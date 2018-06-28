@@ -5,13 +5,14 @@ Broad users can add necessary command line tools to their path by executing:
 source /seq/regev_genome_portal/conda_env/kco_env/kco.sh
  ```
  
+If you get the error "BASH_VERSION: Undefined variable.", you need to switch to using the bash shell by typing *bash* and then entering the previous command again.
 #### Demultiplex ####
 Demultiplex each flowcell using [cellranger mkfastq](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/mkfastq)
 
 
 #### Create Sample Sheet ####
-Generate a sample sheet. A sample sheet is a tab separated file with one sample name and fastq directory per line. 
-Please note that if same library was sequenced on multiple flowcells, you will have one line for each sample/flowcell.
+A sample sheet is a tab separated file with one sample name and fastq directory per line. 
+Please note that if the same library was sequenced on multiple flowcells, you will have one line for each sample and flowcell combination.
 
 kco sample_sheet /broad/hptmp/mydir1 /broad/hptmp/mydir2  --out sample_sheet.txt
 
