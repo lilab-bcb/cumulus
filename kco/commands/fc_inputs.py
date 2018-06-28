@@ -10,7 +10,7 @@ from firecloud import api as fapi
 import kco
 
 
-def fc_inputs(method, out, config):
+def do_fc_inputs(method, out, config):
     method_namespace, method_name, method_version = kco.fs_split(method)
     if method_namespace is None:
         raise ValueError('Method should be specified as namespace/name (e.g. regev/drop-seq)')
@@ -77,4 +77,4 @@ def main(argsv):
                         help='Repository config to use for generating input.json stub (e.g. regev/drop-seq-MMUL_8_0_1')
     parser.add_argument('-o', '--out', dest='out', action='store', required=True, help='JSON output file')
     args = parser.parse_args(argsv)
-    fc_inputs(args.method, args.out, args.config)
+    do_fc_inputs(args.method, args.out, args.config)

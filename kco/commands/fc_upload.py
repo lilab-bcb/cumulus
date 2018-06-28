@@ -21,7 +21,7 @@ def get_unique_url(unique_urls, base_url, name):
 search_inside_file_whitelist = set(['txt', 'xlsx', 'tsv', 'csv'])
 
 
-def fc_upload(inputs, workspace, dry_run):
+def do_fc_upload(inputs, workspace, dry_run):
     workspace_namespace, workspace_name, workspace_version = kco.fs_split(workspace)
     bucket = kco.get_or_create_workspace(workspace_namespace, workspace_name)['bucketName']
     unique_urls = set()
@@ -85,4 +85,4 @@ def main(argsv):
             inputs.update(kco.get_wdl_inputs(path))
         else:
             inputs.update({str(uuid.uuid1()): path})
-    fc_upload(inputs, args.workspace, args.dry_run)
+    do_fc_upload(inputs, args.workspace, args.dry_run)

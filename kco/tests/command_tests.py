@@ -34,7 +34,7 @@ class CommandTests(unittest.TestCase):
 
     def test_upload_sample_sheet(self):
         kco.sample_sheet.main(['-d', 'inputs', '-o', 'test_sample_sheet.txt'])
-        kco.upload.main(['--dry-run', '-w', 'regev-development/test', 'test_sample_sheet.txt'])
+        kco.fc_upload.main(['--dry-run', '-w', 'regev-development/test', 'test_sample_sheet.txt'])
         os.remove('test_sample_sheet.txt')
 
     def test_run(self):

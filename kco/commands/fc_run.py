@@ -7,7 +7,7 @@ from firecloud import api as fapi
 import kco
 
 
-def fc_run(method: str, workspace: str, wdl_inputs: Union[str, dict], upload: bool) -> str:
+def do_fc_run(method: str, workspace: str, wdl_inputs: Union[str, dict], upload: bool) -> str:
     """Run a FireCloud method.
 
     Args:
@@ -35,7 +35,7 @@ def fc_run(method: str, workspace: str, wdl_inputs: Union[str, dict], upload: bo
     launch_entity = None
     workspace_namespace, workspace_name, workspace_version = kco.fs_split(workspace)
     if upload:
-        kco.fc_upload(inputs, workspace, False)
+        kco.do_fc_upload(inputs, workspace, False)
     config_namespace = workspace_namespace
     config_name = method_name + '_' + str(uuid.uuid1())
     method_body = {
@@ -89,5 +89,5 @@ def main(argsv):
     # parser.add_argument('-c', '--config_name', dest='config_name', action='store', required=False,
     #                     help='Method configuration name')
     args = parser.parse_args(argsv)
-    url = fc_run(args.method, args.workspace, args.wdl_inputs, not args.no_upload)
+    url = do_fc_run(args.method, args.workspace, args.wdl_inputs, not args.no_upload)
     print(url)

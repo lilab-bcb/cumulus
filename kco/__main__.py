@@ -6,7 +6,7 @@ import argparse
 
 
 def main():
-    command_list = [fc_inputs, fc_run, sample_sheet, upload]
+    command_list = [fc_inputs, fc_run, sample_sheet, fc_upload]
     parser = argparse.ArgumentParser(description='Run a kco command')
     command_list_strings = list(map(lambda x: x.__name__[len('kco.commands.'):], command_list))
     parser.add_argument('command', help='The kco command', choices=command_list_strings)
