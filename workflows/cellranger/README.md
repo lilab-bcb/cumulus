@@ -17,9 +17,9 @@ kco sample_sheet /broad/hptmp/mydir1 /broad/hptmp/mydir2  --out sample_sheet.txt
 
 The following example sample sheet indicates that sample s1 was sequenced on two flowcells, while s2 was sequenced on one flowcell:
 <table>
-<tr><td>s1</td>/broad/hptmp/mydir1/s1</tr>
-<tr><td>s2</td>/broad/hptmp/mydir1/s2</tr>
-<tr><td>s1</td>/broad/hptmp/mydir2/s1</tr>
+<tr><td>s1</td><td>/broad/hptmp/mydir1/s1</td></tr>
+<tr><td>s2</td><td>/broad/hptmp/mydir1/s2</td></tr>
+<tr><td>s1</td><td>/broad/hptmp/mydir2/s1</td></tr>
 </table>
 
 #### Create FireCloud Workspace ####
