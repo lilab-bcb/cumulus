@@ -17,8 +17,8 @@ workflow dropseq {
     String five_adaptor = "AAGCAGTGGTATCAACGCAGAGTGAATGGG"
     String primer = "AAGCAGTGGTATCAACGCAGAGTAC"
     String? java_memory
-
-    Int threads = 2
+    Int collapse_barcodes_threads = 2
+    Int star_threads = 6
     Int base_qc = 10
     Int min_core_reads = 3000
     Int core_barcodes = 1000
@@ -150,7 +150,7 @@ workflow dropseq {
            call star_align {
                input:
                     star_genome_refs_zipped=star_genome_refs_zipped,
-                    num_threads=threads,
+                    star_threads=star_threads,
                     align_fastq=SamToFastq.Polya_Trim_Unaligned_Fq,
                     limitBAMsortRAM=limitBAMsortRAM,
                     star_memory=star_memory,
@@ -214,7 +214,7 @@ workflow dropseq {
                  edit_distance=edit_distance,
                  collapse_read_quality=collapse_read_quality,
                  max_records=max_records,
-                 threads=threads,
+                 collapse_barcodes_threads=collapse_barcodes_threads,
                  min_core_read=min_core_reads,
                  min_noncore_read=min_noncore_reads,
                  base_qc=base_qc,
@@ -796,7 +796,7 @@ task SamToFastq {
 
 task star_align {
 
- Int num_threads
+ Int star_threads
  File align_fastq
  String limitBAMsortRAM
  String base_name
@@ -812,7 +812,7 @@ task star_align {
  tar xvzf ${star_genome_refs_zipped}
 
   STAR --genomeDir STAR2_5 \
-  --runThreadN ${num_threads} \
+  --runThreadN ${star_threads} \
   --readFilesIn ${align_fastq} \
   --readFilesCommand "gunzip -c" \
   --outSAMtype BAM SortedByCoordinate \
@@ -834,7 +834,8 @@ task star_align {
     docker: "regevlab/dropseq_v5"
     disks: "local-disk " + sub(((size(align_fastq,"GB")+30)*20),"\\..*","") + " SSD"
     memory: "${star_memory}"
-    preemptible: 1
+    preemptible: 2
+    cpu: "${star_threads}"
  }
 
 }
@@ -948,7 +949,7 @@ task CollapseBarCodes {
  Int edit_distance
  Int collapse_read_quality
  Int max_records
- Int threads
+ Int collapse_barcodes_threads
  Int min_core_read
  Int min_noncore_read
  String sample_name
@@ -968,7 +969,7 @@ task CollapseBarCodes {
   FILTER_PCR_DUPLICATES=false \
   FIND_INDELS=true \
   MAX_RECORDS_IN_RAM=${max_records} \
-  NUM_THREADS=${threads} \
+  NUM_THREADS=${collapse_barcodes_threads} \
   MIN_NUM_READS_CORE=${min_core_read} \
   MIN_NUM_READS_NONCORE=${min_noncore_read}
  }
@@ -980,7 +981,7 @@ task CollapseBarCodes {
     docker: "regevlab/dropseq_v5"
     disks: "local-disk " + sub(((size(tag_read,"GB")+1)*2),"\\..*","") + " SSD"
     memory: "4GB"
-    cpu: threads
+    cpu: "${collapse_barcodes_threads}"
     preemptible: 2
  }
 }
