@@ -2,6 +2,20 @@
 
 [KCO](https://www.broadinstitute.org/klarman-cell-observatory) tools, workflows, and spells
 
+#### Login to Google ####
+Commands that interact with FireCloud require that you've logged in to Google.
+
+If you've done this before you can skip this step - you only need to do this once.
+
+Execute the following command to login to Google.
+ ```
+gcloud auth login
+ ```
+
+Copy and paste the link in your unix terminal into your web browser.
+Copy and paste the authorization code in your unix terminal.
+
+
 #### kco sample-sheet ####
 *kco sample-sheet* creates a sample sheet.
 
@@ -116,4 +130,5 @@ Example: Generate a stub JSON file based on the published config for running Dro
 ```
 kco fc-inputs -m regev/drop-seq -c regev/drop-seq-MMUL_8_0_1
 ```
+
 
