@@ -5,7 +5,7 @@ Broad users can add necessary command line tools to their path by executing:
 source /seq/regev_genome_portal/conda_env/kco_env/kco.sh
  ```
  
-If you get the error "BASH_VERSION: Undefined variable.", you need to switch to using the bash shell by typing *bash* and then entering the previous command again.
+If you get the error "BASH_VERSION: Undefined variable.", you need to switch to using the bash shell by typing *bash* and then entering the previous command again. You can change your default shell my emailing help.
 #### Demultiplex ####
 Demultiplex each flowcell using [cellranger mkfastq](https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/mkfastq)
 
