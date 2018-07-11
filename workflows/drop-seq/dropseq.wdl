@@ -605,7 +605,7 @@ task FastqToSam {
 
  runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub((((size(fastq1,"GB")+size(fastq2,"GB"))+1)*20),"\\..*","") + " SSD"
+    disks: "local-disk " + sub((((size(fastq1,"GB")+size(fastq2,"GB"))+1)*20),"\\..*","") + " HDD"
     memory: "50 GB"
     preemptible: 2
  }
@@ -649,7 +649,7 @@ task TagBamWithReadSequenceExtended {
 
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(input_sam,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(input_sam,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
  }
@@ -683,7 +683,7 @@ task FilterXQBam {
 
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(xc_tagged_sam,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(xc_tagged_sam,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
  }
@@ -722,7 +722,7 @@ task TrimStartingSequence {
 
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(tagged_filtered_sam,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(tagged_filtered_sam,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
  }
@@ -757,7 +757,7 @@ task PolyATrimmer {
 
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(trimmed_sam,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(trimmed_sam,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
  }
@@ -788,7 +788,7 @@ task SamToFastq {
 
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(polya_trim_unaligned_bam,"GB")+1)*4),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(polya_trim_unaligned_bam,"GB")+1)*4),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
  }
@@ -832,7 +832,7 @@ task star_align {
 
    runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(align_fastq,"GB")+30)*20),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(align_fastq,"GB")+30)*20),"\\..*","") + " HDD"
     memory: "${star_memory}"
     preemptible: 2
     cpu: "${star_threads}"
@@ -872,7 +872,7 @@ task MergeBamAlignment {
 
  runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(polya_trim_unaligned_bam,"GB")+30)*20),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(polya_trim_unaligned_bam,"GB")+30)*20),"\\..*","") + " HDD"
     memory: "100GB"
     preemptible: 2
  }
@@ -903,7 +903,7 @@ task TagReadWithInterval {
  }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(in_bam,"GB")+30)*20),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(in_bam,"GB")+30)*20),"\\..*","") + " HDD"
     memory: "100GB"
     preemptible: 2
  }
@@ -935,7 +935,7 @@ task TagReadWithGeneExon {
  }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(tag_interval_exon,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(tag_interval_exon,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
  }
@@ -979,7 +979,7 @@ task CollapseBarCodes {
  }
    runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(tag_read,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(tag_read,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     cpu: "${collapse_barcodes_threads}"
     preemptible: 2
@@ -1018,7 +1018,7 @@ task DetectBeadSynthesisErrors {
  }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(collapsed_barcodes,"GB")+5)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(collapsed_barcodes,"GB")+5)*2),"\\..*","") + " HDD"
     memory: "100GB"
     preemptible: 2
  }
@@ -1038,7 +1038,7 @@ task SamIndex {
  }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(corrected_barcodes,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(corrected_barcodes,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
  }
@@ -1067,7 +1067,7 @@ task BAMTagHistogram {
  }
    runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(corrected_barcodes,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(corrected_barcodes,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
  }
@@ -1089,7 +1089,7 @@ task decompress_hist {
  }
    runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(bam_tag_histogram,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(bam_tag_histogram,"GB")+1)*2),"\\..*","") + " HDD"
     preemptible: 2
  }
 }
@@ -1117,7 +1117,7 @@ task DropSeqCumuPlot {
  }
  runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(bam_tag_histogram_unzip,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(bam_tag_histogram_unzip,"GB")+1)*2),"\\..*","") + " HDD"
     preemptible: 2
  }
 }
@@ -1143,7 +1143,7 @@ task CollectCellBarcodes {
  }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(bam_tag_histogram_unzip,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(bam_tag_histogram_unzip,"GB")+1)*2),"\\..*","") + " HDD"
     preemptible: 2
  }
 }
@@ -1174,7 +1174,7 @@ task FilterMixedBams {
  }
  runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(corrected_barcodes,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(corrected_barcodes,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
  }
@@ -1209,7 +1209,7 @@ task PureDigitalExpressionUMI {
   }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(filter_input,"GB")+size(barcodes,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(filter_input,"GB")+size(barcodes,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
  }
@@ -1250,7 +1250,7 @@ task MixedDigitalExpressionUMI {
 
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(filter_inputs[0].left,"GB")+size(barcodes,"GB")+1)*3),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(filter_inputs[0].left,"GB")+size(barcodes,"GB")+1)*3),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
  }
@@ -1286,7 +1286,7 @@ task PureDigitalExpressionReads {
   }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(filter_input,"GB")+size(barcodes,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(filter_input,"GB")+size(barcodes,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
  }
@@ -1327,7 +1327,7 @@ task MixedDigitalExpressionReads {
   }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(filter_inputs[0].left,"GB")+size(barcodes,"GB")+1)*3),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(filter_inputs[0].left,"GB")+size(barcodes,"GB")+1)*3),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
   }
@@ -1358,7 +1358,7 @@ task MixedDigitalExpressionReads {
          }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(input_bam,"GB")+2)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(input_bam,"GB")+2)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
   }
@@ -1394,7 +1394,7 @@ task MixedDigitalExpressionReads {
   }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(input_bam,"GB")+2)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(input_bam,"GB")+2)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
   }
@@ -1421,7 +1421,7 @@ task GatherReadQualityMetrics {
   }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
   }
@@ -1449,7 +1449,7 @@ task GatherReadQualityMetricsByCell {
         }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
   }
@@ -1478,7 +1478,7 @@ task GatherReadQualityMetricsByCell {
          }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
   }
@@ -1509,7 +1509,7 @@ task GatherReadQualityMetricsByCell {
          }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
   }
@@ -1538,7 +1538,7 @@ task GatherReadQualityMetricsByCell {
          }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
   }
@@ -1569,7 +1569,7 @@ task GatherReadQualityMetricsByCell {
          }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
   }
@@ -1597,7 +1597,7 @@ task GatherReadQualityMetricsByCell {
           }
     runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
   }
@@ -1624,7 +1624,7 @@ task GatherReadQualityMetricsByCell {
            }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(input_bam,"GB")+size(reads_per_cell_barcode_col,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(input_bam,"GB")+size(reads_per_cell_barcode_col,"GB")+1)*2),"\\..*","") + " HDD"
     preemptible: 2
   }
 }
@@ -1643,7 +1643,7 @@ task GatherReadQualityMetricsByCell {
   }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(bead_error,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(bead_error,"GB")+1)*2),"\\..*","") + " HDD"
     preemptible: 2
   }
  }
@@ -1673,7 +1673,7 @@ task GatherReadQualityMetricsByCell {
   }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
   }
@@ -1715,7 +1715,7 @@ task GatherReadQualityMetricsByCell {
   }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
   }
@@ -1763,7 +1763,7 @@ task GatherReadQualityMetricsByCell {
   }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(input_bams[0].left,"GB")+1)*4),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(input_bams[0].left,"GB")+1)*4),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
   }
@@ -1803,7 +1803,7 @@ task MolecularBarcodeDistributionsByGeneSingle {
          }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(input_bam,"GB")+1)*2),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
   }
@@ -1849,7 +1849,7 @@ task MolecularBarcodeDistributionsByGeneMultiple {
          }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(input_bams[0].left,"GB")+1)*4),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(input_bams[0].left,"GB")+1)*4),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
   }
@@ -1878,7 +1878,7 @@ task categorizeCellsUsingKnee {
             }
   runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(selected_barcodes,"GB")+1)*2),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(selected_barcodes,"GB")+1)*2),"\\..*","") + " HDD"
     preemptible: 2
   }
 }
@@ -1913,7 +1913,7 @@ task NumReadsPerCellBarcodeOrganism {
             }
       runtime {
     docker: "regevlab/dropseq_v5"
-    disks: "local-disk " + sub(((size(species_bams[0].left,"GB")+1)*4),"\\..*","") + " SSD"
+    disks: "local-disk " + sub(((size(species_bams[0].left,"GB")+1)*4),"\\..*","") + " HDD"
     memory: "4GB"
     preemptible: 2
   }
