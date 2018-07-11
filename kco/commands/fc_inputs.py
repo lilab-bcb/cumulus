@@ -46,7 +46,7 @@ def do_fc_inputs(method, out, config):
                     repo_config = fapi.get_repository_config(repo_config['namespace'], repo_config['name'],
                                                              repo_config['snapshotId']).json()
 
-        jar = pkg_resources.resource_filename('kco', 'womtool-32.jar')
+        jar = pkg_resources.resource_filename('kco', 'womtool-33.1.jar')
         tmp_json_file = tempfile.mkstemp(suffix='.json')[1]
         with open(tmp_json_file, 'w') as tmp_json_out:
             subprocess.check_call(['java', '-jar', jar, 'inputs', tmp_wdl_file], stdout=tmp_json_out)
