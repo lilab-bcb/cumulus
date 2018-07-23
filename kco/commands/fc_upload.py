@@ -56,13 +56,14 @@ def do_fc_upload(inputs, workspace, dry_run, bucket_folder):
                         if isinstance(values[i], str) and os.path.exists(values[i]):
                             sub_gs_url = input_file_to_output_gsurl.get(values[i], None)
                             if sub_gs_url is None:
-                                sub_gs_url = get_unique_url(unique_urls, 'gs://' + bucket + '/', os.path.basename(os.path.abspath(values[i])))
-                                unique_urls.add(sub_gs_url)                                                        
+                                sub_gs_url = get_unique_url(unique_urls, 'gs://' + bucket + '/',
+                                                            os.path.basename(os.path.abspath(values[i])))
+                                unique_urls.add(sub_gs_url)
                                 input_file_to_output_gsurl[values[i]] = sub_gs_url
                                 print('Uploading ' + str(values[i]) + ' to ' + sub_gs_url)
                                 if not dry_run:
                                     subprocess.check_call(
-                                        ['gsutil', '-m', 'cp', '-r', str(values[i]), sub_gs_url])
+                                        ['gsutil', '-q', '-m', 'cp', '-r', str(values[i]), sub_gs_url])
                             values[i] = sub_gs_url
                             changed_file_contents = True
                     df[c] = values
@@ -74,7 +75,7 @@ def do_fc_upload(inputs, workspace, dry_run, bucket_folder):
                 df.to_csv(input_path, sep=out_sep, index=False, header=False)
             print('Uploading ' + input_path + ' to ' + input_gs_url)
             if not dry_run:
-                subprocess.check_call(['gsutil', '-m', 'cp', input_path, input_gs_url])
+                subprocess.check_call(['gsutil', '-q', '-m', 'cp', input_path, input_gs_url])
             inputs[k] = input_gs_url
             if changed_file_contents:
                 os.remove(input_path)
@@ -84,7 +85,8 @@ def main(argsv):
     parser = argparse.ArgumentParser(description='Upload files/directories to a Google bucket.')
     parser.add_argument('-w', '--workspace', dest='workspace', action='store', required=True,
                         help='Workspace name (e.g. foo/bar). The workspace is created if it does not exist')
-    parser.add_argument('--bucket-folder', metavar = '<folder>', dest='bucket_folder', action='store', help='Store inputs to <folder> under workspace''s google bucket')
+    parser.add_argument('--bucket-folder', metavar='<folder>', dest='bucket_folder', action='store',
+                        help='Store inputs to <folder> under workspace''s google bucket')
     parser.add_argument('--dry-run', dest='dry_run', action='store_true',
                         help='Causes upload to run in "dry run" mode, i.e., just outputting what would be uploaded without actually doing any uploading.')
     parser.add_argument(dest='input', help='Input JSON or file, such as a sample sheet.', nargs='+')
