@@ -17,6 +17,14 @@ def get_unique_url(unique_urls, base_url, name):
         counter = counter + 1
     return gs_url
 
+def upload_to_google_bucket(source, dest, dry_run = False):
+    print('Uploading ' + source + ' to ' + dest)
+    if not dry_run:
+        if os.path.isdir(source):
+            subprocess.check_call(['gsutil', '-m', 'rsync', '-r', source, dest])
+        else:
+            subprocess.check_call(['gsutil', '-m', 'cp', '-r', source, dest])
+
 
 search_inside_file_whitelist = set(['txt', 'xlsx', 'tsv', 'csv'])
 
@@ -54,16 +62,13 @@ def do_fc_upload(inputs, workspace, dry_run, bucket_folder):
                     values = df[c].values
                     for i in range(len(values)):
                         if isinstance(values[i], str) and os.path.exists(values[i]):
+                            values[i] = os.path.abspath(values[i])
                             sub_gs_url = input_file_to_output_gsurl.get(values[i], None)
                             if sub_gs_url is None:
-                                sub_gs_url = get_unique_url(unique_urls, 'gs://' + bucket + '/',
-                                                            os.path.basename(os.path.abspath(values[i])))
-                                unique_urls.add(sub_gs_url)
+                                sub_gs_url = get_unique_url(unique_urls, 'gs://' + bucket + '/', os.path.basename(os.path.abspath(values[i])))
+                                unique_urls.add(sub_gs_url)                                                        
                                 input_file_to_output_gsurl[values[i]] = sub_gs_url
-                                print('Uploading ' + str(values[i]) + ' to ' + sub_gs_url)
-                                if not dry_run:
-                                    subprocess.check_call(
-                                        ['gsutil', '-q', '-m', 'cp', '-r', str(values[i]), sub_gs_url])
+                                upload_to_google_bucket(values[i], sub_gs_url, dry_run)
                             values[i] = sub_gs_url
                             changed_file_contents = True
                     df[c] = values
@@ -73,9 +78,7 @@ def do_fc_upload(inputs, workspace, dry_run, bucket_folder):
                 print('Rewriting file paths in ' + original_path + ' to ' + input_path)
                 out_sep = ',' if input_path_extension == 'csv' else '\t'
                 df.to_csv(input_path, sep=out_sep, index=False, header=False)
-            print('Uploading ' + input_path + ' to ' + input_gs_url)
-            if not dry_run:
-                subprocess.check_call(['gsutil', '-q', '-m', 'cp', input_path, input_gs_url])
+            upload_to_google_bucket(input_path, input_gs_url, dry_run)
             inputs[k] = input_gs_url
             if changed_file_contents:
                 os.remove(input_path)
@@ -85,8 +88,7 @@ def main(argsv):
     parser = argparse.ArgumentParser(description='Upload files/directories to a Google bucket.')
     parser.add_argument('-w', '--workspace', dest='workspace', action='store', required=True,
                         help='Workspace name (e.g. foo/bar). The workspace is created if it does not exist')
-    parser.add_argument('--bucket-folder', metavar='<folder>', dest='bucket_folder', action='store',
-                        help='Store inputs to <folder> under workspace''s google bucket')
+    parser.add_argument('--bucket-folder', metavar = '<folder>', dest='bucket_folder', action='store', help='Store inputs to <folder> under workspace''s google bucket')
     parser.add_argument('--dry-run', dest='dry_run', action='store_true',
                         help='Causes upload to run in "dry run" mode, i.e., just outputting what would be uploaded without actually doing any uploading.')
     parser.add_argument(dest='input', help='Input JSON or file, such as a sample sheet.', nargs='+')
