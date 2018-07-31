@@ -26,7 +26,7 @@ RUN pip install --upgrade pip && \
 	cd /software/hnswlib/python_bindings && python setup.py install && cd ../../..
 
 COPY scrtools-0.3.0.tar.gz /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/workflows/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/monitor_script.sh /software
 
 RUN tar -xzf /software/scrtools-0.3.0.tar.gz -C /software && \
 	cd /software/scrtools-0.3.0 && pip install . && cd ../..
