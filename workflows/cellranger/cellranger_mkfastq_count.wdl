@@ -1,5 +1,5 @@
 import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/1/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/12/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/15/plain-WDL/descriptor" as crc
 
 workflow cellranger_mkfastq_count {
 	# 5 or 6 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry]). gs URL

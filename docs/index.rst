@@ -14,5 +14,3 @@
    cellranger
    scrtools
    command_line
-
-
