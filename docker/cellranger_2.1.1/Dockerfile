@@ -14,7 +14,7 @@ pip install xlsxwriter
 
 RUN mkdir /software
 COPY bcl2fastq2_0v2.20.0.422-2_amd64.deb /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/workflows/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/monitor_script.sh /software
 ADD cellranger-2.1.1.tar /software
 
 RUN dpkg -i /software/bcl2fastq2_0v2.20.0.422-2_amd64.deb

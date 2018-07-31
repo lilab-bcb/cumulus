@@ -6,19 +6,16 @@ workflow cellranger_count {
 	# CellRanger output directory, gs url
 	String output_directory
 
-	# gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38-1.2.0.tar.gz
-	# gs://regev-lab/resources/cellranger/refdata-cellranger-mm10-1.2.0.tar.gz
-	# gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38_and_mm10-1.2.0.tar.gz
-	# GRCh38, mm10, GRCh38_and_mm10, or a URL to a tar.gz file
+	# GRCh38, mm10, GRCh38_and_mm10, GRCh38_premrna, mm10_premrna or a URL to a tar.gz file
 	String genome
-	
-	File genome_file = (if genome == 'GRCh38' 
-								then 'gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38-1.2.0.tar.gz'
-								else (if genome == 'mm10' 
-										then 'gs://regev-lab/resources/cellranger/refdata-cellranger-mm10-1.2.0.tar.gz' 
-										else (if genome == 'GRCh38_and_mm10'
-												then 'gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38_and_mm10-1.2.0.tar.gz'
-												else genome)))
+
+
+	File acronym_file
+	Map[String, String] acronym2gsurl = read_map(acronym_file)
+	# If reference is a url
+	Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
+
+	File genome_file = (if is_url then genome else acronym2gsurl[genome])
 
 	# chemistry of the channel
 	String? chemistry = "auto"
