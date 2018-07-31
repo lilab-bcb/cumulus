@@ -34,7 +34,13 @@ Follow the steps below to run CellRanger mkfastq/count on FireCloud.
 		* - **Sample**
 		  - Contains sample names. Each 10x channel should have a unique sample name.
 		* - **Reference**
-		  - Provides the reference genome used by *cellran ger count* for each 10x channel. The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as **GRCh38** for human, **mm10** for mouse, and **GRCh38\_and\_mm10** for human and mouse.
+		  - | Provides the reference genome used by *cellran ger count* for each 10x channel. 
+		    | The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as
+		    | **GRCh38** for human, 
+		    | **mm10** for mouse, 
+		    | **GRCh38_and_mm10** for human and mouse,
+		    | **GRCh38_premrna** for human, introns included, and
+		    | **mm10_premrna** for mouse, introns included.
 		* - **Flowcell**
 		  - Indicates the Google bucket URL of uploaded BCL folders.
 		* - **Lane**
