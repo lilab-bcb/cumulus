@@ -40,7 +40,7 @@ workflow scrtools_subcluster {
 	# Calculate diffusion-based pseudotimes based on <roots>. <roots> should be a comma-separated list of cell barcodes.
 	String? calculate_pseudotime
 	# Run louvain clustering algorithm.
-	Boolean? run_louvain
+	Boolean? run_louvain = true
 	# Resolution parameter for the louvain clustering algorithm. [default: 1.3]
 	Float? louvain_resolution
 	# Run KMeans clustering algorithm on diffusion components.
@@ -62,7 +62,7 @@ workflow scrtools_subcluster {
 	# Resolution parameter for louvain. [default: 1.3]
 	Float? approx_louvain_resolution
 	# Run multi-core tSNE for visualization.
-	Boolean? run_tsne
+	Boolean? run_tsne = true
 	# tSNE’s perplexity parameter. [default: 30]
 	Float? tsne_perplexity
 	# Run FItSNE for visualization.
@@ -94,7 +94,7 @@ workflow scrtools_subcluster {
 	# Control false discovery rate at <alpha>. [default: 0.05]
 	Float? alpha
 	# Calculate Fisher’s exact test.
-	Boolean? fisher
+	Boolean? fisher = true
 	# Calculate Mann-Whitney U test.
 	Boolean? mwu
 	# Calculate area under cuver in ROC curve.
@@ -102,7 +102,7 @@ workflow scrtools_subcluster {
 
 	# If also annotate cell types for clusters based on DE results.
 	Boolean? annotate_cluster
-	# Organism, could either be "human" or "mouse" [default: human]
+	# Organism, could either be "human_immune" or "mouse_immune" or "mouse_brain" [default: human_immune]
 	String? organism
 	# Minimum cell type score to report a potential cell type. [default: 0.5]
 	Float? minimum_report_score
