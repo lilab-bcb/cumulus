@@ -64,10 +64,10 @@ global inputs
 	  - This is the prefix for all output files. It should contain the google bucket url, subdirectory name and output name prefix
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir/my_results"
 	  - 
-	* - genome
+	* - **genome**
 	  - Reference genome name
-	  - "mm10"
 	  - "GRCh38"
+	  - 
 	* - num_cpu
 	  - Number of cpus per scrtools job
 	  - 32
@@ -214,7 +214,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	* - run_louvain
 	  - Run louvain clustering algorithm
 	  - true
-	  - false
+	  - true
 	* - louvain_resolution
 	  - Resolution parameter for the louvain clustering algorithm
 	  - 1.3
@@ -238,7 +238,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	* - run_tsne
 	  - Run multi-core tSNE for visualization
 	  - true
-	  - false
+	  - true
 	* - tsne_perplexity
 	  - tSNE’s perplexity parameter
 	  - 30
@@ -319,7 +319,7 @@ de_analysis inputs
 	* - fisher
 	  - Calculate Fisher’s exact test
 	  - true
-	  - false
+	  - true
 	* - mwu
 	  - Calculate Mann-Whitney U test
 	  - true
@@ -333,7 +333,7 @@ de_analysis inputs
 	  - true
 	  - false
 	* - organism
-	  - Organism, could either be "human" or "mouse"
+	  - Organism, could either be "human_immune", "mouse_immune", or "mouse_brain"
 	  - "mouse"
 	  - "human"
 	* - minimum_report_score
