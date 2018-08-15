@@ -6,6 +6,7 @@ Follow the steps below to run **scrtools** on FireCloud.
 #. Create a sample sheet, **count_matrix.csv**, which describes the metadata for each 10x channel. The sample sheet should at least contain 3 columns --- *Sample*, *Reference*, and *Location*. *Sample* refers to sample names, *Reference* refers to the genome name, and *Location* refers to the location of the channel-specific count matrix in 10x format (e.g. ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_gene_bc_matrices_h5.h5``). You are free to add any other columns and these columns will be used in selecting channels for futher analysis. In the example below, we have *Source*, which refers to the tissue of origin, *Platform*, which refers to the sequencing platform, and *Donor*, which refers to the donor ID.
 
 	Example::
+
 		Sample,Source,Platform,Donor,Reference,Location
 		sample_1,bone_marrow,NextSeq,1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_gene_bc_matrices_h5.h5
 		sample_2,bone_marrow,NextSeq,2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_2/filtered_gene_bc_matrices_h5.h5
@@ -146,6 +147,10 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - If output cell and gene filtration results to a spreadsheet
 	  - true
 	  - true
+	* - output_seurat_compatible
+	  - If output Seurat-compatible h5ad file
+	  - true
+	  - false
 	* - output_loom
 	  - If output loom-formatted file
 	  - false
@@ -284,6 +289,9 @@ cluster outputs
 	* - output_filt_xlsx
 	  - File
 	  - Spreadsheet containing filtration results (output_name.filt.xlsx)
+	* - output_seurat_h5ad
+	  - File
+	  - Seurat readable h5ad file (output_name.seurat.h5ad)
 	* - output_loom_file
 	  - File
 	  - Outputted loom file (output_name.loom)
@@ -498,6 +506,9 @@ scrtools_subcluster's outputs
 	* - **output_h5ad**
 	  - File
 	  - h5ad-formatted HDF5 file containing all results (output_name.h5ad)
+	* - output_seurat_h5ad
+	  - File
+	  - Seurat readable h5ad file (output_name.seurat.h5ad)
 	* - output_loom_file
 	  - File
 	  - Outputted loom file (output_name.loom)
@@ -513,3 +524,19 @@ scrtools_subcluster's outputs
 	* - output_htmls
 	  - Array[File]
 	  - Outputted html files
+
+---------------------------------
+
+
+Load ``scrtools`` results into ``Seurat``  
+-----------------------------------------
+
+First, you need to set ``output_seurat_compatible`` to ``true`` in ``scrtools`` or ``scrtools_subcluster`` to obtain Seurat-compatible h5ad file ``output_name.seurat.h5ad``.
+
+Then following the codes below to load the results into ``Seurat``::
+
+	library(Seurat)
+	library(reticulate)
+	ad <- import("anndata", convert = FALSE)
+	test_ad <- ad$read_h5ad("output_name.seurat.h5ad")
+	test <- Convert(test_ad, to = "seurat")

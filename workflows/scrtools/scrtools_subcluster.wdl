@@ -1,5 +1,5 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scrtools:tasks/versions/6/plain-WDL/descriptor" as tasks
-# import "../scrtools_tasks.wdl" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scrtools:tasks/versions/7/plain-WDL/descriptor" as tasks
+# import "../scrtools/scrtools_tasks.wdl" as tasks
 
 workflow scrtools_subcluster {
 	File input_h5ad
@@ -25,6 +25,8 @@ workflow scrtools_subcluster {
 
 	# If correct batch effects [default: false]
 	Boolean? correct_batch_effect
+	# If output Seurat compatible h5ad file [default: false]
+	Boolean? output_seurat_compatible
 	# If output loom-formatted file [default: false]
 	Boolean? output_loom
 	# Random number generator seed. [default: 0]
@@ -132,6 +134,7 @@ workflow scrtools_subcluster {
 			output_name = out_name,
 			subset_selections = subset_selections,
 			correct_batch_effect = correct_batch_effect,
+			output_seurat_compatible = output_seurat_compatible,
 			output_loom = output_loom,
 			random_state = random_state,
 			nPC = nPC,
@@ -217,6 +220,7 @@ workflow scrtools_subcluster {
 		input:
 			output_name = output_name,
 			output_h5ad = subcluster.output_h5ad,
+			output_seurat_h5ad = subcluster.output_seurat_h5ad,
 			output_loom_file = subcluster.output_loom_file,
 			output_de_h5ad = de_analysis.output_de_h5ad,
 			output_de_xlsx = de_analysis.output_de_xlsx,

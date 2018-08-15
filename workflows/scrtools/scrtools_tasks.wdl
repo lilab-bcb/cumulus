@@ -54,6 +54,7 @@ task run_scrtools_cluster {
 	Int preemptible
 	String? genome
 	Boolean? output_filtration_results
+	Boolean? output_seurat_compatible
 	Boolean? output_loom
 	Boolean? correct_batch_effect
 	String? batch_group_by
@@ -108,6 +109,8 @@ task run_scrtools_cluster {
 			call_args.extend(['--genome', '${genome}'])
 		if '${output_filtration_results}' is 'true':
 			call_args.extend(['--output-filtration-results', '${output_name}' + '.filt.xlsx'])
+		if '${output_seurat_compatible}' is 'true':
+			call_args.append('--output-seurat-compatible')
 		if '${output_loom}' is 'true':
 			call_args.append('--output-loom')
 		if '${correct_batch_effect}' is 'true':
@@ -198,6 +201,7 @@ task run_scrtools_cluster {
 	output {
 		File output_h5ad = "${output_name}.h5ad"
 		Array[File] output_filt_xlsx = glob("${output_name}.filt.xlsx")
+		Array[File] output_seurat_h5ad = glob("${output_name}.seurat.h5ad")
 		Array[File] output_loom_file = glob("${output_name}.loom")
 		File monitoringLog = "monitoring.log"
 	}
@@ -368,6 +372,7 @@ task run_scrtools_subcluster {
 	Int preemptible
 	String subset_selections 
 	Boolean? correct_batch_effect
+	Boolean? output_seurat_compatible
 	Boolean? output_loom
 	Int? random_state
 	Boolean? run_uncentered_pca
@@ -417,6 +422,8 @@ task run_scrtools_subcluster {
 				call_args.extend(['--subset-selection', sel])
 		if '${correct_batch_effect}' is 'true':
 			call_args.append('--correct-batch-effect')
+		if '${output_seurat_compatible}' is 'true':
+			call_args.append('--output-seurat-compatible')
 		if '${output_loom}' is 'true':
 			call_args.append('--output-loom')
 		if '${random_state}' is not '':
@@ -492,6 +499,7 @@ task run_scrtools_subcluster {
 
 	output {
 		File output_h5ad = "${output_name}.h5ad"
+		Array[File] output_seurat_h5ad = glob("${output_name}.seurat.h5ad")
 		Array[File] output_loom_file = glob("${output_name}.loom")
 		File monitoringLog = "monitoring.log"
 	}
@@ -513,6 +521,7 @@ task organize_results {
 	File? output_10x_h5
 	File? output_h5ad
 	Array[File]? output_filt_xlsx
+	Array[File]? output_seurat_h5ad
 	Array[File]? output_loom_file
 	File? output_de_h5ad
 	File? output_de_xlsx
@@ -529,7 +538,7 @@ task organize_results {
 		import os
 		from subprocess import check_call
 		dest = os.path.dirname('${output_name}') + '/'
-		files = ['${output_10x_h5}', '${sep=" " output_filt_xlsx}', '${sep=" " output_loom_file}', '${output_de_xlsx}', '${sep=" " output_anno_file}']
+		files = ['${output_10x_h5}', '${sep=" " output_filt_xlsx}', '${sep=" " output_seurat_h5ad}', '${sep=" " output_loom_file}', '${output_de_xlsx}', '${sep=" " output_anno_file}']
 		files.append('${output_h5ad}' if '${output_de_h5ad}' is '' else '${output_de_h5ad}')
 		files.extend('${sep="," output_pngs}'.split(','))
 		files.extend('${sep="," output_htmls}'.split(','))

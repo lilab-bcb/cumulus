@@ -1,5 +1,5 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scrtools:tasks/versions/6/plain-WDL/descriptor" as tasks
-# import "../scrtools_tasks.wdl" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scrtools:tasks/versions/7/plain-WDL/descriptor" as tasks
+# import "../scrtools/scrtools_tasks.wdl" as tasks
 
 workflow scrtools {
 	File input_count_matrix_csv
@@ -35,6 +35,8 @@ workflow scrtools {
 
 	# If output cell and gene filtration results [default: true]
 	Boolean? output_filtration_results = true
+	# If output Seurat compatible h5ad file [default: false]
+	Boolean? output_seurat_compatible
 	# If output loom-formatted file [default: false]
 	Boolean? output_loom
 	# If correct batch effects [default: false]
@@ -169,6 +171,7 @@ workflow scrtools {
 			output_name = out_name,
 			genome = genome,
 			output_filtration_results = output_filtration_results,
+			output_seurat_compatible = output_seurat_compatible,
 			output_loom = output_loom,
 			correct_batch_effect = correct_batch_effect,
 			batch_group_by = batch_group_by,
@@ -263,6 +266,7 @@ workflow scrtools {
 			output_10x_h5 = aggregate_matrices.output_10x_h5,
 			output_h5ad = cluster.output_h5ad,
 			output_filt_xlsx = cluster.output_filt_xlsx,
+			output_seurat_h5ad = cluster.output_seurat_h5ad,
 			output_loom_file = cluster.output_loom_file,
 			output_de_h5ad = de_analysis.output_de_h5ad,
 			output_de_xlsx = de_analysis.output_de_xlsx,
