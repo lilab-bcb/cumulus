@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scrtools:tasks/versions/7/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:tasks/versions/1/plain-WDL/descriptor" as tasks
 # import "../scrtools/scrtools_tasks.wdl" as tasks
 
 workflow scrtools_subcluster {
