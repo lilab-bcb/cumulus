@@ -180,7 +180,7 @@ task generate_count_config {
 				chemistry = 'auto'
 				if 'Chemistry' in df_local.columns:
 					assert df_local['Chemistry'].unique().size == 1
-					chemistry = df_local['Chemistry'][0]
+					chemistry = df_local['Chemistry'].iat[0]
 				fo4.write(sample_id + '\t' + chemistry + '\n')
 		CODE
 	}
