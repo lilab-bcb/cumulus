@@ -6,9 +6,9 @@ You can run FireCloud pipelines via command line by installing the **kco** tools
 Install ``kco`` tools
 ^^^^^^^^^^^^^^^^^^^^^
 
-First, you need to request a RedHat7 server::
+First, you need to request a UGER server::
 
-	qrsh -q interactive -l h_vmem=4g -l os=RedHat7 -pe smp 8 -binding linear:8 -P regevlab
+	qrsh -q interactive -l h_vmem=4g -pe smp 8 -binding linear:8 -P regevlab
 
 Above command requests an interactive shell with 4G memory per thread and 8 threads. Feel free to change the memory and thread parameters.
 
