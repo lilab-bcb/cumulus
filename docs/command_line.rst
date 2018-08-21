@@ -1,24 +1,34 @@
 Run above FireCloud pipelines via command line
 ----------------------------------------------
 
-You can run FireCloud pipelines via command line by installing the **kco** tools.
+You can run FireCloud pipelines via the command line by installing the **kco** tools.
 
-Install ``kco`` tools
+
+Install ``kco`` tools for Broad users
 ^^^^^^^^^^^^^^^^^^^^^
+Request an UGER server::
 
-First, you need to request a UGER server::
-
+    reuse UGER
 	qrsh -q interactive -l h_vmem=4g -pe smp 8 -binding linear:8 -P regevlab
 
-Above command requests an interactive shell with 4G memory per thread and 8 threads. Feel free to change the memory and thread parameters.
+The above command requests an interactive shell with 4G memory per thread and 8 threads. Feel free to change the memory and thread parameters.
 
-Secondly, make sure you have ``conda`` installed. If you haven't installed ``conda``, use the following commands to install::
+Add conda to your path::
+    reuse .anaconda3-5.0.1
+
+Activate the kco virtual environment::
+    source activate /seq/regev_genome_portal/conda_env/kco_tools
+
+Install ``kco`` tools for non-Broad users
+^^^^^^^^^^^^^^^^^^^^^
+
+Make sure you have ``conda`` installed. If you haven't installed ``conda``, use the following commands to install::
 
 	wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh .
 	bash Miniconda3-latest-Linux-x86_64.sh -p /users/foo/miniconda3
 	mv Miniconda3-latest-Linux-x86_64.sh /users/foo/miniconda3
 
-Thirdly, create an virtual environment ``kco`` and install ``kco`` tools::
+Next, create an virtual environment ``kco`` and install ``kco`` tools::
 
 	conda create -n kco -y pip
 	source activate kco
