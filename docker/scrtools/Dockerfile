@@ -25,11 +25,11 @@ RUN pip install --upgrade pip && \
 	git clone https://github.com/nmslib/hnsw.git /software/hnswlib && \
 	cd /software/hnswlib/python_bindings && python setup.py install && cd ../../..
 
-COPY scrtools-0.4.0.tar.gz /software
+COPY scrtools-0.5.0.tar.gz /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/monitor_script.sh /software
 
-RUN tar -xzf /software/scrtools-0.4.0.tar.gz -C /software && \
-	cd /software/scrtools-0.4.0 && pip install . && cd ../.. && \
+RUN tar -xzf /software/scrtools-0.5.0.tar.gz -C /software && \
+	cd /software/scrtools-0.5.0 && pip install . && cd ../.. && \
 	chmod a+rx /software/monitor_script.sh
 
 ENV PATH=/software:$PATH
