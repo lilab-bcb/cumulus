@@ -6,25 +6,35 @@ You can run FireCloud pipelines via command line by installing the **kco** tools
 Install ``kco`` tools
 ^^^^^^^^^^^^^^^^^^^^^
 
-First, you need to request a UGER server::
-
-	qrsh -q interactive -l h_vmem=4g -pe smp 8 -binding linear:8 -P regevlab
-
-Above command requests an interactive shell with 4G memory per thread and 8 threads. Feel free to change the memory and thread parameters.
-
-Secondly, make sure you have ``conda`` installed. If you haven't installed ``conda``, use the following commands to install::
+First, make sure you have ``conda`` installed. If you haven't installed ``conda``, use the following commands to install::
 
 	wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh .
 	bash Miniconda3-latest-Linux-x86_64.sh -p /users/foo/miniconda3
 	mv Miniconda3-latest-Linux-x86_64.sh /users/foo/miniconda3
 
-Thirdly, create an virtual environment ``kco`` and install ``kco`` tools::
+Then, create an virtual environment ``kco`` and install ``kco`` tools::
 
 	conda create -n kco -y pip
 	source activate kco
 	git clone https://github.com/klarman-cell-observatory/KCO.git kco_tools
 	cd kco_tools
 	pip install -e .
+
+---------------------------------
+
+RegevLab: use pre-installed **kco** tools
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+First, you need to request a UGER server::
+
+	qrsh -q interactive -l h_vmem=4g -pe smp 8 -binding linear:8 -P regevlab
+
+Above command requests an interactive shell with 4G memory per thread and 8 threads. Feel free to change the memory and thread parameters.
+
+Then, type the following command to activate ``conda`` environment that has ``kco`` tools pre-installed::
+
+	reuse .anaconda3-5.0.1
+	source activate /seq/regev_genome_portal/conda_env/kco_tools
 
 ---------------------------------
 
