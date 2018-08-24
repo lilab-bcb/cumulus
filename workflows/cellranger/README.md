@@ -127,7 +127,7 @@ Sometimes, people might want to perform demux locally and only run *cellranger c
 
 1. Copy your FASTQ files to the workspace using gsutil in your unix terminal. 
 
-    You should upload folders of FASTQS. Each foloder contains one subfolder per sample. Each subfolder contains all FASTQ files from the corresponding sample.
+    You should upload folders of FASTQS. Each folder contains one subfolder per sample. Each subfolder contains all FASTQ files from the corresponding sample.
 
     Example: *gsutil -m cp -r /foo/bar/fastq_path/K18WBC6Z4 gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq*
     
