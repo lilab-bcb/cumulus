@@ -10,7 +10,7 @@ If you've done this before you can skip this step - you only need to do this onc
 
 	Note: Broad users do not have to install this-they can type::
 
-		use Google-Cloud-SDK
+		reuse Google-Cloud-SDK
 
 	to make the Google Cloud tools available. 
 
