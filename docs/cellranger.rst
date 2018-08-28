@@ -188,11 +188,11 @@ See the table below for important *Cell Ranger mkfastq/count* outputs.
 Only run ``cellranger count``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Sometimes, people might want to perform demux locally and only run ``cellranger count`` on the cloud. This section describes how to only run ``cellranger count``  via ``cellranger_mkfastq_count``.
+Sometimes, people might want to perform demultiplexing locally and only run ``cellranger count`` on the cloud. This section describes how to only run ``cellranger count``  via ``cellranger_mkfastq_count``.
 
 #. Copy your FASTQ files to the workspace using gsutil in your unix terminal. 
 
-	You should upload folders of FASTQS. Each foloder contains one subfolder per sample. Each subfolder contains all FASTQ files from the corresponding sample.
+	You should upload folders of FASTQS. Each folder should contain all FASTQ files for one sample.
 
 	Example::
 
@@ -204,20 +204,35 @@ Sometimes, people might want to perform demux locally and only run ``cellranger 
     
     You can also read `FireCloud instructions`_ on uploading data.
 
-#. Replace the ``Flowcell`` column in the sample sheet with the locations of FASTQ folders and upload it into your workspace.
+#. Create scRNA-Seq formatted sample sheet for cell ranger count only (required column headers are shown in bold):
+
+.. list-table::
+	:widths: 5 30
+	:header-rows: 1
+	* - Column
+	  - Description
+	* - **Sample**
+  	- Contains sample names. Each 10x channel should have a unique sample name.
+	* - **Reference**
+	  - | Provides the reference genome used by *cellranger count*.
+		| The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as
+		| **GRCh38** for human,
+		| **mm10** for mouse,
+		| **GRCh38_and_mm10** for human and mouse,
+		| **GRCh38_premrna** for human, introns included, and
+		| **mm10_premrna** for mouse, introns included.
+	* - **Flowcell**
+	  - Indicates the Google bucket URL of uploaded FASTQ folders.
+	* - Chemistry
+	  - Optionally describe the 10x chemistry used for the sample. If this column is omitted, *cellranger count* will try to determine the chemistry automatically.
+
 
 	Example::
 
-		Lane,Sample,Index
-		Sample,Reference,Flowcell,Lane,Index,Chemistry
-		sample_1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq,1-2,SI-GA-A8,threeprime
-		sample_2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq,3-4,SI-GA-B8,threeprime
-		sample_3,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq,5-6,SI-GA-C8,fiveprime
-		sample_4,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq,7-8,SI-GA-D8,fiveprime
-		sample_1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/K10WBC9Z2_fastq,1-2,SI-GA-A8,threeprime
-		sample_2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/K10WBC9Z2_fastq,3-4,SI-GA-B8,threeprime
-		sample_3,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/K10WBC9Z2_fastq,5-6,SI-GA-C8,fiveprime
-		sample_4,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/K10WBC9Z2_fastq,7-8,SI-GA-D8,fiveprime
+		Sample,Reference,Flowcell
+		sample_1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/sample1_run1
+		sample_2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/sample2_run1
+		sample_1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/sample1_run2
 
 #. Set optional input ``run_mkfastq`` to ``false``.
 
