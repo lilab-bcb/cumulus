@@ -26,12 +26,12 @@ Follow the steps below to run CellRanger mkfastq/count on FireCloud.
 	scRNA-Seq formatted sample sheet description (required column headers are shown in bold):
 
 	.. list-table::
-		:widths: 5 30
+:widths: 5 30
 		:header-rows: 1
 
-		* - Column
-		  - Description
-		* - **Sample**
+    		* - Column
+    		  - Description
+    		* - **Sample**
 		  - Contains sample names. Each 10x channel should have a unique sample name.
 		* - **Reference**
 		  - | Provides the reference genome used by *cellran ger count* for each 10x channel. 
@@ -65,7 +65,7 @@ Follow the steps below to run CellRanger mkfastq/count on FireCloud.
 		sample_4,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,7-8,SI-GA-D8,fiveprime
 
 
-#. Upload your sample sheet to the workspace bucket.  
+#. Upload your sample sheet to the workspace bucket.
 
 	Example::
 
@@ -90,11 +90,11 @@ Cell Ranger mkfastq/count inputs:
 	:widths: 5 30 30 5
 	:header-rows: 1
 
-	* - Name
-	  - Description
-	  - Example
-	  - Default
-	* - **input_csv_file**
+    	* - Name
+    	  - Description
+    	  - Example
+    	  - Default
+    	* - **input_csv_file**
 	  - Sample Sheet (contains Sample, Reference, Flowcell, Lane, Index)
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.csv"
 	  - 
@@ -167,21 +167,21 @@ See the table below for important *Cell Ranger mkfastq/count* outputs.
 	:widths: 5 5 10
 	:header-rows: 1
 
-	* - Name
-	  - Type
-	  - Description
-	* - output_fastqs_directory
-	  - Array[String]
-	  - A list of google bucket urls containing FASTQ files, one url per flowcell.
-	* - output_count_directory
-	  - Array[String]
-	  - A list of google bucket urls containing count matrices, one url per sample.
-	* - metrics_summaries
-	  - File
-	  - A excel spreadsheet containing QCs for each sample.
-	* - output_web_summary
-	  - Array[File]
-	  - A list of htmls visualizing QCs for each sample (cellranger count output).
+    	* - Name
+    	  - Type
+    	  - Description
+    	* - output_fastqs_directory
+    	  - Array[String]
+    	  - A list of google bucket urls containing FASTQ files, one url per flowcell.
+    	* - output_count_directory
+    	  - Array[String]
+    	  - A list of google bucket urls containing count matrices, one url per sample.
+    	* - metrics_summaries
+    	  - File
+    	  - A excel spreadsheet containing QCs for each sample.
+    	* - output_web_summary
+    	  - Array[File]
+    	  - A list of htmls visualizing QCs for each sample (cellranger count output).
 
 ---------------------------------
 
@@ -209,9 +209,9 @@ Sometimes, people might want to perform demultiplexing locally and only run ``ce
 .. list-table::
 	:widths: 5 30
 	:header-rows: 1
-	* - Column
-	  - Description
-	* - **Sample**
+    	* - Column
+    	  - Description
+    	* - **Sample**
   	- Contains sample names. Each 10x channel should have a unique sample name.
 	* - **Reference**
 	  - | Provides the reference genome used by *cellranger count*.
@@ -222,17 +222,17 @@ Sometimes, people might want to perform demultiplexing locally and only run ``ce
 		| **GRCh38_premrna** for human, introns included, and
 		| **mm10_premrna** for mouse, introns included.
 	* - **Flowcell**
-	  - Indicates the Google bucket URL of uploaded FASTQ folders.
+	  - Indicates the Google bucket URL of the uploaded FASTQ folders. The full path to the FASTQ files is FlowCell/Sample
 	* - Chemistry
 	  - Optionally describe the 10x chemistry used for the sample. If this column is omitted, *cellranger count* will try to determine the chemistry automatically.
 
 
-	Example::
+	In the following example sample_1 is sequenced on 2 flowcells. The FASTQ files for flowcell_1 are located at gs://fc-e0000000-0000-0000-0000-000000000000/flowcell_1/sample_1
+	while the FASTQ files for flowcell_2 are located at gs://fc-e0000000-0000-0000-0000-000000000000/flowcell_2_sample1 ::
 
 		Sample,Reference,Flowcell
-		sample_1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/sample1_run1
-		sample_2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/sample2_run1
-		sample_1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/sample1_run2
+		sample_1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/flowcell_1
+		sample_1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/flowcell_2
 
 #. Set optional input ``run_mkfastq`` to ``false``.
 
