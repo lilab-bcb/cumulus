@@ -8,12 +8,12 @@ Install ``kco`` tools for Broad users
 Request an UGER server::
 
     reuse UGER
-	qrsh -q interactive -l h_vmem=4g -pe smp 8 -binding linear:8 -P regevlab
+    qrsh -q interactive -l h_vmem=4g -pe smp 8 -binding linear:8 -P regevlab
 
 The above command requests an interactive shell with 4G memory per thread and 8 threads. Feel free to change the memory and thread parameters.
 
 Add conda to your path::
-    reuse .anaconda3-5.0.1
+    reuse Anaconda3
 
 Activate the kco virtual environment::
     source activate /seq/regev_genome_portal/conda_env/kco_tools
