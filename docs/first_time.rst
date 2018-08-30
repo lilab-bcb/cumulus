@@ -27,7 +27,9 @@ If you've done this before you can skip this step - you only need to do this onc
 Create a FireCloud workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Follow this document_ to create a FireCloud_ workspace.
+#. Create a new FireCloud_ workspace by clicking Create New Workspace in FireCloud
+
+For more detailed instructions please see this document_
 
 .. _document: https://software.broadinstitute.org/firecloud/documentation/article?id=10746
 .. _FireCloud: https://portal.firecloud.org
