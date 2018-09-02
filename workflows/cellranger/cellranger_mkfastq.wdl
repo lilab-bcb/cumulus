@@ -57,19 +57,35 @@ task run_cellranger_mkfastq {
 		set -e
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
-		gsutil -q -m cp -r ${input_bcl_directory} .
-		# cp -r ${input_bcl_directory} .
+		# gsutil -q -m cp -r ${input_bcl_directory} .
+		cp -r ${input_bcl_directory} .
 		cellranger mkfastq --id=results --run=${run_id} --csv=${input_csv_file} --jobmode=local
-		gsutil -q -m rsync -d -r results/outs ${output_directory}/${run_id}_fastqs
-		# cp -r results/outs ${output_directory}/${run_id}_fastqs
-
 
 		python <<CODE
 		import os
-		from subprocess import check_call, check_output, CalledProcessError
+		import glob
+		import pandas as pd
+		from subprocess import check_call
 		with open("output_fastqs_flowcell_directory.txt", "w") as fout:
 			flowcell = [name for name in os.listdir('results/outs/fastq_path') if name != 'Reports' and name != 'Stats' and os.path.isdir('results/outs/fastq_path/' + name)][0]
 			fout.write('${output_directory}/${run_id}_fastqs/fastq_path/' + flowcell + '\n')
+		prefix = 'results/outs/fastq_path/' + flowcell + '/'
+		df = pd.read_csv('${input_csv_file}', header = 0)
+		idx = df['Index'].apply(lambda x: x.find('-') < 0)
+		for sample_id in df[idx]['Sample']:
+			call_args = ['mkdir', '-p', prefix + sample_id]
+			check_call(call_args)
+			call_args = ['mv']
+			call_args.extend(glob.glob(prefix + sample_id + '_S*_L*_*_001.fastq.gz'))
+			call_args.append(prefix + sample_id);
+			check_call(call_args)
+		CODE
+
+		# gsutil -q -m rsync -d -r results/outs ${output_directory}/${run_id}_fastqs
+		cp -r results/outs ${output_directory}/${run_id}_fastqs
+
+		python <<CODE
+		from subprocess import check_call, check_output, CalledProcessError
 		if '${delete_input_bcl_directory}' is 'true':
 			try:
 				call_args = ['gsutil', '-q', 'stat', '${output_directory}/${run_id}_fastqs/qc_summary.json']
