@@ -1,5 +1,6 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/1/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/15/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/3/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/16/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:scrtools_adt/versions/2/plain-WDL/descriptor" as sa
 
 workflow cellranger_mkfastq_count {
 	# 5 or 6 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry]). gs URL
@@ -25,6 +26,16 @@ workflow cellranger_mkfastq_count {
 	# Expected number of recovered cells. Default: 3,000 cells. Mutually exclusive with force_cells
 	Int? expect_cells = 3000
 
+	# For extracting ADT count
+
+	# antibody barcodes in csv format
+	File? antibody_barcode_file
+
+	# maximum hamming distance in antibody barcodes
+	Int? max_mismatch = 3
+
+
+
 	# Currently, only 2.1.1 is available
 	String? cellranger_version = "2.1.1"
 
@@ -32,10 +43,14 @@ workflow cellranger_mkfastq_count {
 	Int? num_cpu = 64
 	# Memory in GB
 	Int? memory = 128
+	# Optional memory in GB for scrtools_adt
+	Int? adt_memory = 32
 	# Optional disk space for mkfastq.
 	Int? mkfastq_disk_space = 1500
 	# Optional disk space needed for cell ranger count.
 	Int? count_disk_space = 500	
+	# Optional disk space needed for scrtools_adt
+	Int? adt_disk_space = 100
 	# Number of preemptible tries 
 	Int? preemptible = 2
 
@@ -75,32 +90,50 @@ workflow cellranger_mkfastq_count {
 				preemptible = preemptible			
 		}
 
-		scatter (sample_id in generate_count_config.sample_ids) {
-			call crc.cellranger_count as cellranger_count {
-				input:
-					sample_id = sample_id,
-					input_fastqs_directories = generate_count_config.sample2dir[sample_id],
-					output_directory = cellranger_output_directory,
-					genome = generate_count_config.sample2genome[sample_id],
-					chemistry = generate_count_config.sample2chemistry[sample_id],
-					secondary = secondary,
-					do_force_cells = do_force_cells,
-					force_cells = force_cells,
-					expect_cells = expect_cells,
-					cellranger_version = cellranger_version,
-					num_cpu = num_cpu,
-					memory = memory,
-					disk_space = count_disk_space,
-					preemptible = preemptible
+		if (generate_count_config.sample_ids[0] != '') {
+			scatter (sample_id in generate_count_config.sample_ids) {
+				call crc.cellranger_count as cellranger_count {
+					input:
+						sample_id = sample_id,
+						input_fastqs_directories = generate_count_config.sample2dir[sample_id],
+						output_directory = cellranger_output_directory,
+						genome = generate_count_config.sample2genome[sample_id],
+						chemistry = generate_count_config.sample2chemistry[sample_id],
+						secondary = secondary,
+						do_force_cells = do_force_cells,
+						force_cells = force_cells,
+						expect_cells = expect_cells,
+						cellranger_version = cellranger_version,
+						num_cpu = num_cpu,
+						memory = memory,
+						disk_space = count_disk_space,
+						preemptible = preemptible
+				}
 			}
+
+			call collect_summaries {
+				input:
+					summaries = cellranger_count.output_metrics_summary,
+					sample_ids = cellranger_count.output_count_directory,
+					cellranger_version = cellranger_version,
+					preemptible = preemptible
+			}		
 		}
 
-		call collect_summaries {
-			input:
-				summaries = cellranger_count.output_metrics_summary,
-				sample_ids = cellranger_count.output_count_directory,
-				cellranger_version = cellranger_version,
-				preemptible = preemptible
+		if (generate_count_config.sample_adt_ids[0] != '' && defined(antibody_barcode_file)) {
+			scatter (sample_id in generate_count_config.sample_adt_ids) {
+				call sa.scrtools_adt as scrtools_adt {
+					input:
+						sample_id = sample_id,
+						input_fastqs_directories = generate_count_config.sample_adt2dir[sample_id],
+						output_directory = cellranger_output_directory,
+						antibody_barcode_file = antibody_barcode_file,
+						max_mismatch = max_mismatch,
+						memory = adt_memory,
+						disk_space = adt_disk_space,
+						preemptible = preemptible
+				}
+			}		
 		}
 	}
 }
@@ -169,19 +202,32 @@ task generate_count_config {
 		for run_id, fastq_dir in zip(run_ids, fastq_dirs):
 			if run_id is not '':
 				rid2fdir[run_id] = fastq_dir
-		with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2, open('sample2genome.txt', 'w') as fo3, open('sample2chemistry.txt', 'w') as fo4:
+		with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2, open('sample2genome.txt', 'w') as fo3, open('sample2chemistry.txt', 'w') as fo4, open('sample_adt_ids.txt', 'w') as fo5, open('sample_adt2dir.txt', 'w') as fo6:
+			n_normal = 0
 			for sample_id in df['Sample'].unique():
-				fo1.write(sample_id + '\n')
 				df_local = df.loc[df['Sample'] == sample_id]
-				dirs = df_local['Flowcell'].map(lambda x: x if len(rid2fdir) == 0 else rid2fdir[os.path.basename(x)]).values
-				fo2.write(sample_id + '\t' + ','.join(dirs) + '\n')
-				assert df_local['Reference'].unique().size == 1
-				fo3.write(sample_id + '\t' + df_local['Reference'].iat[0] + '\n')
-				chemistry = 'auto'
-				if 'Chemistry' in df_local.columns:
-					assert df_local['Chemistry'].unique().size == 1
-					chemistry = df_local['Chemistry'].iat[0]
-				fo4.write(sample_id + '\t' + chemistry + '\n')
+				assert df_local['Index'].unique().size == 1
+				is_adt = df_local['Index'].iat[0].find('-') < 0
+				if not is_adt:
+					n_normal += 1
+					fo1.write(sample_id + '\n')
+					dirs = df_local['Flowcell'].map(lambda x: x if len(rid2fdir) == 0 else rid2fdir[os.path.basename(x)]).values
+					fo2.write(sample_id + '\t' + ','.join(dirs) + '\n')
+					assert df_local['Reference'].unique().size == 1
+					fo3.write(sample_id + '\t' + df_local['Reference'].iat[0] + '\n')
+					chemistry = 'auto'
+					if 'Chemistry' in df_local.columns:
+						assert df_local['Chemistry'].unique().size == 1
+						chemistry = df_local['Chemistry'].iat[0]
+					fo4.write(sample_id + '\t' + chemistry + '\n')
+				else:
+					fo5.write(sample_id + '\n')
+					dirs = df_local['Flowcell'].map(lambda x: x if len(rid2fdir) == 0 else rid2fdir[os.path.basename(x)]).values
+					fo6.write(sample_id + '\t' + ','.join(dirs) + '\n')
+			if n_normal == 0:
+				fo2.write('null\tnull\n')
+				fo3.write('null\tnull\n')
+				fo4.write('null\tnull\n')
 		CODE
 	}
 
@@ -190,6 +236,8 @@ task generate_count_config {
 		Map[String, String] sample2dir = read_map('sample2dir.txt')
 		Map[String, String] sample2genome = read_map('sample2genome.txt')
 		Map[String, String] sample2chemistry = read_map('sample2chemistry.txt')
+		Array[String] sample_adt_ids = read_lines('sample_adt_ids.txt')
+		Map[String, String] sample_adt2dir = read_map('sample_adt2dir.txt')
 	}
 
 	runtime {

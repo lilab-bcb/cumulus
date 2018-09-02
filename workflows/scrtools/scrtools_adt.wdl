@@ -1,4 +1,4 @@
-workflow cellranger_count {
+workflow scrtools_adt {
 	# Sample ID
 	String sample_id
 	# A comma-separated list of input FASTQs directories (gs urls)
@@ -6,78 +6,48 @@ workflow cellranger_count {
 	# CellRanger output directory, gs url
 	String output_directory
 
-	# GRCh38, mm10, GRCh38_and_mm10, GRCh38_premrna, mm10_premrna or a URL to a tar.gz file
-	String genome
+	# cell barcodes, from 10x
+	File barcode_file = "gs://regev-lab/resources/cellranger/737K-august-2016.txt"
 
+	# antibody barcodes in csv format
+	File antibody_barcode_file
 
-	File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
-	Map[String, String] acronym2gsurl = read_map(acronym_file)
-	# If reference is a url
-	Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
+	# maximum hamming distance in antibody barcodes
+	Int? max_mismatch = 3
 
-	File genome_file = (if is_url then genome else acronym2gsurl[genome])
-
-	# chemistry of the channel
-	String? chemistry = "auto"
-	# Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
-	Boolean? secondary = false
-	# If force cells, default: true
-	Boolean? do_force_cells = false
-	# Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells. Default: 6,000 cells
-	Int? force_cells = 6000
-	# Expected number of recovered cells. Default: 3,000 cells. Mutually exclusive with force_cells
-	Int? expect_cells = 3000
-
-	# Currently, only 2.1.1 is available
-	String? cellranger_version = "2.1.1"
-
-	# Number of cpus per cellranger job
-	Int? num_cpu = 64
 	# Memory in GB
-	Int? memory = 128
+	Int? memory = 32
 	# Disk space in GB
-	Int? disk_space = 500
+	Int? disk_space = 100
 	# Number of preemptible tries 
 	Int? preemptible = 2
 
-	call run_cellranger_count {
+	call run_generate_count_matrix_ADTs {
 		input:
 			sample_id = sample_id,
 			input_fastqs_directories = input_fastqs_directories,
 			output_directory = output_directory,
-			genome_file = genome_file,
-			chemistry = chemistry,
-			secondary = secondary,
-			do_force_cells = do_force_cells,
-			force_cells = force_cells,
-			expect_cells = expect_cells,
-			cellranger_version = cellranger_version,
-			num_cpu = num_cpu,
+			cell_barcodes = barcode_file,
+			antibody_barcodes = antibody_barcode_file,
+			max_mismatch = max_mismatch,
 			memory = memory,
 			disk_space = disk_space,
 			preemptible = preemptible
 	}
 
 	output {
-		String output_count_directory = run_cellranger_count.output_count_directory
-		File output_metrics_summary = run_cellranger_count.output_metrics_summary
-		File output_web_summary = run_cellranger_count.output_web_summary
-		File monitoringLog = run_cellranger_count.monitoringLog
+		String output_count_directory = run_generate_count_matrix_ADTs.output_count_directory
+		File monitoringLog = run_generate_count_matrix_ADTs.monitoringLog
 	}
 }
 
-task run_cellranger_count {
+task run_generate_count_matrix_ADTs {
 	String sample_id
 	String input_fastqs_directories
 	String output_directory
-	File genome_file
-	String chemistry
-	Boolean secondary
-	Boolean do_force_cells
-	Int force_cells
-	Int expect_cells
-	String cellranger_version
-	Int num_cpu
+	File cell_barcodes
+	File antibody_barcodes
+	Int max_mismatch
 	Int memory
 	Int disk_space
 	Int preemptible
@@ -86,11 +56,8 @@ task run_cellranger_count {
 		set -e
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
-		mkdir -p genome_dir
-		tar xf ${genome_file} -C genome_dir --strip-components 1
 
 		python <<CODE
-		import os
 		from subprocess import check_call
 
 		fastqs = []
@@ -104,31 +71,27 @@ task run_cellranger_count {
 			check_call(call_args)
 			fastqs.append('${sample_id}_' + str(i))
 	
-		call_args = ['cellranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=${sample_id}', '--chemistry=${chemistry}', '--jobmode=local']
-		call_args.append('--force-cells=${force_cells}' if ('${do_force_cells}' is 'true') else '--expect-cells=${expect_cells}')
-		if '${secondary}' is not 'true':
-			call_args.append('--nosecondary')
+		call_args = ['generate_count_matrix_ADTs', '${cell_barcodes}', '${antibody_barcodes}', ','.join(fastqs), '${sample_id}', '--max-mismatch', '${max_mismatch}']
 		print(' '.join(call_args))
 		check_call(call_args)
 		CODE
 
-		gsutil -q -m rsync -d -r results/outs ${output_directory}/${sample_id}
-		# cp -r results/outs ${output_directory}/${sample_id}
+		gsutil -q -m cp ${sample_id}.*csv ${output_directory}/${sample_id}/
+		# mkdir -p ${output_directory}/${sample_id}
+		# cp -f ${sample_id}.*csv ${output_directory}/${sample_id}/
 	}
 
 	output {
 		String output_count_directory = "${output_directory}/${sample_id}"
-		File output_metrics_summary = "results/outs/metrics_summary.csv"
-		File output_web_summary = "results/outs/web_summary.html"
 		File monitoringLog = "monitoring.log"
 	}
 
 	runtime {
-		docker: "regevlab/cellranger-${cellranger_version}"
+		docker: "regevlab/scrtools"
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
-		cpu: "${num_cpu}"
+		cpu: 1
 		preemptible: "${preemptible}"
 	}
 }

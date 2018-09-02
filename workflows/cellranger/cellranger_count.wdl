@@ -90,7 +90,6 @@ task run_cellranger_count {
 		tar xf ${genome_file} -C genome_dir --strip-components 1
 
 		python <<CODE
-		import os
 		from subprocess import check_call
 
 		fastqs = []
