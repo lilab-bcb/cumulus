@@ -13,9 +13,11 @@ Request an UGER server::
 The above command requests an interactive shell with 4G memory per thread and 8 threads. Feel free to change the memory and thread parameters.
 
 Add conda to your path::
+
     reuse Anaconda3
 
 Activate the kco virtual environment::
+
     source activate /seq/regev_genome_portal/conda_env/kco_tools
 
 Install ``kco`` tools for non-Broad users
@@ -23,17 +25,17 @@ Install ``kco`` tools for non-Broad users
 
 Make sure you have ``conda`` installed. If you haven't installed ``conda``, use the following commands to install::
 
-	wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh .
-	bash Miniconda3-latest-Linux-x86_64.sh -p /users/foo/miniconda3
-	mv Miniconda3-latest-Linux-x86_64.sh /users/foo/miniconda3
+    wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh .
+    bash Miniconda3-latest-Linux-x86_64.sh -p /users/foo/miniconda3
+    mv Miniconda3-latest-Linux-x86_64.sh /users/foo/miniconda3
 
 Next, create an virtual environment ``kco`` and install ``kco`` tools::
 
-	conda create -n kco -y pip
-	source activate kco
-	git clone https://github.com/klarman-cell-observatory/KCO.git kco_tools
-	cd kco_tools
-	pip install -e .
+    conda create -n kco -y pip
+    source activate kco
+    git clone https://github.com/klarman-cell-observatory/KCO.git kco_tools
+    cd kco_tools
+    pip install -e .
 
 ---------------------------------
 
@@ -52,26 +54,26 @@ Options
 +++++++
 
 .. list-table::
-	:widths: 5 20
-	:header-rows: 1
+    :widths: 5 20
+    :header-rows: 1
 
-	* - Name
-	  - Description
-	* - | **-m**
-	    | **--method**
-	  - | Method namespace/name (e.g. regev/cellranger_mkfastq_count).
-	    | A version can optionally be specified (e.g. regev/cell_ranger_mkfastq_count/4), otherwise the latest version of the method is used
-	* - | **-w**
-	    | **--workspace**
-	  - Workspace name (e.g. foo/bar). The workspace will be created if it does not exist
-	* - | **-i**
-	    | **--inputs**
-	  - WDL input JSON. Can be specified as file or string
-	* - --bucket-folder
-	  - Store inputs to <folder> under workspace's google bucket
-	* - | -o
-	    | --upload
-	  - Upload files/directories to the workspace Google Cloud bucket and output updated input json (with local path replaced by google bucket urls) to <updated_json>
+    * - Name
+      - Description
+    * - | **-m**
+        | **--method**
+      - | Method namespace/name (e.g. regev/cellranger_mkfastq_count).
+        | A version can optionally be specified (e.g. regev/cell_ranger_mkfastq_count/4), otherwise the latest version of the method is used
+    * - | **-w**
+        | **--workspace**
+      - Workspace name (e.g. foo/bar). The workspace will be created if it does not exist
+    * - | **-i**
+        | **--inputs**
+      - WDL input JSON. Can be specified as file or string
+    * - --bucket-folder
+      - Store inputs to <folder> under workspace's google bucket
+    * - | -o
+        | --upload
+      - Upload files/directories to the workspace Google Cloud bucket and output updated input json (with local path replaced by google bucket urls) to <updated_json>
 
 Examples
 ++++++++
@@ -80,15 +82,15 @@ Upload BCL directories and sample sheet, convert sample sheet paths to gs:// URL
 
 example_sample_sheet.csv::
 
-	Sample,Reference,Flowcell,Lane,Index,Chemistry
-	sample_1,GRCh38,/mylocalpath/flowcell1,1-2,SI-GA-A8,threeprime
-	sample_2,GRCh38,/mylocalpath/flowcell1,3-4,SI-GA-B8,threeprime
-	sample_3,mm10,/mylocalpath/flowcell1,5-6,SI-GA-C8,fiveprime
-	sample_4,mm10,/mylocalpath/flowcell1,7-8,SI-GA-D8,fiveprime
-	sample_1,GRCh38,/mylocalpath/flowcell2,1-2,SI-GA-A8,threeprime
-	sample_2,GRCh38,/mylocalpath/flowcell2,3-4,SI-GA-B8,threeprime
-	sample_3,mm10,/mylocalpath/flowcell2,5-6,SI-GA-C8,fiveprime
-	sample_4,mm10,/mylocalpath/flowcell2,7-8,SI-GA-D8,fiveprime
+    Sample,Reference,Flowcell,Lane,Index,Chemistry
+    sample_1,GRCh38,/mylocalpath/flowcell1,1-2,SI-GA-A8,threeprime
+    sample_2,GRCh38,/mylocalpath/flowcell1,3-4,SI-GA-B8,threeprime
+    sample_3,mm10,/mylocalpath/flowcell1,5-6,SI-GA-C8,fiveprime
+    sample_4,mm10,/mylocalpath/flowcell1,7-8,SI-GA-D8,fiveprime
+    sample_1,GRCh38,/mylocalpath/flowcell2,1-2,SI-GA-A8,threeprime
+    sample_2,GRCh38,/mylocalpath/flowcell2,3-4,SI-GA-B8,threeprime
+    sample_3,mm10,/mylocalpath/flowcell2,5-6,SI-GA-C8,fiveprime
+    sample_4,mm10,/mylocalpath/flowcell2,7-8,SI-GA-D8,fiveprime
 
 Note that sample_1, sample_2, sample_3, and sample_4 are sequenced on 2 flowcells and for each sample, all of its FASTQ files will be passed to cell ranger count in one command by the pipeline.
 
@@ -96,18 +98,18 @@ inputs.json:
 
 .. code-block:: json
 
-	{
-		"cellranger_mkfastq_count.input_csv_file" : "mylocalpath/sample_sheet.csv",
-		"cellranger_mkfastq_count.cellranger_output_directory" : "gs://url/outputs",
-		"cellranger_mkfastq_count.delete_input_bcl_directory": true
-	}
+    {
+        "cellranger_mkfastq_count.input_csv_file" : "mylocalpath/sample_sheet.csv",
+        "cellranger_mkfastq_count.cellranger_output_directory" : "gs://url/outputs",
+        "cellranger_mkfastq_count.delete_input_bcl_directory": true
+    }
 
 Run the following command to kick off your FireCloud pipeline::
 
-	kco fc_run -m regev/cellranger_mkfastq_count -i inputs.json -w myworkspace_namespace/myworkspace_name --bucket-folder inputs -o inputs_updated.json
+    kco fc_run -m regev/cellranger_mkfastq_count -i inputs.json -w myworkspace_namespace/myworkspace_name --bucket-folder inputs -o inputs_updated.json
 
 Upon success, **kco fc_run** returns a url pointing the the submitted FireCloud job. 
 
 If for any reason, your job failed. You could rerun it without uploading files again via the following command::
 
-	kco fc_run -m regev/cellranger_mkfastq_count -i inputs_updated.json -w myworkspace_namespace/myworkspace_name
+    kco fc_run -m regev/cellranger_mkfastq_count -i inputs_updated.json -w myworkspace_namespace/myworkspace_name
