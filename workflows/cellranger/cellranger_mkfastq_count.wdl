@@ -204,6 +204,7 @@ task generate_count_config {
 				rid2fdir[run_id] = fastq_dir
 		with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2, open('sample2genome.txt', 'w') as fo3, open('sample2chemistry.txt', 'w') as fo4, open('sample_adt_ids.txt', 'w') as fo5, open('sample_adt2dir.txt', 'w') as fo6:
 			n_normal = 0
+			n_non_normal = 0
 			for sample_id in df['Sample'].unique():
 				df_local = df.loc[df['Sample'] == sample_id]
 				assert df_local['Index'].unique().size == 1
@@ -221,6 +222,7 @@ task generate_count_config {
 						chemistry = df_local['Chemistry'].iat[0]
 					fo4.write(sample_id + '\t' + chemistry + '\n')
 				else:
+					n_non_normal += 1
 					fo5.write(sample_id + '\n')
 					dirs = df_local['Flowcell'].map(lambda x: x if len(rid2fdir) == 0 else rid2fdir[os.path.basename(x)]).values
 					fo6.write(sample_id + '\t' + ','.join(dirs) + '\n')
@@ -228,6 +230,9 @@ task generate_count_config {
 				fo2.write('null\tnull\n')
 				fo3.write('null\tnull\n')
 				fo4.write('null\tnull\n')
+			if n_non_normal == 0:
+				fo5.write('null\tnull\n')
+				fo6.write('null\tnull\n')
 		CODE
 	}
 
