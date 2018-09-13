@@ -47,7 +47,8 @@ Follow the steps below to run CellRanger mkfastq/count on FireCloud.
 		* - **Reference**
 		  - | Provides the reference genome used by *cellran ger count* for each 10x channel. 
 			| The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as
-			| **GRCh38** for human, 
+			| **GRCh38** for human GRCh38,
+			| **hg19** for human hg19,
 			| **mm10** for mouse, 
 			| **GRCh38_and_mm10** for human and mouse,
 			| **GRCh38_premrna** for human, introns included, and

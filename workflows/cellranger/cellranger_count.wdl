@@ -6,7 +6,7 @@ workflow cellranger_count {
 	# CellRanger output directory, gs url
 	String output_directory
 
-	# GRCh38, mm10, GRCh38_and_mm10, GRCh38_premrna, mm10_premrna or a URL to a tar.gz file
+	# GRCh38, hg19, mm10, GRCh38_and_mm10, GRCh38_premrna, mm10_premrna or a URL to a tar.gz file
 	String genome
 
 
