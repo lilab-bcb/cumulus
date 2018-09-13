@@ -1,6 +1,0 @@
-GRCh38	gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38-1.2.0.tar.gz
-mm10	gs://regev-lab/resources/cellranger/refdata-cellranger-mm10-1.2.0.tar.gz
-GRCh38_and_mm10	gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38_and_mm10-1.2.0.tar.gz
-GRCh38_premrna	gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38_premrna-1.2.0.tar.gz
-mm10_premrna	gs://regev-lab/resources/cellranger/refdata-cellranger-mm10_premrna-1.2.0.tar.gz
-GRCh38_premrna_and_mm10_premrna	gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38_premrna_and_mm10_premrna-1.2.0.tar.gz

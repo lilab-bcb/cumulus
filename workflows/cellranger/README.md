@@ -199,7 +199,7 @@ Name | Description | Example | Default
 --- | --- | --- | ---
 **input_count_matrix_csv** | Input CSV file describing metadata of each 10x channel | "my_count_matrix.csv" | 
 **output_name** | This is the prefix for all output files. It should contain the google bucket url, subdirectory name and output name prefix | "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir/my_results" | 
-genome | Reference genome name | "mm10" | "GRCh38"
+genome | Reference genome name | "mm10" | "GRCh38" | "hg19"
 num_cpu | Number of cpus per scrtools job | 32 | 64
 memory | Memory size in GB | 200 | 200
 disk_space | Total disk space | 100 | 100
