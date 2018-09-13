@@ -8,7 +8,7 @@ workflow cellranger_mkfastq {
 
 	# Whether to delete input bcl directory. If false, you should delete this folder yourself so as to not incur storage charges.
 	Boolean delete_input_bcl_directory
-	# Currently, only 2.1.1 is available
+	# 2.1.1 or 2.2.0
 	String? cellranger_version = "2.1.1"
 
 	# Number of cpus per cellranger job
