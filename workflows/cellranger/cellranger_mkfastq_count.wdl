@@ -36,7 +36,7 @@ workflow cellranger_mkfastq_count {
 
 
 
-	# Currently, only 2.1.1 is available
+	# 2.1.1 or 2.2.0
 	String? cellranger_version = "2.1.1"
 
 	# Number of cpus per cellranger job
