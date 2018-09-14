@@ -7,6 +7,7 @@ from firecloud import api as fapi
 import kco
 import json
 
+
 def convert_inputs(inputs: dict) -> dict:
     results = dict()
     for key, value in inputs.items():
@@ -21,6 +22,7 @@ def convert_inputs(inputs: dict) -> dict:
             value = str(value)
         results[key] = value
     return results
+
 
 def do_fc_run(method: str, workspace: str, wdl_inputs: Union[str, dict], out_json: str, bucket_folder: str) -> str:
     """Run a FireCloud method.
@@ -39,7 +41,10 @@ def do_fc_run(method: str, workspace: str, wdl_inputs: Union[str, dict], out_jso
     method_namespace, method_name, method_version = kco.fs_split(method)
     if method_version is None:
         version = -1
-        methods = fapi.list_repository_methods(method_name).json()
+        list_methods = fapi.list_repository_methods(method_name)
+        if list_methods.status_code != 200:
+            raise ValueError('Unable to get method ' + method_name)
+        methods = list_methods.json()
         for method in methods:
             if method['namespace'] == method_namespace:
                 version = max(version, method['snapshotId'])
@@ -67,7 +72,7 @@ def do_fc_run(method: str, workspace: str, wdl_inputs: Union[str, dict], out_jso
         'prerequisites': {},
         'inputs': convert_inputs(inputs),
         'outputs': {},
-        'methodConfigVersion': 1, 
+        'methodConfigVersion': 1,
         'deleted': False
     }
 
@@ -103,11 +108,11 @@ def main(argsv):
     parser.add_argument('-m', '--method', dest='method', action='store', required=True, help=kco.METHOD_HELP)
     parser.add_argument('-w', '--workspace', dest='workspace', action='store', required=True,
                         help='Workspace name (e.g. foo/bar). The workspace is created if it does not exist')
-    parser.add_argument('--bucket-folder', metavar = '<folder>', dest='bucket_folder', action='store',
+    parser.add_argument('--bucket-folder', metavar='<folder>', dest='bucket_folder', action='store',
                         help='Store inputs to <folder> under workspace''s google bucket')
     parser.add_argument('-i', '--input', dest='wdl_inputs', action='store', required=True,
                         help='WDL input JSON.')
-    parser.add_argument('-o', '--upload', dest='out_json', metavar = '<updated_json>', action='store',
+    parser.add_argument('-o', '--upload', dest='out_json', metavar='<updated_json>', action='store',
                         help='Upload files/directories to the workspace Google Cloud bucket and output updated input json (with local path replaced by google bucket urls) to <updated_json>.')
     # parser.add_argument('-c', '--config_name', dest='config_name', action='store', required=False,
     #                     help='Method configuration name')
