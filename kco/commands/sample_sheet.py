@@ -6,7 +6,8 @@ import os.path
 
 def main(argsv):
     parser = argparse.ArgumentParser(description='Generate a sample sheet')
-    parser.add_argument(dest='dir', help='Root directory to look for fastq files. Directory is searched recursively',
+    parser.add_argument('-d', '--dir', dest='dir',
+                        help='Root directory to look for fastq files. Directory is searched recursively',
                         nargs='+')
     parser.add_argument('-f', '--format', dest='output_format', help='Format of sample sheet',
                         choices=['directory', 'r1_r2', 'r1_r2_i1'], default='directory')
