@@ -20,20 +20,17 @@ def get_or_create_workspace(workspace_namespace, workspace_name):
 
 
 def get_wdl_inputs(wdl_inputs):
-    inputs = wdl_inputs
     if type(wdl_inputs) != dict:
         if os.path.exists(wdl_inputs):
             with open(wdl_inputs, 'r') as f:
-                inputs = json.loads(f.read())
+                return json.loads(f.read())
                 # Filter out any key/values that contain #, and escape strings with quotes as MCs need this to not be treated as expressions
                 # inputs = {k: "\"{}\"".format(v) for k, v in inputs_json.items() if '#' not in k}
         elif type(wdl_inputs) == str:
-            inputs = json.loads(wdl_inputs)
+            return json.loads(wdl_inputs)
         else:
             print('Unknown input type: ' + str(type(wdl_inputs)))
-    else:
-        inputs = wdl_inputs
-    return inputs
+    return wdl_inputs
 
 
 def fs_split(s: str) -> Tuple[str, str, str]:
