@@ -60,8 +60,8 @@ workflow cellranger_count {
 
 	output {
 		String output_count_directory = run_cellranger_count.output_count_directory
-		File output_metrics_summary = run_cellranger_count.output_metrics_summary
-		File output_web_summary = run_cellranger_count.output_web_summary
+		String output_metrics_summary = run_cellranger_count.output_metrics_summary
+		String output_web_summary = run_cellranger_count.output_web_summary
 		File monitoringLog = run_cellranger_count.monitoringLog
 	}
 }
