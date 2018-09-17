@@ -94,7 +94,7 @@ task run_cellranger_count {
 
 		fastqs = []
 		for i, directory in enumerate('${input_fastqs_directories}'.split(',')):
-			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/${sample_id}', '.']
+			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + ('/' if directory[len(directory)-1] != '/' else '') + '${sample_id}', '.']
 			# call_args = ['cp', '-r', directory + '/${sample_id}', '.']
 			print(' '.join(call_args))
 			check_call(call_args)
