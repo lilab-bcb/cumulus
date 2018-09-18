@@ -155,6 +155,8 @@ task generate_bcl_csv {
 
 		with open('run_ids.txt', 'w') as fo1, open('inpdirs.txt', 'w') as fo2, open('bcls.txt', 'w') as fo3:
 			for input_dir in df['Flowcell'].unique():
+				if input_dir[len(input_dir)-1] == '/':
+					input_dir = input_dir[0:len(input_dir)-1]
 				run_id = os.path.basename(input_dir)
 				bcl_df = df.loc[df['Flowcell'] == input_dir, ['Lane', 'Sample', 'Index']]
 				bcl_df.to_csv(run_id + '_bcl.csv', index = False)
