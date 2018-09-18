@@ -6,7 +6,7 @@ workflow cellranger_mkfastq_count {
 	# 5 or 6 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry]). gs URL
 	File input_csv_file
 	# CellRanger output directory, gs URL
-	String cellranger_output_directory
+	String output_directory
 
 	# If run cellranger mkfastq
 	Boolean run_mkfastq = true
@@ -50,7 +50,7 @@ workflow cellranger_mkfastq_count {
 	Int? adt_disk_space = 100
 	# Number of preemptible tries 
 	Int? preemptible = 2
-
+	String cellranger_output_directory = sub(output_directory,"\\/$","")
 
 	if (run_mkfastq) {
 		call generate_bcl_csv {
@@ -196,37 +196,40 @@ task generate_count_config {
 		import os
 		import pandas as pd
 		from subprocess import check_call
-		df = pd.read_csv('${input_csv_file}', header = 0)
+		df = pd.read_csv('${input_csv_file}', header = 0, dtype={'Sample':str})
 		run_ids = '${sep="," run_ids}'.split(',')
 		fastq_dirs = '${sep="," fastq_dirs}'.split(',')
 		rid2fdir = dict()
 		for run_id, fastq_dir in zip(run_ids, fastq_dirs):
 			if run_id is not '':
 				rid2fdir[run_id] = fastq_dir
+		output_dir = '${output_dir}'
 		with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2, open('sample2genome.txt', 'w') as fo3, open('sample2chemistry.txt', 'w') as fo4, open('sample_adt_ids.txt', 'w') as fo5, open('sample_adt2dir.txt', 'w') as fo6, open('count_matrix.csv', 'w') as fo7:
 			n_normal = 0
 			n_non_normal = 0
 			fo7.write('Sample,Reference,Location\n')
 			for sample_id in df['Sample'].unique():
+				if sample_id.find(' ') != -1:
+					raise ValueError('Invalid sample id: ' + sample_id)
 				df_local = df.loc[df['Sample'] == sample_id]
 				assert df_local['Index'].unique().size == 1
 				is_adt = df_local['Index'].iat[0].find('-') < 0
 				if not is_adt:
 					n_normal += 1
-					fo1.write(str(sample_id) + '\n')
+					fo1.write(sample_id + '\n')
 					dirs = df_local['Flowcell'].map(lambda x: x if len(rid2fdir) == 0 else rid2fdir[os.path.basename(x)]).values
-					fo2.write(str(sample_id) + '\t' + ','.join(dirs) + '\n')
+					fo2.write(sample_id + '\t' + ','.join(dirs) + '\n')
 					assert df_local['Reference'].unique().size == 1
-					fo3.write(str(sample_id) + '\t' + df_local['Reference'].iat[0] + '\n')
+					fo3.write(sample_id + '\t' + df_local['Reference'].iat[0] + '\n')
 					chemistry = 'auto'
 					if 'Chemistry' in df_local.columns:
 						assert df_local['Chemistry'].unique().size == 1
 						chemistry = df_local['Chemistry'].iat[0]
-					fo4.write(str(sample_id) + '\t' + chemistry + '\n')
-					fo7.write(str(sample_id) + ',' + df_local['Reference'].iat[0] + ',' + '${output_dir}' + '/' + str(sample_id) + '/filtered_gene_bc_matrices_h5.h5' + '\n')
+					fo4.write(sample_id + '\t' + chemistry + '\n')
+					fo7.write(sample_id + ',' + df_local['Reference'].iat[0] + ',' + output_dir + ('/' if output_dir[len(output_dir)-1] != '/' else '') + sample_id + '/filtered_gene_bc_matrices_h5.h5' + '\n')
 				else:
 					n_non_normal += 1
-					fo5.write(str(sample_id) + '\n')
+					fo5.write(sample_id + '\n')
 					dirs = df_local['Flowcell'].map(lambda x: x if len(rid2fdir) == 0 else rid2fdir[os.path.basename(x)]).values
 					fo6.write(sample_id + '\t' + ','.join(dirs) + '\n')
 
