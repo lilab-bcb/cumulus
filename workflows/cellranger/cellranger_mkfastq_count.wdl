@@ -1,5 +1,5 @@
 import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/4/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/16/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/17/plain-WDL/descriptor" as crc
 import "https://api.firecloud.org/ga4gh/v1/tools/regev:scrtools_adt/versions/2/plain-WDL/descriptor" as sa
 
 workflow cellranger_mkfastq_count {
@@ -196,7 +196,8 @@ task generate_count_config {
 		import os
 		import pandas as pd
 		from subprocess import check_call
-		df = pd.read_csv('${input_csv_file}', header = 0, dtype={'Sample':str})
+		df = pd.read_csv('${input_csv_file}', header = 0)
+		df['Sample'] = df['Sample'].astype(str)
 		run_ids = '${sep="," run_ids}'.split(',')
 		fastq_dirs = '${sep="," fastq_dirs}'.split(',')
 		rid2fdir = dict()
@@ -241,7 +242,7 @@ task generate_count_config {
 				fo5.write('null\tnull\n')
 				fo6.write('null\tnull\n')
 		CODE
-		gsutil -q -m cp count_matrix.csv ${output_dir}/
+		gsutil -q -m cp count_matrix.csv "${output_dir}/"
 	}
 
 	output {
