@@ -1,12 +1,12 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/3/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/16/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/4/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/17/plain-WDL/descriptor" as crc
 import "https://api.firecloud.org/ga4gh/v1/tools/regev:scrtools_adt/versions/2/plain-WDL/descriptor" as sa
 
 workflow cellranger_mkfastq_count {
 	# 5 or 6 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry]). gs URL
 	File input_csv_file
 	# CellRanger output directory, gs URL
-	String cellranger_output_directory
+	String output_directory
 
 	# If run cellranger mkfastq
 	Boolean run_mkfastq = true
@@ -34,11 +34,8 @@ workflow cellranger_mkfastq_count {
 	# maximum hamming distance in antibody barcodes
 	Int? max_mismatch = 3
 
-
-
 	# 2.1.1 or 2.2.0
 	String? cellranger_version = "2.1.1"
-
 	# Number of cpus per cellranger job
 	Int? num_cpu = 64
 	# Memory in GB
@@ -53,7 +50,7 @@ workflow cellranger_mkfastq_count {
 	Int? adt_disk_space = 100
 	# Number of preemptible tries 
 	Int? preemptible = 2
-
+	String cellranger_output_directory = sub(output_directory,"\\/$","")
 
 	if (run_mkfastq) {
 		call generate_bcl_csv {
@@ -84,6 +81,7 @@ workflow cellranger_mkfastq_count {
 		call generate_count_config {
 			input:
 				input_csv_file = input_csv_file,
+				output_dir = cellranger_output_directory,
 				run_ids = generate_bcl_csv.run_ids,
 				fastq_dirs = cellranger_mkfastq.output_fastqs_flowcell_directory,
 				cellranger_version = cellranger_version,
@@ -153,8 +151,12 @@ task generate_bcl_csv {
 		import pandas as pd 
 		from subprocess import check_call
 		df = pd.read_csv('${input_csv_file}', header = 0)
+
+
 		with open('run_ids.txt', 'w') as fo1, open('inpdirs.txt', 'w') as fo2, open('bcls.txt', 'w') as fo3:
 			for input_dir in df['Flowcell'].unique():
+				if input_dir[len(input_dir)-1] == '/':
+					input_dir = input_dir[0:len(input_dir)-1]
 				run_id = os.path.basename(input_dir)
 				bcl_df = df.loc[df['Flowcell'] == input_dir, ['Lane', 'Sample', 'Index']]
 				bcl_df.to_csv(run_id + '_bcl.csv', index = False)
@@ -182,6 +184,7 @@ task generate_bcl_csv {
 
 task generate_count_config {
 	File input_csv_file
+	String output_dir
 	Array[String]? run_ids
 	Array[String]? fastq_dirs
 	String cellranger_version
@@ -196,16 +199,21 @@ task generate_count_config {
 		import pandas as pd
 		from subprocess import check_call
 		df = pd.read_csv('${input_csv_file}', header = 0)
+		df['Sample'] = df['Sample'].astype(str)
 		run_ids = '${sep="," run_ids}'.split(',')
 		fastq_dirs = '${sep="," fastq_dirs}'.split(',')
 		rid2fdir = dict()
 		for run_id, fastq_dir in zip(run_ids, fastq_dirs):
 			if run_id is not '':
 				rid2fdir[run_id] = fastq_dir
-		with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2, open('sample2genome.txt', 'w') as fo3, open('sample2chemistry.txt', 'w') as fo4, open('sample_adt_ids.txt', 'w') as fo5, open('sample_adt2dir.txt', 'w') as fo6:
+		output_dir = '${output_dir}'
+		with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2, open('sample2genome.txt', 'w') as fo3, open('sample2chemistry.txt', 'w') as fo4, open('sample_adt_ids.txt', 'w') as fo5, open('sample_adt2dir.txt', 'w') as fo6, open('count_matrix.csv', 'w') as fo7:
 			n_normal = 0
 			n_non_normal = 0
+			fo7.write('Sample,Reference,Location\n')
 			for sample_id in df['Sample'].unique():
+				if sample_id.find(' ') != -1:
+					raise ValueError('Invalid sample id: ' + sample_id)
 				df_local = df.loc[df['Sample'] == sample_id]
 				assert df_local['Index'].unique().size == 1
 				is_adt = df_local['Index'].iat[0].find('-') < 0
@@ -221,11 +229,13 @@ task generate_count_config {
 						assert df_local['Chemistry'].unique().size == 1
 						chemistry = df_local['Chemistry'].iat[0]
 					fo4.write(sample_id + '\t' + chemistry + '\n')
+					fo7.write(sample_id + ',' + df_local['Reference'].iat[0] + ',' + output_dir + ('/' if output_dir[len(output_dir)-1] != '/' else '') + sample_id + '/filtered_gene_bc_matrices_h5.h5' + '\n')
 				else:
 					n_non_normal += 1
 					fo5.write(sample_id + '\n')
 					dirs = df_local['Flowcell'].map(lambda x: x if len(rid2fdir) == 0 else rid2fdir[os.path.basename(x)]).values
 					fo6.write(sample_id + '\t' + ','.join(dirs) + '\n')
+
 			if n_normal == 0:
 				fo2.write('null\tnull\n')
 				fo3.write('null\tnull\n')
@@ -234,6 +244,7 @@ task generate_count_config {
 				fo5.write('null\tnull\n')
 				fo6.write('null\tnull\n')
 		CODE
+		gsutil -q -m cp count_matrix.csv "${output_dir}/"
 	}
 
 	output {
@@ -243,6 +254,7 @@ task generate_count_config {
 		Map[String, String] sample2chemistry = read_map('sample2chemistry.txt')
 		Array[String] sample_adt_ids = read_lines('sample_adt_ids.txt')
 		Map[String, String] sample_adt2dir = read_map('sample_adt2dir.txt')
+		String count_matrix = "${output_dir}/count_matrix.csv"
 	}
 
 	runtime {

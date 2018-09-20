@@ -60,8 +60,8 @@ workflow cellranger_count {
 
 	output {
 		String output_count_directory = run_cellranger_count.output_count_directory
-		File output_metrics_summary = run_cellranger_count.output_metrics_summary
-		File output_web_summary = run_cellranger_count.output_web_summary
+		String output_metrics_summary = run_cellranger_count.output_metrics_summary
+		String output_web_summary = run_cellranger_count.output_web_summary
 		File monitoringLog = run_cellranger_count.monitoringLog
 	}
 }
@@ -94,7 +94,7 @@ task run_cellranger_count {
 
 		fastqs = []
 		for i, directory in enumerate('${input_fastqs_directories}'.split(',')):
-			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/${sample_id}', '.']
+			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + ('/' if directory[len(directory)-1] != '/' else '') + '${sample_id}', '.']
 			# call_args = ['cp', '-r', directory + '/${sample_id}', '.']
 			print(' '.join(call_args))
 			check_call(call_args)
@@ -117,8 +117,8 @@ task run_cellranger_count {
 
 	output {
 		String output_count_directory = "${output_directory}/${sample_id}"
-		File output_metrics_summary = "results/outs/metrics_summary.csv"
-		File output_web_summary = "results/outs/web_summary.html"
+		String output_metrics_summary = "${output_directory}/${sample_id}/metrics_summary.csv"
+		String output_web_summary = "${output_directory}/${sample_id}/web_summary.html"
 		File monitoringLog = "monitoring.log"
 	}
 

@@ -2,7 +2,6 @@ import os
 import unittest
 
 import pandas as pd
-from firecloud import api as fapi
 
 import kco
 
@@ -41,7 +40,7 @@ class CommandTests(unittest.TestCase):
         kco.fc_run.main(['-m', 'broadgdac/echo', '-i', 'test.json', '-w', 'regev-development/test'])
 
     def test_inputs(self):
-        kco.fc_inputs.main(['-m', 'broadgdac/echo', '-o', 'test.json'])
+        kco.fc_inputs.main(['-m', 'broadgdac/echo', '-o', 'test-inputs.json'])
         os.remove('test.json')
 
 
