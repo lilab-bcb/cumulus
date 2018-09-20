@@ -57,10 +57,10 @@ task run_cellranger_mkfastq {
 		set -e
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
-		# gsutil -q -m cp -r ${input_bcl_directory} .
-		cp -r ${input_bcl_directory} .
+		gsutil -q -m cp -r ${input_bcl_directory} .
 		cellranger mkfastq --id=results --run=${run_id} --csv=${input_csv_file} --jobmode=local
-
+	#	gsutil -m -q cp results/results.mri.tgz ${output_directory}/${run_id}_mri/
+		gsutil -q -m rsync -d -r results/outs ${output_directory}/${run_id}_fastqs
 		python <<CODE
 		import os
 		import glob
@@ -80,9 +80,6 @@ task run_cellranger_mkfastq {
 			call_args.append(prefix + sample_id);
 			check_call(call_args)
 		CODE
-
-		# gsutil -q -m rsync -d -r results/outs ${output_directory}/${run_id}_fastqs
-		cp -r results/outs ${output_directory}/${run_id}_fastqs
 
 		python <<CODE
 		from subprocess import check_call, check_output, CalledProcessError

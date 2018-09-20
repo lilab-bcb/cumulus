@@ -17,8 +17,9 @@ def get_unique_url(unique_urls, base_url, name):
         counter = counter + 1
     return gs_url
 
-def upload_to_google_bucket(source, dest, dry_run = False):
-    print('Uploading ' + source + ' to ' + dest)
+
+def upload_to_google_bucket(source, dest, dry_run=False):
+    print(('Dry run: ' if dry_run else '') + 'Uploading  ' + source + ' to ' + dest)
     if not dry_run:
         if os.path.isdir(source):
             subprocess.check_call(['gsutil', '-m', 'rsync', '-r', source, dest])
@@ -65,8 +66,9 @@ def do_fc_upload(inputs, workspace, dry_run, bucket_folder):
                             values[i] = os.path.abspath(values[i])
                             sub_gs_url = input_file_to_output_gsurl.get(values[i], None)
                             if sub_gs_url is None:
-                                sub_gs_url = get_unique_url(unique_urls, 'gs://' + bucket + '/', os.path.basename(os.path.abspath(values[i])))
-                                unique_urls.add(sub_gs_url)                                                        
+                                sub_gs_url = get_unique_url(unique_urls, 'gs://' + bucket + '/',
+                                                            os.path.basename(os.path.abspath(values[i])))
+                                unique_urls.add(sub_gs_url)
                                 input_file_to_output_gsurl[values[i]] = sub_gs_url
                                 upload_to_google_bucket(values[i], sub_gs_url, dry_run)
                             values[i] = sub_gs_url
@@ -88,7 +90,8 @@ def main(argsv):
     parser = argparse.ArgumentParser(description='Upload files/directories to a Google bucket.')
     parser.add_argument('-w', '--workspace', dest='workspace', action='store', required=True,
                         help='Workspace name (e.g. foo/bar). The workspace is created if it does not exist')
-    parser.add_argument('--bucket-folder', metavar = '<folder>', dest='bucket_folder', action='store', help='Store inputs to <folder> under workspace''s google bucket')
+    parser.add_argument('--bucket-folder', metavar='<folder>', dest='bucket_folder', action='store',
+                        help='Store inputs to <folder> under workspace''s google bucket')
     parser.add_argument('--dry-run', dest='dry_run', action='store_true',
                         help='Causes upload to run in "dry run" mode, i.e., just outputting what would be uploaded without actually doing any uploading.')
     parser.add_argument(dest='input', help='Input JSON or file, such as a sample sheet.', nargs='+')
