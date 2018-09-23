@@ -3,11 +3,12 @@ workflow scrtools_adt {
 	String sample_id
 	# A comma-separated list of input FASTQs directories (gs urls)
 	String input_fastqs_directories
-	# CellRanger output directory, gs url
+	# Output directory, gs url
 	String output_directory
 
 	# cell barcodes, from 10x
 	File barcode_file = "gs://regev-lab/resources/cellranger/737K-august-2016.txt"
+	# File barcode_file = "737K-august-2016.txt"
 
 	# antibody barcodes in csv format
 	File antibody_barcode_file
@@ -26,7 +27,7 @@ workflow scrtools_adt {
 		input:
 			sample_id = sample_id,
 			input_fastqs_directories = input_fastqs_directories,
-			output_directory = output_directory,
+			output_directory = sub(output_directory, "/+$", ""),
 			cell_barcodes = barcode_file,
 			antibody_barcodes = antibody_barcode_file,
 			max_mismatch = max_mismatch,
@@ -62,6 +63,7 @@ task run_generate_count_matrix_ADTs {
 
 		fastqs = []
 		for i, directory in enumerate('${input_fastqs_directories}'.split(',')):
+			directory = re.sub('/+$', '', directory) # remove trailing slashes 
 			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/${sample_id}', '.']
 			# call_args = ['cp', '-r', directory + '/${sample_id}', '.']
 			print(' '.join(call_args))

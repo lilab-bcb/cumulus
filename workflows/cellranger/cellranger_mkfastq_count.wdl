@@ -1,12 +1,18 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/4/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/17/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/7/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/18/plain-WDL/descriptor" as crc
 import "https://api.firecloud.org/ga4gh/v1/tools/regev:scrtools_adt/versions/2/plain-WDL/descriptor" as sa
+
+# import "../cellranger/cellranger_mkfastq.wdl" as crm
+# import "../cellranger/cellranger_count.wdl" as crc
+# import "../scrtools/scrtools_adt.wdl" as sa
 
 workflow cellranger_mkfastq_count {
 	# 5 or 6 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry]). gs URL
 	File input_csv_file
-	# CellRanger output directory, gs URL
+	# Output directory, gs URL
 	String output_directory
+	# Output directory, with trailing slashes stripped
+	String output_directory_stripped = sub(output_directory, "/+$", "")
 
 	# If run cellranger mkfastq
 	Boolean run_mkfastq = true
@@ -14,12 +20,12 @@ workflow cellranger_mkfastq_count {
 	Boolean run_count = true
 
 
-	# Whether to delete input_bcl_directory. If false, you should delete this folder yourself so as to not incur storage charges.
-	Boolean delete_input_bcl_directory = false
+	# Whether to delete input_bcl_directory, default: true
+	Boolean? delete_input_bcl_directory = true
 
 	# Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
 	Boolean? secondary = false
-	# If force cells, default: true
+	# If force cells, default: false
 	Boolean? do_force_cells = false
 	# Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells. Default: 6,000 cells
 	Int? force_cells = 6000
@@ -30,7 +36,6 @@ workflow cellranger_mkfastq_count {
 
 	# antibody barcodes in csv format
 	File? antibody_barcode_file
-
 	# maximum hamming distance in antibody barcodes
 	Int? max_mismatch = 3
 
@@ -50,13 +55,12 @@ workflow cellranger_mkfastq_count {
 	Int? adt_disk_space = 100
 	# Number of preemptible tries 
 	Int? preemptible = 2
-	String cellranger_output_directory = sub(output_directory,"\\/$","")
 
 	if (run_mkfastq) {
 		call generate_bcl_csv {
 			input:
 				input_csv_file = input_csv_file,
-				output_dir = cellranger_output_directory,
+				output_dir = output_directory_stripped,
 				cellranger_version = cellranger_version,
 				preemptible = preemptible
 		}
@@ -66,7 +70,7 @@ workflow cellranger_mkfastq_count {
 				input:
 					input_bcl_directory = generate_bcl_csv.inpdirs[run_id],
 					input_csv_file = generate_bcl_csv.bcls[run_id],
-					output_directory = cellranger_output_directory,
+					output_directory = output_directory_stripped,
 					delete_input_bcl_directory = delete_input_bcl_directory,
 					cellranger_version = cellranger_version,
 					num_cpu = num_cpu,
@@ -81,7 +85,7 @@ workflow cellranger_mkfastq_count {
 		call generate_count_config {
 			input:
 				input_csv_file = input_csv_file,
-				output_dir = cellranger_output_directory,
+				output_dir = output_directory_stripped,
 				run_ids = generate_bcl_csv.run_ids,
 				fastq_dirs = cellranger_mkfastq.output_fastqs_flowcell_directory,
 				cellranger_version = cellranger_version,
@@ -94,7 +98,7 @@ workflow cellranger_mkfastq_count {
 					input:
 						sample_id = sample_id,
 						input_fastqs_directories = generate_count_config.sample2dir[sample_id],
-						output_directory = cellranger_output_directory,
+						output_directory = output_directory_stripped,
 						genome = generate_count_config.sample2genome[sample_id],
 						chemistry = generate_count_config.sample2chemistry[sample_id],
 						secondary = secondary,
@@ -124,7 +128,7 @@ workflow cellranger_mkfastq_count {
 					input:
 						sample_id = sample_id,
 						input_fastqs_directories = generate_count_config.sample_adt2dir[sample_id],
-						output_directory = cellranger_output_directory,
+						output_directory = output_directory_stripped,
 						antibody_barcode_file = antibody_barcode_file,
 						max_mismatch = max_mismatch,
 						memory = adt_memory,
@@ -148,15 +152,14 @@ task generate_bcl_csv {
 
 		python <<CODE
 		import os
+		import re
 		import pandas as pd 
 		from subprocess import check_call
+
 		df = pd.read_csv('${input_csv_file}', header = 0)
-
-
+		df['Flowcell'] = df['Flowcell'].map(lambda x: re.sub('/+$', '', x)) # remove trailing slashes
 		with open('run_ids.txt', 'w') as fo1, open('inpdirs.txt', 'w') as fo2, open('bcls.txt', 'w') as fo3:
 			for input_dir in df['Flowcell'].unique():
-				if input_dir[len(input_dir)-1] == '/':
-					input_dir = input_dir[0:len(input_dir)-1]
 				run_id = os.path.basename(input_dir)
 				bcl_df = df.loc[df['Flowcell'] == input_dir, ['Lane', 'Sample', 'Index']]
 				bcl_df.to_csv(run_id + '_bcl.csv', index = False)
@@ -196,17 +199,21 @@ task generate_count_config {
 
 		python <<CODE
 		import os
+		import re
 		import pandas as pd
 		from subprocess import check_call
+
 		df = pd.read_csv('${input_csv_file}', header = 0)
 		df['Sample'] = df['Sample'].astype(str)
+		df['Flowcell'] = df['Flowcell'].map(lambda x: re.sub('/+$', '', x)) # remove trailing slashes
+
 		run_ids = '${sep="," run_ids}'.split(',')
 		fastq_dirs = '${sep="," fastq_dirs}'.split(',')
 		rid2fdir = dict()
 		for run_id, fastq_dir in zip(run_ids, fastq_dirs):
 			if run_id is not '':
 				rid2fdir[run_id] = fastq_dir
-		output_dir = '${output_dir}'
+
 		with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2, open('sample2genome.txt', 'w') as fo3, open('sample2chemistry.txt', 'w') as fo4, open('sample_adt_ids.txt', 'w') as fo5, open('sample_adt2dir.txt', 'w') as fo6, open('count_matrix.csv', 'w') as fo7:
 			n_normal = 0
 			n_non_normal = 0
@@ -229,7 +236,7 @@ task generate_count_config {
 						assert df_local['Chemistry'].unique().size == 1
 						chemistry = df_local['Chemistry'].iat[0]
 					fo4.write(sample_id + '\t' + chemistry + '\n')
-					fo7.write(sample_id + ',' + df_local['Reference'].iat[0] + ',' + output_dir + ('/' if output_dir[len(output_dir)-1] != '/' else '') + sample_id + '/filtered_gene_bc_matrices_h5.h5' + '\n')
+					fo7.write(sample_id + ',' + df_local['Reference'].iat[0] + ',${output_dir}/' + sample_id + '/filtered_gene_bc_matrices_h5.h5\n')
 				else:
 					n_non_normal += 1
 					fo5.write(sample_id + '\n')
@@ -244,7 +251,9 @@ task generate_count_config {
 				fo5.write('null\tnull\n')
 				fo6.write('null\tnull\n')
 		CODE
-		gsutil -q -m cp count_matrix.csv "${output_dir}/"
+
+		gsutil -q -m cp count_matrix.csv ${output_dir}/
+		# cp count_matrix.csv ${output_dir}/
 	}
 
 	output {
