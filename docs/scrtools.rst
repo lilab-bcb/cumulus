@@ -13,6 +13,8 @@ Follow the steps below to run **scrtools** on FireCloud.
 		sample_3,pbmc,NextSeq,1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_3/filtered_gene_bc_matrices_h5.h5
 		sample_4,pbmc,NextSeq,2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_4/filtered_gene_bc_matrices_h5.h5
 
+	If you ran **cellranger_mkfastq_count**, you should obtain a template **count_matrix.csv** file that you can modify from **cellranger_mkfastq_count**'s outputs. 
+
 #. Upload your sample sheet to the workspace.  
 
 	Example::

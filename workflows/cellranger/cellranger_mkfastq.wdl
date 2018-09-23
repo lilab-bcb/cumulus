@@ -7,9 +7,9 @@ workflow cellranger_mkfastq {
 	String output_directory
 
 	# Whether to delete input bcl directory. If false, you should delete this folder yourself so as to not incur storage charges.
-	Boolean delete_input_bcl_directory
-	# 2.1.1 or 2.2.0
-	String? cellranger_version = "2.1.1"
+	Boolean? delete_input_bcl_directory = true
+	# 2.2.0 or 2.1.1
+	String? cellranger_version = "2.2.0"
 
 	# Number of cpus per cellranger job
 	Int? num_cpu = 64
@@ -22,9 +22,9 @@ workflow cellranger_mkfastq {
 
 	call run_cellranger_mkfastq {
 		input:
-			input_bcl_directory = input_bcl_directory,
+			input_bcl_directory = sub(input_bcl_directory, "/+$", ""),
 			input_csv_file = input_csv_file,
-			output_directory = output_directory,
+			output_directory = sub(output_directory, "/+$", ""),
 			delete_input_bcl_directory = delete_input_bcl_directory,
 			cellranger_version = cellranger_version,
 			num_cpu = num_cpu,
@@ -58,9 +58,11 @@ task run_cellranger_mkfastq {
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
 		gsutil -q -m cp -r ${input_bcl_directory} .
+		# cp -r ${input_bcl_directory} .
 		cellranger mkfastq --id=results --run=${run_id} --csv=${input_csv_file} --jobmode=local
-	#	gsutil -m -q cp results/results.mri.tgz ${output_directory}/${run_id}_mri/
 		gsutil -q -m rsync -d -r results/outs ${output_directory}/${run_id}_fastqs
+		# cp -r results/outs ${output_directory}/${run_id}_fastqs
+
 		python <<CODE
 		import os
 		import glob

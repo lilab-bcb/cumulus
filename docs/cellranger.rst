@@ -4,8 +4,6 @@ Run Cell Ranger mkfastq/count
 Follow the steps below to run CellRanger mkfastq/count on FireCloud.
 
 #. Copy your sequencing output to your workspace bucket using gsutil in your unix terminal. You can obtain your bucket URL in the workspace summary tab in FireCloud under Google Bucket. You can also read `FireCloud instructions`_ on uploading data.
-
-	It is highly recommended that you delete the **BCL files** after the pipeline is finished by turning on the **delete_input_directory** option.
 	
 	Example of copying the directory at /foo/bar/nextseq/Data/VK18WBC6Z4 to a Google Cloud bucket::
 
@@ -45,14 +43,16 @@ Follow the steps below to run CellRanger mkfastq/count on FireCloud.
 		* - **Sample**
 		  - Contains sample names. Each 10x channel should have a unique sample name.
 		* - **Reference**
-		  - | Provides the reference genome used by *cellran ger count* for each 10x channel. 
+		  - 
+			| Provides the reference genome used by *cellranger count* for each 10x channel. 
 			| The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as
 			| **GRCh38** for human GRCh38,
 			| **hg19** for human hg19,
 			| **mm10** for mouse, 
 			| **GRCh38_and_mm10** for human and mouse,
-			| **GRCh38_premrna** for human, introns included, and
-			| **mm10_premrna** for mouse, introns included.
+			| **GRCh38_premrna** for human, introns included,
+			| **mm10_premrna** for mouse, introns included, and
+			| **GRCh38_premrna_and_mm10_premrna** for human and mouse, introns included.
 		* - **Flowcell**
 		  - Indicates the Google bucket URL of uploaded BCL folders.
 		* - **Lane**
@@ -110,8 +110,8 @@ Cell Ranger mkfastq/count inputs:
 	  - Sample Sheet (contains Sample, Reference, Flowcell, Lane, Index)
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.csv"
 	  - 
-	* - **cellranger_output_directory**
-	  - Cellranger output directory
+	* - **output_directory**
+	  - Output directory
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_output"
 	  -
 	* - run_mkfastq
@@ -125,7 +125,7 @@ Cell Ranger mkfastq/count inputs:
 	* - delete_input_directory
 	  - If delete BCL directories after demux. If false, you should delete this folder yourself so as to not incur storage charges 
 	  - true
-	  - false
+	  - true
 	* - do_force_cells
 	  - force cells
 	  - true
@@ -143,8 +143,8 @@ Cell Ranger mkfastq/count inputs:
 	  - false
 	  - false
 	* - cellranger_version
-	  - Cellranger version
-	  - "2.1.1"
+	  - Cellranger version, could be 2.2.0 or 2.1.1
+	  - "2.2.0"
 	  - "2.1.1"
 	* - num_cpu
 	  - Number of cpus to request for one node
@@ -194,6 +194,9 @@ See the table below for important *Cell Ranger mkfastq/count* outputs.
 	* - output_web_summary
 	  - Array[File]
 	  - A list of htmls visualizing QCs for each sample (cellranger count output).
+	* - count_matrix
+	  - String
+	  - gs url for a template count_matrix.csv to run scrtools.
 
 ---------------------------------
 
@@ -227,13 +230,16 @@ Sometimes, people might want to perform demultiplexing locally and only run ``ce
 		* - **Sample**
 		  - Contains sample names. Each 10x channel should have a unique sample name.
 		* - **Reference**
-		  - | Provides the reference genome used by *cellranger count*.
+		  - 
+			| Provides the reference genome used by *cellranger count*.
 			| The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as
-			| **GRCh38** for human,
-			| **mm10** for mouse,
+			| **GRCh38** for human GRCh38,
+			| **hg19** for human hg19,
+			| **mm10** for mouse, 
 			| **GRCh38_and_mm10** for human and mouse,
-			| **GRCh38_premrna** for human, introns included, and
-			| **mm10_premrna** for mouse, introns included.
+			| **GRCh38_premrna** for human, introns included,
+			| **mm10_premrna** for mouse, introns included, and
+			| **GRCh38_premrna_and_mm10_premrna** for human and mouse, introns included.
 		* - **Flowcell**
 		  - Indicates the Google bucket URL of the uploaded FASTQ folders. The full path to the FASTQ files is FlowCell/Sample
 		* - Chemistry

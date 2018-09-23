@@ -6,11 +6,12 @@ workflow cellranger_count {
 	# CellRanger output directory, gs url
 	String output_directory
 
-	# GRCh38, hg19, mm10, GRCh38_and_mm10, GRCh38_premrna, mm10_premrna or a URL to a tar.gz file
+	# GRCh38, hg19, mm10, GRCh38_and_mm10, GRCh38_premrna, mm10_premrna, GRCh38_premrna_and_mm10_premrna or a URL to a tar.gz file
 	String genome
 
 
 	File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
+	# File acronym_file = "index.tsv"
 	Map[String, String] acronym2gsurl = read_map(acronym_file)
 	# If reference is a url
 	Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
@@ -21,15 +22,15 @@ workflow cellranger_count {
 	String? chemistry = "auto"
 	# Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
 	Boolean? secondary = false
-	# If force cells, default: true
+	# If force cells, default: false
 	Boolean? do_force_cells = false
 	# Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells. Default: 6,000 cells
 	Int? force_cells = 6000
 	# Expected number of recovered cells. Default: 3,000 cells. Mutually exclusive with force_cells
 	Int? expect_cells = 3000
 
-	# 2.1.1 or 2.2.0
-	String? cellranger_version = "2.1.1"
+	# 2.2.0 or 2.1.1
+	String? cellranger_version = "2.2.0"
 
 	# Number of cpus per cellranger job
 	Int? num_cpu = 64
@@ -44,7 +45,7 @@ workflow cellranger_count {
 		input:
 			sample_id = sample_id,
 			input_fastqs_directories = input_fastqs_directories,
-			output_directory = output_directory,
+			output_directory = sub(output_directory, "/+$", ""),
 			genome_file = genome_file,
 			chemistry = chemistry,
 			secondary = secondary,
@@ -90,11 +91,13 @@ task run_cellranger_count {
 		tar xf ${genome_file} -C genome_dir --strip-components 1
 
 		python <<CODE
+		import re
 		from subprocess import check_call
 
 		fastqs = []
 		for i, directory in enumerate('${input_fastqs_directories}'.split(',')):
-			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + ('/' if directory[len(directory)-1] != '/' else '') + '${sample_id}', '.']
+			directory = re.sub('/+$', '', directory) # remove trailing slashes 
+			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/${sample_id}', '.']
 			# call_args = ['cp', '-r', directory + '/${sample_id}', '.']
 			print(' '.join(call_args))
 			check_call(call_args)
