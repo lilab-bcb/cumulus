@@ -222,6 +222,7 @@ task generate_count_config {
 				if sample_id.find(' ') != -1:
 					raise ValueError('Invalid sample id: ' + sample_id)
 				df_local = df.loc[df['Sample'] == sample_id]
+				is_adt = False
 				if 'Index' in df_local.columns:
 					assert df_local['Index'].unique().size == 1
 					is_adt = df_local['Index'].iat[0].find('-') < 0
