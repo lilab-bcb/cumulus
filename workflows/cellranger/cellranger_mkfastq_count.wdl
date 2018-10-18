@@ -1,9 +1,12 @@
 import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/7/plain-WDL/descriptor" as crm
 import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/18/plain-WDL/descriptor" as crc
+# import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_vdj/versions/1/plain-WDL/descriptor" as crv
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_vdj/versions/1/plain-WDL/descriptor" as crv
 import "https://api.firecloud.org/ga4gh/v1/tools/regev:scrtools_adt/versions/2/plain-WDL/descriptor" as sa
 
 # import "../cellranger/cellranger_mkfastq.wdl" as crm
 # import "../cellranger/cellranger_count.wdl" as crc
+# import "../cellranger/cellranger_vdj.wdl" as crv
 # import "../scrtools/scrtools_adt.wdl" as sa
 
 workflow cellranger_mkfastq_count {
@@ -32,6 +35,15 @@ workflow cellranger_mkfastq_count {
 	# Expected number of recovered cells. Default: 3,000 cells. Mutually exclusive with force_cells
 	Int? expect_cells = 3000
 
+	# For vdj
+
+	# For vdj, force pipeline to use this number of cells, bypassing the cell detection algorithm.
+	Int? vdj_force_cells
+	# Do not align reads to reference V(D)J sequences before de novo assembly. Default: false
+	Boolean? vdj_denovo = false
+	# Force the web summary HTML and metrics summary CSV to only report on a particular chain type. The accepted values are: auto for autodetection based on TR vs IG representation, TR for T cell receptors, IG for B cell receptors, all for all chain types.
+	String? vdj_chain 
+
 	# For extracting ADT count
 
 	# antibody barcodes in csv format
@@ -39,8 +51,8 @@ workflow cellranger_mkfastq_count {
 	# maximum hamming distance in antibody barcodes
 	Int? max_mismatch = 3
 
-	# 2.1.1 or 2.2.0
-	String? cellranger_version = "2.1.1"
+	# 2.2.0 or 2.1.1
+	String? cellranger_version = "2.2.0"
 	# Number of cpus per cellranger job
 	Int? num_cpu = 64
 	# Memory in GB
@@ -51,6 +63,8 @@ workflow cellranger_mkfastq_count {
 	Int? mkfastq_disk_space = 1500
 	# Optional disk space needed for cell ranger count.
 	Int? count_disk_space = 500	
+	# Optional disk space needed for cell ranger vdj.
+	Int? vdj_disk_space = 500	
 	# Optional disk space needed for scrtools_adt
 	Int? adt_disk_space = 100
 	# Number of preemptible tries 
@@ -122,12 +136,40 @@ workflow cellranger_mkfastq_count {
 			}		
 		}
 
+		if (generate_count_config.sample_vdj_ids[0] != '') {
+			scatter (sample_id in generate_count_config.sample_vdj_ids) {
+				call crv.cellranger_vdj as cellranger_vdj {
+					input:
+						sample_id = sample_id,
+						input_fastqs_directories = generate_count_config.sample2dir[sample_id],
+						output_directory = output_directory_stripped,
+						genome = generate_count_config.sample2genome[sample_id],
+						force_cells = vdj_force_cells,
+						denovo = vdj_denovo,
+						chain = vdj_chain,
+						cellranger_version = cellranger_version,
+						num_cpu = num_cpu,
+						memory = memory,
+						disk_space = vdj_disk_space,
+						preemptible = preemptible
+				}
+			}
+
+			call collect_summaries as collect_summaries_vdj {
+				input:
+					summaries = cellranger_vdj.output_metrics_summary,
+					sample_ids = cellranger_vdj.output_vdj_directory,
+					cellranger_version = cellranger_version,
+					preemptible = preemptible
+			}		
+		}
+
 		if (generate_count_config.sample_adt_ids[0] != '' && defined(antibody_barcode_file)) {
 			scatter (sample_id in generate_count_config.sample_adt_ids) {
 				call sa.scrtools_adt as scrtools_adt {
 					input:
 						sample_id = sample_id,
-						input_fastqs_directories = generate_count_config.sample_adt2dir[sample_id],
+						input_fastqs_directories = generate_count_config.sample2dir[sample_id],
 						output_directory = output_directory_stripped,
 						antibody_barcode_file = antibody_barcode_file,
 						max_mismatch = max_mismatch,
@@ -214,44 +256,54 @@ task generate_count_config {
 			if run_id is not '':
 				rid2fdir[run_id] = fastq_dir
 
-		with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2, open('sample2genome.txt', 'w') as fo3, open('sample2chemistry.txt', 'w') as fo4, open('sample_adt_ids.txt', 'w') as fo5, open('sample_adt2dir.txt', 'w') as fo6, open('count_matrix.csv', 'w') as fo7:
-			n_normal = 0
-			n_non_normal = 0
-			fo7.write('Sample,Reference,Location\n')
+		with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2, open('sample2genome.txt', 'w') as fo3, open('sample2chemistry.txt', 'w') as fo4, \
+			 open('count_matrix.csv', 'w') as fo5, open('sample_vdj_ids.txt', 'w') as fo6, open('sample_adt_ids.txt', 'w') as fo7:
+
+			fo5.write('Sample,Reference,Location\n')
+
+			n_ref = n_chem = 0
+
 			for sample_id in df['Sample'].unique():
 				if sample_id.find(' ') != -1:
 					raise ValueError('Invalid sample id: ' + sample_id)
 				df_local = df.loc[df['Sample'] == sample_id]
-				is_adt = False
-				if 'Index' in df_local.columns:
-					assert df_local['Index'].unique().size == 1
-					is_adt = df_local['Index'].iat[0].find('-') < 0
-				if not is_adt:
-					n_normal += 1
+				
+				data_type = 'count'
+				if 'DataType' in df_local.columns:
+					assert df_local['DataType'].unique().size == 1
+					data_type = df_local['DataType'].iat[0]
+
+				if data_type == 'count':
 					fo1.write(sample_id + '\n')
-					dirs = df_local['Flowcell'].map(lambda x: x if len(rid2fdir) == 0 else rid2fdir[os.path.basename(x)]).values
-					fo2.write(sample_id + '\t' + ','.join(dirs) + '\n')
+				elif data_type == 'vdj':
+					fo6.write(sample_id + '\n')
+				elif data_type == 'adt':
+					fo7.write(sample_id + '\n')
+				else:
+					print('Invalid data type: ' + data_type + '!')
+					assert False
+
+				dirs = df_local['Flowcell'].map(lambda x: x if len(rid2fdir) == 0 else rid2fdir[os.path.basename(x)]).values
+				fo2.write(sample_id + '\t' + ','.join(dirs) + '\n')
+				
+				if data_type != 'adt':
 					assert df_local['Reference'].unique().size == 1
 					fo3.write(sample_id + '\t' + df_local['Reference'].iat[0] + '\n')
+					n_ref += 1
+
+				if data_type == 'count':
 					chemistry = 'auto'
 					if 'Chemistry' in df_local.columns:
 						assert df_local['Chemistry'].unique().size == 1
 						chemistry = df_local['Chemistry'].iat[0]
 					fo4.write(sample_id + '\t' + chemistry + '\n')
-					fo7.write(sample_id + ',' + df_local['Reference'].iat[0] + ',${output_dir}/' + sample_id + '/filtered_gene_bc_matrices_h5.h5\n')
-				else:
-					n_non_normal += 1
-					fo5.write(sample_id + '\n')
-					dirs = df_local['Flowcell'].map(lambda x: x if len(rid2fdir) == 0 else rid2fdir[os.path.basename(x)]).values
-					fo6.write(sample_id + '\t' + ','.join(dirs) + '\n')
+					n_chem += 1
+					fo5.write(sample_id + ',' + df_local['Reference'].iat[0] + ',${output_dir}/' + sample_id + '/filtered_gene_bc_matrices_h5.h5\n')
 
-			if n_normal == 0:
-				fo2.write('null\tnull\n')
+			if n_ref == 0:
 				fo3.write('null\tnull\n')
+			if n_chem == 0:
 				fo4.write('null\tnull\n')
-			if n_non_normal == 0:
-				fo5.write('null\tnull\n')
-				fo6.write('null\tnull\n')
 		CODE
 
 		gsutil -q -m cp count_matrix.csv ${output_dir}/
@@ -263,9 +315,9 @@ task generate_count_config {
 		Map[String, String] sample2dir = read_map('sample2dir.txt')
 		Map[String, String] sample2genome = read_map('sample2genome.txt')
 		Map[String, String] sample2chemistry = read_map('sample2chemistry.txt')
-		Array[String] sample_adt_ids = read_lines('sample_adt_ids.txt')
-		Map[String, String] sample_adt2dir = read_map('sample_adt2dir.txt')
 		String count_matrix = "${output_dir}/count_matrix.csv"
+		Array[String] sample_vdj_ids = read_lines('sample_vdj_ids.txt')
+		Array[String] sample_adt_ids = read_lines('sample_adt_ids.txt')
 	}
 
 	runtime {
