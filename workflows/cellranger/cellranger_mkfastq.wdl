@@ -60,8 +60,6 @@ task run_cellranger_mkfastq {
 		gsutil -q -m cp -r ${input_bcl_directory} .
 		# cp -r ${input_bcl_directory} .
 		cellranger mkfastq --id=results --run=${run_id} --csv=${input_csv_file} --jobmode=local --ignore-dual-index
-		gsutil -q -m rsync -d -r results/outs ${output_directory}/${run_id}_fastqs
-		# cp -r results/outs ${output_directory}/${run_id}_fastqs
 
 		python <<CODE
 		import os
@@ -82,6 +80,9 @@ task run_cellranger_mkfastq {
 			call_args.append(prefix + sample_id);
 			check_call(call_args)
 		CODE
+
+		gsutil -q -m rsync -d -r results/outs ${output_directory}/${run_id}_fastqs
+		# cp -r results/outs ${output_directory}/${run_id}_fastqs
 
 		python <<CODE
 		from subprocess import check_call, check_output, CalledProcessError
