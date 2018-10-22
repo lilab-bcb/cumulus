@@ -59,7 +59,7 @@ task run_cellranger_mkfastq {
 		monitor_script.sh > monitoring.log &
 		gsutil -q -m cp -r ${input_bcl_directory} .
 		# cp -r ${input_bcl_directory} .
-		cellranger mkfastq --id=results --run=${run_id} --csv=${input_csv_file} --jobmode=local --ignore-dual-index
+		cellranger mkfastq --id=results --run=${run_id} --csv=${input_csv_file} --jobmode=local --ignore-dual-index --qc
 
 		python <<CODE
 		import os
@@ -88,7 +88,7 @@ task run_cellranger_mkfastq {
 		from subprocess import check_call, check_output, CalledProcessError
 		if '${delete_input_bcl_directory}' is 'true':
 			try:
-				call_args = ['gsutil', '-q', 'stat', '${output_directory}/${run_id}_fastqs/qc_summary.json']
+				call_args = ['gsutil', '-q', 'stat', '${output_directory}/${run_id}_fastqs/input_samplesheet.csv']
 				print(' '.join(call_args))
 				check_output(call_args)
 				call_args = ['gsutil', '-q', '-m', 'rm', '-r', '${input_bcl_directory}']
