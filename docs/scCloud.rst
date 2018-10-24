@@ -1,7 +1,7 @@
-Run Single Cell RNA-Seq analysis tools (scrtools)
--------------------------------------------------
+Run single-cell cloud-based analysis module (scCloud) for scRNA-Seq data analysis
+---------------------------------------------------------------------------------
 
-Follow the steps below to run **scrtools** on FireCloud.
+Follow the steps below to run **scCloud** on FireCloud.
 
 #. Create a sample sheet, **count_matrix.csv**, which describes the metadata for each 10x channel. The sample sheet should at least contain 3 columns --- *Sample*, *Reference*, and *Location*. *Sample* refers to sample names, *Reference* refers to the genome name, and *Location* refers to the location of the channel-specific count matrix in 10x format (e.g. ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_gene_bc_matrices_h5.h5``). You are free to add any other columns and these columns will be used in selecting channels for futher analysis. In the example below, we have *Source*, which refers to the tissue of origin, *Platform*, which refers to the sequencing platform, and *Donor*, which refers to the donor ID.
 
@@ -21,26 +21,26 @@ Follow the steps below to run **scrtools** on FireCloud.
 	
 		gsutil cp /foo/bar/projects/my_count_matrix.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
-#. Import **scrtools** method.
+#. Import **scCloud** method.
 
-	In FireCloud, select the "Method Configurations" tab then click "Import Configuration". Click "Import From Method Repository". Type **scrtools**.
+	In FireCloud, select the "Method Configurations" tab then click "Import Configuration". Click "Import From Method Repository". Type **scCloud/scCloud**.
 
 #. Uncheck "Configure inputs/outputs using the Workspace Data Model"
 
 ---------------------------------
 
-scrtools steps:
+scCloud steps:
 ^^^^^^^^^^^^^^^
 
-**scrtools** processes single cell data in the following steps:
+**scCloud** processes single cell data in the following steps:
 
 #. **aggregate_matrix**. This step aggregates channel-specific count matrices into one big count matrix. Users could specify which channels they want to analyze and which sample attributes they want to import to the count matrix in this step.
 
-#. **cluster**. This step is the main analysis step. In this step, **scrtools** performs low quality cell filtration, variable gene selection, batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. tSNE/FLE).
+#. **cluster**. This step is the main analysis step. In this step, **scCloud** performs low quality cell filtration, variable gene selection, batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. tSNE/FLE).
 
-#. **de_analysis**. This step is optional. In this step, **scrtools** could calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **scrtools** could also calculate the area under ROC curve values for putative markers. If the samples are human or mouse immune cells, **scrtools** could also optionally annotate putative cell types for each cluster based on known markers.
+#. **de_analysis**. This step is optional. In this step, **scCloud** could calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **scCloud** could also calculate the area under ROC curve values for putative markers. If the samples are human or mouse immune cells, **scCloud** could also optionally annotate putative cell types for each cluster based on known markers.
 
-#. **plot**. This step is optional. In this step, **scrtools** could generate 3 types of figures based on the **cluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne** plot shows the same tSNE colored by different attributes (e.g. cluster labels, conditions) side-by-side. Lastly, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components.
+#. **plot**. This step is optional. In this step, **scCloud** could generate 3 types of figures based on the **cluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne** plot shows the same tSNE colored by different attributes (e.g. cluster labels, conditions) side-by-side. Lastly, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components.
 
 In the following, we will first introduce global inputs and then introduce the WDL inputs and outputs for each step separately. But please note that you need to set inputs from all steps simultaneously in the FireCloud WDL. 
 
@@ -72,7 +72,7 @@ global inputs
 	  - "GRCh38"
 	  - 
 	* - num_cpu
-	  - Number of cpus per scrtools job
+	  - Number of cpus per scCloud job
 	  - 32
 	  - 64
 	* - memory
@@ -135,7 +135,7 @@ cluster
 cluster inputs
 ++++++++++++++
 
-Note that we will only list important inputs here. For other inputs, please refer to **scrtools** package documentation.
+Note that we will only list important inputs here. For other inputs, please refer to **scCloud** package documentation.
 
 .. list-table::
 	:widths: 5 20 10 5
@@ -425,29 +425,29 @@ plot outputs
 Run subcluster analysis
 -----------------------
 
-Once we have **scrtools** outputs, we could further analyze a subset of cells by running **scrtools_subcluster**. To run **scrtools_subcluster**, follow the following steps:
+Once we have **scCloud** outputs, we could further analyze a subset of cells by running **scCloud_subcluster**. To run **scCloud_subcluster**, follow the following steps:
 
-#. Import **scrtools_subcluster** method.
+#. Import **scCloud_subcluster** method.
 
-	In FireCloud, select the "Method Configurations" tab then click "Import Configuration". Click "Import From Method Repository". Type **scrtools_subcluster**.
+	In FireCloud, select the "Method Configurations" tab then click "Import Configuration". Click "Import From Method Repository". Type **scCloud/scCloud_subcluster**.
 
 #. Uncheck "Configure inputs/outputs using the Workspace Data Model".
 
-scrtools_subcluster steps:
+scCloud_subcluster steps:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-*scrtools_subcluster* processes the subset of single cells in the following steps:
+*scCloud_subcluster* processes the subset of single cells in the following steps:
 
-#. **subcluster**. In this step, **scrtools_subcluster** first select the subset of cells from **scrtools** outputs according to user-provided criteria. It then performs batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. tSNE/FLE).
+#. **subcluster**. In this step, **scCloud_subcluster** first select the subset of cells from **scCloud** outputs according to user-provided criteria. It then performs batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. tSNE/FLE).
 
-#. **de_analysis**. This step is optional. In this step, **scrtools_subcluster** could calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **scrtools_subcluster** could also calculate the area under ROC curve values for putative markers. If the samples are human or mouse immune cells, **scrtools_subcluster** could also optionally annotate putative cell types for each cluster based on known markers.
+#. **de_analysis**. This step is optional. In this step, **scCloud_subcluster** could calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **scCloud_subcluster** could also calculate the area under ROC curve values for putative markers. If the samples are human or mouse immune cells, **scCloud_subcluster** could also optionally annotate putative cell types for each cluster based on known markers.
 
-#. **plot**. This step is optional. In this step, **scrtools_subcluster** could generate 3 types of figures based on the **subcluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne** plot shows the same tSNE colored by different attributes (e.g. cluster labels, conditions) side-by-side. Lastly, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components.
+#. **plot**. This step is optional. In this step, **scCloud_subcluster** could generate 3 types of figures based on the **subcluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne** plot shows the same tSNE colored by different attributes (e.g. cluster labels, conditions) side-by-side. Lastly, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components.
 
-scrtools_subcluster's inputs
+scCloud_subcluster's inputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Since **scrtools_subcluster** shares many inputs/outputs with **scrtools**, we will only cover inputs/outputs that are specific to **scrtools_subcluster**.
+Since **scCloud_subcluster** shares many inputs/outputs with **scCloud**, we will only cover inputs/outputs that are specific to **scCloud_subcluster**.
 
 Note that we will make the required inputs/outputs bold and all other inputs/outputs are optional.
 
@@ -460,7 +460,7 @@ Note that we will make the required inputs/outputs bold and all other inputs/out
 	  - Example
 	  - Default
 	* - **input_h5ad**
-	  - Input h5ad file containing *scrtools* results
+	  - Input h5ad file containing *scCloud* results
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir/my_results.h5ad"
 	  - 
 	* - **output_name**
@@ -479,7 +479,7 @@ Note that we will make the required inputs/outputs bold and all other inputs/out
 	  - "sample_1-ACCCGGGTTT-1"
 	  - None
 	* - num_cpu
-	  - Number of cpus per scrtools job
+	  - Number of cpus per scCloud job
 	  - 32
 	  - 64
 	* - memory
@@ -495,7 +495,7 @@ Note that we will make the required inputs/outputs bold and all other inputs/out
 	  - 2
 	  - 2
 
-scrtools_subcluster's outputs
+scCloud_subcluster's outputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table::
@@ -530,10 +530,10 @@ scrtools_subcluster's outputs
 ---------------------------------
 
 
-Load ``scrtools`` results into ``Seurat``  
+Load ``scCloud`` results into ``Seurat``  
 -----------------------------------------
 
-First, you need to set ``output_seurat_compatible`` to ``true`` in ``scrtools`` or ``scrtools_subcluster`` to obtain Seurat-compatible h5ad file ``output_name.seurat.h5ad``.
+First, you need to set ``output_seurat_compatible`` to ``true`` in ``scCloud`` or ``scCloud_subcluster`` to obtain Seurat-compatible h5ad file ``output_name.seurat.h5ad``.
 
 Then following the codes below to load the results into ``Seurat``::
 
