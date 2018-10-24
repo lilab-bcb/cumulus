@@ -100,7 +100,7 @@ inputs.json:
 
 	{
 		"cellranger_mkfastq_count.input_csv_file" : "mylocalpath/sample_sheet.csv",
-		"cellranger_mkfastq_count.cellranger_output_directory" : "gs://url/outputs",
+		"cellranger_mkfastq_count.output_directory" : "gs://url/outputs",
 		"cellranger_mkfastq_count.delete_input_bcl_directory": true
 	}
 

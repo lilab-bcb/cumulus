@@ -92,7 +92,7 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on FireCloud.
 
 #. Import cellranger_mkfastq_count method.
 
-	In FireCloud, select the ``Method Configurations`` tab then click ``Import Configuration``. Click ``Import From Method Repository``. Type cellranger_mkfastq_count.
+	In FireCloud, select the ``Method Configurations`` tab then click ``Import Configuration``. Click ``Import From Method Repository``. Type **regev/cellranger_mkfastq_count**.
 
 #. Uncheck ``Configure inputs/outputs using the Workspace Data Model``.
 
@@ -231,7 +231,7 @@ See the table below for important *Cell Ranger mkfastq/count* outputs.
 	  - A list of google bucket urls containing vdj results, one url per sample.
 	* - output_adt_directory
 	  - Array[String]
-	  - A list of google bucket urls containing adt count matrices, one url per sample.	  
+	  - A list of google bucket urls containing adt count matrices, one url per sample.
 	* - metrics_summaries
 	  - File
 	  - A excel spreadsheet containing QCs for each sample.
@@ -240,7 +240,7 @@ See the table below for important *Cell Ranger mkfastq/count* outputs.
 	  - A list of htmls visualizing QCs for each sample (cellranger count output).
 	* - count_matrix
 	  - String
-	  - gs url for a template count_matrix.csv to run scrtools.
+	  - gs url for a template count_matrix.csv to run scCloud.
 
 ---------------------------------
 

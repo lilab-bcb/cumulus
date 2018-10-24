@@ -12,5 +12,6 @@
 
    first_time
    cellranger
-   scrtools
+   scCloud
+   hashing_cite_seq
    command_line
