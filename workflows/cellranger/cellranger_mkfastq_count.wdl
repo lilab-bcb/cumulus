@@ -1,12 +1,12 @@
 import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/10/plain-WDL/descriptor" as crm
 import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/18/plain-WDL/descriptor" as crc
 import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_vdj/versions/1/plain-WDL/descriptor" as crv
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:scrtools_adt/versions/2/plain-WDL/descriptor" as sa
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/1/plain-WDL/descriptor" as sa
 
 # import "../cellranger/cellranger_mkfastq.wdl" as crm
 # import "../cellranger/cellranger_count.wdl" as crc
 # import "../cellranger/cellranger_vdj.wdl" as crv
-# import "../scrtools/scrtools_adt.wdl" as sa
+# import "../scCloud/scCloud_adt.wdl" as sa
 
 workflow cellranger_mkfastq_count {
 	# 5 or 6 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry]). gs URL
@@ -56,7 +56,7 @@ workflow cellranger_mkfastq_count {
 	Int? num_cpu = 64
 	# Memory in GB
 	Int? memory = 128
-	# Optional memory in GB for scrtools_adt
+	# Optional memory in GB for scCloud_adt
 	Int? adt_memory = 32
 	# Optional disk space for mkfastq.
 	Int? mkfastq_disk_space = 1500
@@ -64,7 +64,7 @@ workflow cellranger_mkfastq_count {
 	Int? count_disk_space = 500	
 	# Optional disk space needed for cell ranger vdj.
 	Int? vdj_disk_space = 500	
-	# Optional disk space needed for scrtools_adt
+	# Optional disk space needed for scCloud_adt
 	Int? adt_disk_space = 100
 	# Number of preemptible tries 
 	Int? preemptible = 2
@@ -165,7 +165,7 @@ workflow cellranger_mkfastq_count {
 
 		if (generate_count_config.sample_adt_ids[0] != '' && defined(antibody_barcode_file)) {
 			scatter (sample_id in generate_count_config.sample_adt_ids) {
-				call sa.scrtools_adt as scrtools_adt {
+				call sa.scCloud_adt as scCloud_adt {
 					input:
 						sample_id = sample_id,
 						input_fastqs_directories = generate_count_config.sample2dir[sample_id],
