@@ -258,7 +258,7 @@ task generate_count_config {
 		with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2, open('sample2genome.txt', 'w') as fo3, open('sample2chemistry.txt', 'w') as fo4, \
 			 open('count_matrix.csv', 'w') as fo5, open('sample_vdj_ids.txt', 'w') as fo6, open('sample_adt_ids.txt', 'w') as fo7:
 
-			fo5.write('Sample,Reference,Location\n')
+			fo5.write('Sample,Location\n')
 
 			n_ref = n_chem = 0
 
@@ -297,7 +297,7 @@ task generate_count_config {
 						chemistry = df_local['Chemistry'].iat[0]
 					fo4.write(sample_id + '\t' + chemistry + '\n')
 					n_chem += 1
-					fo5.write(sample_id + ',' + df_local['Reference'].iat[0] + ',${output_dir}/' + sample_id + '/filtered_gene_bc_matrices_h5.h5\n')
+					fo5.write(sample_id + ',${output_dir}/' + sample_id + '/filtered_gene_bc_matrices_h5.h5\n')
 
 			if n_ref == 0:
 				fo3.write('null\tnull\n')

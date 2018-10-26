@@ -1,11 +1,14 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/1/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/4/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud {
+	# Input csv-formatted file containing information of each scRNA-Seq run
 	File input_count_matrix_csv
-	# google bucket, subdirectory name and results name prefix
+	# Google bucket, subdirectory name and results name prefix
 	String output_name
-	
+	# Reference genome name, can be None if you want scCloud to infer it from data for you
+	String genome = ""
+
 	# Number of cpus per scCloud job
 	Int? num_cpu = 64
 	# Memory size in GB
@@ -22,17 +25,26 @@ workflow scCloud {
 
 	# for aggregate_matrices
 
-	# Reference genome name
-	String genome
 	# Select channels that satisfy all restrictions. Each restriction takes the format of name:value,...,value. Multiple restrictions are separated by ';'
 	String? restrictions
 	# Specify a comma-separated list of outputted attributes. These attributes should be column names in the csv file
 	String? attributes
+	# If we have demultiplexed data, turning on this option will make scCloud only include barcodes that are predicted as singlets
+	Boolean? select_only_singlets = false
+	# Only keep barcodes with at least this number of expressed genes
+	Int? minimum_number_of_genes
+	# If inputs are dropseq data
+	Boolean is_dropseq = false
+
+	# If inputs are dropseq data, this option needs to turn on and provides the reference genome name
+	String dropseq_genome = if is_dropseq then genome else ""
 
 
 
 	# for cluster
 
+	# If input data are CITE-Seq data
+	Boolean? cite_seq = false
 	# If output cell and gene filtration results [default: true]
 	Boolean? output_filtration_results = true
 	# If output Seurat compatible h5ad file [default: false]
@@ -142,6 +154,8 @@ workflow scCloud {
 	String? plot_tsne
 	# Takes the format of "attr,attr,...,attr". If non-empty, generate attr colored 3D interactive plot. The 3 coordinates are the first 3 PCs of all diffusion components.
 	String? plot_diffmap
+	# Plot cells based on t-SNE coordinates estimated from antibody expressions. Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored t-SNEs side by side.
+	String? plot_citeseq_tsne
 
 
 	# for scp_output
@@ -157,9 +171,11 @@ workflow scCloud {
 		input:
 			input_count_matrix_csv = input_count_matrix_csv,
 			output_name = out_name,
-			genome = genome,
 			restrictions = restrictions,
 			attributes = attributes,
+			select_only_singlets = select_only_singlets,
+			minimum_number_of_genes = minimum_number_of_genes,
+			dropseq_genome = dropseq_genome,
 			memory = memory,
 			disk_space = disk_space,
 			preemptible = preemptible
@@ -170,6 +186,7 @@ workflow scCloud {
 			input_10x_file = aggregate_matrices.output_10x_h5,
 			output_name = out_name,
 			genome = genome,
+			cite_seq = cite_seq,
 			output_filtration_results = output_filtration_results,
 			output_seurat_compatible = output_seurat_compatible,
 			output_loom = output_loom,
@@ -242,6 +259,7 @@ workflow scCloud {
 				plot_composition = plot_composition,
 				plot_tsne = plot_tsne,
 				plot_diffmap = plot_diffmap,
+				plot_citeseq_tsne = plot_citeseq_tsne,
 				memory = memory,
 				disk_space = disk_space,
 				preemptible = preemptible
