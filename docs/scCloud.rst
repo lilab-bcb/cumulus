@@ -3,7 +3,7 @@ Run single-cell cloud-based analysis module (scCloud) for scRNA-Seq data analysi
 
 Follow the steps below to run **scCloud** on FireCloud.
 
-#. Create a sample sheet, **count_matrix.csv**, which describes the metadata for each 10x channel. The sample sheet should at least contain 3 columns --- *Sample*, *Reference*, and *Location*. *Sample* refers to sample names, *Reference* refers to the genome name, and *Location* refers to the location of the channel-specific count matrix in 10x format (e.g. ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_gene_bc_matrices_h5.h5``). You are free to add any other columns and these columns will be used in selecting channels for futher analysis. In the example below, we have *Source*, which refers to the tissue of origin, *Platform*, which refers to the sequencing platform, and *Donor*, which refers to the donor ID.
+#. Create a sample sheet, **count_matrix.csv**, which describes the metadata for each 10x channel. The sample sheet should at least contain 2 columns --- *Sample* and *Location*. *Sample* refers to sample names and *Location* refers to the location of the channel-specific count matrix in either 10x format (e.g. ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_gene_bc_matrices_h5.h5``) or dropseq format (e.g. ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_2/sample_2.umi.dge.txt.gz``). You are free to add any other columns and these columns will be used in selecting channels for futher analysis. In the example below, we have *Source*, which refers to the tissue of origin, *Platform*, which refers to the sequencing platform, *Donor*, which refers to the donor ID, and *Reference*, which refers to the reference genome.
 
 	Example::
 
@@ -36,11 +36,11 @@ scCloud steps:
 
 #. **aggregate_matrix**. This step aggregates channel-specific count matrices into one big count matrix. Users could specify which channels they want to analyze and which sample attributes they want to import to the count matrix in this step.
 
-#. **cluster**. This step is the main analysis step. In this step, **scCloud** performs low quality cell filtration, variable gene selection, batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. tSNE/FLE).
+#. **cluster**. This step is the main analysis step. In this step, **scCloud** performs low quality cell filtration, variable gene selection, batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. t-SNE/FLE).
 
 #. **de_analysis**. This step is optional. In this step, **scCloud** could calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **scCloud** could also calculate the area under ROC curve values for putative markers. If the samples are human or mouse immune cells, **scCloud** could also optionally annotate putative cell types for each cluster based on known markers.
 
-#. **plot**. This step is optional. In this step, **scCloud** could generate 3 types of figures based on the **cluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne** plot shows the same tSNE colored by different attributes (e.g. cluster labels, conditions) side-by-side. Lastly, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components.
+#. **plot**. This step is optional. In this step, **scCloud** could generate 3 types of figures based on the **cluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne** plot shows the same t-SNE colored by different attributes (e.g. cluster labels, conditions) side-by-side. Lastly, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components.
 
 In the following, we will first introduce global inputs and then introduce the WDL inputs and outputs for each step separately. But please note that you need to set inputs from all steps simultaneously in the FireCloud WDL. 
 
@@ -61,14 +61,14 @@ global inputs
 	  - Default
 	* - **input_count_matrix_csv**
 	  - Input CSV file describing metadata of each 10x channel
-	  - "my_count_matrix.csv"
+	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_count_matrix.csv"
 	  - 
 	* - **output_name**
 	  - This is the prefix for all output files. It should contain the google bucket url, subdirectory name and output name prefix
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir/my_results"
 	  - 
-	* - **genome**
-	  - Reference genome name
+	* - genome
+	  - A string contains comma-separated genome names. scCloud will read all groups associated with genome names in the list from the hdf5 file. If genome is None, all groups will be considered.
 	  - "GRCh38"
 	  - 
 	* - num_cpu
@@ -112,6 +112,18 @@ aggregate_matrix inputs
 	  - Specify a comma-separated list of outputted attributes. These attributes should be column names in the count_matrix.csv file
 	  - "Source,Platform,Donor"
 	  - 
+	* - select_only_singlets
+	  - If we have demultiplexed data, turning on this option will make scCloud only include barcodes that are predicted as singlets
+	  - true
+	  - false
+	* - minimum_number_of_genes
+	  - Only keep barcodes with at least this number of expressed genes
+	  - 100
+	  - 
+	* - is_dropseq
+	  - If inputs are dropseq data
+	  - true
+	  - false
 
 aggregate_matrix output
 +++++++++++++++++++++++
@@ -145,6 +157,12 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - Description
 	  - Example
 	  - Default
+	* - cite_seq
+	  - | Data are CITE-Seq data. scCloud will perform analyses on RNA count matrix first. 
+	    | Then it will attach the ADT matrix to the RNA matrix with all antibody names changing to 'AD-' + antibody_name. 
+	    | Lastly, it will embed the antibody expression using t-SNE (the basis used for plotting is 'citeseq_tsne').
+	  - true
+	  - false
 	* - output_filtration_results
 	  - If output cell and gene filtration results to a spreadsheet
 	  - true
@@ -243,15 +261,15 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - 1.3
 	  - 1.3
 	* - run_tsne
-	  - Run multi-core tSNE for visualization
+	  - Run multi-core t-SNE for visualization
 	  - true
 	  - true
 	* - tsne_perplexity
-	  - tSNE’s perplexity parameter
+	  - t-SNE’s perplexity parameter
 	  - 30
 	  - 30
 	* - run_fitsne
-	  - Run FItSNE for visualization
+	  - Run FIt-SNE for visualization
 	  - true
 	  - false
 	* - run_umap
@@ -393,7 +411,7 @@ plot inputs
 	  - None
 	* - plot_tsne
 	  - | Takes the format of "attr,attr,...,attr". 
-	    | If non-empty, plot attr colored tSNEs side by side
+	    | If non-empty, plot attr colored t-SNEs side by side
 	  - "louvain_labels,Donor"
 	  - None
 	* - plot_diffmap
@@ -401,6 +419,12 @@ plot inputs
 	    | If non-empty, generate attr colored 3D interactive plot. 
 	    | The 3 coordinates are the first 3 PCs of all diffusion components
 	  - "louvain_labels,Donor"
+	  - None
+	* - plot_citeseq_tsne
+	  - | plot cells based on t-SNE coordinates estimated from antibody expressions.
+		| Takes the format of "attr,attr,...,attr". 
+	    | If non-empty, plot attr colored t-SNEs side by side
+	  - "louvain_labels"
 	  - None
 
 plot outputs
@@ -422,6 +446,17 @@ plot outputs
 
 ---------------------------------
 
+Run CITE-Seq analysis
+---------------------
+
+To run CITE-Seq analysis, turn on ``cite_seq`` option. 
+
+An embedding of epitope expressions via t-SNE is available at basis ``X_citeseq_tsne``. 
+
+To plot this epitope embedding, turn on ``plot_citeseq_tsne`` option.
+
+---------------------------------
+
 Run subcluster analysis
 -----------------------
 
@@ -438,11 +473,11 @@ scCloud_subcluster steps:
 
 *scCloud_subcluster* processes the subset of single cells in the following steps:
 
-#. **subcluster**. In this step, **scCloud_subcluster** first select the subset of cells from **scCloud** outputs according to user-provided criteria. It then performs batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. tSNE/FLE).
+#. **subcluster**. In this step, **scCloud_subcluster** first select the subset of cells from **scCloud** outputs according to user-provided criteria. It then performs batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. t-SNE/FLE).
 
 #. **de_analysis**. This step is optional. In this step, **scCloud_subcluster** could calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **scCloud_subcluster** could also calculate the area under ROC curve values for putative markers. If the samples are human or mouse immune cells, **scCloud_subcluster** could also optionally annotate putative cell types for each cluster based on known markers.
 
-#. **plot**. This step is optional. In this step, **scCloud_subcluster** could generate 3 types of figures based on the **subcluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne** plot shows the same tSNE colored by different attributes (e.g. cluster labels, conditions) side-by-side. Lastly, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components.
+#. **plot**. This step is optional. In this step, **scCloud_subcluster** could generate 3 types of figures based on the **subcluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne** plot shows the same t-SNE colored by different attributes (e.g. cluster labels, conditions) side-by-side. Lastly, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components.
 
 scCloud_subcluster's inputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^

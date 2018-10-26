@@ -7,9 +7,11 @@ task run_scCloud_aggregate_matrices {
 	Int memory
 	Int disk_space
 	Int preemptible
-	String? genome
 	String? restrictions
 	String? attributes
+	Boolean? select_only_singlets
+	Int? minimum_number_of_genes
+	String? dropseq_genome
 
 	command {
 		set -e
@@ -18,14 +20,19 @@ task run_scCloud_aggregate_matrices {
 		python <<CODE
 		from subprocess import check_call
 		call_args = ['scCloud', 'aggregate_matrix', '${input_count_matrix_csv}', '${output_name}', '--google-cloud']
-		if '${genome}' is not '':
-			call_args.extend(['--genome', '${genome}'])
 		if '${restrictions}' is not '':
 			ress = '${restrictions}'.split(';')
 			for res in ress:
 				call_args.extend(['--restriction', res])
 		if '${attributes}' is not '':
 			call_args.extend(['--attributes', '${attributes}'])
+		if '${select_only_singlets}' is 'true':
+			call_args.append('--select-only-singlets')
+		if '${minimum_number_of_genes}' is not '':
+			call_args.extend(['--minimum-number-of-genes', '${minimum_number_of_genes}'])
+		if '${dropseq_genome}' is not '':
+			call_args.extend(['--dropseq-genome', '${dropseq_genome}'])
+
 		print(' '.join(call_args))
 		check_call(call_args)
 		CODE
@@ -53,6 +60,7 @@ task run_scCloud_cluster {
 	Int disk_space
 	Int preemptible
 	String? genome
+	Boolean? cite_seq
 	Boolean? output_filtration_results
 	Boolean? output_seurat_compatible
 	Boolean? output_loom
@@ -107,6 +115,8 @@ task run_scCloud_cluster {
 		call_args = ['scCloud', 'cluster', '${input_10x_file}', '${output_name}', '-p', '${num_cpu}']
 		if '${genome}' is not '':
 			call_args.extend(['--genome', '${genome}'])
+		if '${cite_seq}' is 'true':
+			call_args.append('--cite-seq')
 		if '${output_filtration_results}' is 'true':
 			call_args.extend(['--output-filtration-results', '${output_name}' + '.filt.xlsx'])
 		if '${output_seurat_compatible}' is 'true':
@@ -293,6 +303,7 @@ task run_scCloud_plot {
 	String? plot_composition
 	String? plot_tsne
 	String? plot_diffmap
+	String? plot_citeseq_tsne
 
 	command {
 		set -e
@@ -317,6 +328,10 @@ task run_scCloud_plot {
 				call_args = ['scCloud', 'iplot', '--attribute', attr, 'diffmap_pca', '${input_h5ad}', '${output_name}.' + attr + '.diffmap_pca.html']
 				print(' '.join(call_args))
 				check_call(call_args)
+		if '${plot_citeseq_tsne}' is not '':
+			call_args = ['scCloud', 'plot', 'scatter', '--basis', 'citeseq_tsne', '--attributes', '${plot_citeseq_tsne}', '${input_h5ad}', '${output_name}.epitope.tsne.png']
+			print(' '.join(call_args))
+			check_call(call_args)			
 		CODE
 	}
 
@@ -538,6 +553,9 @@ task organize_results {
 		import os
 		from subprocess import check_call
 		dest = os.path.dirname('${output_name}') + '/'
+
+		# check_call(['mkdir', '-p', dest])
+		
 		files = ['${output_10x_h5}', '${sep=" " output_filt_xlsx}', '${sep=" " output_seurat_h5ad}', '${sep=" " output_loom_file}', '${output_de_xlsx}', '${sep=" " output_anno_file}']
 		files.append('${output_h5ad}' if '${output_de_h5ad}' is '' else '${output_de_h5ad}')
 		files.extend('${sep="," output_pngs}'.split(','))
@@ -583,6 +601,7 @@ task generate_hashing_cite_seq_tasks {
 				if row['TYPE'] == 'cite-seq':
 					fo2.write(outname + '\n')
 				else:
+					assert row['TYPE'] in ['cell-hashing', 'nuclei-hashing']
 					fo1.write(outname + '\n')
 				fo3.write(outname + '\t' + row['RNA'] + '\n')
 				fo4.write(outname + '\t' + row['ADT'] + '\n')
@@ -605,8 +624,8 @@ task generate_hashing_cite_seq_tasks {
 }
 
 task run_scCloud_demuxEM {
-	String input_adt_csv
-	String input_raw_gene_bc_matrices_h5
+	File input_adt_csv
+	File input_raw_gene_bc_matrices_h5
 	String output_dir
 	String output_name
 	Int num_cpu
@@ -626,14 +645,9 @@ task run_scCloud_demuxEM {
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
 
-		gsutil -q cp ${input_adt_csv} input_adt.csv
-		gsutil -q cp ${input_raw_gene_bc_matrices_h5} input_raw_gene_bc_matrices.h5
-		# cp ${input_adt_csv} input_adt.csv
-		# cp ${input_raw_gene_bc_matrices_h5} input_raw_gene_bc_matrices.h5
-
 		python <<CODE
 		from subprocess import check_call
-		call_args = ['scCloud', 'demuxEM', 'input_adt.csv', 'input_raw_gene_bc_matrices.h5', '${output_name}', '-p', '${num_cpu}', '--hash-type', '${hash_type}']
+		call_args = ['scCloud', 'demuxEM', '${input_adt_csv}', '${input_raw_gene_bc_matrices_h5}', '${output_name}', '-p', '${num_cpu}', '--hash-type', '${hash_type}']
 		if '${genome}' is not '':
 			call_args.extend(['--genome', '${genome}'])
 		if '${min_num_genes}' is not '':
@@ -672,6 +686,43 @@ task run_scCloud_demuxEM {
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: num_cpu
+		preemptible: preemptible
+	}
+}
+
+task run_scCloud_merge_rna_adt {
+	File input_raw_gene_bc_matrices_h5
+	File input_adt_csv
+	File antibody_control_csv
+	String output_dir
+	String output_name
+	Int memory
+	Int disk_space
+	Int preemptible
+
+	command {
+		set -e
+		export TMPDIR=/tmp
+		monitor_script.sh > monitoring.log &
+
+		scCloud merge_rna_adt ${input_raw_gene_bc_matrices_h5} ${input_adt_csv} ${antibody_control_csv} ${output_name}_merged_10x.h5
+
+		gsutil -q cp ${output_name}_merged_10x.h5 ${output_dir}/${output_name}/
+		# mkdir -p ${output_dir}/${output_name}
+		# cp ${output_name}_merged_10x.h5 ${output_dir}/${output_name}/
+	}
+
+	output {
+		String output_folder = "${output_dir}/${output_name}"
+		File monitoringLog = "monitoring.log"
+	}
+
+	runtime {
+		docker: "regevlab/sccloud"
+		memory: "${memory} GB"
+		bootDiskSizeGb: 12
+		disks: "local-disk ${disk_space} HDD"
+		cpu: 1
 		preemptible: preemptible
 	}
 }

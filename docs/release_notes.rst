@@ -1,3 +1,8 @@
+Version 0.4.0 `October 26, 2018`
+--------------------------------
+
+Added CITE-Seq module for analyzing CITE-Seq data.
+
 Version 0.3.0 `October 24, 2018`
 --------------------------------
 

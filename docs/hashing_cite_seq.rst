@@ -1,5 +1,5 @@
-Demultiplex cell-hashing/nuclei-hashing data using demuxEM or perform CITE-Seq analysis
----------------------------------------------------------------------------------------
+Demultiplex cell-hashing/nuclei-hashing data using demuxEM or prepare for CITE-Seq analysis
+-------------------------------------------------------------------------------------------
 
 Follow the steps below to run **scCloud** for cell-hashing/nuclei-hashing/CITE-Seq data on FireCloud.
 
@@ -11,11 +11,21 @@ Follow the steps below to run **scCloud** for cell-hashing/nuclei-hashing/CITE-S
 		sample_1,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/raw_gene_bc_matrices_h5.h5,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1_ADT/sample_1_ADT.csv,cell-hashing
 		sample_2,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_2/raw_gene_bc_matrices_h5.h5,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_2_ADT/sample_2_ADT.csv,nuclei-hashing
 
-#. Upload your sample sheet to the workspace.  
+#. Create an additional antibody-control sheet **antibody_control.csv** if you have CITE-Seq data. This sheet contains 2 columns --- *Antibody* and *Control*. 
+
+	Example::
+
+		Antibody,Control
+		CD8,Mouse-IgG1
+		HLA-ABC,Mouse-IgG2a
+		CD45RA,Mouse-IgG2b
+
+#. Upload your sample sheets to the workspace.  
 
 	Example::
 	
 		gsutil cp /foo/bar/projects/my_sample_sheet_hashing.csv gs://fc-e0000000-0000-0000-0000-000000000000/
+		gsutil cp /foo/bar/projects/antibody_control.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
 #. Import **scCloud_hashing_cite_seq** method.
 
@@ -38,7 +48,7 @@ scCloud_hashing_cite_seq inputs:
 	  - Default
 	* - **input_sample_sheet**
 	  - Input CSV file describing metadata of RNA and ADT data pairing
-	  - "my_sample_sheet_hashing.csv"
+	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_sample_sheet_hashing.csv"
 	  - 
 	* - **output_directory**
 	  - This is the output directory (gs url + path) for all results. There will be one folder per RNA-ADT data pair under this directory
@@ -67,6 +77,10 @@ scCloud_hashing_cite_seq inputs:
 	* - demuxEM_generate_gender_plot
 	  - demuxEM parameter. If generate violin plots using gender-specific genes (e.g. Xist). <demuxEM_generate_gender_plot> is a comma-separated list of gene names
 	  - "XIST"
+	  - 
+	* - antibody_control_csv
+	  - merge_rna_adt parameter. This is a CSV file containing the IgG control information for each antibody.
+	  - "gs://fc-e0000000-0000-0000-0000-000000000000/antibody_control_csv"
 	  - 
 	* - num_cpu
 	  - Number of cpus per scCloud_hashing_cite_seq job
@@ -103,7 +117,7 @@ See the table below for important *scCloud_hashing_cite_seq* outputs:
 	  - Array[String]
 	  - A list of google bucket urls containing results for every RNA-ADT data pairs.
 
-In the output folder of each RNA-ADT data pair, you can find the following files:
+In the output folder of each cell-hashing/nuclei-hashing RNA-ADT data pair, you can find the following files:
 
 .. list-table::
 	:widths: 5 10
@@ -128,6 +142,17 @@ In the output folder of each RNA-ADT data pair, you can find the following files
 	* - output_name.gene_name.violin.png
 	  - Optional outputs. Violin plots depicting gender-specific gene expression across samples. We can have multiple plots if a gene list is provided in input 'demuxEM_generate_gender_plot'.
 
+In the output folder of each cite-seq RNA-ADT data pair, you can find the following file:
+
+.. list-table::
+	:widths: 5 10
+	:header-rows: 1
+
+	* - Name
+	  - Description
+	* - output_name_merged_10x.h5ad
+	  - An h5ad file containing both RNA and ADT count matrices.
+
 ---------------------------------
 
 Load demultiplexing results into ``Python`` and ``R``
@@ -147,10 +172,3 @@ To load the results into ``R``, you need to install R package ``reticulate`` in 
 	data <- ad$read_h5ad("output_name_demux.h5ad")
 
 Results are in ``data$obs['demux_type']``, ``data$obs['assignment']``, and ``data$obsm['raw_probs']``.
-
----------------------------------
-
-CITE-Seq data analysis
-----------------------
-
-To be done.

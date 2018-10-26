@@ -12,6 +12,6 @@
 
    first_time
    cellranger
-   scCloud
    hashing_cite_seq
+   scCloud
    command_line

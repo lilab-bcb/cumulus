@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/3/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/4/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud_hashing_cite_seq {
@@ -31,6 +31,10 @@ workflow scCloud_hashing_cite_seq {
 	# Generate violin plots using gender-specific genes (e.g. Xist). <demuxEM_generate_gender_plot> is a comma-separated list of gene names.
 	String? demuxEM_generate_gender_plot
 
+	# merge_rna_adt parameters
+	# A CSV file containing the IgG control information for each antibody.
+	File? antibody_control_csv
+
 
 
 	call tasks.generate_hashing_cite_seq_tasks as generate_hashing_cite_seq_tasks {
@@ -45,7 +49,7 @@ workflow scCloud_hashing_cite_seq {
 				input:
 					input_adt_csv = generate_hashing_cite_seq_tasks.id2adt[hashing_id],
 					input_raw_gene_bc_matrices_h5 = generate_hashing_cite_seq_tasks.id2rna[hashing_id],
-					output_dir = output_directory,
+					output_dir = sub(output_directory, "/+$", ""),
 					output_name = hashing_id,
 					hash_type = generate_hashing_cite_seq_tasks.id2type[hashing_id],
 					genome = genome,
@@ -55,6 +59,22 @@ workflow scCloud_hashing_cite_seq {
 					generate_diagnostic_plots = demuxEM_generate_diagnostic_plots,
 					generate_gender_plot = demuxEM_generate_gender_plot,					
 					num_cpu = num_cpu,
+					memory = memory,
+					disk_space = disk_space,
+					preemptible = preemptible
+			}
+		}
+	}
+
+	if (generate_hashing_cite_seq_tasks.cite_seq_ids[0] != '') {
+		scatter (cite_seq_id in generate_hashing_cite_seq_tasks.cite_seq_ids) {
+			call tasks.run_scCloud_merge_rna_adt as run_scCloud_merge_rna_adt {
+				input:
+					input_raw_gene_bc_matrices_h5 = generate_hashing_cite_seq_tasks.id2rna[cite_seq_id],
+					input_adt_csv = generate_hashing_cite_seq_tasks.id2adt[cite_seq_id],
+					antibody_control_csv = antibody_control_csv,
+					output_dir = sub(output_directory, "/+$", ""),
+					output_name = cite_seq_id,
 					memory = memory,
 					disk_space = disk_space,
 					preemptible = preemptible
