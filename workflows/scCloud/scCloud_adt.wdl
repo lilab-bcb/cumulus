@@ -59,6 +59,7 @@ task run_generate_count_matrix_ADTs {
 		monitor_script.sh > monitoring.log &
 
 		python <<CODE
+		import re
 		from subprocess import check_call
 
 		fastqs = []
