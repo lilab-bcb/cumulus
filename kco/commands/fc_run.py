@@ -54,6 +54,8 @@ def do_fc_run(method: str, workspace: str, wdl_inputs: Union[str, dict], out_jso
     root_entity = None
     launch_entity = None
     workspace_namespace, workspace_name, workspace_version = kco.fs_split(workspace)
+    kco.get_or_create_workspace(workspace_namespace, workspace_name)
+
     if out_json is not None:
         kco.do_fc_upload(inputs, workspace, False, bucket_folder)
         with open(out_json, 'w') as fout:
