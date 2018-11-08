@@ -86,7 +86,7 @@ def do_fc_run(method: str, workspace: str, wdl_inputs: Union[str, dict], out_jso
     else:
         config_submission = fapi.create_workspace_config(workspace_namespace, workspace_name, method_body)
         if config_submission.status_code != 201:
-            raise ValueError('Unable to create workspace config')
+            raise ValueError('Unable to create workspace config - ' + str(config_submission.json()))
 
     launch_submission = fapi.create_submission(workspace_namespace, workspace_name, config_namespace, config_name,
                                                launch_entity, root_entity, "")
