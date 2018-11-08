@@ -10,7 +10,7 @@ Request an UGER server::
 	reuse UGER
 	qrsh -q interactive -l h_vmem=4g -pe smp 8 -binding linear:8 -P regevlab
 
-The above command requests an interactive shell with 4G memory per thread and 8 threads. Feel free to change the memory and thread parameters.
+The above command requests an interactive shell using the regevlab project with 4G memory per thread, 8 threads. Feel free to change the memory, thread, and project parameters.
 
 Add conda to your path::
 
