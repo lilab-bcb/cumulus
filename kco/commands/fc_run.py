@@ -17,6 +17,7 @@ def convert_inputs(inputs: dict) -> dict:
         elif isinstance(value, list) and len(value) > 0 and isinstance(value[0], str):
             for i in range(len(value)):
                 value[i] = '"{0}"'.format(value[i])
+            value = '[{0}]'.format(','.join(value))
         else:
             value = str(value)
         results[key] = value
