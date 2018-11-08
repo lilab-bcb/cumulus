@@ -1,11 +1,10 @@
 import argparse
-import uuid
+import json
 from typing import Union
 
 from firecloud import api as fapi
 
 import kco
-import json
 
 
 def convert_inputs(inputs: dict) -> dict:
@@ -43,7 +42,7 @@ def do_fc_run(method: str, workspace: str, wdl_inputs: Union[str, dict], out_jso
         version = -1
         list_methods = fapi.list_repository_methods(method_name)
         if list_methods.status_code != 200:
-            raise ValueError('Unable to get method ' + method_name)
+            raise ValueError('Unable to list methods ' + ' - ' + str(list_methods.json))
         methods = list_methods.json()
         for method in methods:
             if method['namespace'] == method_namespace:
@@ -82,7 +81,7 @@ def do_fc_run(method: str, workspace: str, wdl_inputs: Union[str, dict], out_jso
         config_submission = fapi.update_workspace_config(workspace_namespace, workspace_name, config_namespace,
                                                          config_name, method_body)
         if config_submission.status_code != 200:
-            raise ValueError('Unable to update workspace config')
+            raise ValueError('Unable to update workspace config - ' + str(config_submission.json()))
 
     else:
         config_submission = fapi.create_workspace_config(workspace_namespace, workspace_name, method_body)
