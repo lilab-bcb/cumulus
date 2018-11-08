@@ -83,7 +83,7 @@ def do_fc_run(method: str, workspace: str, wdl_inputs: Union[str, dict], out_jso
         config_submission = fapi.update_workspace_config(workspace_namespace, workspace_name, config_namespace,
                                                          config_name, method_body)
         if config_submission.status_code != 200:
-            raise ValueError('Unable to update workspace config - ' + str(config_submission.json()))
+            raise ValueError('Unable to update workspace config. Response: ' + str(config_submission.status_code))
 
     else:
         config_submission = fapi.create_workspace_config(workspace_namespace, workspace_name, method_body)
