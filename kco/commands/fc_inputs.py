@@ -17,7 +17,10 @@ def do_fc_inputs(method, out, config):
 
     if method_version is None:
         version = -1
-        methods = fapi.list_repository_methods(method_name).json()
+        list_methods = fapi.list_repository_methods(method_name)
+        if list_methods.status_code != 200:
+            raise ValueError('Unable to list methods ' + ' - ' + str(list_methods.json))
+        methods = list_methods.json()
         for method in methods:
             if method['namespace'] == method_namespace:
                 version = max(version, method['snapshotId'])

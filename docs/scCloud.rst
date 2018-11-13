@@ -570,10 +570,59 @@ Load ``scCloud`` results into ``Seurat``
 
 First, you need to set ``output_seurat_compatible`` to ``true`` in ``scCloud`` or ``scCloud_subcluster`` to obtain Seurat-compatible h5ad file ``output_name.seurat.h5ad``.
 
-Then following the codes below to load the results into ``Seurat``::
+Then execute the code below to load the results into ``Seurat``::
 
 	library(Seurat)
 	library(reticulate)
 	ad <- import("anndata", convert = FALSE)
 	test_ad <- ad$read_h5ad("output_name.seurat.h5ad")
 	test <- Convert(test_ad, to = "seurat")
+
+
+Visualize ``scCloud`` results in Python
+----------------------------------------
+
+Ensure you have `scanpy`_ installed.
+
+Load the output::
+
+	import scanpy.api as sc
+	adata = sc.read("output_name.h5ad")
+
+Violin plot of the computed quality measures::
+
+	sc.pl.violin(adata, ['n_genes', 'n_counts', 'percent_mito'], jitter=0.4, multi_panel=True)
+
+tSNE colored by louvain cluster labels::
+
+	sc.pl.tsne(adata, color=['louvain_labels'])
+
+tSNE colored by channel::
+
+	sc.pl.tsne(adata, color=['Channel'])
+
+tSNE colored by genes of interest::
+
+	sc.pl.tsne(adata, color=['GAPDH', 'HMGN2'], use_raw=True)
+
+Violin plot of genes of interest grouped by louvain cluster labels::
+
+	sc.pl.violin(adata, ['GAPDH', 'HMGN2'], groupby='louvain_labels')
+
+Dot plot of marker genes::
+
+	# get top 5 markers per cluster by Fisher's exact test q-value and log_fold_change and show dotplot
+	unique_louvain_labels = adata.obs['louvain_labels'].unique()
+	unique_markers = set()
+	for group in unique_louvain_labels:
+    	unique_markers.update(list(adata.var.sort_values(by=['fisher_qval_' + str(group), 'log_fold_change_' + str(group)],
+                                   ascending=[True, False]).index.values[0:5]))
+	markers = list(unique_markers)
+	sc.pl.dotplot(adata, markers, groupby='louvain_labels')
+
+Save plot to pdf::
+
+	# Set the parameter save='my_figure_name.pdf' and show=False to save any plot to pdf
+	sc.pl.dotplot(adata, markers, groupby='louvain_labels', save='markers.pdf', show=False)
+
+.. _scanpy: https://scanpy.readthedocs.io/en/latest/installation.html

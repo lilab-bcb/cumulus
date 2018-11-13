@@ -1,11 +1,10 @@
 import argparse
-import uuid
+import json
 from typing import Union
 
 from firecloud import api as fapi
 
 import kco
-import json
 
 
 def convert_inputs(inputs: dict) -> dict:
@@ -18,6 +17,7 @@ def convert_inputs(inputs: dict) -> dict:
         elif isinstance(value, list) and len(value) > 0 and isinstance(value[0], str):
             for i in range(len(value)):
                 value[i] = '"{0}"'.format(value[i])
+            value = '[{0}]'.format(','.join(value))
         else:
             value = str(value)
         results[key] = value
@@ -43,7 +43,7 @@ def do_fc_run(method: str, workspace: str, wdl_inputs: Union[str, dict], out_jso
         version = -1
         list_methods = fapi.list_repository_methods(method_name)
         if list_methods.status_code != 200:
-            raise ValueError('Unable to get method ' + method_name)
+            raise ValueError('Unable to list methods ' + ' - ' + str(list_methods.json))
         methods = list_methods.json()
         for method in methods:
             if method['namespace'] == method_namespace:
@@ -55,6 +55,8 @@ def do_fc_run(method: str, workspace: str, wdl_inputs: Union[str, dict], out_jso
     root_entity = None
     launch_entity = None
     workspace_namespace, workspace_name, workspace_version = kco.fs_split(workspace)
+    kco.get_or_create_workspace(workspace_namespace, workspace_name)
+
     if out_json is not None:
         kco.do_fc_upload(inputs, workspace, False, bucket_folder)
         with open(out_json, 'w') as fout:
@@ -82,12 +84,12 @@ def do_fc_run(method: str, workspace: str, wdl_inputs: Union[str, dict], out_jso
         config_submission = fapi.update_workspace_config(workspace_namespace, workspace_name, config_namespace,
                                                          config_name, method_body)
         if config_submission.status_code != 200:
-            raise ValueError('Unable to update workspace config')
+            raise ValueError('Unable to update workspace config. Response: ' + str(config_submission.status_code))
 
     else:
         config_submission = fapi.create_workspace_config(workspace_namespace, workspace_name, method_body)
         if config_submission.status_code != 201:
-            raise ValueError('Unable to create workspace config')
+            raise ValueError('Unable to create workspace config - ' + str(config_submission.json()))
 
     launch_submission = fapi.create_submission(workspace_namespace, workspace_name, config_namespace, config_name,
                                                launch_entity, root_entity, "")
