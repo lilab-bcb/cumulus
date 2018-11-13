@@ -119,7 +119,7 @@ aggregate_matrix inputs
 	* - minimum_number_of_genes
 	  - Only keep barcodes with at least this number of expressed genes
 	  - 100
-	  - 
+	  - 100
 	* - is_dropseq
 	  - If inputs are dropseq data
 	  - true

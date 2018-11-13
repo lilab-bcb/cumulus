@@ -32,7 +32,7 @@ workflow scCloud {
 	# If we have demultiplexed data, turning on this option will make scCloud only include barcodes that are predicted as singlets
 	Boolean? select_only_singlets = false
 	# Only keep barcodes with at least this number of expressed genes
-	Int? minimum_number_of_genes
+	Int? minimum_number_of_genes = 100
 	# If inputs are dropseq data
 	Boolean is_dropseq = false
 
