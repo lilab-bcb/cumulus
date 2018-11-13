@@ -5,8 +5,6 @@ workflow smartseq2_per_plate {
 	String plate_name
 	# Output directory, gs URL
 	String output_directory
-	# Output directory, with trailing slashes stripped
-	String output_directory_stripped = sub(output_directory, "/+$", "")
 	# Reference to align reads against
 	File reference
 
