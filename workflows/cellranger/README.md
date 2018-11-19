@@ -277,7 +277,7 @@ cluster_labels | Specify the cluster labels used for differential expression ana
 alpha | Control false discovery rate at <alpha> | 0.05 | 0.05
 fisher | Calculate Fisher’s exact test | true | false
 mwu | Calculate Mann-Whitney U test | true | false
-roc | Calculate area under cuver in ROC curve | true | false
+roc | Calculate area under curve in ROC curve | true | false
 annotate_cluster | If also annotate cell types for clusters based on DE results | true | false
 organism | Organism, could either be "human" or "mouse" | "mouse" | "human"
 minimum_report_score | Minimum cell type score to report a potential cell type | 0.5 | 0.5
