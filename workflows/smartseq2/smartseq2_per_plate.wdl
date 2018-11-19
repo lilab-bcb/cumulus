@@ -5,8 +5,17 @@ workflow smartseq2_per_plate {
 	String plate_name
 	# Output directory, gs URL
 	String output_directory
-	# Reference to align reads against
-	File reference
+
+	# GRCh38, GRCm38 or a URL to a tar.gz file
+	String reference
+
+	File acronym_file = "gs://regev-lab/resources/SmartSeq2/index.tsv"
+	# File acronym_file = "smartseq2_index.tsv"
+	Map[String, String] acronym2gsurl = read_map(acronym_file)
+	# If reference is a url
+	Boolean is_url = sub(reference, "^.+\\.(tgz|gz)$", "URL") == "URL"
+
+	File reference_file = (if is_url then reference else acronym2gsurl[reference])
 
 	# Number of cpus per job
 	Int? num_cpu = 4
@@ -26,7 +35,7 @@ workflow smartseq2_per_plate {
 	scatter (i in range(length(parse_sample_sheet.cell_ids))) {
 		call run_rsem {
 			input:
-				reference = reference,
+				reference = reference_file,
 				read1 = parse_sample_sheet.read1_list[i],
 				read2 = parse_sample_sheet.read2_list[i],
 				sample_name = parse_sample_sheet.cell_ids[i],

@@ -1,3 +1,8 @@
+Version 0.5.0 `November 18, 2018`
+---------------------------------
+
+Added support for plated-based SMART-Seq2 scRNA-Seq data.
+
 Version 0.4.0 `October 26, 2018`
 --------------------------------
 

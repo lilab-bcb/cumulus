@@ -13,5 +13,6 @@
    first_time
    cellranger
    hashing_cite_seq
+   smart_seq_2
    scCloud
    command_line
