@@ -353,7 +353,7 @@ de_analysis inputs
 	  - true
 	  - false
 	* - roc
-	  - Calculate area under cuver in ROC curve
+	  - Calculate area under curve in ROC curve
 	  - true
 	  - false
 	* - annotate_cluster

@@ -135,7 +135,7 @@ workflow scCloud {
 	Boolean? fisher = true
 	# Calculate Mann-Whitney U test.
 	Boolean? mwu
-	# Calculate area under cuver in ROC curve.
+	# Calculate area under curve in ROC curve.
 	Boolean? roc
 
 	# If also annotate cell types for clusters based on DE results.
