@@ -169,7 +169,7 @@ Cell Ranger mkfastq/count/vdj inputs:
 	  - 3
 	  - 3
 	* - cellranger_version
-	  - Cellranger version, could be 2.2.0 or 2.1.1
+	  - Cellranger version, could be 3.0.0, 2.2.0, 2.1.1
 	  - "2.2.0"
 	  - "2.2.0"
 	* - num_cpu
