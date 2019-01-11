@@ -22,8 +22,8 @@ workflow cellranger_mkfastq_count {
 	Boolean run_count = true
 
 
-	# Whether to delete input_bcl_directory, default: true
-	Boolean? delete_input_bcl_directory = true
+	# Whether to delete input_bcl_directory, default: false
+	Boolean? delete_input_bcl_directory = false
 
 	# Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
 	Boolean? secondary = false
