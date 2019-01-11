@@ -1,6 +1,8 @@
 #ifndef GZIP_UTILS
 #define GZIP_UTILS
 
+#include <cctype>
+#include <cstring>
 #include <string>
 #include <fstream>
 
@@ -26,8 +28,11 @@ struct iGZipFile {
 	~iGZipFile() { close(); }
 
 	bool open(const char* input_file) {
+		const char *ptr = strstr(input_file, ".gz");
+		bool isGZ = ptr != NULL && *(ptr + 3) == 0;
+
 		fin.open(input_file, std::ios_base::in | std::ios_base::binary);
-		gin.push(boost::iostreams::gzip_decompressor());
+		if (isGZ) gin.push(boost::iostreams::gzip_decompressor());
 		gin.push(fin);
 
 		return true;
@@ -51,6 +56,13 @@ struct iGZipFile {
 		if (!success) return 2;
 		success = (bool)getline(gin, aread.qual);
 		return (success ? 4 : 3);
+	}
+
+	bool next(std::string& line) {
+		bool success = (bool)getline(gin, line);
+		if (success) 
+			while (iscntrl(line.back())) line.pop_back(); // remove \r 		
+		return success;
 	}
 };
 

@@ -2,13 +2,14 @@
 #define BARCODE_UTILS
 
 #include <cstdio>
-#include <cctype>
 #include <cassert>
 #include <cstdint>
 #include <string>
 #include <fstream>
 #include <vector>
 #include <unordered_map>
+
+#include "gzip_utils.hpp"
 
 struct ValueType {
 	int item_id;
@@ -117,14 +118,13 @@ inline void mutate_index(HashType& index_dict, uint64_t binary_id, int len, int 
 }
 
 void parse_sample_sheet(const char* sample_sheet_file, int& n_barcodes, int& barcode_len, HashType& index_dict, std::vector<std::string>& index_names, int max_mismatch = 1) {
-	std::ifstream fin(sample_sheet_file);
+	iGZipFile fin(sample_sheet_file);
 	std::string line, index_name, index_seq;
 
 	n_barcodes = 0;
 	index_dict.clear();
 	index_names.clear();
-	while (std::getline(fin, line)) {
-		while (iscntrl(line.back())) line.pop_back(); // remove \r 		
+	while (fin.next(line)) {
 		std::size_t pos = line.find_first_of(',');
 		if (pos != std::string::npos) { index_seq = line.substr(0, pos); index_name = line.substr(pos + 1); }
 		else { index_seq = line; index_name = line; }
@@ -141,7 +141,7 @@ void parse_sample_sheet(const char* sample_sheet_file, int& n_barcodes, int& bar
 	int n_amb = 0;
 	for (auto&& kv : index_dict) 
 		if (kv.second.item_id < 0) ++n_amb;
-	printf("In the index, %d out of %d items are ambigious, ratio = %.2f.\n", n_amb, index_dict.size(), n_amb * 1.0 / index_dict.size());
+	printf("In the index, %d out of %d items are ambigious, ratio = %.2f.\n", n_amb, (int)index_dict.size(), n_amb * 1.0 / index_dict.size());
 }
 
 #endif 
