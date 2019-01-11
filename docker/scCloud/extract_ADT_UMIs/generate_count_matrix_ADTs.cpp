@@ -24,18 +24,19 @@ struct InputFile{
 	InputFile(string r1, string r2) : input_r1(r1), input_r2(r2) {}
 };
 
-int max_mismatch, first_n;
+int max_mismatch, umi_len;
+string feature_name;
 
 vector<InputFile> inputs; 
 
 Read read1, read2;
 iGZipFile gzip_in_r1, gzip_in_r2;
 
-int n_cell, n_antibody; // number of cell and antibody barcodes
-int cell_blen, antibody_blen; // cell barcode length and antibody barcode length
-vector<string> cell_names, antibody_names;
-HashType cell_index, antibody_index;
-HashIterType cell_iter, antibody_iter;
+int n_cell, n_feature; // number of cell and feature barcodes
+int cell_blen, feature_blen; // cell barcode length and feature barcode length
+vector<string> cell_names, feature_names;
+HashType cell_index, feature_index;
+HashIterType cell_iter, feature_iter;
 
 Cell2Antibody data_matrix;
 
@@ -93,7 +94,7 @@ void parse_input_directory(char* input_dirs) {
 
 // valdiate the BA...A pattern
 // lenA, length of A string
-inline bool validate_pattern(const string& tag, int pos, int lenA, int max_mismatch) {
+inline bool validate_pattern_antibody(const string& tag, int pos, int lenA, int max_mismatch) {
 	int nmis = (tag[pos] != 'C' && tag[pos] != 'G' && tag[pos] != 'T');
 	++pos;
 	for (int i = 0; i < lenA; ++i, ++pos) {
@@ -103,13 +104,47 @@ inline bool validate_pattern(const string& tag, int pos, int lenA, int max_misma
 	return true;
 }
 
+inline int locate_feature_start_crispr(const string& sequence, int range, const string& pattern, int max_mismatch) {
+	int best_pos = -1, best_nmis = max_mismatch + 1, npat = pattern.length(), n_mis;
+	range -= npat - 1;
+	for (int i = 0; i < range; ++i) {
+		n_mis = 0;
+		for (int j = 0; j < npat; ++j) {
+			n_mis += (sequence[i + j] != pattern[j]);
+			if (n_mis > max_mismatch) break;
+		}
+		if (best_nmis > n_mis) {
+			best_pos = i;
+			best_nmis = n_mis;
+		}
+	}
+	return best_pos >= 0 ? best_pos + npat : -1;
+}
+
+inline bool extract_feature_barcode(const string& sequence, int feature_length, const string& feature_name, string& feature_barcode) {
+	bool success;
+
+	if (feature_name == "antibody") {
+		success = validate_pattern_antibody(sequence, feature_length, 7, 1);
+		if (success) feature_barcode = sequence.substr(0, feature_length);
+	}
+	else {
+		assert(feature_name == "crispr");
+		int pos = locate_feature_start_crispr(sequence, sequence.length() - feature_length, "GGAAAGGACGAAACACCG", 1);
+		success = pos >= 0;
+		if (success) feature_barcode = sequence.substr(pos, feature_length);
+	}
+
+	return success;
+}
+
 void produce_output(const char* out_name) {
 	int i, total_umi, set_size;
 	char outF[STRLEN];
 	ofstream fout;
 	vector<SortType> sort_arr;
 	vector<vector<int> > ADTs;
-	vector<int> dummy(n_antibody, 0);
+	vector<int> dummy(n_feature, 0);
 	vector<int> nreads, numis;
 
 	i = 0;
@@ -136,8 +171,8 @@ void produce_output(const char* out_name) {
 	fout<< "Antibody";
 	for (auto&& val : sort_arr) fout<< ","<< cell_names[val.cell_id];
 	fout<< endl;
-	for (i = 0; i < n_antibody; ++i) {
-		fout<< antibody_names[i];
+	for (i = 0; i < n_feature; ++i) {
+		fout<< feature_names[i];
 		for (auto&& val : sort_arr) fout<< ","<< ADTs[val.pos][i];
 		fout<< endl;
 	}
@@ -161,7 +196,7 @@ void produce_output(const char* out_name) {
 
 int main(int argc, char* argv[]) {
 	if (argc < 5) {
-		printf("Usage: generate_count_matrix_ADTs cell_barcodes.txt antibody_barcodes.csv fastq_folders output_name [--max-mismatch #] [--first-n n]\n");
+		printf("Usage: generate_count_matrix_ADTs cell_barcodes.txt[.gz] feature_barcodes.csv fastq_folders output_name [--feature feature_name] [--max-mismatch #] [--umi-length len]\n");
 		exit(-1);
 	}
 
@@ -169,26 +204,29 @@ int main(int argc, char* argv[]) {
 
 	a = time(NULL);
 
-	first_n = -1;
+	feature_name = "antibody";
 	max_mismatch = 2;
-
+	umi_len = 10;
 	for (int i = 5; i < argc; ++i) {
+		if (!strcmp(argv[i], "--feature")) {
+			feature_name = argv[i + 1];
+		}
 		if (!strcmp(argv[i], "--max-mismatch")) {
 			max_mismatch = atoi(argv[i + 1]);
 		}
-		if (!strcmp(argv[i], "--first-n")) {
-			first_n = atoi(argv[i + 1]);
+		if (!strcmp(argv[i], "--umi-length")) {
+			umi_len = atoi(argv[i + 1]);
 		}
 	}
 
 	parse_sample_sheet(argv[1], n_cell, cell_blen, cell_index, cell_names, 1);
-	parse_sample_sheet(argv[2], n_antibody, antibody_blen, antibody_index, antibody_names, max_mismatch);
+	parse_sample_sheet(argv[2], n_feature, feature_blen, feature_index, feature_names, max_mismatch);
 	
 	parse_input_directory(argv[3]);
 
 	int cnt = 0;
-	string cell_barcode, umi, antibody_barcode;
-	uint64_t binary_cell, binary_umi, binary_antibody;
+	string cell_barcode, umi, feature_barcode;
+	uint64_t binary_cell, binary_umi, binary_feature;
 	
 	data_matrix.clear();
 
@@ -204,26 +242,22 @@ int main(int argc, char* argv[]) {
 			cell_iter = cell_index.find(binary_cell);
 
 			if (cell_iter != cell_index.end() && cell_iter->second.item_id >= 0) {
-				if (validate_pattern(read2.seq, antibody_blen, 7, 1)) {
-					antibody_barcode = read2.seq.substr(0, antibody_blen);
-					binary_antibody = barcode_to_binary(antibody_barcode);
-					antibody_iter = antibody_index.find(binary_antibody);
+				if (extract_feature_barcode(read2.seq, feature_blen, feature_name, feature_barcode)) {
+					binary_feature = barcode_to_binary(feature_barcode);
+					feature_iter = feature_index.find(binary_feature);
 
-					if (antibody_iter != antibody_index.end() && antibody_iter->second.item_id >= 0) {
+					if (feature_iter != feature_index.end() && feature_iter->second.item_id >= 0) {
 						umi = read1.seq.substr(cell_blen);
 						binary_umi = barcode_to_binary(umi);
 
 						auto& one_cell = data_matrix[cell_iter->second.item_id];
 						++one_cell.nreads;
-						one_cell.ADTs[antibody_iter->second.item_id].insert(binary_umi);
+						one_cell.ADTs[feature_iter->second.item_id].insert(binary_umi);
 					}
 				}
 			}
 
-
 			if (cnt % 1000000 == 0) printf("Processed %d reads.\n", cnt);
-
-			if (first_n > 0 && cnt >= first_n) break;
 		}
 
 		gzip_in_r1.close();
