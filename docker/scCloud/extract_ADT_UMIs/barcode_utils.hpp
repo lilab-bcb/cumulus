@@ -62,6 +62,7 @@ static const std::vector<std::vector<uint64_t> > aux_arr = init_aux_arr();
 uint64_t barcode_to_binary(const std::string& barcode) {
 	uint64_t binary_id = 0;
 	char c;
+	if (barcode.length() > UPPER) printf("%s\n", barcode.c_str());
 	assert(barcode.length() <= UPPER);
 	for (auto&& it = barcode.rbegin(); it != barcode.rend(); ++it) {
 		c = *it;

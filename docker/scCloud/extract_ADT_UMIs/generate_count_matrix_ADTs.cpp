@@ -24,8 +24,8 @@ struct InputFile{
 	InputFile(string r1, string r2) : input_r1(r1), input_r2(r2) {}
 };
 
-int max_mismatch, umi_len;
-string feature_name;
+int max_mismatch_cell, max_mismatch_feature, umi_len;
+string feature_type;
 
 vector<InputFile> inputs; 
 
@@ -121,15 +121,15 @@ inline int locate_feature_start_crispr(const string& sequence, int range, const 
 	return best_pos >= 0 ? best_pos + npat : -1;
 }
 
-inline bool extract_feature_barcode(const string& sequence, int feature_length, const string& feature_name, string& feature_barcode) {
+inline bool extract_feature_barcode(const string& sequence, int feature_length, const string& feature_type, string& feature_barcode) {
 	bool success;
 
-	if (feature_name == "antibody") {
+	if (feature_type == "antibody") {
 		success = validate_pattern_antibody(sequence, feature_length, 7, 1);
 		if (success) feature_barcode = sequence.substr(0, feature_length);
 	}
 	else {
-		assert(feature_name == "crispr");
+		assert(feature_type == "crispr");
 		int pos = locate_feature_start_crispr(sequence, sequence.length() - feature_length, "GGAAAGGACGAAACACCG", 1);
 		success = pos >= 0;
 		if (success) feature_barcode = sequence.substr(pos, feature_length);
@@ -168,7 +168,7 @@ void produce_output(const char* out_name) {
 
 	sprintf(outF, "%s.csv", out_name);
 	fout.open(outF);
-	fout<< "Antibody";
+	fout<< (feature_type == "antibody" ? "Antibody" : "CRISPR");
 	for (auto&& val : sort_arr) fout<< ","<< cell_names[val.cell_id];
 	fout<< endl;
 	for (i = 0; i < n_feature; ++i) {
@@ -196,7 +196,15 @@ void produce_output(const char* out_name) {
 
 int main(int argc, char* argv[]) {
 	if (argc < 5) {
-		printf("Usage: generate_count_matrix_ADTs cell_barcodes.txt[.gz] feature_barcodes.csv fastq_folders output_name [--feature feature_name] [--max-mismatch #] [--umi-length len]\n");
+		printf("Usage: generate_count_matrix_ADTs cell_barcodes.txt[.gz] feature_barcodes.csv fastq_folders output_name [--max-mismatch-cell #] [--feature feature_type] [--max-mismatch-feature #] [--umi-length len]\n");
+		printf("Arguments:\n\tcell_barcodes.txt[.gz]\t10x genomics barcode white list\n");
+		printf("\tfeature_barcodes.csv\tfeature barcode file;barcode,feature_name\n");
+		printf("\tfastq_folders\tfolder contain all R1 and R2 FASTQ files ending with 001.fastq.gz\n");
+		printf("\toutput_name\toutput file name prefix;output_name.csv and output_name.stat.csv\n");
+		printf("Options:\n\t--max-mismatch-cell #\tmaximum number of mismatches allowed for cell barcodes [default: 1]\n");
+		printf("\t--feature feature_type\tfeature type can be either antibody or crispr [default: antibody]\n");
+		printf("\t--max-mismatch-feature #\tmaximum number of mismatches allowed for feature barcodes [default: 3]\n");
+		printf("\t--umi-length len\tlength of the UMI sequence [default: 10]\n");
 		exit(-1);
 	}
 
@@ -204,23 +212,29 @@ int main(int argc, char* argv[]) {
 
 	a = time(NULL);
 
-	feature_name = "antibody";
-	max_mismatch = 2;
+	max_mismatch_cell = 1;
+	feature_type = "antibody";
+	max_mismatch_feature = 3;
 	umi_len = 10;
+
 	for (int i = 5; i < argc; ++i) {
-		if (!strcmp(argv[i], "--feature")) {
-			feature_name = argv[i + 1];
+		if (!strcmp(argv[i], "--max-mismatch-cell")) {
+			max_mismatch_cell = atoi(argv[i + 1]);
 		}
-		if (!strcmp(argv[i], "--max-mismatch")) {
-			max_mismatch = atoi(argv[i + 1]);
+		if (!strcmp(argv[i], "--feature")) {
+			feature_type = argv[i + 1];
+		}
+		if (!strcmp(argv[i], "--max-mismatch-feature")) {
+			max_mismatch_feature = atoi(argv[i + 1]);
 		}
 		if (!strcmp(argv[i], "--umi-length")) {
 			umi_len = atoi(argv[i + 1]);
 		}
 	}
 
-	parse_sample_sheet(argv[1], n_cell, cell_blen, cell_index, cell_names, 1);
-	parse_sample_sheet(argv[2], n_feature, feature_blen, feature_index, feature_names, max_mismatch);
+	parse_sample_sheet(argv[1], n_cell, cell_blen, cell_index, cell_names, max_mismatch_cell);
+	printf("Time spent on parsing cell barcodes = %.2fs.\n", difftime(time(NULL), a));
+	parse_sample_sheet(argv[2], n_feature, feature_blen, feature_index, feature_names, max_mismatch_feature);
 	
 	parse_input_directory(argv[3]);
 
@@ -242,12 +256,12 @@ int main(int argc, char* argv[]) {
 			cell_iter = cell_index.find(binary_cell);
 
 			if (cell_iter != cell_index.end() && cell_iter->second.item_id >= 0) {
-				if (extract_feature_barcode(read2.seq, feature_blen, feature_name, feature_barcode)) {
+				if (extract_feature_barcode(read2.seq, feature_blen, feature_type, feature_barcode)) {
 					binary_feature = barcode_to_binary(feature_barcode);
 					feature_iter = feature_index.find(binary_feature);
 
 					if (feature_iter != feature_index.end() && feature_iter->second.item_id >= 0) {
-						umi = read1.seq.substr(cell_blen);
+						umi = read1.seq.substr(cell_blen, umi_len);
 						binary_umi = barcode_to_binary(umi);
 
 						auto& one_cell = data_matrix[cell_iter->second.item_id];
@@ -267,7 +281,7 @@ int main(int argc, char* argv[]) {
 	produce_output(argv[4]);
 
 	b = time(NULL);
-	printf("Time spent = %.2f.\n", difftime(b, a));
+	printf("Time spent = %.2fs.\n", difftime(b, a));
 
 	return 0;
 }
