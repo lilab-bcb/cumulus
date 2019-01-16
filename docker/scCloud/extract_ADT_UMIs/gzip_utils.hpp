@@ -2,7 +2,6 @@
 #define GZIP_UTILS
 
 #include <cctype>
-#include <cstring>
 #include <string>
 #include <fstream>
 
@@ -12,7 +11,7 @@
 struct Read {
 	std::string name, seq, qual;
 
-	std::string toString() {
+	std::string toString() const {
 		return "@" + name + "\n" + seq + "\n+\n" + qual + "\n";
 	}
 };
@@ -22,14 +21,15 @@ struct iGZipFile {
 	boost::iostreams::filtering_istream gin;
 	std::string line;
 
-	iGZipFile(const char* input_file = NULL) {
-		if (input_file != NULL) open(input_file);
+	iGZipFile(const std::string& input_file = "") {
+		if (input_file != "") open(input_file);
 	}
+
 	~iGZipFile() { close(); }
 
-	bool open(const char* input_file) {
-		const char *ptr = strstr(input_file, ".gz");
-		bool isGZ = ptr != NULL && *(ptr + 3) == 0;
+	bool open(const std::string& input_file) {
+		size_t pos = input_file.find(".gz");
+		bool isGZ = (pos != std::string::npos) && (pos + 3 == input_file.length());
 
 		fin.open(input_file, std::ios_base::in | std::ios_base::binary);
 		if (isGZ) gin.push(boost::iostreams::gzip_decompressor());
@@ -47,19 +47,23 @@ struct iGZipFile {
 	int next(Read& aread) {
 		bool success;
 
-		success = (bool)getline(gin, aread.name);
+		success = (bool)std::getline(gin, aread.name);
 		if (!success) return 0;
 		aread.name = aread.name.substr(1);
-		success = (bool)getline(gin, aread.seq);
+		success = (bool)std::getline(gin, aread.seq);
 		if (!success) return 1;
-		success = (bool)getline(gin, line);
+		success = (bool)std::getline(gin, line);
 		if (!success) return 2;
-		success = (bool)getline(gin, aread.qual);
+		success = (bool)std::getline(gin, aread.qual);
 		return (success ? 4 : 3);
 	}
 
-	bool next(std::string& line) {
-		bool success = (bool)getline(gin, line);
+	boost::iostreams::filtering_istream& operator()() {
+		return gin;
+	}
+
+	bool getline(std::string& line) {
+		bool success = (bool)std::getline(gin, line);
 		if (success) 
 			while (iscntrl(line.back())) line.pop_back(); // remove \r 		
 		return success;
@@ -70,8 +74,8 @@ struct oGZipFile {
 	std::ofstream fout;
 	boost::iostreams::filtering_ostream gout;
 
-	oGZipFile(const char* output_file = NULL) {
-		if (output_file != NULL) open(output_file);
+	oGZipFile(const std::string& output_file = "") {
+		if (output_file != "") open(output_file);
 	}
 
 	oGZipFile(const oGZipFile& o) {
@@ -79,9 +83,12 @@ struct oGZipFile {
 
 	~oGZipFile() { close(); }
 
-	bool open(const char* output_file) {
+	bool open(const std::string& output_file) {
+		size_t pos = output_file.find(".gz");
+		bool isGZ = (pos != std::string::npos) && (pos + 3 == output_file.length());
+
 		fout.open(output_file, std::ios_base::out | std::ios_base::binary | std::ios_base::trunc);
-		gout.push(boost::iostreams::gzip_compressor());
+		if (isGZ) gout.push(boost::iostreams::gzip_compressor());
 		gout.push(fout);
 
 		return true;
@@ -93,10 +100,12 @@ struct oGZipFile {
 		return true;
 	}
 
-	void write(Read& aread) {
+	void write(const Read& aread) {
 		const std::string &outstr = aread.toString();
 		gout.write(outstr.c_str(), outstr.length());
 	}
+
+	boost::iostreams::filtering_ostream& operator()() { return gout; }
 };
 
 #endif

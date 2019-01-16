@@ -12,7 +12,7 @@
 
 #include "gzip_utils.hpp"
 #include "barcode_utils.hpp"
-#include "citeseq_utils.hpp"
+#include "datamatrix_utils.hpp"
 
 using namespace std;
 
@@ -26,6 +26,8 @@ struct InputFile{
 
 int max_mismatch_cell, max_mismatch_feature, umi_len;
 string feature_type;
+int min_reads_per_umi;
+double min_ratio_per_umi;
 
 vector<InputFile> inputs; 
 
@@ -38,8 +40,7 @@ vector<string> cell_names, feature_names;
 HashType cell_index, feature_index;
 HashIterType cell_iter, feature_iter;
 
-Cell2Antibody data_matrix;
-
+DataCollector dataCollector;
 
 void parse_input_directory(char* input_dirs) {
 	DIR *dir;
@@ -138,65 +139,9 @@ inline bool extract_feature_barcode(const string& sequence, int feature_length, 
 	return success;
 }
 
-void produce_output(const char* out_name) {
-	int i, total_umi, set_size;
-	char outF[STRLEN];
-	ofstream fout;
-	vector<SortType> sort_arr;
-	vector<vector<int> > ADTs;
-	vector<int> dummy(n_feature, 0);
-	vector<int> nreads, numis;
-
-	i = 0;
-	sort_arr.clear();
-	ADTs.clear();
-	nreads.clear(); numis.clear();
-	for (auto&& kv : data_matrix) {
-		ADTs.push_back(dummy);
-		total_umi = 0;
-		for (auto&& kv2 : kv.second.ADTs) {
-			set_size = kv2.second.size();
-			ADTs[i][kv2.first] = set_size;
-			total_umi += set_size;
-		}
-		nreads.push_back(kv.second.nreads);
-		numis.push_back(total_umi);
-		sort_arr.emplace_back(i++, kv.first);
-	}
-
-	sort(sort_arr.begin(), sort_arr.end());
-
-	sprintf(outF, "%s.csv", out_name);
-	fout.open(outF);
-	fout<< (feature_type == "antibody" ? "Antibody" : "CRISPR");
-	for (auto&& val : sort_arr) fout<< ","<< cell_names[val.cell_id];
-	fout<< endl;
-	for (i = 0; i < n_feature; ++i) {
-		fout<< feature_names[i];
-		for (auto&& val : sort_arr) fout<< ","<< ADTs[val.pos][i];
-		fout<< endl;
-	}
-	fout.close();
-
-	int all_cells = sort_arr.size(), all_reads = 0, all_umis = 0;
-	sprintf(outF, "%s.stat.csv", out_name);
-	fout.open(outF);
-	fout<< "Barcode,Total_reads,Total_umis"<< endl;
-	for (auto&& val : sort_arr) {
-		fout<< cell_names[val.cell_id]<< ","<< nreads[val.pos]<< ","<< numis[val.pos]<< endl;
-		all_reads += nreads[val.pos];
-		all_umis += numis[val.pos];
-	}
-	fout.close();
-
-	printf("all_cells = %d, all_reads = %d, all_umis = %d.\n", all_cells, all_reads, all_umis);
-}
-
-
-
 int main(int argc, char* argv[]) {
 	if (argc < 5) {
-		printf("Usage: generate_count_matrix_ADTs cell_barcodes.txt[.gz] feature_barcodes.csv fastq_folders output_name [--max-mismatch-cell #] [--feature feature_type] [--max-mismatch-feature #] [--umi-length len]\n");
+		printf("Usage: generate_count_matrix_ADTs cell_barcodes.txt[.gz] feature_barcodes.csv fastq_folders output_name [--max-mismatch-cell #] [--feature feature_type] [--max-mismatch-feature #] [--umi-length len] [--min-reads-per-umi min_reads] [--min-ratio-per-umi ratio]\n");
 		printf("Arguments:\n\tcell_barcodes.txt[.gz]\t10x genomics barcode white list\n");
 		printf("\tfeature_barcodes.csv\tfeature barcode file;barcode,feature_name\n");
 		printf("\tfastq_folders\tfolder contain all R1 and R2 FASTQ files ending with 001.fastq.gz\n");
@@ -205,6 +150,10 @@ int main(int argc, char* argv[]) {
 		printf("\t--feature feature_type\tfeature type can be either antibody or crispr [default: antibody]\n");
 		printf("\t--max-mismatch-feature #\tmaximum number of mismatches allowed for feature barcodes [default: 3]\n");
 		printf("\t--umi-length len\tlength of the UMI sequence [default: 10]\n");
+		printf("\t--min-reads-per-umi min_reads\tminimum number of reads required to keep one UMI as true signal [default: 1]\n");
+		printf("\t--min-ratio-per-umi ratio\tif one barcode-umi combination has multiple features, only features with percentage of reads in the combination > ratio [default: 0.0]\n");
+		printf("Outputs:\n\toutput_name.csv\tfeature-cell count matrix. First row: [Antibody/CRISPR],barcode_1,...,barcode_n;Other rows: feature_name,feature_count_1,...,feature_count_n\n");
+		printf("\toutput_name.stat.csv.gz\tgzipped sufficient statistics file. First row: Barcode,UMI,Feature,Count; Other rows: each row describe the read count for one barcode-umi-feature combination\n");
 		exit(-1);
 	}
 
@@ -216,6 +165,8 @@ int main(int argc, char* argv[]) {
 	feature_type = "antibody";
 	max_mismatch_feature = 3;
 	umi_len = 10;
+	min_reads_per_umi = 1;
+	min_ratio_per_umi = 0.0;
 
 	for (int i = 5; i < argc; ++i) {
 		if (!strcmp(argv[i], "--max-mismatch-cell")) {
@@ -230,6 +181,12 @@ int main(int argc, char* argv[]) {
 		if (!strcmp(argv[i], "--umi-length")) {
 			umi_len = atoi(argv[i + 1]);
 		}
+		if (!strcmp(argv[i], "--min-reads-per-umi")) {
+			min_reads_per_umi = atoi(argv[i + 1]);
+		}
+		if (!strcmp(argv[i], "--min-ratio-per-umi")) {
+			min_ratio_per_umi = atof(argv[i + 1]);
+		}
 	}
 
 	parse_sample_sheet(argv[1], n_cell, cell_blen, cell_index, cell_names, max_mismatch_cell);
@@ -242,7 +199,7 @@ int main(int argc, char* argv[]) {
 	string cell_barcode, umi, feature_barcode;
 	uint64_t binary_cell, binary_umi, binary_feature;
 	
-	data_matrix.clear();
+	dataCollector.clear();
 
 	for (auto&& input_fastq : inputs) {
 		gzip_in_r1.open(input_fastq.input_r1.c_str());
@@ -264,9 +221,7 @@ int main(int argc, char* argv[]) {
 						umi = read1.seq.substr(cell_blen, umi_len);
 						binary_umi = barcode_to_binary(umi);
 
-						auto& one_cell = data_matrix[cell_iter->second.item_id];
-						++one_cell.nreads;
-						one_cell.ADTs[feature_iter->second.item_id].insert(binary_umi);
+						dataCollector.insert(cell_iter->second.item_id, binary_umi, feature_iter->second.item_id);
 					}
 				}
 			}
@@ -278,7 +233,9 @@ int main(int argc, char* argv[]) {
 		gzip_in_r2.close();		
 	}
 
-	produce_output(argv[4]);
+	printf("Parsing input data is finished.\n");
+
+	dataCollector.output(argv[4], feature_type, n_feature, cell_names, umi_len, feature_names, min_reads_per_umi, min_ratio_per_umi);
 
 	b = time(NULL);
 	printf("Time spent = %.2fs.\n", difftime(b, a));
