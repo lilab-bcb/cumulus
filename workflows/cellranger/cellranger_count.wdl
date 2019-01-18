@@ -29,7 +29,7 @@ workflow cellranger_count {
 	# Expected number of recovered cells. Default: 3,000 cells. Mutually exclusive with force_cells
 	Int? expect_cells = 3000
 
-	# 2.2.0 or 2.1.1
+	# 2.1.1, 2.2.0, 3.0.0, or 3.0.2
 	String? cellranger_version = "2.2.0"
 
 	# Number of cpus per cellranger job

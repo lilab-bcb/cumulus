@@ -46,15 +46,18 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on FireCloud.
 		  - 
 			| Provides the reference genome used by *cellranger count* for each 10x channel. 
 			| The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as
-			| **GRCh38** for human GRCh38,
-			| **hg19** for human hg19,
-			| **mm10** for mouse, 
-			| **GRCh38_and_mm10** for human and mouse,
-			| **GRCh38_premrna** for human, introns included,
-			| **mm10_premrna** for mouse, introns included, 
-			| **GRCh38_premrna_and_mm10_premrna** for human and mouse, introns included,
-			| **GRCh38_vdj** for human V(D)J sequences, and
-			| **GRCm38_vdj** for mouse V(D)J sequences.
+			| **GRCh38** for human GRCh38, cellranger reference 1.2.0, Ensembl v84 gene annotation,
+			| **hg19** for human hg19, cellranger reference 1.2.0, Ensembl v82 gene annotation,
+			| **mm10** for mouse mm10, cellranger reference 1.2.0, Ensembl v84 gene annotation,
+			| **GRCh38_and_mm10** for human and mouse, built from GRCh38 and mm10 cellranger references (1.2.0), Ensembl v84 gene annotations for both human and mouse,
+			| **GRCh38_premrna** for human, introns included, built from GRCh38 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcriopts as exons,
+			| **mm10_premrna** for mouse, introns included, built from mm10 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcriopts as exons,
+			| **GRCh38_premrna_and_mm10_premrna** for human and mouse, introns included, built from GRCh38_premrna and mm10_premrna,
+			| **GRCh38_vdj** for human V(D)J sequences, cellranger reference 2.0.0, annotation built from *Homo_sapiens.GRCh38.87.chr_patch_hapl_scaff.gtf* and *vdj_GRCh38_alts_ensembl_10x_genes-2.0.0.gtf*,
+			| **GRCm38_vdj** for mouse V(D)J sequences, cellranger reference 2.0.0, annotation built from *Mus_musculus.GRCm38.90.chr_patch_hapl_scaff.gtf*,
+			| **GRCh38v3.0.0** for human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation,
+			| **hg19v3.0.0** for human hg19, cellranger reference 3.0.0, Ensembl v87 gene annotation,
+			| **mm10v3.0.0** for mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation.
 		* - **Flowcell**
 		  - Indicates the Google bucket URL of uploaded BCL folders.
 		* - **Lane**
@@ -62,25 +65,46 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on FireCloud.
 		* - **Index**
 		  - Contains 10x sample index set names (e.g. SI-GA-A12).
 		* - Chemistry
-		  - Describes the 10x chemistry used for the sample. If this column is omitted, *cellranger count* will try to determine the chemistry automatically. This column is optional.
+		  - 
+			| Describes the 10x chemistry used for the sample. 
+			| This column is optional. If omitted, *cellranger count* will try to determine the chemistry automatically.
+			| Note that if the index read has extra bases besides cell barcode and UMI, autodetection might fail. In this case, please specify the chemistry.
+			| According to *cellranger count*'s documentation, chemistry can be
+			| **auto** for autodetection (default),
+			| **threeprime** for Single Cell 3′,
+			| **fiveprime** for Single Cell 5′,
+			| **SC3Pv1** for Single Cell 3′ v1,
+			| **SC3Pv2** for Single Cell 3′ v2,
+			| **SC3Pv3** for Single Cell 3′ v3,
+			| **SC5P-PE** for Single Cell 5′ paired-end (both R1 and R2 are used for alignment),
+			| **SC5P-R2** for Single Cell 5′ R2-only (where only R2 is used for alignment).
 		* - DataType
-		  - Describes the data type of the sample --- *count*, *vdj*, or *adt*. *count* refers to gene expression data (*cellranger count*), *vdj* refers to V(D)J data (*cellranger vdj*), and *adt* refers to antibody tag data. This column is optional and the default data type is *count*.   
+		  - 
+			| Describes the data type of the sample --- *count*, *vdj*, *adt*, or *crispr*. 
+			| **count** refers to gene expression data (*cellranger count*), 
+			| **vdj** refers to V(D)J data (*cellranger vdj*), 
+			| **adt** refers to antibody tag data, which can be either CITE-Seq, cell-hashing, or nucleus-hashing, and
+			| **crispr** refers to Perturb-seq guide tag data.
+			| This column is optional and the default data type is *count*.
+		* - FeatureBarcodeFile
+		  - Google bucket urls pointing to feature barcode files for *adt* and *crispr* data. Features can be either antibody for CITE-Seq, cell-hashing, nucleus-hashing or gRNA for Perburb-seq. This column is optional provided no *adt* or *crispr* data are in the sample sheet.
 
 	The sample sheet supports sequencing the same 10x channels across multiple flowcells. If a sample is sequenced across multiple flowcells, simply list it in multiple rows, with one flowcell per row. In the following example, we have 4 samples sequenced in two flowcells.
 
 	Example::
 
-		Sample,Reference,Flowcell,Lane,Index,Chemistry,DataType
+		Sample,Reference,Flowcell,Lane,Index,Chemistry,DataType,FeatureBarcodeFile
 		sample_1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,threeprime,count
-		sample_2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3-4,SI-GA-B8,threeprime,count
+		sample_2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3-4,SI-GA-B8,SC3Pv3,count
 		sample_3,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,5-6,SI-GA-C8,fiveprime,count
 		sample_4,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,7-8,SI-GA-D8,fiveprime,count
 		sample_1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,1-2,SI-GA-A8,threeprime,count
-		sample_2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,3-4,SI-GA-B8,threeprime,count
+		sample_2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,3-4,SI-GA-B8,SC3Pv3,count
 		sample_3,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,5-6,SI-GA-C8,fiveprime,count
 		sample_4,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,7-8,SI-GA-D8,fiveprime,count
 		sample_5,GRCh38_vdj,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZZ,1,SI-GA-A1,fiveprime,vdj
-		sample_6,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZZ,2,AGATCCTT,threeprime,adt
+		sample_6,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZZ,2,AGATCCTT,SC3Pv3,adt,gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index.csv
+		sample_7,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZZ,3,TCCGGAGA,threeprime,crispr,gs://fc-e0000000-0000-0000-0000-000000000000/crispr_index.csv
 
 
 #. Upload your sample sheet to the workspace bucket.
@@ -130,8 +154,8 @@ Cell Ranger mkfastq/count/vdj inputs:
 	  - true
 	* - delete_input_directory
 	  - If delete BCL directories after demux. If false, you should delete this folder yourself so as to not incur storage charges 
-	  - true
-	  - true
+	  - false
+	  - false
 	* - do_force_cells
 	  - force cells
 	  - true
@@ -160,16 +184,12 @@ Cell Ranger mkfastq/count/vdj inputs:
 	  - Force the web summary HTML and metrics summary CSV to only report on a particular chain type. The accepted values are: auto for autodetection based on TR vs IG representation, TR for T cell receptors, IG for B cell receptors, all for all chain types
 	  - TR
 	  - 
-	* - antibody_barcode_file
-	  - Antibody barcodes in csv format for the adt task
-	  - antibody_barcodes.csv
-	  -
 	* - max_mismatch
-	  - Maximum hamming distance in antibody barcodes for the adt task
+	  - Maximum hamming distance in feature barcodes for the adt task
 	  - 3
 	  - 3
 	* - cellranger_version
-	  - Cellranger version, could be 3.0.0, 2.2.0, 2.1.1
+	  - Cellranger version, could be 2.11, 2.2.0, 3.0.0, 3.0.2
 	  - "2.2.0"
 	  - "2.2.0"
 	* - num_cpu
@@ -180,8 +200,8 @@ Cell Ranger mkfastq/count/vdj inputs:
 	  - Memory in GB
 	  - 128
 	  - 128
-	* - adt_memory
-	  - Optional memory in GB for extracting ADT count matrix
+	* - feature_memory
+	  - Optional memory in GB for extracting feature count matrix
 	  - 32
 	  - 32
 	* - mkfastq_disk_space
@@ -196,8 +216,8 @@ Cell Ranger mkfastq/count/vdj inputs:
 	  - Disk space in gigabytes needed for cellranger vdj
 	  - 500
 	  - 500
-	* - adt_disk_space
-	  - Disk space in gigabytes needed for extracting adt counts
+	* - feature_disk_space
+	  - Disk space in gigabytes needed for extracting feature count matrix
 	  - 100
 	  - 100
 	* - preemptible
@@ -275,23 +295,46 @@ Sometimes, people might want to perform demultiplexing locally and only run ``ce
 		  - Contains sample names. Each 10x channel should have a unique sample name.
 		* - **Reference**
 		  - 
-			| Provides the reference genome used by *cellranger count*.
+			| Provides the reference genome used by *cellranger count* for each 10x channel. 
 			| The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as
-			| **GRCh38** for human GRCh38,
-			| **hg19** for human hg19,
-			| **mm10** for mouse, 
-			| **GRCh38_and_mm10** for human and mouse,
-			| **GRCh38_premrna** for human, introns included,
-			| **mm10_premrna** for mouse, introns included,
-			| **GRCh38_premrna_and_mm10_premrna** for human and mouse, introns included,
-			| **GRCh38_vdj** for human V(D)J sequences, and
-			| **GRCm38_vdj** for mouse V(D)J sequences.
+			| **GRCh38** for human GRCh38, cellranger reference 1.2.0, Ensembl v84 gene annotation,
+			| **hg19** for human hg19, cellranger reference 1.2.0, Ensembl v82 gene annotation,
+			| **mm10** for mouse mm10, cellranger reference 1.2.0, Ensembl v84 gene annotation,
+			| **GRCh38_and_mm10** for human and mouse, built from GRCh38 and mm10 cellranger references (1.2.0), Ensembl v84 gene annotations for both human and mouse,
+			| **GRCh38_premrna** for human, introns included, built from GRCh38 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcriopts as exons,
+			| **mm10_premrna** for mouse, introns included, built from mm10 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcriopts as exons,
+			| **GRCh38_premrna_and_mm10_premrna** for human and mouse, introns included, built from GRCh38_premrna and mm10_premrna,
+			| **GRCh38_vdj** for human V(D)J sequences, cellranger reference 2.0.0, annotation built from *Homo_sapiens.GRCh38.87.chr_patch_hapl_scaff.gtf* and *vdj_GRCh38_alts_ensembl_10x_genes-2.0.0.gtf*,
+			| **GRCm38_vdj** for mouse V(D)J sequences, cellranger reference 2.0.0, annotation built from *Mus_musculus.GRCm38.90.chr_patch_hapl_scaff.gtf*,
+			| **GRCh38v3.0.0** for human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation,
+			| **hg19v3.0.0** for human hg19, cellranger reference 3.0.0, Ensembl v87 gene annotation,
+			| **mm10v3.0.0** for mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation.
 		* - **Flowcell**
 		  - Indicates the Google bucket URL of the uploaded FASTQ folders. The full path to the FASTQ files is FlowCell/Sample
 		* - Chemistry
-		  - Describe the 10x chemistry used for the sample. This column is optional. If this column is omitted, *cellranger count* will try to determine the chemistry automatically.
+		  -
+			| Describes the 10x chemistry used for the sample. 
+			| This column is optional. If omitted, *cellranger count* will try to determine the chemistry automatically.
+			| Note that if the index read has extra bases besides cell barcode and UMI, autodetection might fail. In this case, please specify the chemistry.
+			| According to *cellranger count*'s documentation, chemistry can be
+			| **auto** for autodetection (default),
+			| **threeprime** for Single Cell 3′,
+			| **fiveprime** for Single Cell 5′,
+			| **SC3Pv1** for Single Cell 3′ v1,
+			| **SC3Pv2** for Single Cell 3′ v2,
+			| **SC3Pv3** for Single Cell 3′ v3,
+			| **SC5P-PE** for Single Cell 5′ paired-end (both R1 and R2 are used for alignment),
+			| **SC5P-R2** for Single Cell 5′ R2-only (where only R2 is used for alignment).
 		* - DataType
-		  - Describes the data type of the sample --- *count*, *vdj*, or *adt*. *count* refers to gene expression data (*cellranger count*), *vdj* refers to V(D)J data (*cellranger vdj*), and *adt* refers to antibody tag data. This column is optional and the default data type is *count*.
+		  -
+			| Describes the data type of the sample --- *count*, *vdj*, *adt*, or *crispr*. 
+			| **count** refers to gene expression data (*cellranger count*), 
+			| **vdj** refers to V(D)J data (*cellranger vdj*), 
+			| **adt** refers to antibody tag data, which can be either CITE-Seq, cell-hashing, or nucleus-hashing, and
+			| **crispr** refers to Perturb-seq guide tag data.
+			| This column is optional and the default data type is *count*.
+		* - FeatureBarcodeFile
+		  - Google bucket urls pointing to feature barcode files for *adt* and *crispr* data. This column is optional provided no *adt* or *crispr* data are in the sample sheet.
 
 	In the following example sample_1 is sequenced on 2 flowcells. The FASTQ files for flowcell_1 are located at gs://fc-e0000000-0000-0000-0000-000000000000/flowcell_1/sample_1 while the FASTQ files for flowcell_2 are located at gs://fc-e0000000-0000-0000-0000-000000000000/flowcell_2_sample1::
 
@@ -303,24 +346,17 @@ Sometimes, people might want to perform demultiplexing locally and only run ``ce
 
 ---------------------------------
 
-Run CITE-Seq/Cell-hashing/Nuclei-hashing
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Extract feature count matrices from CITE-Seq/Cell-hashing/Nucleus-hashing/Perturb-seq assays
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This WDL could extract ADT counts from *CITE-Seq/Cell-hashing/Nuclei-hashing* assays. Please follow the instructions below.
+``cellranger_mkfastq_count`` can optionally extract feature count matrices from *CITE-Seq/Cell-hashing/Nucleus-hashing/Perturb-seq* assays. For *CITE-Seq/Cell-hashing/Nucleus-hasing*, the feature refers to antibody. Note that for *CITE-Seq/Cell-hashing*, only Biolegend TotalSeq-A is supported. For *Perturb-seq*, the feature refers to guide RNA. To extract feature count matrices, please follow the instructions below.
 
-#. Add both RNA assay and ADT assay information into the sample sheet.
+Instructions to configure ``cellranger_mkfastq_count``
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-	See below for an example::
+#. Prepare one feature barcode file per assay and upload the files to the Google bucket.
 
-		Sample,Reference,Flowcell,Lane,Index,Chemistry,DataType
-		sample_1_rna,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,threeprime,count
-		sample_1_adt,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,ATTACTCG,threeprime,adt
-
-	The second line in the above sheet describes the ADT part. The only difference between ADT and RNA parts is the *Index*. For the ADT part, the index is the Illumina index primer sequence (e.g. ATTACTCG).
-
-#. Prepare an antibody barcode file and upload to the Google bucket.
-
-	Prepare a CSV file with the following format: antibody_barcode,name.
+	Prepare a CSV file with the following format: feature_barcode,feature_name.
 	See below for an example::
 
 		TTCCTGCCATTACTA,sample_1
@@ -329,6 +365,19 @@ This WDL could extract ADT counts from *CITE-Seq/Cell-hashing/Nuclei-hashing* as
 		TGGTGTCATTCTTGA,sample_4
 
 	The above file describes a cell-hashing application with 4 samples.
+
+#. Add assay information into the sample sheet.
+
+	See below for an example::
+
+		Sample,Reference,Flowcell,Lane,Index,Chemistry,DataType,FeatureBarcodeFile
+		sample_1_rna,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,threeprime,count
+		sample_1_adt,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,ATTACTCG,threeprime,adt,gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index.csv
+		sample_2_adt,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3-4,TCCGGAGA,SC3Pv3,adt,gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index.csv
+		sample_3_crispr,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,5-6,CGCTCATT,SC3Pv3,crispr,gs://fc-e0000000-0000-0000-0000-000000000000/crispr_index.csv
+
+	In the above sample sheet, the first line describes the normal 3' RNA assay. The second line describes its associated antibody tag data, which can from either a CITE-Seq, cell-hashing, or nucleus-hashing experiment. Note that for the tag data, the *Index* field is different. The index for tag and crispr data should be Illumina index primer sequence (e.g. D701 in line two). In addition, the *DataType* field is changed to *adt*. The third line describes another tag data, which is in 10x genomics' V3 chemistry. For tag and crispr data, it is important to explicitly state the chemistry (e.g. *SC3Pv3*). The last line describes one gRNA guide data for Perturb-seq (see the *crispr* in *DataType* field). Note that it is users' responsibility to avoid index collision between 10x genomics' RNA indexes (e.g. SI-GA-A8) and Illumina index sequences for tag and crispr data (e.g. ATTACTCG).
+
 
 #. Fill in the ADT-specific parameters:
 
@@ -340,12 +389,8 @@ This WDL could extract ADT counts from *CITE-Seq/Cell-hashing/Nuclei-hashing* as
 		  - Description
 		  - Example
 		  - Default
-		* - **antibody_barcode_file**
-		  - Antibody barcode file in CSV format
-		  - "gs://fc-e0000000-0000-0000-0000-000000000000/antibody_barcode_file.csv"
-		  -
 		* - max_mismatch
-		  - Maximum hamming distance in matching antibody barcodes
+		  - Maximum hamming distance in matching feature barcodes
 		  - 3
 		  - 3
 		* - adt_memory
@@ -357,15 +402,25 @@ This WDL could extract ADT counts from *CITE-Seq/Cell-hashing/Nuclei-hashing* as
 		  - 100
 		  - 100
 
+Parameters used for feature count matrix extraction
++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-Extracted ADT output
-++++++++++++++++++++
+If the chemistry is V2, `10x genomics v2 cell barcode white list`_ will be used, a hamming distance of 1 is allowed for matching cell barcodes, and the UMI length is 10. 
+If the chemistry is V3, `10x genomics v3 cell barcode white list`_ will be used, a hamming distance of 0 is allowed for matching cell barcodes, and the UMI length is 12.
 
-For each ADT sample, a folder with the sample ID is generated under ``cellranger_output_directory``. In the folder, two files --- ``sample_id.csv`` and ``sample_id.stat.csv`` are generated.
+For Perturb-seq data, a small number of gRNA guide barcode sequences will be sequenced ultra-deeply and we may have PCR chimeric reads. Therefore, we only keep barcode-feature-UMI combinations supported by more than 10 reads and additionally require the read support ratio, defined as total reads supporting barcode-feature-UMI over total reads supporting barcode-UMI for one feature be larger than 0.25. 
 
-``sample_id.csv`` has the following format. The first line describes the column names: ``Antibody,cell_barcode_1,cell_barcode_2,...,cell_barcode_n``. The following lines describe UMI counts for each antibody barcode, with the following format: ``name,umi_count_1,umi_count_2,...,umi_count_n``.
+Extracted feature count matrix output
++++++++++++++++++++++++++++++++++++++
 
-``sample_id.stat.csv`` has the following format. The first line describes the column names: ``Barcode,Total_reads,Total_umis``. The following lines describe all cellular barcodes with at least UMI count, with the following format: ``cell_barcode,number_of_reads,number_of_umis``.
+For each antibody tag or crispr tag sample, a folder with the sample ID is generated under ``cellranger_output_directory``. In the folder, two files --- ``sample_id.csv`` and ``sample_id.stat.csv.gz`` are generated.
+
+``sample_id.csv`` is the feature count matrix. It has the following format. The first line describes the column names: ``Antibody/CRISPR,cell_barcode_1,cell_barcode_2,...,cell_barcode_n``. The following lines describe UMI counts for each feature barcode, with the following format: ``feature_name,umi_count_1,umi_count_2,...,umi_count_n``.
+
+``sample_id.stat.csv.gz`` stores the gzipped sufficient statistics. It has the following format. The first line describes the column names: ``Barcode,UMI,Feature,Count``. The following lines describe the read counts for every barcode-umi-feature combination.
+
 
 
 .. _FireCloud instructions: https://software.broadinstitute.org/firecloud/documentation/article?id=10574
+.. _10x genomics v2 cell barcode white list: gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
+.. _10x genomics v3 cell barcode white list: gs://regev-lab/resources/cellranger/3M-february-2018.txt.gz

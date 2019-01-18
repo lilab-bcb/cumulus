@@ -62,15 +62,21 @@ task run_scCloud_cluster {
 	String? genome
 	Boolean? cite_seq
 	Boolean? output_filtration_results
-	Boolean? output_seurat_compatible
+	Boolean? plot_filtration_results
+	String? plot_filtration_figsize
+	Boolean? make_output_seurat_compatible
 	Boolean? output_loom
+	Boolean? output_parquet
 	Boolean? correct_batch_effect
 	String? batch_group_by
 	Int? min_genes
 	Int? max_genes
+	Int? min_umis
+	Int? max_umis
 	String? mito_prefix
 	Float? percent_mito
 	Float? gene_percent_cells
+	Int? min_genes_on_raw
 	Float? counts_per_cell_after
 	Int? random_state
 	Boolean? run_uncentered_pca
@@ -83,11 +89,6 @@ task run_scCloud_cluster {
 	Boolean? run_louvain
 	Float? louvain_resolution
 	String? louvain_affinity
-	Boolean? run_kmeans
-	Int? kmeans_n_clusters
-	Boolean? run_hdbscan
-	Int? hdbscan_min_cluster_size
-	Int? hdbscan_min_samples
 	Boolean? run_approximated_louvain
 	Int? approx_louvain_ninit
 	Int? approx_louvain_nclusters
@@ -118,9 +119,13 @@ task run_scCloud_cluster {
 		if '${cite_seq}' is 'true':
 			call_args.append('--cite-seq')
 		if '${output_filtration_results}' is 'true':
-			call_args.extend(['--output-filtration-results', '${output_name}' + '.filt.xlsx'])
-		if '${output_seurat_compatible}' is 'true':
-			call_args.append('--output-seurat-compatible')
+			call_args.append('--output-filtration-results')
+		if '${plot_filtration_results}' is 'true':
+			call_args.append('--plot-filtration-results')
+		if '${plot_filtration_figsize}' is not '':
+			call_args.extend(['--plot-filtration-figsize', '${plot_filtration_figsize}'])
+		if '${make_output_seurat_compatible}' is 'true':
+			call_args.append('--make-output-seurat-compatible')
 		if '${output_loom}' is 'true':
 			call_args.append('--output-loom')
 		if '${correct_batch_effect}' is 'true':
@@ -131,12 +136,18 @@ task run_scCloud_cluster {
 			call_args.extend(['--min-genes', '${min_genes}'])
 		if '${max_genes}' is not '':
 			call_args.extend(['--max-genes', '${max_genes}'])
+		if '${min_umis}' is not '':
+			call_args.extend(['--min-umis', '${min_umis}'])
+		if '${max_umis}' is not '':
+			call_args.extend(['--max-umis', '${max_umis}'])
 		if '${mito_prefix}' is not '':
 			call_args.extend(['--mito-prefix', '${mito_prefix}'])
 		if '${percent_mito}' is not '' :
 			call_args.extend(['--percent-mito', '${percent_mito}'])
 		if '${gene_percent_cells}' is not '':
 			call_args.extend(['--gene-percent-cells', '${gene_percent_cells}'])
+		if '${min_genes_on_raw}' is not '':
+			call_args.extend(['--min-genes-on-raw', '${min_genes_on_raw}'])
 		if '${counts_per_cell_after}' is not '':
 			call_args.extend(['--counts-per-cell-after', '${counts_per_cell_after}'])
 		if '${random_state}' is not '':
@@ -161,16 +172,6 @@ task run_scCloud_cluster {
 			call_args.extend(['--louvain-resolution', '${louvain_resolution}'])
 		if '${louvain_affinity}' is not '':
 			call_args.extend(['--louvain-affinity', '${louvain_affinity}'])
-		if '${run_kmeans}' is 'true':
-			call_args.append('--run-kmeans')
-		if '${kmeans_n_clusters}' is not '':
-			call_args.extend(['--kmeans-n-clusters', '${kmeans_n_clusters}'])
-		if '${run_hdbscan}' is 'true':
-			call_args.append('--run-hdbscan')
-		if '${hdbscan_min_cluster_size}' is not '':
-			call_args.extend(['--hdbscan-min-cluster-size', '${hdbscan_min_cluster_size}'])
-		if '${hdbscan_min_samples}' is not '':
-			call_args.extend(['--hdbscan-min-samples', '${hdbscan_min_samples}'])
 		if '${run_approximated_louvain}' is 'true':
 			call_args.append('--run-approximated-louvain')
 		if '${approx_louvain_ninit}' is not '':
@@ -205,14 +206,19 @@ task run_scCloud_cluster {
 			call_args.extend(['--fle-affinity', '${fle_affinity}'])
 		print(' '.join(call_args))
 		check_call(call_args)
+		if '${output_parquet}' is 'true':
+			call_args = ['scCloud', 'parquet', '${output_name}.h5ad', '${output_name}', '-p', '${num_cpu}']
+			print(' '.join(call_args))
+			check_call(call_args)			
 		CODE
 	}
 
 	output {
 		File output_h5ad = "${output_name}.h5ad"
 		Array[File] output_filt_xlsx = glob("${output_name}.filt.xlsx")
-		Array[File] output_seurat_h5ad = glob("${output_name}.seurat.h5ad")
+		Array[File] output_filt_plot = glob("${output_name}.filt.*.pdf")
 		Array[File] output_loom_file = glob("${output_name}.loom")
+		Array[File] output_parquet_file = glob("{output_name}.parquet")
 		File monitoringLog = "monitoring.log"
 	}
 
@@ -302,6 +308,8 @@ task run_scCloud_plot {
 	Int preemptible
 	String? plot_composition
 	String? plot_tsne
+	String? plot_umap
+	String? plot_fle
 	String? plot_diffmap
 	String? plot_citeseq_tsne
 
@@ -315,11 +323,19 @@ task run_scCloud_plot {
 			pairs = '${plot_composition}'.split(',')
 			for pair in pairs:
 				lab, attr = pair.split(':')
-				call_args = ['scCloud', 'plot', 'composition', '--cluster-labels', lab, '--attribute', attr, '--style', 'normalized', '--not-stacked', '${input_h5ad}', '${output_name}.' + lab + '+' + attr + '.composition.png']
+				call_args = ['scCloud', 'plot', 'composition', '--cluster-labels', lab, '--attribute', attr, '--style', 'normalized', '--not-stacked', '${input_h5ad}', '${output_name}.' + lab + '+' + attr + '.composition.pdf']
 				print(' '.join(call_args))
 				check_call(call_args)
 		if '${plot_tsne}' is not '':
-			call_args = ['scCloud', 'plot', 'scatter', '--attributes', '${plot_tsne}', '${input_h5ad}', '${output_name}.tsne.png']
+			call_args = ['scCloud', 'plot', 'scatter', '--attributes', '${plot_tsne}', '${input_h5ad}', '${output_name}.tsne.pdf']
+			print(' '.join(call_args))
+			check_call(call_args)
+		if '${plot_umap}' is not '':
+			call_args = ['scCloud', 'plot', 'scatter', '--basis', 'umap', '--attributes', '${plot_umap}', '${input_h5ad}', '${output_name}.umap.pdf']
+			print(' '.join(call_args))
+			check_call(call_args)
+		if '${plot_fle}' is not '':
+			call_args = ['scCloud', 'plot', 'scatter', '--basis', 'fle', '--attributes', '${plot_fle}', '${input_h5ad}', '${output_name}.fle.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '${plot_diffmap}' is not '':
@@ -329,14 +345,14 @@ task run_scCloud_plot {
 				print(' '.join(call_args))
 				check_call(call_args)
 		if '${plot_citeseq_tsne}' is not '':
-			call_args = ['scCloud', 'plot', 'scatter', '--basis', 'citeseq_tsne', '--attributes', '${plot_citeseq_tsne}', '${input_h5ad}', '${output_name}.epitope.tsne.png']
+			call_args = ['scCloud', 'plot', 'scatter', '--basis', 'citeseq_tsne', '--attributes', '${plot_citeseq_tsne}', '${input_h5ad}', '${output_name}.epitope.tsne.pdf']
 			print(' '.join(call_args))
-			check_call(call_args)			
+			check_call(call_args)
 		CODE
 	}
 
 	output {
-		Array[File] output_pngs = glob("*.png")
+		Array[File] output_pdfs = glob("*.pdf")
 		Array[File] output_htmls = glob("*.html")
 	}
 
@@ -387,8 +403,8 @@ task run_scCloud_subcluster {
 	Int preemptible
 	String subset_selections 
 	Boolean? correct_batch_effect
-	Boolean? output_seurat_compatible
 	Boolean? output_loom
+	Boolean? output_parquet
 	Int? random_state
 	Boolean? run_uncentered_pca
 	Boolean? no_variable_gene_selection
@@ -401,11 +417,6 @@ task run_scCloud_subcluster {
 	Boolean? run_louvain
 	Float? louvain_resolution
 	String? louvain_affinity
-	Boolean? run_kmeans
-	Int? kmeans_n_clusters
-	Boolean? run_hdbscan
-	Int? hdbscan_min_cluster_size
-	Int? hdbscan_min_samples
 	Boolean? run_approximated_louvain
 	Int? approx_louvain_ninit
 	Int? approx_louvain_nclusters
@@ -437,8 +448,6 @@ task run_scCloud_subcluster {
 				call_args.extend(['--subset-selection', sel])
 		if '${correct_batch_effect}' is 'true':
 			call_args.append('--correct-batch-effect')
-		if '${output_seurat_compatible}' is 'true':
-			call_args.append('--output-seurat-compatible')
 		if '${output_loom}' is 'true':
 			call_args.append('--output-loom')
 		if '${random_state}' is not '':
@@ -465,16 +474,6 @@ task run_scCloud_subcluster {
 			call_args.extend(['--louvain-resolution', '${louvain_resolution}'])
 		if '${louvain_affinity}' is not '':
 			call_args.extend(['--louvain-affinity', '${louvain_affinity}'])
-		if '${run_kmeans}' is 'true':
-			call_args.append('--run-kmeans')
-		if '${kmeans_n_clusters}' is not '':
-			call_args.extend(['--kmeans-n-clusters', '${kmeans_n_clusters}'])
-		if '${run_hdbscan}' is 'true':
-			call_args.append('--run-hdbscan')
-		if '${hdbscan_min_cluster_size}' is not '':
-			call_args.extend(['--hdbscan-min-cluster-size', '${hdbscan_min_cluster_size}'])
-		if '${hdbscan_min_samples}' is not '':
-			call_args.extend(['--hdbscan-min-samples', '${hdbscan_min_samples}'])
 		if '${run_approximated_louvain}' is 'true':
 			call_args.append('--run-approximated-louvain')
 		if '${approx_louvain_ninit}' is not '':
@@ -509,13 +508,17 @@ task run_scCloud_subcluster {
 			call_args.extend(['--fle-affinity', '${fle_affinity}'])
 		print(' '.join(call_args))
 		check_call(call_args)
+		if '${output_parquet}' is 'true':
+			call_args = ['scCloud', 'parquet', '${output_name}.h5ad', '${output_name}', '-p', '${num_cpu}']
+			print(' '.join(call_args))
+			check_call(call_args)
 		CODE
 	}
 
 	output {
 		File output_h5ad = "${output_name}.h5ad"
-		Array[File] output_seurat_h5ad = glob("${output_name}.seurat.h5ad")
 		Array[File] output_loom_file = glob("${output_name}.loom")
+		Array[File] output_parquet_file = glob("{output_name}.parquet")
 		File monitoringLog = "monitoring.log"
 	}
 
@@ -536,12 +539,13 @@ task organize_results {
 	File? output_10x_h5
 	File? output_h5ad
 	Array[File]? output_filt_xlsx
-	Array[File]? output_seurat_h5ad
+	Array[File]? output_filt_plot
 	Array[File]? output_loom_file
+	Array[File]? output_parquet_file
 	File? output_de_h5ad
 	File? output_de_xlsx
 	Array[File]? output_anno_file
-	Array[File]? output_pngs
+	Array[File]? output_pdfs
 	Array[File]? output_htmls
 	Array[File]? output_scp_files
 
@@ -556,15 +560,16 @@ task organize_results {
 
 		# check_call(['mkdir', '-p', dest])
 		
-		files = ['${output_10x_h5}', '${sep=" " output_filt_xlsx}', '${sep=" " output_seurat_h5ad}', '${sep=" " output_loom_file}', '${output_de_xlsx}', '${sep=" " output_anno_file}']
+		files = ['${output_10x_h5}', '${sep=" " output_filt_xlsx}', '${sep=" " output_loom_file}', '${sep=" " output_parquet_file}', '${output_de_xlsx}', '${sep=" " output_anno_file}']
 		files.append('${output_h5ad}' if '${output_de_h5ad}' is '' else '${output_de_h5ad}')
-		files.extend('${sep="," output_pngs}'.split(','))
+		files.extend('${sep="," output_filt_plot}'.split(','))
+		files.extend('${sep="," output_pdfs}'.split(','))
 		files.extend('${sep="," output_htmls}'.split(','))
 		files.extend('${sep="," output_scp_files}'.split(','))
 		for file in files:
 			if file is not '':
-				# call_args = ['cp', file, dest]
-				call_args = ['gsutil', '-q', 'cp', file, dest]
+				call_args = ['cp', file, dest]
+				# call_args = ['gsutil', '-q', 'cp', file, dest]
 				print(' '.join(call_args))
 				check_call(call_args)
 		CODE
@@ -579,9 +584,6 @@ task organize_results {
 		preemptible: preemptible
 	}
 }
-
-
-
 
 task generate_hashing_cite_seq_tasks {
 	File input_sample_sheet
@@ -664,15 +666,15 @@ task run_scCloud_demuxEM {
 		check_call(call_args)
 		CODE
 
-		gsutil -q cp ${output_name}_demux_10x.h5 ${output_dir}/${output_name}/
-		gsutil -q cp ${output_name}_ADTs.h5ad ${output_dir}/${output_name}/
-		gsutil -q cp ${output_name}_demux.h5ad ${output_dir}/${output_name}/
-		gsutil -q -m cp ${output_name}.*.png ${output_dir}/${output_name}/
-		# mkdir -p ${output_dir}/${output_name}
-		# cp ${output_name}_demux_10x.h5 ${output_dir}/${output_name}/
-		# cp ${output_name}_ADTs.h5ad ${output_dir}/${output_name}/
-		# cp ${output_name}_demux.h5ad ${output_dir}/${output_name}/
-		# cp ${output_name}.*.png ${output_dir}/${output_name}/
+		# gsutil -q cp ${output_name}_demux_10x.h5 ${output_dir}/${output_name}/
+		# gsutil -q cp ${output_name}_ADTs.h5ad ${output_dir}/${output_name}/
+		# gsutil -q cp ${output_name}_demux.h5ad ${output_dir}/${output_name}/
+		# gsutil -q -m cp ${output_name}.*.pdf ${output_dir}/${output_name}/
+		mkdir -p ${output_dir}/${output_name}
+		cp ${output_name}_demux_10x.h5 ${output_dir}/${output_name}/
+		cp ${output_name}_ADTs.h5ad ${output_dir}/${output_name}/
+		cp ${output_name}_demux.h5ad ${output_dir}/${output_name}/
+		cp ${output_name}.*.pdf ${output_dir}/${output_name}/
 	}
 
 	output {
