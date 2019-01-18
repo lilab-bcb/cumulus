@@ -1,5 +1,5 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/4/plain-WDL/descriptor" as tasks
-# import "../scCloud/scCloud_tasks.wdl" as tasks
+# import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/4/plain-WDL/descriptor" as tasks
+import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud {
 	# Input csv-formatted file containing information of each scRNA-Seq run
@@ -45,12 +45,18 @@ workflow scCloud {
 
 	# If input data are CITE-Seq data
 	Boolean? cite_seq = false
-	# If output cell and gene filtration results [default: true]
+	# If output cell and gene filtration results as a spreadsheet. [default: true]
 	Boolean? output_filtration_results = true
-	# If output Seurat compatible h5ad file [default: false]
-	Boolean? output_seurat_compatible
+	# If plot filtration results as PDF files. [default: true]
+	Boolean? plot_filtration_results = true
+	# Figure size for filtration plots. <figsize> is a comma-separated list of two numbers, the width and height of the figure (e.g. 6,4).
+	String? plot_filtration_figsize
+	# Make output h5ad file seurat compatible. Caution: this will significantly increase the output size. Do not turn this option on for large data sets. [default: false]
+	Boolean? make_output_seurat_compatible
 	# If output loom-formatted file [default: false]
 	Boolean? output_loom
+	# If output parquet-formatted file [default: false]
+	Boolean? output_parquet
 	# If correct batch effects [default: false]
 	Boolean? correct_batch_effect
 	# Batch correction assumes the differences in gene expression between channels are due to batch effects. However, in many cases, we know that channels can be partitioned into several groups and each group is biologically different from others. In this case, we will only perform batch correction for channels within each group. This option defines the groups. If <expression> is None, we assume all channels are from one group. Otherwise, groups are defined according to <expression>. <expression> takes the form of either ‘attr’, or ‘attr1+attr2+…+attrn’, or ‘attr=value11,…,value1n_1;value21,…,value2n_2;…;valuem1,…,valuemn_m’. In the first form, ‘attr’ should be an existing sample attribute, and groups are defined by ‘attr’. In the second form, ‘attr1’,…,’attrn’ are n existing sample attributes and groups are defined by the Cartesian product of these n attributes. In the last form, there will be m + 1 groups. A cell belongs to group i (i > 0) if and only if its sample attribute ‘attr’ has a value among valuei1,…,valuein_i. A cell belongs to group 0 if it does not belong to any other groups.
@@ -59,12 +65,18 @@ workflow scCloud {
 	Int? min_genes
 	# Only keep cells with less than <number> of genes. [default: 6000]
 	Int? max_genes
+	# Only keep cells with at least <number> of UMIs. [default: 100]
+	Int? min_umis
+	# Only keep cells with less than <number> of UMIs. [default: 600000]	
+	Int? max_umis
 	# Prefix for mitochondrial genes. [default: MT-]
 	String? mito_prefix
 	# Only keep cells with mitochondrial ratio less than <ratio>. [default: 0.1]
 	Float? percent_mito
 	# Only use genes that are expressed in at <ratio> * 100 percent of cells to select variable genes. [default: 0.0005]
 	Float? gene_percent_cells
+	# If input are raw 10x matrix, which include all barcodes, perform a pre-filtration step to keep the data size small. In the pre-filtration step, only keep cells with at least <number> of genes. [default: 100]
+	Int? min_genes_on_raw
 	# Total counts per cell after normalization. [default: 1e5]
 	Float? counts_per_cell_after
 	# Random number generator seed. [default: 0]
@@ -81,16 +93,6 @@ workflow scCloud {
 	Boolean? run_louvain = true
 	# Resolution parameter for the louvain clustering algorithm. [default: 1.3]
 	Float? louvain_resolution
-	# Run KMeans clustering algorithm on diffusion components.
-	Boolean? run_kmeans
-	# Target at <number> clusters for K means. [default: 20]
-	Int? kmeans_n_clusters
-	# Run hdbscan clustering algorithm on diffusion components.
-	Boolean? run_hdbscan
-	# Minimum cluster size for hdbscan. [default: 50]
-	Int? hdbscan_min_cluster_size
-	# Minimum number of samples for hdbscan. [default: 50]
-	Int? hdbscan_min_samples
 	# Run approximated louvain clustering algorithm.
 	Boolean? run_approximated_louvain
 	# Number of Kmeans tries. [default: 20]
@@ -140,7 +142,7 @@ workflow scCloud {
 
 	# If also annotate cell types for clusters based on DE results.
 	Boolean? annotate_cluster
-	# Organism, could either be "human_immune" or "mouse_immune" or "mouse_brain" [default: human_immune]
+	# Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain" or a JSON file describing the markers. [default: human_immune]
 	String? organism
 	# Minimum cell type score to report a potential cell type. [default: 0.5]
 	Float? minimum_report_score
@@ -150,8 +152,12 @@ workflow scCloud {
 
 	# Takes the format of "label:attr,label:attr,...,label:attr". If non-empty, generate composition plot for each "label:attr" pair. "label" refers to cluster labels and "attr" refers to sample conditions.
 	String? plot_composition
-	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored tSNEs side by side. 
+	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored tSNEs side by side.
 	String? plot_tsne
+	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored UMAPs side by side.
+	String? plot_umap
+	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FLEs side by side.
+	String? plot_fle
 	# Takes the format of "attr,attr,...,attr". If non-empty, generate attr colored 3D interactive plot. The 3 coordinates are the first 3 PCs of all diffusion components.
 	String? plot_diffmap
 	# Plot cells based on t-SNE coordinates estimated from antibody expressions. Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored t-SNEs side by side.
@@ -160,9 +166,9 @@ workflow scCloud {
 
 	# for scp_output
 
-	# If generate outputs required by single cell portal
+	# If generate outputs required by single cell portal.
 	Boolean generate_scp_outputs = false
-
+	# Output dense expression matrix instead.
 	Boolean output_dense = false
 
 
@@ -188,15 +194,21 @@ workflow scCloud {
 			genome = genome,
 			cite_seq = cite_seq,
 			output_filtration_results = output_filtration_results,
-			output_seurat_compatible = output_seurat_compatible,
+			plot_filtration_results = plot_filtration_results,
+			plot_filtration_figsize = plot_filtration_figsize,
+			make_output_seurat_compatible = make_output_seurat_compatible,
 			output_loom = output_loom,
+			output_parquet = output_parquet,
 			correct_batch_effect = correct_batch_effect,
 			batch_group_by = batch_group_by,
 			min_genes = min_genes,
 			max_genes = max_genes,
+			min_umis = min_umis,
+			max_umis = max_umis,
 			mito_prefix = mito_prefix,
 			percent_mito = percent_mito,
 			gene_percent_cells = gene_percent_cells,
+			min_genes_on_raw = min_genes_on_raw,
 			counts_per_cell_after = counts_per_cell_after,
 			random_state = random_state,
 			nPC = nPC,
@@ -205,11 +217,6 @@ workflow scCloud {
 			diffmap_K = diffmap_K,
 			run_louvain = run_louvain,
 			louvain_resolution = louvain_resolution,
-			run_kmeans = run_kmeans,
-			kmeans_n_clusters = kmeans_n_clusters,
-			run_hdbscan = run_hdbscan,
-			hdbscan_min_cluster_size = hdbscan_min_cluster_size,
-			hdbscan_min_samples = hdbscan_min_samples,
 			run_approximated_louvain = run_approximated_louvain,
 			approx_louvain_ninit = approx_louvain_ninit,
 			approx_louvain_nclusters = approx_louvain_nclusters,
@@ -251,13 +258,15 @@ workflow scCloud {
 		}
 	}
 
-	if (defined(plot_composition) || defined(plot_tsne) || defined(plot_diffmap)) {
+	if (defined(plot_composition) || defined(plot_tsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_diffmap) || defined(plot_citeseq_tsne)) {
 		call tasks.run_scCloud_plot as plot {
 			input:
 				input_h5ad = cluster.output_h5ad,
 				output_name = out_name,
 				plot_composition = plot_composition,
 				plot_tsne = plot_tsne,
+				plot_umap = plot_umap,
+				plot_fle = plot_fle,
 				plot_diffmap = plot_diffmap,
 				plot_citeseq_tsne = plot_citeseq_tsne,
 				memory = memory,
@@ -284,12 +293,13 @@ workflow scCloud {
 			output_10x_h5 = aggregate_matrices.output_10x_h5,
 			output_h5ad = cluster.output_h5ad,
 			output_filt_xlsx = cluster.output_filt_xlsx,
-			output_seurat_h5ad = cluster.output_seurat_h5ad,
+			output_filt_plot = cluster.output_filt_plot,
 			output_loom_file = cluster.output_loom_file,
+			output_parquet_file = cluster.output_parquet_file,
 			output_de_h5ad = de_analysis.output_de_h5ad,
 			output_de_xlsx = de_analysis.output_de_xlsx,
 			output_anno_file = de_analysis.output_anno_file,
-			output_pngs = plot.output_pngs,
+			output_pdfs = plot.output_pdfs,
 			output_htmls = plot.output_htmls,
 			output_scp_files = scp_output.output_scp_files,
 			disk_space = disk_space,

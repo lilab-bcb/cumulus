@@ -1,15 +1,15 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/10/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/18/plain-WDL/descriptor" as crc
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_vdj/versions/1/plain-WDL/descriptor" as crv
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/2/plain-WDL/descriptor" as sa
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/11/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/19/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_vdj/versions/2/plain-WDL/descriptor" as crv
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/3/plain-WDL/descriptor" as sa
 
 # import "../cellranger/cellranger_mkfastq.wdl" as crm
 # import "../cellranger/cellranger_count.wdl" as crc
 # import "../cellranger/cellranger_vdj.wdl" as crv
-# import "../scCloud/scCloud_adt.wdl" as sa
+# import "../cellranger/scCloud_adt.wdl" as sa
 
 workflow cellranger_mkfastq_count {
-	# 5 or 6 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry]). gs URL
+	# 5 - 8 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry, DataType, FeatureBarcodeFile]). gs URL
 	File input_csv_file
 	# Output directory, gs URL
 	String output_directory
@@ -45,19 +45,17 @@ workflow cellranger_mkfastq_count {
 
 	# For extracting ADT count
 
-	# antibody barcodes in csv format
-	File? antibody_barcode_file
 	# maximum hamming distance in antibody barcodes
 	Int? max_mismatch = 3
 
-	# 2.2.0 or 2.1.1
+	# 2.1.1, 2.2.0, 3.0.0, or 3.0.2
 	String? cellranger_version = "2.2.0"
 	# Number of cpus per cellranger job
 	Int? num_cpu = 64
 	# Memory in GB
 	Int? memory = 128
 	# Optional memory in GB for scCloud_adt
-	Int? adt_memory = 32
+	Int? feature_memory = 32
 	# Optional disk space for mkfastq.
 	Int? mkfastq_disk_space = 1500
 	# Optional disk space needed for cell ranger count.
@@ -65,7 +63,7 @@ workflow cellranger_mkfastq_count {
 	# Optional disk space needed for cell ranger vdj.
 	Int? vdj_disk_space = 500	
 	# Optional disk space needed for scCloud_adt
-	Int? adt_disk_space = 100
+	Int? feature_disk_space = 100
 	# Number of preemptible tries 
 	Int? preemptible = 2
 
@@ -163,17 +161,19 @@ workflow cellranger_mkfastq_count {
 			}		
 		}
 
-		if (generate_count_config.sample_adt_ids[0] != '' && defined(antibody_barcode_file)) {
-			scatter (sample_id in generate_count_config.sample_adt_ids) {
+		if (generate_count_config.sample_feature_ids[0] != '') {
+			scatter (sample_id in generate_count_config.sample_feature_ids) {
 				call sa.scCloud_adt as scCloud_adt {
 					input:
 						sample_id = sample_id,
 						input_fastqs_directories = generate_count_config.sample2dir[sample_id],
 						output_directory = output_directory_stripped,
-						antibody_barcode_file = antibody_barcode_file,
+						chemistry = generate_count_config.sample2chemistry[sample_id],
+						data_type = generate_count_config.sample2datatype[sample_id],
+						feature_barcode_file = generate_count_config.sample2fbf[sample_id],
 						max_mismatch = max_mismatch,
-						memory = adt_memory,
-						disk_space = adt_disk_space,
+						memory = feature_memory,
+						disk_space = feature_disk_space,
 						preemptible = preemptible
 				}
 			}		
@@ -245,6 +245,7 @@ task generate_count_config {
 		from subprocess import check_call
 
 		df = pd.read_csv('${input_csv_file}', header = 0)
+		df.fillna('', inplace = True)
 		df['Sample'] = df['Sample'].astype(str)
 		df['Flowcell'] = df['Flowcell'].map(lambda x: re.sub('/+$', '', x)) # remove trailing slashes
 
@@ -256,11 +257,12 @@ task generate_count_config {
 				rid2fdir[run_id] = fastq_dir
 
 		with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2, open('sample2genome.txt', 'w') as fo3, open('sample2chemistry.txt', 'w') as fo4, \
-			 open('count_matrix.csv', 'w') as fo5, open('sample_vdj_ids.txt', 'w') as fo6, open('sample_adt_ids.txt', 'w') as fo7:
+			 open('count_matrix.csv', 'w') as fo5, open('sample_vdj_ids.txt', 'w') as fo6, open('sample_feature_ids.txt', 'w') as fo7, \
+			 open('sample2datatype.txt', 'w') as fo8, open('sample2fbf.txt', 'w') as fo9:
 
 			fo5.write('Sample,Location\n')
 
-			n_ref = n_chem = 0
+			n_ref = n_chem = n_fbf = 0
 
 			for sample_id in df['Sample'].unique():
 				if sample_id.find(' ') != -1:
@@ -276,7 +278,7 @@ task generate_count_config {
 					fo1.write(sample_id + '\n')
 				elif data_type == 'vdj':
 					fo6.write(sample_id + '\n')
-				elif data_type == 'adt':
+				elif data_type == 'adt' or data_type == 'crispr':
 					fo7.write(sample_id + '\n')
 				else:
 					print('Invalid data type: ' + data_type + '!')
@@ -285,24 +287,41 @@ task generate_count_config {
 				dirs = df_local['Flowcell'].map(lambda x: x if len(rid2fdir) == 0 else rid2fdir[os.path.basename(x)]).values
 				fo2.write(sample_id + '\t' + ','.join(dirs) + '\n')
 				
-				if data_type != 'adt':
+				if data_type == 'count' or data_type == 'vdj':
 					assert df_local['Reference'].unique().size == 1
 					fo3.write(sample_id + '\t' + df_local['Reference'].iat[0] + '\n')
 					n_ref += 1
 
-				if data_type == 'count':
+				if data_type == 'count' or data_type == 'adt' or data_type == 'crispr':
 					chemistry = 'auto'
 					if 'Chemistry' in df_local.columns:
 						assert df_local['Chemistry'].unique().size == 1
 						chemistry = df_local['Chemistry'].iat[0]
 					fo4.write(sample_id + '\t' + chemistry + '\n')
 					n_chem += 1
-					fo5.write(sample_id + ',${output_dir}/' + sample_id + '/filtered_gene_bc_matrices_h5.h5\n')
+
+				if data_type == 'adt' or data_type == 'crispr':
+					assert 'FeatureBarcodeFile' in df_local.columns
+					assert df_local['FeatureBarcodeFile'].unique().size == 1
+					feature_barcode_file = df_local['FeatureBarcodeFile'].iat[0]
+					assert feature_barcode_file != ''
+					fo8.write(sample_id + '\t' + data_type + '\n')
+					fo9.write(sample_id + '\t' + feature_barcode_file + '\n')
+					n_fbf += 1
+
+				if data_type == 'count':
+					if chemistry == 'SC3Pv3':
+						fo5.write(sample_id + ',${output_dir}/' + sample_id + '/filtered_feature_bc_matrix.h5\n')
+					else:
+						fo5.write(sample_id + ',${output_dir}/' + sample_id + '/filtered_gene_bc_matrices_h5.h5\n')
 
 			if n_ref == 0:
 				fo3.write('null\tnull\n')
 			if n_chem == 0:
 				fo4.write('null\tnull\n')
+			if n_fbf == 0:
+				fo8.write('null\tnull\n')
+				fo9.write('null\tnull\n')
 		CODE
 
 		gsutil -q -m cp count_matrix.csv ${output_dir}/
@@ -316,7 +335,9 @@ task generate_count_config {
 		Map[String, String] sample2chemistry = read_map('sample2chemistry.txt')
 		String count_matrix = "${output_dir}/count_matrix.csv"
 		Array[String] sample_vdj_ids = read_lines('sample_vdj_ids.txt')
-		Array[String] sample_adt_ids = read_lines('sample_adt_ids.txt')
+		Array[String] sample_feature_ids = read_lines('sample_feature_ids.txt')
+		Map[String, String] sample2datatype = read_map('sample2datatype.txt')
+		Map[String, String] sample2fbf = read_map('sample2fbf.txt')
 	}
 
 	runtime {

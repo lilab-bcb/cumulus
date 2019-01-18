@@ -25,10 +25,10 @@ workflow scCloud_subcluster {
 
 	# If correct batch effects [default: false]
 	Boolean? correct_batch_effect
-	# If output Seurat compatible h5ad file [default: false]
-	Boolean? output_seurat_compatible
 	# If output loom-formatted file [default: false]
 	Boolean? output_loom
+	# If output parquet-formatted file [default: false]
+	Boolean? output_parquet
 	# Random number generator seed. [default: 0]
 	Int? random_state
 	# Number of PCs. [default: 50]
@@ -45,16 +45,6 @@ workflow scCloud_subcluster {
 	Boolean? run_louvain = true
 	# Resolution parameter for the louvain clustering algorithm. [default: 1.3]
 	Float? louvain_resolution
-	# Run KMeans clustering algorithm on diffusion components.
-	Boolean? run_kmeans
-	# Target at <number> clusters for K means. [default: 20]
-	Int? kmeans_n_clusters
-	# Run hdbscan clustering algorithm on diffusion components.
-	Boolean? run_hdbscan
-	# Minimum cluster size for hdbscan. [default: 50]
-	Int? hdbscan_min_cluster_size
-	# Minimum number of samples for hdbscan. [default: 50]
-	Int? hdbscan_min_samples
 	# Run approximated louvain clustering algorithm.
 	Boolean? run_approximated_louvain
 	# Number of Kmeans tries. [default: 20]
@@ -116,6 +106,10 @@ workflow scCloud_subcluster {
 	String? plot_composition
 	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored tSNEs side by side. 
 	String? plot_tsne
+	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored UMAPs side by side.
+	String? plot_umap
+	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FLEs side by side.
+	String? plot_fle
 	# Takes the format of "attr,attr,...,attr". If non-empty, generate attr colored 3D interactive plot. The 3 coordinates are the first 3 PCs of all diffusion components.
 	String? plot_diffmap
 
@@ -124,8 +118,9 @@ workflow scCloud_subcluster {
 
 	# If generate outputs required by single cell portal
 	Boolean generate_scp_outputs = false
-
+	# Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain" or a JSON file describing the markers. [default: human_immune]
 	Boolean output_dense = false
+
 
 
 	call tasks.run_scCloud_subcluster as subcluster {
@@ -134,8 +129,8 @@ workflow scCloud_subcluster {
 			output_name = out_name,
 			subset_selections = subset_selections,
 			correct_batch_effect = correct_batch_effect,
-			output_seurat_compatible = output_seurat_compatible,
 			output_loom = output_loom,
+			output_parquet = output_parquet,
 			random_state = random_state,
 			nPC = nPC,
 			nDC = nDC,
@@ -144,11 +139,6 @@ workflow scCloud_subcluster {
 			calculate_pseudotime = calculate_pseudotime,
 			run_louvain = run_louvain,
 			louvain_resolution = louvain_resolution,
-			run_kmeans = run_kmeans,
-			kmeans_n_clusters = kmeans_n_clusters,
-			run_hdbscan = run_hdbscan,
-			hdbscan_min_cluster_size = hdbscan_min_cluster_size,
-			hdbscan_min_samples = hdbscan_min_samples,
 			run_approximated_louvain = run_approximated_louvain,
 			approx_louvain_ninit = approx_louvain_ninit,
 			approx_louvain_nclusters = approx_louvain_nclusters,
@@ -190,18 +180,20 @@ workflow scCloud_subcluster {
 		}
 	}
 
-	if (defined(plot_composition) || defined(plot_tsne) || defined(plot_diffmap)) {
+	if (defined(plot_composition) || defined(plot_tsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_diffmap)) {
 		call tasks.run_scCloud_plot as plot {
 			input:
 				input_h5ad = subcluster.output_h5ad,
 				output_name = out_name,
 				plot_composition = plot_composition,
 				plot_tsne = plot_tsne,
+				plot_umap = plot_umap,
+				plot_fle = plot_fle,
 				plot_diffmap = plot_diffmap,
 				memory = memory,
 				disk_space = disk_space,
 				preemptible = preemptible
-		}	
+		}
 	}
 
 	if (generate_scp_outputs) {
@@ -220,12 +212,12 @@ workflow scCloud_subcluster {
 		input:
 			output_name = output_name,
 			output_h5ad = subcluster.output_h5ad,
-			output_seurat_h5ad = subcluster.output_seurat_h5ad,
 			output_loom_file = subcluster.output_loom_file,
+			output_parquet_file = subcluster.output_parquet_file,
 			output_de_h5ad = de_analysis.output_de_h5ad,
 			output_de_xlsx = de_analysis.output_de_xlsx,
 			output_anno_file = de_analysis.output_anno_file,
-			output_pngs = plot.output_pngs,
+			output_pdfs = plot.output_pdfs,
 			output_htmls = plot.output_htmls,
 			output_scp_files = scp_output.output_scp_files,
 			disk_space = disk_space,

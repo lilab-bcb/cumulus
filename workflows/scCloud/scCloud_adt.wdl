@@ -6,14 +6,20 @@ workflow scCloud_adt {
 	# Output directory, gs url
 	String output_directory
 
-	# cell barcodes, from 10x
-	File barcode_file = "gs://regev-lab/resources/cellranger/737K-august-2016.txt"
-	# File barcode_file = "737K-august-2016.txt"
+	# 10x genomics chemistry 
+	String chemistry
 
-	# antibody barcodes in csv format
-	File antibody_barcode_file
+	# data type, either adt or crispr
+	String data_type
 
-	# maximum hamming distance in antibody barcodes
+	# cell barcodes white list, from 10x genomics, can be either v2 or v3 chemistry
+	# File cell_barcode_file = (if chemistry == "SC3Pv3" then "gs://regev-lab/resources/cellranger/3M-february-2018.txt.gz" else "gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz")
+	File cell_barcode_file = (if chemistry == "SC3Pv3" then "3M-february-2018.txt.gz" else "737K-august-2016.txt.gz")
+
+	# feature barcodes in csv format
+	File feature_barcode_file
+
+	# maximum hamming distance in feature barcodes
 	Int? max_mismatch = 3
 
 	# Memory in GB
@@ -28,8 +34,10 @@ workflow scCloud_adt {
 			sample_id = sample_id,
 			input_fastqs_directories = input_fastqs_directories,
 			output_directory = sub(output_directory, "/+$", ""),
-			cell_barcodes = barcode_file,
-			antibody_barcodes = antibody_barcode_file,
+			chemistry = chemistry,
+			data_type = data_type,
+			cell_barcodes = cell_barcode_file,
+			feature_barcodes = feature_barcode_file,
 			max_mismatch = max_mismatch,
 			memory = memory,
 			disk_space = disk_space,
@@ -46,8 +54,10 @@ task run_generate_count_matrix_ADTs {
 	String sample_id
 	String input_fastqs_directories
 	String output_directory
+	String chemistry
+	String data_type
 	File cell_barcodes
-	File antibody_barcodes
+	File feature_barcodes
 	Int max_mismatch
 	Int memory
 	Int disk_space
@@ -74,14 +84,22 @@ task run_generate_count_matrix_ADTs {
 			check_call(call_args)
 			fastqs.append('${sample_id}_' + str(i))
 	
-		call_args = ['generate_count_matrix_ADTs', '${cell_barcodes}', '${antibody_barcodes}', ','.join(fastqs), '${sample_id}', '--max-mismatch', '${max_mismatch}']
+		call_args = ['generate_count_matrix_ADTs', '${cell_barcodes}', '${feature_barcodes}', ','.join(fastqs), '${sample_id}', '--max-mismatch-feature', '${max_mismatch}']
+		if '${data_type}' is 'crispr':
+			call_args.extend(['--feature', 'crispr', '--min-reads-per-umi', '11', '--min-ratio-per-umi', '0.25'])
+		else:
+			call_args.extend(['--feature', 'antibody'])
+		if '${chemistry}' is 'SC3Pv3':
+			call_args.extend(['--max-mismatch-cell', '0', '--umi-length', '12'])
+		else:
+			call_args.extend(['--max-mismatch-cell', '1', '--umi-length', '10'])
 		print(' '.join(call_args))
 		check_call(call_args)
 		CODE
 
-		gsutil -q -m cp ${sample_id}.*csv ${output_directory}/${sample_id}/
+		gsutil -q -m cp ${sample_id}.*csv* ${output_directory}/${sample_id}/
 		# mkdir -p ${output_directory}/${sample_id}
-		# cp -f ${sample_id}.*csv ${output_directory}/${sample_id}/
+		# cp -f ${sample_id}.*csv* ${output_directory}/${sample_id}/
 	}
 
 	output {

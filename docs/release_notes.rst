@@ -1,3 +1,12 @@
+Version 0.6.0 `January 18, 2018`
+--------------------------------
+
+Added support for 10x genomics V3 chemistry.
+
+Added support for extracting feature matrix for Perturb-Seq data.
+
+Changed output_seurat_compatible to make_output_seurat_compatible and R script to convert h5ad to Seurat object. 
+
 Version 0.5.0 `November 18, 2018`
 ---------------------------------
 

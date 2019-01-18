@@ -25,7 +25,7 @@ workflow cellranger_vdj {
 	# Force the web summary HTML and metrics summary CSV to only report on a particular chain type. The accepted values are: auto for autodetection based on TR vs IG representation, TR for T cell receptors, IG for B cell receptors, all for all chain types.
 	String? chain 
 
-	# 2.2.0
+	# 2.1.1, 2.2.0, 3.0.0, or 3.0.2
 	String? cellranger_version = "2.2.0"
 
 	# Number of cpus per cellranger job
