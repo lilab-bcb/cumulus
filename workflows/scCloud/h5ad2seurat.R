@@ -23,7 +23,7 @@ Convert.anndata.base.AnnData <- function(
 				x = as.numeric(x = from$raw$X$data),
 				index1 = FALSE
 			)
-			rownames(x = raw.data.matrix) <- rownames(x = py_to_r(from$var))
+			rownames(x = raw.data.matrix) <- rownames(x = py_to_r(from$raw$var))
 			colnames(x = raw.data.matrix) <- rownames(x = py_to_r(from$obs))
 			meta.data <- py_to_r(from$obs)
 			if ("n_counts" %in% colnames(x = meta.data)) {
