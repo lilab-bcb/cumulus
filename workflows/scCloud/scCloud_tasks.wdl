@@ -64,7 +64,7 @@ task run_scCloud_cluster {
 	Boolean? output_filtration_results
 	Boolean? plot_filtration_results
 	String? plot_filtration_figsize
-	Boolean? make_output_seurat_compatible
+	Boolean? output_seurat_compatible
 	Boolean? output_loom
 	Boolean? output_parquet
 	Boolean? correct_batch_effect
@@ -85,7 +85,7 @@ task run_scCloud_cluster {
 	Int? nPC
 	Int? nDC
 	Float? diffmap_alpha
-	Float? diffmap_K
+	Int? diffmap_K
 	Boolean? run_louvain
 	Float? louvain_resolution
 	String? louvain_affinity
@@ -124,8 +124,8 @@ task run_scCloud_cluster {
 			call_args.append('--plot-filtration-results')
 		if '${plot_filtration_figsize}' is not '':
 			call_args.extend(['--plot-filtration-figsize', '${plot_filtration_figsize}'])
-		if '${make_output_seurat_compatible}' is 'true':
-			call_args.append('--make-output-seurat-compatible')
+		if '${output_seurat_compatible}' is 'true':
+			call_args.append('--output-seurat-compatible')
 		if '${output_loom}' is 'true':
 			call_args.append('--output-loom')
 		if '${correct_batch_effect}' is 'true':
@@ -215,6 +215,7 @@ task run_scCloud_cluster {
 
 	output {
 		File output_h5ad = "${output_name}.h5ad"
+		Array[File] output_seurat_h5ad = glob("${output_name}.seurat.h5ad")
 		Array[File] output_filt_xlsx = glob("${output_name}.filt.xlsx")
 		Array[File] output_filt_plot = glob("${output_name}.filt.*.pdf")
 		Array[File] output_loom_file = glob("${output_name}.loom")
@@ -412,7 +413,7 @@ task run_scCloud_subcluster {
 	Int? nPC
 	Int? nDC
 	Float? diffmap_alpha
-	Float? diffmap_K
+	Int? diffmap_K
 	String? calculate_pseudotime
 	Boolean? run_louvain
 	Float? louvain_resolution
@@ -538,6 +539,7 @@ task organize_results {
 	Int preemptible
 	File? output_10x_h5
 	File? output_h5ad
+	Array[File]? output_seurat_h5ad
 	Array[File]? output_filt_xlsx
 	Array[File]? output_filt_plot
 	Array[File]? output_loom_file
@@ -560,7 +562,7 @@ task organize_results {
 
 		# check_call(['mkdir', '-p', dest])
 		
-		files = ['${output_10x_h5}', '${sep=" " output_filt_xlsx}', '${sep=" " output_loom_file}', '${sep=" " output_parquet_file}', '${output_de_xlsx}', '${sep=" " output_anno_file}']
+		files = ['${output_10x_h5}', '${sep=" " output_seurat_h5ad}', '${sep=" " output_filt_xlsx}', '${sep=" " output_loom_file}', '${sep=" " output_parquet_file}', '${output_de_xlsx}', '${sep=" " output_anno_file}']
 		files.append('${output_h5ad}' if '${output_de_h5ad}' is '' else '${output_de_h5ad}')
 		files.extend('${sep="," output_filt_plot}'.split(','))
 		files.extend('${sep="," output_pdfs}'.split(','))
@@ -568,8 +570,8 @@ task organize_results {
 		files.extend('${sep="," output_scp_files}'.split(','))
 		for file in files:
 			if file is not '':
-				call_args = ['cp', file, dest]
-				# call_args = ['gsutil', '-q', 'cp', file, dest]
+				# call_args = ['cp', file, dest]
+				call_args = ['gsutil', '-q', 'cp', file, dest]
 				print(' '.join(call_args))
 				check_call(call_args)
 		CODE
@@ -666,15 +668,15 @@ task run_scCloud_demuxEM {
 		check_call(call_args)
 		CODE
 
-		# gsutil -q cp ${output_name}_demux_10x.h5 ${output_dir}/${output_name}/
-		# gsutil -q cp ${output_name}_ADTs.h5ad ${output_dir}/${output_name}/
-		# gsutil -q cp ${output_name}_demux.h5ad ${output_dir}/${output_name}/
-		# gsutil -q -m cp ${output_name}.*.pdf ${output_dir}/${output_name}/
-		mkdir -p ${output_dir}/${output_name}
-		cp ${output_name}_demux_10x.h5 ${output_dir}/${output_name}/
-		cp ${output_name}_ADTs.h5ad ${output_dir}/${output_name}/
-		cp ${output_name}_demux.h5ad ${output_dir}/${output_name}/
-		cp ${output_name}.*.pdf ${output_dir}/${output_name}/
+		gsutil -q cp ${output_name}_demux_10x.h5 ${output_dir}/${output_name}/
+		gsutil -q cp ${output_name}_ADTs.h5ad ${output_dir}/${output_name}/
+		gsutil -q cp ${output_name}_demux.h5ad ${output_dir}/${output_name}/
+		gsutil -q -m cp ${output_name}.*.pdf ${output_dir}/${output_name}/
+		# mkdir -p ${output_dir}/${output_name}
+		# cp ${output_name}_demux_10x.h5 ${output_dir}/${output_name}/
+		# cp ${output_name}_ADTs.h5ad ${output_dir}/${output_name}/
+		# cp ${output_name}_demux.h5ad ${output_dir}/${output_name}/
+		# cp ${output_name}.*.pdf ${output_dir}/${output_name}/
 	}
 
 	output {

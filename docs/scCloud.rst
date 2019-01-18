@@ -30,7 +30,7 @@ Follow the steps below to run **scCloud** on FireCloud.
 ---------------------------------
 
 scCloud steps:
-^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^
 
 **scCloud** processes single cell data in the following steps:
 
@@ -175,8 +175,8 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - Figure size for filtration plots. <figsize> is a comma-separated list of two numbers, the width and height of the figure (e.g. 6,4)
 	  - 6,4
 	  -
-	* - make_output_seurat_compatible
-	  - Make output h5ad file seurat compatible. Caution: this will significantly increase the output size. Do not turn this option on for large data sets
+	* - output_seurat_compatible
+	  - Output seurat-compatible h5ad file. Caution: File size might be large, do not turn this option on for large data sets.
 	  - true
 	  - false
 	* - output_loom
@@ -346,6 +346,9 @@ cluster outputs
 	    | and ``data.obsm['X_fle']`` records the force-directed layout coordinates from the diffusion components.
 	    | The ``uns`` field stores other related information, such as reference genome (``data.uns['genome']``).
 	    | If '--make-output-seurat-compatible' is on, this file can be loaded into R and converted into a Seurat object
+	* - output_seurat_h5ad
+	  - File
+	  - h5ad file in seurat-compatible manner. This file can be loaded into R and converted into a Seurat object
 	* - output_filt_xlsx
 	  - File
 	  - | Spreadsheet containing filtration results (output_name.filt.xlsx).
@@ -461,32 +464,32 @@ The top level of the JSON file is an object with two name/value pairs: *title* a
 See below for an example JSON snippet::
 
 	{
-		"title" : "Mouse brain cell markers",
-		"cell_types" : [
-			{
-				"name" : "Glutamatergic neuron",
-				"markers" : [
-								{
-									"genes" : ["Rbfox3+", "Reln+", "Slc17a6+", "Slc17a7+"],
-									"weight" : 1.0
-								}
-							],
-				"subtypes" : {
-					"title" : "Glutamatergic neuron subtype markers",
-					"cell_types" : [
-						{
-							"name" : "Glutamatergic layer 4",
-							"markers" : [
-								{
-									"genes" : ["Rorb+", "Paqr8+"],
-									"weight" : 1.0
-								}
-							]
-						}
-					]
-				}
-			}
-		]
+	  "title" : "Mouse brain cell markers",
+	    "cell_types" : [
+	      {
+	        "name" : "Glutamatergic neuron",
+	        "markers" : [
+	          {
+	            "genes" : ["Rbfox3+", "Reln+", "Slc17a6+", "Slc17a7+"],
+	            "weight" : 1.0
+	          }
+	        ],
+	        "subtypes" : {
+	          "title" : "Glutamatergic neuron subtype markers",
+	            "cell_types" : [
+	              {
+	                "name" : "Glutamatergic layer 4",
+	                "markers" : [
+	                  {
+	                    "genes" : ["Rorb+", "Paqr8+"],
+	                    "weight" : 1.0
+	                  }
+	                ]
+	              }
+	            ]
+	        }
+	      }
+	    ]
 	}
 
 Algorithm
@@ -701,7 +704,7 @@ Then execute the code below to load the results into ``Seurat``::
 	library(reticulate)
 	source("https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/workflows/scCloud/h5ad2seurat.R")
 	ad <- import("anndata", convert = FALSE)
-	test_ad <- ad$read_h5ad("output_name.h5ad")
+	test_ad <- ad$read_h5ad("output_name.seurat.h5ad")
 	test <- Convert.anndata.base.AnnData(test_ad, to = "seurat")
 
 The resulting seurat object will have three data slots. *raw.data* records filtered raw count matrix. *data* records filtered and log-normalized expression matrix. *scale.data* records variable-gene-selected, standardized expression matrix that are ready to perform PCA.

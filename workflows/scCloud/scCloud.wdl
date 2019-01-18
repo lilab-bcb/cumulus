@@ -1,5 +1,5 @@
-# import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/4/plain-WDL/descriptor" as tasks
-import "../scCloud/scCloud_tasks.wdl" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/5/plain-WDL/descriptor" as tasks
+# import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud {
 	# Input csv-formatted file containing information of each scRNA-Seq run
@@ -51,8 +51,8 @@ workflow scCloud {
 	Boolean? plot_filtration_results = true
 	# Figure size for filtration plots. <figsize> is a comma-separated list of two numbers, the width and height of the figure (e.g. 6,4).
 	String? plot_filtration_figsize
-	# Make output h5ad file seurat compatible. Caution: this will significantly increase the output size. Do not turn this option on for large data sets. [default: false]
-	Boolean? make_output_seurat_compatible
+	# Output seurat-compatible h5ad file. Caution: File size might be large, do not turn this option on for large data sets. [default: false]
+	Boolean? output_seurat_compatible
 	# If output loom-formatted file [default: false]
 	Boolean? output_loom
 	# If output parquet-formatted file [default: false]
@@ -88,7 +88,7 @@ workflow scCloud {
 	# Power parameter for diffusion-based pseudotime. [default: 0.5]
 	Float? diffmap_alpha
 	# Number of neighbors used for constructing affinity matrix. [default: 100]
-	Float? diffmap_K
+	Int? diffmap_K
 	# Run louvain clustering algorithm.
 	Boolean? run_louvain = true
 	# Resolution parameter for the louvain clustering algorithm. [default: 1.3]
@@ -196,7 +196,7 @@ workflow scCloud {
 			output_filtration_results = output_filtration_results,
 			plot_filtration_results = plot_filtration_results,
 			plot_filtration_figsize = plot_filtration_figsize,
-			make_output_seurat_compatible = make_output_seurat_compatible,
+			output_seurat_compatible = output_seurat_compatible,
 			output_loom = output_loom,
 			output_parquet = output_parquet,
 			correct_batch_effect = correct_batch_effect,
@@ -292,6 +292,7 @@ workflow scCloud {
 			output_name = output_name,
 			output_10x_h5 = aggregate_matrices.output_10x_h5,
 			output_h5ad = cluster.output_h5ad,
+			output_seurat_h5ad = cluster.output_seurat_h5ad,
 			output_filt_xlsx = cluster.output_filt_xlsx,
 			output_filt_plot = cluster.output_filt_plot,
 			output_loom_file = cluster.output_loom_file,

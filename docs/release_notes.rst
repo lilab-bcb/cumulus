@@ -5,7 +5,17 @@ Added support for 10x genomics V3 chemistry.
 
 Added support for extracting feature matrix for Perturb-Seq data.
 
-Changed output_seurat_compatible to make_output_seurat_compatible and R script to convert h5ad to Seurat object. 
+Added R script to convert output_name.seurat.h5ad to Seurat object. Now the raw.data slot stores filtered raw counts.
+
+Added min_umis and max_umis to filter cells based on UMI counts.
+
+Added QC plots and improved filtration spreadsheet.
+
+Added support for plotting UMAP and FLE.
+
+Now users can upload their JSON file to annotate cell types.
+
+Improved documentation.
 
 Version 0.5.0 `November 18, 2018`
 ---------------------------------
