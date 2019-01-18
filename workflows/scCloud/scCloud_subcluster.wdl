@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/4/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/5/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud_subcluster {
@@ -38,7 +38,7 @@ workflow scCloud_subcluster {
 	# Power parameter for diffusion-based pseudotime. [default: 0.5]
 	Float? diffmap_alpha
 	# Number of neighbors used for constructing affinity matrix. [default: 100]
-	Float? diffmap_K
+	Int? diffmap_K
 	# Calculate diffusion-based pseudotimes based on <roots>. <roots> should be a comma-separated list of cell barcodes.
 	String? calculate_pseudotime
 	# Run louvain clustering algorithm.
