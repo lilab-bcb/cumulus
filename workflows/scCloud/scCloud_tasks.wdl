@@ -43,7 +43,7 @@ task run_scCloud_aggregate_matrices {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud"
+		docker: "regevlab/sccloud-0.6.0"
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -224,7 +224,7 @@ task run_scCloud_cluster {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud"
+		docker: "regevlab/sccloud-0.6.0"
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -292,7 +292,7 @@ task run_scCloud_de_analysis {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud"
+		docker: "regevlab/sccloud-0.6.0"
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -358,7 +358,7 @@ task run_scCloud_plot {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud"
+		docker: "regevlab/sccloud-0.6.0"
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -386,7 +386,7 @@ task run_scCloud_scp_output {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud"
+		docker: "regevlab/sccloud-0.6.0"
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -524,7 +524,7 @@ task run_scCloud_subcluster {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud"
+		docker: "regevlab/sccloud-0.6.0"
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -578,7 +578,7 @@ task organize_results {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud"
+		docker: "regevlab/sccloud-0.6.0"
 		memory: "30 GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -622,7 +622,7 @@ task generate_hashing_cite_seq_tasks {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud"
+		docker: "regevlab/sccloud-0.6.0"
 		preemptible: preemptible
 	}
 }
@@ -685,7 +685,7 @@ task run_scCloud_demuxEM {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud"
+		docker: "regevlab/sccloud-0.6.0"
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -722,7 +722,7 @@ task run_scCloud_merge_rna_adt {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud"
+		docker: "regevlab/sccloud-0.6.0"
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
