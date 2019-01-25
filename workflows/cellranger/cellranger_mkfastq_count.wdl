@@ -1,7 +1,7 @@
 import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/11/plain-WDL/descriptor" as crm
 import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/19/plain-WDL/descriptor" as crc
 import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_vdj/versions/2/plain-WDL/descriptor" as crv
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/3/plain-WDL/descriptor" as sa
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/5/plain-WDL/descriptor" as sa
 
 # import "../cellranger/cellranger_mkfastq.wdl" as crm
 # import "../cellranger/cellranger_count.wdl" as crc

@@ -108,7 +108,7 @@ task run_generate_count_matrix_ADTs {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud"
+		docker: "regevlab/sccloud-0.6.0"
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
