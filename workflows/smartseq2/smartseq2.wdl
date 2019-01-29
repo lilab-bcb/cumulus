@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:smartseq2_per_plate/versions/3/plain-WDL/descriptor" as ss2pp
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:smartseq2_per_plate/versions/4/plain-WDL/descriptor" as ss2pp
 # import "../smartseq2/smartseq2_per_plate.wdl" as ss2pp
 
 workflow smartseq2 {
@@ -76,6 +76,7 @@ task parse_input_csv {
 
 	runtime {
 		docker: "regevlab/smartseq2"
+		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
 		preemptible: "${preemptible}"
 	}
 }

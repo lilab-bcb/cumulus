@@ -1,7 +1,7 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/11/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/19/plain-WDL/descriptor" as crc
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_vdj/versions/2/plain-WDL/descriptor" as crv
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/5/plain-WDL/descriptor" as sa
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/12/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/20/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_vdj/versions/3/plain-WDL/descriptor" as crv
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/6/plain-WDL/descriptor" as sa
 
 # import "../cellranger/cellranger_mkfastq.wdl" as crm
 # import "../cellranger/cellranger_count.wdl" as crc
@@ -222,6 +222,7 @@ task generate_bcl_csv {
 
 	runtime {
 		docker: "regevlab/cellranger-${cellranger_version}"
+		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
 		preemptible: "${preemptible}"
 	}
 }
@@ -342,6 +343,7 @@ task generate_count_config {
 
 	runtime {
 		docker: "regevlab/cellranger-${cellranger_version}"
+		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
 		preemptible: "${preemptible}"
 	}
 }
@@ -380,6 +382,7 @@ task collect_summaries {
 
 	runtime {
 		docker: "regevlab/cellranger-${cellranger_version}"
+		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
 		preemptible: "${preemptible}"
 	}
 }

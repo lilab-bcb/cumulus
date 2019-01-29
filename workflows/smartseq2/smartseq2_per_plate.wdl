@@ -84,6 +84,7 @@ task parse_sample_sheet {
 
 	runtime {
 		docker: "regevlab/smartseq2"
+		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
 		preemptible: "${preemptible}"
 	}
 }
@@ -118,6 +119,7 @@ task run_rsem {
 
 	runtime {
 		docker: "regevlab/smartseq2"
+		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -168,6 +170,7 @@ task generate_count_matrix {
 
 	runtime {
 		docker: "regevlab/smartseq2"
+		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
