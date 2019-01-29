@@ -66,7 +66,7 @@ Stable version - HTAPP v1
 	  - Snapshot
 	  - Function
 	* - regev/cellranger_mkfastq_count
-	  - 40
+	  - 39
 	  - Run Cell Ranger to extract FASTQ files and generate gene-count matrices for 10x genomics data
 	* - scCloud/scCloud
 	  - 3
