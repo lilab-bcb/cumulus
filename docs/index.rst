@@ -11,6 +11,7 @@
    :hidden:
 
    first_time
+   versions
    cellranger
    hashing_cite_seq
    smart_seq_2
