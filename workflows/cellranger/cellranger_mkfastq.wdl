@@ -108,6 +108,7 @@ task run_cellranger_mkfastq {
 
 	runtime {
 		docker: "regevlab/cellranger-${cellranger_version}"
+		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
