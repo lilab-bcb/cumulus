@@ -31,7 +31,8 @@ workflow cellranger_count {
 
 	# 2.1.1, 2.2.0, 3.0.0, or 3.0.2
 	String? cellranger_version = "2.2.0"
-
+	# Google cloud zones, default to "us-east1-b us-east1-c us-east1-d"
+	String? zones = "us-east1-b us-east1-c us-east1-d"
 	# Number of cpus per cellranger job
 	Int? num_cpu = 64
 	# Memory in GB
@@ -53,6 +54,7 @@ workflow cellranger_count {
 			force_cells = force_cells,
 			expect_cells = expect_cells,
 			cellranger_version = cellranger_version,
+			zones = zones,
 			num_cpu = num_cpu,
 			memory = memory,
 			disk_space = disk_space,
@@ -78,6 +80,7 @@ task run_cellranger_count {
 	Int force_cells
 	Int expect_cells
 	String cellranger_version
+	String zones
 	Int num_cpu
 	Int memory
 	Int disk_space
@@ -127,7 +130,7 @@ task run_cellranger_count {
 
 	runtime {
 		docker: "regevlab/cellranger-${cellranger_version}"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		zones: zones
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"

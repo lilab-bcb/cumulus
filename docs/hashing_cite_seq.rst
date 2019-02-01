@@ -84,6 +84,14 @@ scCloud_hashing_cite_seq inputs:
 	  - merge_rna_adt parameter. This is a CSV file containing the IgG control information for each antibody.
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/antibody_control_csv"
 	  - 
+	* - sccloud_version
+	  - scCloud version
+	  - "0.6.0"
+	  - "0.6.0"
+	* - zones
+	  - Google cloud zones
+	  - "us-east1-b us-east1-c us-east1-d"
+	  - "us-east1-b us-east1-c us-east1-d"
 	* - num_cpu
 	  - Number of cpus per scCloud_hashing_cite_seq job
 	  - 8

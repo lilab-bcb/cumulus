@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/8/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/13/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud {
@@ -9,6 +9,10 @@ workflow scCloud {
 	# Reference genome name, can be None if you want scCloud to infer it from data for you
 	String genome = ""
 
+	# scCloud version, default to "0.6.0"
+	String? sccloud_version = "0.6.0"
+	# Google cloud zones, default to "us-east1-b us-east1-c us-east1-d"
+	String? zones = "us-east1-b us-east1-c us-east1-d"
 	# Number of cpus per scCloud job
 	Int? num_cpu = 64
 	# Memory size in GB
@@ -140,6 +144,13 @@ workflow scCloud {
 	# Calculate area under curve in ROC curve.
 	Boolean? roc
 
+	# If also detect markers using LightGBM
+	Boolean? find_markers_lightgbm
+	# Remove ribosomal genes with either RPL or RPS as prefixes
+	Boolean? remove_ribo
+	# Only report genes with a feature importance score (in gain) of at least <gain>. [default: 1.0]
+	Float? min_gain
+
 	# If also annotate cell types for clusters based on DE results.
 	Boolean? annotate_cluster
 	# Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain" or a JSON file describing the markers. [default: human_immune]
@@ -182,6 +193,8 @@ workflow scCloud {
 			select_only_singlets = select_only_singlets,
 			minimum_number_of_genes = minimum_number_of_genes,
 			dropseq_genome = dropseq_genome,
+			sccloud_version = sccloud_version,
+			zones = zones,
 			memory = memory,
 			disk_space = disk_space,
 			preemptible = preemptible
@@ -232,6 +245,8 @@ workflow scCloud {
 			run_fle = run_fle,
 			fle_K = fle_K,
 			fle_n_steps = fle_n_steps,
+			sccloud_version = sccloud_version,
+			zones = zones,			
 			num_cpu = num_cpu,
 			memory = memory,
 			disk_space = disk_space,
@@ -248,9 +263,15 @@ workflow scCloud {
 				fisher = fisher,
 				mwu = mwu,
 				roc = roc,
+				find_markers_lightgbm = find_markers_lightgbm,
+				remove_ribo = remove_ribo,
+				min_gain = min_gain,
+				random_state = random_state,
 				annotate_cluster = annotate_cluster,
 				organism = organism,
 				minimum_report_score = minimum_report_score,
+				sccloud_version = sccloud_version,
+				zones = zones,				
 				num_cpu = num_cpu,
 				memory = memory,
 				disk_space = disk_space,
@@ -269,6 +290,8 @@ workflow scCloud {
 				plot_fle = plot_fle,
 				plot_diffmap = plot_diffmap,
 				plot_citeseq_tsne = plot_citeseq_tsne,
+				sccloud_version = sccloud_version,
+				zones = zones,
 				memory = memory,
 				disk_space = disk_space,
 				preemptible = preemptible
@@ -281,6 +304,8 @@ workflow scCloud {
 				input_h5ad = cluster.output_h5ad,
 				output_name = out_name,
 				output_dense = output_dense,
+				sccloud_version = sccloud_version,
+				zones = zones,
 				memory = memory,
 				disk_space = disk_space,
 				preemptible = preemptible				
@@ -299,10 +324,13 @@ workflow scCloud {
 			output_parquet_file = cluster.output_parquet_file,
 			output_de_h5ad = de_analysis.output_de_h5ad,
 			output_de_xlsx = de_analysis.output_de_xlsx,
+			output_markers_xlsx = de_analysis.output_markers_xlsx,
 			output_anno_file = de_analysis.output_anno_file,
 			output_pdfs = plot.output_pdfs,
 			output_htmls = plot.output_htmls,
 			output_scp_files = scp_output.output_scp_files,
+			sccloud_version = sccloud_version,
+			zones = zones,
 			disk_space = disk_space,
 			preemptible = preemptible
 	}

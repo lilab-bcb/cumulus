@@ -38,7 +38,7 @@ scCloud steps:
 
 #. **cluster**. This step is the main analysis step. In this step, **scCloud** performs low quality cell filtration, variable gene selection, batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. t-SNE/FLE).
 
-#. **de_analysis**. This step is optional. In this step, **scCloud** could calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **scCloud** could also calculate the area under ROC curve values for putative markers. If the samples are human or mouse immune cells, **scCloud** could also optionally annotate putative cell types for each cluster based on known markers.
+#. **de_analysis**. This step is optional. In this step, **scCloud** could calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **scCloud** could also calculate the area under ROC curve values for putative markers. If *find_markers_lightgbm* is on, **scCloud** will try to identify cluster-specific markers by training a LightGBM classifier. If the samples are human or mouse immune cells, **scCloud** could also optionally annotate putative cell types for each cluster based on known markers.
 
 #. **plot**. This step is optional. In this step, **scCloud** could generate 6 types of figures based on the **cluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne**, **umap**, **fle** plots show the same t-SNE/UMAP/FLE (force-directed layout embedding) colored by different attributes (e.g. cluster labels, conditions) side-by-side. Third, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components. Lastly, if input is CITE-Seq data, **citeseq_tsne** plots tSNEs based on epitope expression.
 
@@ -71,6 +71,14 @@ global inputs
 	  - A string contains comma-separated genome names. scCloud will read all groups associated with genome names in the list from the hdf5 file. If genome is None, all groups will be considered.
 	  - "GRCh38"
 	  - 
+	* - sccloud_version
+	  - scCloud version
+	  - "0.6.0"
+	  - "0.6.0"
+	* - zones
+	  - Google cloud zones
+	  - "us-east1-b us-east1-c us-east1-d"
+	  - "us-east1-b us-east1-c us-east1-d"
 	* - num_cpu
 	  - Number of cpus per scCloud job
 	  - 32
@@ -418,6 +426,18 @@ de_analysis inputs
 	  - Calculate area under curve in ROC curve
 	  - true
 	  - false
+	* - find_markers_lightgbm
+	  - If also detect markers using LightGBM
+	  - true
+	  - false
+	* - remove_ribo
+	  - Remove ribosomal genes with either RPL or RPS as prefixes. Currently only works for human
+	  - true
+	  - false
+	* - min_gain
+	  - Only report genes with a feature importance score (in gain) of at least <gain>
+	  - 10.0
+	  - 1.0 
 	* - annotate_cluster
 	  - If also annotate cell types for clusters based on DE results
 	  - true
@@ -447,6 +467,9 @@ de_analysis outputs
 	* - output_de_xlsx
 	  - File
 	  - Spreadsheet reporting DE results (output_name.de.xlsx)
+	* - output_markers_xlsx
+	  - File
+	  - An excel spreadsheet containing detected markers. Each cluster has one tab in the spreadsheet and each tab has three columns, listing markers that are strongly up-regulated, weakly up-regulated and down-regulated
 	* - output_anno_file
 	  - File
 	  - Annotation file (output_name.anno.txt)

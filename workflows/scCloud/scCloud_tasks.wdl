@@ -4,6 +4,8 @@ workflow scCloud_tasks {
 task run_scCloud_aggregate_matrices {
 	File input_count_matrix_csv
 	String output_name
+	String sccloud_version
+	String zones
 	Int memory
 	Int disk_space
 	Int preemptible
@@ -43,8 +45,8 @@ task run_scCloud_aggregate_matrices {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud-0.6.0"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		docker: "regevlab/sccloud-${sccloud_version}"
+		zones: zones
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -56,6 +58,8 @@ task run_scCloud_aggregate_matrices {
 task run_scCloud_cluster {
 	File input_10x_file
 	String output_name
+	String sccloud_version
+	String zones
 	Int num_cpu
 	Int memory
 	Int disk_space
@@ -220,13 +224,13 @@ task run_scCloud_cluster {
 		Array[File] output_filt_xlsx = glob("${output_name}.filt.xlsx")
 		Array[File] output_filt_plot = glob("${output_name}.filt.*.pdf")
 		Array[File] output_loom_file = glob("${output_name}.loom")
-		Array[File] output_parquet_file = glob("{output_name}.parquet")
+		Array[File] output_parquet_file = glob("${output_name}.parquet")
 		File monitoringLog = "monitoring.log"
 	}
 
 	runtime {
-		docker: "regevlab/sccloud-0.6.0"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		docker: "regevlab/sccloud-${sccloud_version}"
+		zones: zones
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -238,6 +242,8 @@ task run_scCloud_cluster {
 task run_scCloud_de_analysis {
 	File input_h5ad
 	String output_name
+	String sccloud_version
+	String zones	
 	Int num_cpu
 	Int memory
 	Int disk_space
@@ -251,6 +257,11 @@ task run_scCloud_de_analysis {
 	Boolean? annotate_cluster
 	String? organism
 	Float? minimum_report_score
+
+	Boolean? find_markers_lightgbm
+	Boolean? remove_ribo
+	Float? min_gain
+	Int? random_state
 
 	command {
 		set -e
@@ -275,6 +286,18 @@ task run_scCloud_de_analysis {
 			call_args.append('--roc')
 		print(' '.join(call_args))
 		check_call(call_args)
+		if '${find_markers_lightgbm}' is 'true':
+			call_args = ['scCloud', 'find_markers', '${output_name}.h5ad', '${output_name}.markers.xlsx', '-p', '${num_cpu}']
+			if '${labels}' is not '':
+				call_args.extend(['--labels', '${labels}'])
+			if '${remove_ribo}' is 'true':
+				call_args.append('--remove-ribo')
+			if '${min_gain}' is not '':
+				call_args.extend(['--min-gain', '${min_gain}'])
+			if '${random_state}' is not '':
+				call_args.extend(['--random-state', '${random_state}'])
+			print(' '.join(call_args))
+			check_call(call_args)
 		if '${annotate_cluster}' is 'true':
 			call_args = ['scCloud', 'annotate_cluster', '${output_name}.h5ad', '${output_name}' + '.anno.txt']
 			if '${organism}' is not '':
@@ -289,13 +312,14 @@ task run_scCloud_de_analysis {
 	output {
 		File output_de_h5ad = "${output_name}.h5ad"
 		File output_de_xlsx = "${output_name}.de.xlsx"
+		Array[File] output_markers_xlsx = glob("${output_name}.markers.xlsx")
 		Array[File] output_anno_file = glob("${output_name}.anno.txt")
 		File monitoringLog = "monitoring.log"
 	}
 
 	runtime {
-		docker: "regevlab/sccloud-0.6.0"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		docker: "regevlab/sccloud-${sccloud_version}"
+		zones: zones
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -307,6 +331,8 @@ task run_scCloud_de_analysis {
 task run_scCloud_plot {
 	File input_h5ad
 	String output_name
+	String sccloud_version
+	String zones
 	Int memory
 	Int disk_space
 	Int preemptible
@@ -361,8 +387,8 @@ task run_scCloud_plot {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud-0.6.0"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		docker: "regevlab/sccloud-${sccloud_version}"
+		zones: zones
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -375,6 +401,8 @@ task run_scCloud_scp_output {
 	File input_h5ad
 	String output_name
 	Boolean output_dense
+	String sccloud_version
+	String zones
 	Int memory
 	Int disk_space
 	Int preemptible
@@ -390,8 +418,8 @@ task run_scCloud_scp_output {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud-0.6.0"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		docker: "regevlab/sccloud-${sccloud_version}"
+		zones: zones
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -403,6 +431,8 @@ task run_scCloud_scp_output {
 task run_scCloud_subcluster {
 	File input_h5ad
 	String output_name
+	String sccloud_version
+	String zones
 	Int num_cpu
 	Int memory
 	Int disk_space
@@ -524,13 +554,13 @@ task run_scCloud_subcluster {
 	output {
 		File output_h5ad = "${output_name}.h5ad"
 		Array[File] output_loom_file = glob("${output_name}.loom")
-		Array[File] output_parquet_file = glob("{output_name}.parquet")
+		Array[File] output_parquet_file = glob("${output_name}.parquet")
 		File monitoringLog = "monitoring.log"
 	}
 
 	runtime {
-		docker: "regevlab/sccloud-0.6.0"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		docker: "regevlab/sccloud-${sccloud_version}"
+		zones: zones
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -541,6 +571,8 @@ task run_scCloud_subcluster {
 
 task organize_results {
 	String output_name
+	String sccloud_version
+	String zones
 	Int disk_space
 	Int preemptible
 	File? output_10x_h5
@@ -552,6 +584,7 @@ task organize_results {
 	Array[File]? output_parquet_file
 	File? output_de_h5ad
 	File? output_de_xlsx
+	Array[File]? output_markers_xlsx
 	Array[File]? output_anno_file
 	Array[File]? output_pdfs
 	Array[File]? output_htmls
@@ -568,7 +601,7 @@ task organize_results {
 
 		# check_call(['mkdir', '-p', dest])
 		
-		files = ['${output_10x_h5}', '${sep=" " output_seurat_h5ad}', '${sep=" " output_filt_xlsx}', '${sep=" " output_loom_file}', '${sep=" " output_parquet_file}', '${output_de_xlsx}', '${sep=" " output_anno_file}']
+		files = ['${output_10x_h5}', '${sep=" " output_seurat_h5ad}', '${sep=" " output_filt_xlsx}', '${sep=" " output_loom_file}', '${sep=" " output_parquet_file}', '${output_de_xlsx}', '${sep=" " output_markers_xlsx}', '${sep=" " output_anno_file}']
 		files.append('${output_h5ad}' if '${output_de_h5ad}' is '' else '${output_de_h5ad}')
 		files.extend('${sep="," output_filt_plot}'.split(','))
 		files.extend('${sep="," output_pdfs}'.split(','))
@@ -584,8 +617,8 @@ task organize_results {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud-0.6.0"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		docker: "regevlab/sccloud-${sccloud_version}"
+		zones: zones
 		memory: "30 GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -596,6 +629,8 @@ task organize_results {
 
 task generate_hashing_cite_seq_tasks {
 	File input_sample_sheet
+	String sccloud_version
+	String zones
 	Int preemptible
 
 	command {
@@ -629,8 +664,8 @@ task generate_hashing_cite_seq_tasks {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud-0.6.0"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		docker: "regevlab/sccloud-${sccloud_version}"
+		zones: zones
 		preemptible: preemptible
 	}
 }
@@ -640,6 +675,8 @@ task run_scCloud_demuxEM {
 	File input_raw_gene_bc_matrices_h5
 	String output_dir
 	String output_name
+	String sccloud_version
+	String zones
 	Int num_cpu
 	Int memory
 	Int disk_space
@@ -693,8 +730,8 @@ task run_scCloud_demuxEM {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud-0.6.0"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		docker: "regevlab/sccloud-${sccloud_version}"
+		zones: zones
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -709,6 +746,8 @@ task run_scCloud_merge_rna_adt {
 	File antibody_control_csv
 	String output_dir
 	String output_name
+	String sccloud_version
+	String zones
 	Int memory
 	Int disk_space
 	Int preemptible
@@ -731,8 +770,8 @@ task run_scCloud_merge_rna_adt {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud-0.6.0"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		docker: "regevlab/sccloud-${sccloud_version}"
+		zones: zones
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"

@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/8/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/13/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud_subcluster {
@@ -7,7 +7,11 @@ workflow scCloud_subcluster {
 	String output_name
 	# Specify which cells will be included in the subcluster analysis. This field contains one or more <subset_selection> strings separated by ';'. Each <subset_selection> string takes the format of ‘attr:value,…,value’, which means select cells with attr in the values. If multiple <subset_selection> strings are specified, the subset of cells selected is the intersection of these strings.
 	String subset_selections
-	
+
+	# scCloud version, default to "0.6.0"
+	String? sccloud_version = "0.6.0"
+	# Google cloud zones, default to "us-east1-b us-east1-c us-east1-d"
+	String? zones = "us-east1-b us-east1-c us-east1-d"
 	# Number of cpus per scCloud job
 	Int? num_cpu = 64
 	# Memory size in GB
@@ -92,6 +96,13 @@ workflow scCloud_subcluster {
 	# Calculate area under curve in ROC curve.
 	Boolean? roc
 
+	# If also detect markers using LightGBM
+	Boolean? find_markers_lightgbm
+	# Remove ribosomal genes with either RPL or RPS as prefixes
+	Boolean? remove_ribo
+	# Only report genes with a feature importance score (in gain) of at least <gain>. [default: 1.0]
+	Float? min_gain
+
 	# If also annotate cell types for clusters based on DE results.
 	Boolean? annotate_cluster
 	# Organism, could either be "human_immune" or "mouse_immune" or "mouse_brain" [default: human_immune]
@@ -154,6 +165,8 @@ workflow scCloud_subcluster {
 			run_fle = run_fle,
 			fle_K = fle_K,
 			fle_n_steps = fle_n_steps,
+			sccloud_version = sccloud_version,
+			zones = zones,
 			num_cpu = num_cpu,
 			memory = memory,
 			disk_space = disk_space,
@@ -170,9 +183,15 @@ workflow scCloud_subcluster {
 				fisher = fisher,
 				mwu = mwu,
 				roc = roc,
+				find_markers_lightgbm = find_markers_lightgbm,
+				remove_ribo = remove_ribo,
+				min_gain = min_gain,
+				random_state = random_state,
 				annotate_cluster = annotate_cluster,
 				organism = organism,
 				minimum_report_score = minimum_report_score,
+				sccloud_version = sccloud_version,
+				zones = zones,
 				num_cpu = num_cpu,
 				memory = memory,
 				disk_space = disk_space,
@@ -190,6 +209,8 @@ workflow scCloud_subcluster {
 				plot_umap = plot_umap,
 				plot_fle = plot_fle,
 				plot_diffmap = plot_diffmap,
+				sccloud_version = sccloud_version,
+				zones = zones,
 				memory = memory,
 				disk_space = disk_space,
 				preemptible = preemptible
@@ -202,6 +223,8 @@ workflow scCloud_subcluster {
 				input_h5ad = subcluster.output_h5ad,
 				output_name = out_name,
 				output_dense = output_dense,
+				sccloud_version = sccloud_version,
+				zones = zones,
 				memory = memory,
 				disk_space = disk_space,
 				preemptible = preemptible				
@@ -216,10 +239,13 @@ workflow scCloud_subcluster {
 			output_parquet_file = subcluster.output_parquet_file,
 			output_de_h5ad = de_analysis.output_de_h5ad,
 			output_de_xlsx = de_analysis.output_de_xlsx,
+			output_markers_xlsx = de_analysis.output_markers_xlsx,
 			output_anno_file = de_analysis.output_anno_file,
 			output_pdfs = plot.output_pdfs,
 			output_htmls = plot.output_htmls,
 			output_scp_files = scp_output.output_scp_files,
+			sccloud_version = sccloud_version,
+			zones = zones,
 			disk_space = disk_space,
 			preemptible = preemptible
 	}

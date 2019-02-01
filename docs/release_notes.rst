@@ -1,4 +1,4 @@
-Version 0.6.0 `January 18, 2018`
+Version 0.6.0 `January 31, 2018`
 --------------------------------
 
 Added support for 10x genomics V3 chemistry.
@@ -16,6 +16,8 @@ Added support for plotting UMAP and FLE.
 Now users can upload their JSON file to annotate cell types.
 
 Improved documentation.
+
+Added lightGBM based marker detection.
 
 Version 0.5.0 `November 18, 2018`
 ---------------------------------

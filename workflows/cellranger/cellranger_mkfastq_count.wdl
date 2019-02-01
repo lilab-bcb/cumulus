@@ -1,7 +1,7 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/12/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/20/plain-WDL/descriptor" as crc
-import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_vdj/versions/3/plain-WDL/descriptor" as crv
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/7/plain-WDL/descriptor" as sa
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_mkfastq/versions/13/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_count/versions/21/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:cellranger_vdj/versions/5/plain-WDL/descriptor" as crv
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/9/plain-WDL/descriptor" as sa
 
 # import "../cellranger/cellranger_mkfastq.wdl" as crm
 # import "../cellranger/cellranger_count.wdl" as crc
@@ -50,6 +50,10 @@ workflow cellranger_mkfastq_count {
 
 	# 2.1.1, 2.2.0, 3.0.0, or 3.0.2
 	String? cellranger_version = "2.2.0"
+	# scCloud version, default to "0.6.0"
+	String? sccloud_version = "0.6.0"
+	# Google cloud zones, default to "us-east1-b us-east1-c us-east1-d"
+	String? zones = "us-east1-b us-east1-c us-east1-d"
 	# Number of cpus per cellranger job
 	Int? num_cpu = 64
 	# Memory in GB
@@ -73,6 +77,7 @@ workflow cellranger_mkfastq_count {
 				input_csv_file = input_csv_file,
 				output_dir = output_directory_stripped,
 				cellranger_version = cellranger_version,
+				zones = zones,
 				preemptible = preemptible
 		}
 
@@ -84,6 +89,7 @@ workflow cellranger_mkfastq_count {
 					output_directory = output_directory_stripped,
 					delete_input_bcl_directory = delete_input_bcl_directory,
 					cellranger_version = cellranger_version,
+					zones = zones,
 					num_cpu = num_cpu,
 					memory = memory,
 					disk_space = mkfastq_disk_space,
@@ -100,6 +106,7 @@ workflow cellranger_mkfastq_count {
 				run_ids = generate_bcl_csv.run_ids,
 				fastq_dirs = cellranger_mkfastq.output_fastqs_flowcell_directory,
 				cellranger_version = cellranger_version,
+				zones = zones,
 				preemptible = preemptible			
 		}
 
@@ -117,6 +124,7 @@ workflow cellranger_mkfastq_count {
 						force_cells = force_cells,
 						expect_cells = expect_cells,
 						cellranger_version = cellranger_version,
+						zones = zones,
 						num_cpu = num_cpu,
 						memory = memory,
 						disk_space = count_disk_space,
@@ -129,6 +137,7 @@ workflow cellranger_mkfastq_count {
 					summaries = cellranger_count.output_metrics_summary,
 					sample_ids = cellranger_count.output_count_directory,
 					cellranger_version = cellranger_version,
+					zones = zones,
 					preemptible = preemptible
 			}		
 		}
@@ -145,6 +154,7 @@ workflow cellranger_mkfastq_count {
 						denovo = vdj_denovo,
 						chain = vdj_chain,
 						cellranger_version = cellranger_version,
+						zones = zones,
 						num_cpu = num_cpu,
 						memory = memory,
 						disk_space = vdj_disk_space,
@@ -157,6 +167,7 @@ workflow cellranger_mkfastq_count {
 					summaries = cellranger_vdj.output_metrics_summary,
 					sample_ids = cellranger_vdj.output_vdj_directory,
 					cellranger_version = cellranger_version,
+					zones = zones,
 					preemptible = preemptible
 			}		
 		}
@@ -172,6 +183,8 @@ workflow cellranger_mkfastq_count {
 						data_type = generate_count_config.sample2datatype[sample_id],
 						feature_barcode_file = generate_count_config.sample2fbf[sample_id],
 						max_mismatch = max_mismatch,
+						sccloud_version = sccloud_version,
+						zones = zones,
 						memory = feature_memory,
 						disk_space = feature_disk_space,
 						preemptible = preemptible
@@ -185,6 +198,7 @@ task generate_bcl_csv {
 	File input_csv_file
 	String output_dir
 	String cellranger_version
+	String zones
 	Int preemptible
 
 	command {
@@ -222,7 +236,7 @@ task generate_bcl_csv {
 
 	runtime {
 		docker: "regevlab/cellranger-${cellranger_version}"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		zones: zones
 		preemptible: "${preemptible}"
 	}
 }
@@ -233,6 +247,7 @@ task generate_count_config {
 	Array[String]? run_ids
 	Array[String]? fastq_dirs
 	String cellranger_version
+	String zones
 	Int preemptible
 
 	command {
@@ -343,7 +358,7 @@ task generate_count_config {
 
 	runtime {
 		docker: "regevlab/cellranger-${cellranger_version}"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		zones: zones
 		preemptible: "${preemptible}"
 	}
 }
@@ -351,8 +366,9 @@ task generate_count_config {
 task collect_summaries {
 	Array[File] summaries
 	Array[String] sample_ids
-	String? cellranger_version
-	Int? preemptible
+	String cellranger_version
+	String zones
+	Int preemptible
 
 	command {
 		python <<CODE
@@ -382,7 +398,7 @@ task collect_summaries {
 
 	runtime {
 		docker: "regevlab/cellranger-${cellranger_version}"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		zones: zones
 		preemptible: "${preemptible}"
 	}
 }

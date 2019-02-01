@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/8/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/13/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud_hashing_cite_seq {
@@ -7,6 +7,10 @@ workflow scCloud_hashing_cite_seq {
 	# Output directory, gs url
 	String output_directory
 
+	# scCloud version, default to "0.6.0"
+	String? sccloud_version = "0.6.0"
+	# Google cloud zones, default to "us-east1-b us-east1-c us-east1-d"
+	String? zones = "us-east1-b us-east1-c us-east1-d"
 	# Number of cpus
 	Int? num_cpu = 8
 	# Memory in GB
@@ -57,7 +61,9 @@ workflow scCloud_hashing_cite_seq {
 					max_background_probability = demuxEM_max_background_probability,
 					random_state = demuxEM_random_state,
 					generate_diagnostic_plots = demuxEM_generate_diagnostic_plots,
-					generate_gender_plot = demuxEM_generate_gender_plot,					
+					generate_gender_plot = demuxEM_generate_gender_plot,
+					sccloud_version = sccloud_version,
+					zones = zones,
 					num_cpu = num_cpu,
 					memory = memory,
 					disk_space = disk_space,
@@ -75,6 +81,8 @@ workflow scCloud_hashing_cite_seq {
 					antibody_control_csv = antibody_control_csv,
 					output_dir = sub(output_directory, "/+$", ""),
 					output_name = cite_seq_id,
+					sccloud_version = sccloud_version,
+					zones = zones,
 					memory = memory,
 					disk_space = disk_space,
 					preemptible = preemptible

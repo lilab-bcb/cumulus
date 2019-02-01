@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:smartseq2_per_plate/versions/4/plain-WDL/descriptor" as ss2pp
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:smartseq2_per_plate/versions/5/plain-WDL/descriptor" as ss2pp
 # import "../smartseq2/smartseq2_per_plate.wdl" as ss2pp
 
 workflow smartseq2 {
@@ -11,6 +11,10 @@ workflow smartseq2 {
 	# Reference to align reads against, now only GRCm38 is available
 	String reference
 
+	# smartseq2 version, default to "0.1.0"
+	String? smartseq2_version = "0.1.0"
+	# Google cloud zones, default to "us-east1-b us-east1-c us-east1-d"
+	String? zones = "us-east1-b us-east1-c us-east1-d"
 	# Number of cpus per job
 	Int? num_cpu = 4
 	# Memory in GB
@@ -24,6 +28,8 @@ workflow smartseq2 {
 		input:
 			input_csv_file = input_csv_file,
 			output_directory = output_directory_stripped,
+			smartseq2_version = smartseq2_version,
+			zones = zones,
 			preemptible = preemptible
 	}
 
@@ -34,6 +40,8 @@ workflow smartseq2 {
 				plate_name = plate_name,
 				output_directory = output_directory_stripped,
 				reference = reference,
+				smartseq2_version = smartseq2_version,
+				zones = zones,
 				num_cpu = num_cpu,
 				memory = memory,
 				disk_space = disk_space,
@@ -45,6 +53,8 @@ workflow smartseq2 {
 task parse_input_csv {
 	File input_csv_file
 	String output_directory
+	String smartseq2_version
+	String zones
 	Int preemptible
 
 	command {
@@ -75,8 +85,8 @@ task parse_input_csv {
 	}
 
 	runtime {
-		docker: "regevlab/smartseq2"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		docker: "regevlab/smartseq2-${smartseq2_version}"
+		zones: zones
 		preemptible: "${preemptible}"
 	}
 }

@@ -99,6 +99,14 @@ Please see the description of inputs below. Note that required inputs are shown 
 	  - Reference transcriptome to align reads to. Currently we only have ``GRCh38`` for human and ``GRCm38`` for mouse
 	  - GRCh38
 	  - 
+	* - smartseq2_version
+	  - SMART-Seq2 docker version
+	  - "0.1.0"
+	  - "0.1.0"
+	* - zones
+	  - Google cloud zones
+	  - "us-east1-b us-east1-c us-east1-d"
+	  - "us-east1-b us-east1-c us-east1-d"
 	* - num_cpu
 	  - Number of cpus to request for one node
 	  - 4
