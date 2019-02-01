@@ -17,6 +17,10 @@ workflow smartseq2_per_plate {
 
 	File reference_file = (if is_url then reference else acronym2gsurl[reference])
 
+	# smartseq2 version, default to "0.1.0"
+	String? smartseq2_version = "0.1.0"
+	# Google cloud zones, default to "us-east1-b us-east1-c us-east1-d"
+	String? zones = "us-east1-b us-east1-c us-east1-d"
 	# Number of cpus per job
 	Int? num_cpu = 4
 	# Memory in GB
@@ -29,6 +33,8 @@ workflow smartseq2_per_plate {
 	call parse_sample_sheet {
 		input:
 			sample_sheet = sample_sheet,
+			smartseq2_version = smartseq2_version,
+			zones = zones,
 			preemptible = preemptible
 	}
 
@@ -39,6 +45,8 @@ workflow smartseq2_per_plate {
 				read1 = parse_sample_sheet.read1_list[i],
 				read2 = parse_sample_sheet.read2_list[i],
 				sample_name = parse_sample_sheet.cell_ids[i],
+				smartseq2_version = smartseq2_version,
+				zones = zones,
 				num_cpu = num_cpu,
 				memory = memory,
 				disk_space = disk_space,
@@ -50,6 +58,8 @@ workflow smartseq2_per_plate {
 		input:
 			gene_results = run_rsem.rsem_gene,
 			output_name = output_directory + "/" + plate_name,
+			smartseq2_version = smartseq2_version,
+			zones = zones,
 			memory = memory,
 			disk_space = disk_space,
 			preemptible = preemptible
@@ -58,6 +68,8 @@ workflow smartseq2_per_plate {
 
 task parse_sample_sheet {
 	File sample_sheet
+	String smartseq2_version
+	String zones
 	Int preemptible
 
 	command {
@@ -83,8 +95,8 @@ task parse_sample_sheet {
 	}
 
 	runtime {
-		docker: "regevlab/smartseq2"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		docker: "regevlab/smartseq2-${smartseq2_version}"
+		zones: zones
 		preemptible: "${preemptible}"
 	}
 }
@@ -94,6 +106,8 @@ task run_rsem {
 	File read1
 	File read2
 	String sample_name
+	String smartseq2_version
+	String zones	
 	Int num_cpu
 	Int memory
 	Int disk_space
@@ -118,8 +132,8 @@ task run_rsem {
 	}
 
 	runtime {
-		docker: "regevlab/smartseq2"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		docker: "regevlab/smartseq2-${smartseq2_version}"
+		zones: zones
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
@@ -131,6 +145,8 @@ task run_rsem {
 task generate_count_matrix {
 	Array[File] gene_results
 	String output_name
+	String smartseq2_version
+	String zones
 	Int memory
 	Int disk_space
 	Int preemptible
@@ -169,8 +185,8 @@ task generate_count_matrix {
 	}
 
 	runtime {
-		docker: "regevlab/smartseq2"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		docker: "regevlab/smartseq2-${smartseq2_version}"
+		zones: zones
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"

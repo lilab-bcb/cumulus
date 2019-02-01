@@ -192,6 +192,14 @@ Cell Ranger mkfastq/count/vdj inputs:
 	  - Cellranger version, could be 2.11, 2.2.0, 3.0.0, 3.0.2
 	  - "2.2.0"
 	  - "2.2.0"
+	* - sccloud_version
+	  - scCloud version for extracting feature barcode matrix
+	  - "0.6.0"
+	  - "0.6.0"
+	* - zones
+	  - Google cloud zones
+	  - "us-east1-b us-east1-c us-east1-d"
+	  - "us-east1-b us-east1-c us-east1-d"
 	* - num_cpu
 	  - Number of cpus to request for one node
 	  - 64

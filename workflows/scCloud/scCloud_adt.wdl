@@ -22,6 +22,10 @@ workflow scCloud_adt {
 	# maximum hamming distance in feature barcodes
 	Int? max_mismatch = 3
 
+	# scCloud version, default to "0.6.0"
+	String? sccloud_version = "0.6.0"
+	# Google cloud zones, default to "us-east1-b us-east1-c us-east1-d"
+	String? zones = "us-east1-b us-east1-c us-east1-d"
 	# Memory in GB
 	Int? memory = 32
 	# Disk space in GB
@@ -39,6 +43,8 @@ workflow scCloud_adt {
 			cell_barcodes = cell_barcode_file,
 			feature_barcodes = feature_barcode_file,
 			max_mismatch = max_mismatch,
+			sccloud_version = sccloud_version,
+			zones = zones,
 			memory = memory,
 			disk_space = disk_space,
 			preemptible = preemptible
@@ -59,6 +65,8 @@ task run_generate_count_matrix_ADTs {
 	File cell_barcodes
 	File feature_barcodes
 	Int max_mismatch
+	String sccloud_version
+	String zones
 	Int memory
 	Int disk_space
 	Int preemptible
@@ -108,8 +116,8 @@ task run_generate_count_matrix_ADTs {
 	}
 
 	runtime {
-		docker: "regevlab/sccloud-0.6.0"
-		zones: "us-central1-c us-central1-b us-east1-b us-east1-c us-east1-d"
+		docker: "regevlab/sccloud-${sccloud_version}"
+		zones: zones
 		memory: "${memory} GB"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
