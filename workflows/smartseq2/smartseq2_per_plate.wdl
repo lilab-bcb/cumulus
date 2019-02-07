@@ -19,8 +19,8 @@ workflow smartseq2_per_plate {
 
 	# smartseq2 version, default to "0.1.0"
 	String? smartseq2_version = "0.1.0"
-	# Google cloud zones, default to "us-east1-b us-east1-c us-east1-d"
-	String? zones = "us-east1-b us-east1-c us-east1-d"
+	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
+	String? zones = "us-central1-b"
 	# Number of cpus per job
 	Int? num_cpu = 4
 	# Memory in GB

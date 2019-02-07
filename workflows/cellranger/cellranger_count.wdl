@@ -31,8 +31,8 @@ workflow cellranger_count {
 
 	# 2.1.1, 2.2.0, 3.0.0, or 3.0.2
 	String? cellranger_version = "2.2.0"
-	# Google cloud zones, default to "us-east1-b us-east1-c us-east1-d"
-	String? zones = "us-east1-b us-east1-c us-east1-d"
+	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
+	String? zones = "us-central1-b"
 	# Number of cpus per cellranger job
 	Int? num_cpu = 64
 	# Memory in GB

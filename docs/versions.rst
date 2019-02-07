@@ -14,19 +14,19 @@ Latest version
 	  - Snapshot
 	  - Function
 	* - regev/cellranger_mkfastq_count
-	  - 44
+	  - 45
 	  - Run Cell Ranger to extract FASTQ files and generate gene-count matrices for 10x genomics data
 	* - scCloud/smartseq2
-	  - 4
+	  - 5
 	  - Run Bowtie2 and RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files
 	* - scCloud/scCloud
-	  - 13
+	  - 14
 	  - Run scCloud analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering and more
 	* - scCloud/scCloud_subcluster
-	  - 8
+	  - 9
 	  - Run subcluster analysis using scCloud
 	* - scCloud/scCloud_hashing_cite_seq
-	  - 8
+	  - 9
 	  - Run scCloud for cell-hashing/nucleus-hashing/CITE-Seq analysis
 
 Stable version - HTAPP v2
@@ -40,19 +40,19 @@ Stable version - HTAPP v2
 	  - Snapshot
 	  - Function
 	* - regev/cellranger_mkfastq_count
-	  - 44
+	  - 45
 	  - Run Cell Ranger to extract FASTQ files and generate gene-count matrices for 10x genomics data
 	* - scCloud/smartseq2
-	  - 4
+	  - 5
 	  - Run Bowtie2 and RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files
 	* - scCloud/scCloud
-	  - 13
+	  - 14
 	  - Run scCloud analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering and more
 	* - scCloud/scCloud_subcluster
-	  - 8
+	  - 9
 	  - Run subcluster analysis using scCloud
 	* - scCloud/scCloud_hashing_cite_seq
-	  - 8
+	  - 9
 	  - Run scCloud for cell-hashing/nucleus-hashing/CITE-Seq analysis
 
 Stable version - HTAPP v1
