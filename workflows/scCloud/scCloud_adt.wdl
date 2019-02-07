@@ -24,8 +24,8 @@ workflow scCloud_adt {
 
 	# scCloud version, default to "0.6.0"
 	String? sccloud_version = "0.6.0"
-	# Google cloud zones, default to "us-east1-b us-east1-c us-east1-d"
-	String? zones = "us-east1-b us-east1-c us-east1-d"
+	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
+	String? zones = "us-central1-b"
 	# Memory in GB
 	Int? memory = 32
 	# Disk space in GB

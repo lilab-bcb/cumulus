@@ -11,8 +11,8 @@ workflow scCloud {
 
 	# scCloud version, default to "0.6.0"
 	String? sccloud_version = "0.6.0"
-	# Google cloud zones, default to "us-east1-b us-east1-c us-east1-d"
-	String? zones = "us-east1-b us-east1-c us-east1-d"
+	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
+	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus per scCloud job
 	Int? num_cpu = 64
 	# Memory size in GB

@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:smartseq2_per_plate/versions/5/plain-WDL/descriptor" as ss2pp
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:smartseq2_per_plate/versions/6/plain-WDL/descriptor" as ss2pp
 # import "../smartseq2/smartseq2_per_plate.wdl" as ss2pp
 
 workflow smartseq2 {
@@ -13,8 +13,8 @@ workflow smartseq2 {
 
 	# smartseq2 version, default to "0.1.0"
 	String? smartseq2_version = "0.1.0"
-	# Google cloud zones, default to "us-east1-b us-east1-c us-east1-d"
-	String? zones = "us-east1-b us-east1-c us-east1-d"
+	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
+	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus per job
 	Int? num_cpu = 4
 	# Memory in GB
