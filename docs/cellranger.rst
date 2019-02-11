@@ -5,12 +5,6 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on FireCloud.
 
 #. Copy your sequencing output to your workspace bucket using gsutil in your unix terminal. You can obtain your bucket URL in the workspace summary tab in FireCloud under Google Bucket. You can also read `FireCloud instructions`_ on uploading data.
 	
-	Example of copying the directory at /foo/bar/nextseq/Data/VK18WBC6Z4 to a Google Cloud bucket::
-
-		gsutil -m cp -r /foo/bar/nextseq/Data/VK18WBC6Z4 gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4
-	
-	``-m`` means copy in parallel, ``-r`` means copy the directory recursively.
-	
 	Note: Broad users need to be on an UGER node (not a login node) in order to use the ``-m`` flag
 
 	Request an UGER server::
@@ -24,6 +18,13 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on FireCloud.
 		reuse Google-Cloud-SDK
 
 	to make the Google Cloud tools available
+
+	Example of copying the directory at /foo/bar/nextseq/Data/VK18WBC6Z4 to a Google Cloud bucket::
+
+		gsutil -m cp -r /foo/bar/nextseq/Data/VK18WBC6Z4 gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4
+	
+	``-m`` means copy in parallel, ``-r`` means copy the directory recursively.
+	
 
 
 #. Create a scRNA-Seq formatted sample sheet. 
