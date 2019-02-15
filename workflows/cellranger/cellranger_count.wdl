@@ -20,14 +20,12 @@ workflow cellranger_count {
 
 	# chemistry of the channel
 	String? chemistry = "auto"
+	# Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells.
+	Int? force_cells
+	# Expected number of recovered cells. Mutually exclusive with force_cells
+	Int? expect_cells
 	# Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
 	Boolean? secondary = false
-	# If force cells, default: false
-	Boolean? do_force_cells = false
-	# Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells. Default: 6,000 cells
-	Int? force_cells = 6000
-	# Expected number of recovered cells. Default: 3,000 cells. Mutually exclusive with force_cells
-	Int? expect_cells = 3000
 
 	# 2.1.1, 2.2.0, 3.0.0, or 3.0.2
 	String? cellranger_version = "2.2.0"
@@ -35,8 +33,8 @@ workflow cellranger_count {
 	String? zones = "us-central1-b"
 	# Number of cpus per cellranger job
 	Int? num_cpu = 64
-	# Memory in GB
-	Int? memory = 128
+	# Memory string, e.g. 128G
+	String? memory = "128G"
 	# Disk space in GB
 	Int? disk_space = 500
 	# Number of preemptible tries 
@@ -49,10 +47,9 @@ workflow cellranger_count {
 			output_directory = sub(output_directory, "/+$", ""),
 			genome_file = genome_file,
 			chemistry = chemistry,
-			secondary = secondary,
-			do_force_cells = do_force_cells,
 			force_cells = force_cells,
 			expect_cells = expect_cells,
+			secondary = secondary,
 			cellranger_version = cellranger_version,
 			zones = zones,
 			num_cpu = num_cpu,
@@ -75,14 +72,13 @@ task run_cellranger_count {
 	String output_directory
 	File genome_file
 	String chemistry
+	Int? force_cells
+	Int? expect_cells
 	Boolean secondary
-	Boolean do_force_cells
-	Int force_cells
-	Int expect_cells
 	String cellranger_version
 	String zones
 	Int num_cpu
-	Int memory
+	String memory
 	Int disk_space
 	Int preemptible
 
@@ -110,7 +106,10 @@ task run_cellranger_count {
 			fastqs.append('${sample_id}_' + str(i))
 	
 		call_args = ['cellranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=${sample_id}', '--chemistry=${chemistry}', '--jobmode=local']
-		call_args.append('--force-cells=${force_cells}' if ('${do_force_cells}' is 'true') else '--expect-cells=${expect_cells}')
+		if '${force_cells}' is not '':
+			call_args.append('--force-cells=${force_cells}')
+		if '${expect_cells}' is not '':
+			call_args.append('--expect-cells=${expect_cells}')
 		if '${secondary}' is not 'true':
 			call_args.append('--nosecondary')
 		print(' '.join(call_args))
@@ -131,7 +130,7 @@ task run_cellranger_count {
 	runtime {
 		docker: "regevlab/cellranger-${cellranger_version}"
 		zones: zones
-		memory: "${memory} GB"
+		memory: memory
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: "${num_cpu}"

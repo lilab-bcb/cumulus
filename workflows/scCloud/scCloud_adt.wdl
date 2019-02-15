@@ -22,12 +22,12 @@ workflow scCloud_adt {
 	# maximum hamming distance in feature barcodes
 	Int? max_mismatch = 3
 
-	# scCloud version, default to "0.6.0"
-	String? sccloud_version = "0.6.0"
+	# scCloud version
+	String sccloud_version
 	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 	String? zones = "us-central1-b"
-	# Memory in GB
-	Int? memory = 32
+	# Memory string, e.g. 32G
+	String? memory = "32G"
 	# Disk space in GB
 	Int? disk_space = 100
 	# Number of preemptible tries 
@@ -67,7 +67,7 @@ task run_generate_count_matrix_ADTs {
 	Int max_mismatch
 	String sccloud_version
 	String zones
-	Int memory
+	String memory
 	Int disk_space
 	Int preemptible
 
@@ -118,7 +118,7 @@ task run_generate_count_matrix_ADTs {
 	runtime {
 		docker: "regevlab/sccloud-${sccloud_version}"
 		zones: zones
-		memory: "${memory} GB"
+		memory: memory
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: 1
