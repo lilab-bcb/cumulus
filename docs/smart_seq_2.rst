@@ -112,9 +112,9 @@ Please see the description of inputs below. Note that required inputs are shown 
 	  - 4
 	  - 4
 	* - memory
-	  - Memory in GB
-	  - 10
-	  - 10
+	  - Memory size string
+	  - "10GB"
+	  - "10GB"
 	* - disk_space
 	  - Disk space in gigabytes
 	  - 10

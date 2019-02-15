@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:smartseq2_per_plate/versions/6/plain-WDL/descriptor" as ss2pp
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:smartseq2_per_plate/versions/7/plain-WDL/descriptor" as ss2pp
 # import "../smartseq2/smartseq2_per_plate.wdl" as ss2pp
 
 workflow smartseq2 {
@@ -17,8 +17,8 @@ workflow smartseq2 {
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus per job
 	Int? num_cpu = 4
-	# Memory in GB
-	Int? memory = 10
+	# Memory string
+	String? memory = "10G"
 	# disk space in GB
 	Int? disk_space = 10
 	# Number of preemptible tries 

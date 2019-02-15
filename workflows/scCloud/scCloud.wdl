@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/13/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/14/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud {
@@ -15,8 +15,8 @@ workflow scCloud {
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus per scCloud job
 	Int? num_cpu = 64
-	# Memory size in GB
-	Int? memory = 200
+	# Memory size string
+	String? memory = "200G"
 	# Total disk space
 	Int? disk_space = 100
 	# Number of preemptible tries 

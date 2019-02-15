@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/13/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/14/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud_hashing_cite_seq {
@@ -13,8 +13,8 @@ workflow scCloud_hashing_cite_seq {
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus
 	Int? num_cpu = 8
-	# Memory in GB
-	Int? memory = 10
+	# Memory string
+	String? memory = "10G"
 	# Disk space in GB
 	Int? disk_space = 20
 	# Number of preemptible tries 

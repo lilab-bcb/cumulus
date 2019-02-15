@@ -1,5 +1,5 @@
-Run Cell Ranger mkfastq/count/vdj
----------------------------------
+Run Cell Ranger tools using cellranger_orchestra
+------------------------------------------------
 
 Follow the steps below to run CellRanger mkfastq/count/vdj on FireCloud.
 
@@ -56,9 +56,11 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on FireCloud.
 			| **GRCh38_premrna_and_mm10_premrna** for human and mouse, introns included, built from GRCh38_premrna and mm10_premrna,
 			| **GRCh38_vdj** for human V(D)J sequences, cellranger reference 2.0.0, annotation built from *Homo_sapiens.GRCh38.87.chr_patch_hapl_scaff.gtf* and *vdj_GRCh38_alts_ensembl_10x_genes-2.0.0.gtf*,
 			| **GRCm38_vdj** for mouse V(D)J sequences, cellranger reference 2.0.0, annotation built from *Mus_musculus.GRCm38.90.chr_patch_hapl_scaff.gtf*,
-			| **GRCh38v3.0.0** for human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation,
-			| **hg19v3.0.0** for human hg19, cellranger reference 3.0.0, Ensembl v87 gene annotation,
-			| **mm10v3.0.0** for mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation.
+			| **GRCh38_v3.0.0** for human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation,
+			| **hg19_v3.0.0** for human hg19, cellranger reference 3.0.0, Ensembl v87 gene annotation,
+			| **mm10_v3.0.0** for mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation,
+			| **GRCh38_atac_v1.0.1** for scATAC-Seq, human GRCh38, cellranger-atac reference 1.0.1, Gencode v28 basic annotation,
+			| **mm10_atac_v1.0.1** for scATAC-Seq, mouse mm10, cellranger-atac reference 1.0.1, Gencode v28 basic annotation.
 		* - **Flowcell**
 		  - Indicates the Google bucket URL of uploaded BCL folders.
 		* - **Lane**
@@ -82,11 +84,12 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on FireCloud.
 		* - DataType
 		  - 
 			| Describes the data type of the sample --- *count*, *vdj*, *adt*, or *crispr*. 
-			| **count** refers to gene expression data (*cellranger count*), 
+			| **rna** refers to gene expression data (*cellranger count*), 
 			| **vdj** refers to V(D)J data (*cellranger vdj*), 
-			| **adt** refers to antibody tag data, which can be either CITE-Seq, cell-hashing, or nucleus-hashing, and
-			| **crispr** refers to Perturb-seq guide tag data.
-			| This column is optional and the default data type is *count*.
+			| **adt** refers to antibody tag data, which can be either CITE-Seq, cell-hashing, or nucleus-hashing, 
+			| **crispr** refers to Perturb-seq guide tag data,
+			| **atac** refers to scATAC-Seq data (*cellranger-atac count*).
+			| This column is optional and the default data type is *rna*.
 		* - FeatureBarcodeFile
 		  - Google bucket urls pointing to feature barcode files for *adt* and *crispr* data. Features can be either antibody for CITE-Seq, cell-hashing, nucleus-hashing or gRNA for Perburb-seq. This column is optional provided no *adt* or *crispr* data are in the sample sheet.
 
@@ -95,17 +98,19 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on FireCloud.
 	Example::
 
 		Sample,Reference,Flowcell,Lane,Index,Chemistry,DataType,FeatureBarcodeFile
-		sample_1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,threeprime,count
-		sample_2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3-4,SI-GA-B8,SC3Pv3,count
-		sample_3,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,5-6,SI-GA-C8,fiveprime,count
-		sample_4,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,7-8,SI-GA-D8,fiveprime,count
-		sample_1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,1-2,SI-GA-A8,threeprime,count
-		sample_2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,3-4,SI-GA-B8,SC3Pv3,count
-		sample_3,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,5-6,SI-GA-C8,fiveprime,count
-		sample_4,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,7-8,SI-GA-D8,fiveprime,count
+		sample_1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,threeprime,rna
+		sample_2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3-4,SI-GA-B8,SC3Pv3,rna
+		sample_3,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,5-6,SI-GA-C8,fiveprime,rna
+		sample_4,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,7-8,SI-GA-D8,fiveprime,rna
+		sample_1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,1-2,SI-GA-A8,threeprime,rna
+		sample_2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,3-4,SI-GA-B8,SC3Pv3,rna
+		sample_3,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,5-6,SI-GA-C8,fiveprime,rna
+		sample_4,mm10,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,7-8,SI-GA-D8,fiveprime,rna
 		sample_5,GRCh38_vdj,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZZ,1,SI-GA-A1,fiveprime,vdj
 		sample_6,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZZ,2,AGATCCTT,SC3Pv3,adt,gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index.csv
 		sample_7,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZZ,3,TCCGGAGA,threeprime,crispr,gs://fc-e0000000-0000-0000-0000-000000000000/crispr_index.csv
+		sample_8,GRCh38_atac_v1.0.1,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9YB,*,SI-NA-A1,auto,atac
+
 
 
 #. Upload your sample sheet to the workspace bucket.
@@ -117,17 +122,17 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on FireCloud.
 
 #. Import cellranger_mkfastq_count method.
 
-	In FireCloud, select the ``Method Configurations`` tab then click ``Import Configuration``. Click ``Import From Method Repository``. Type **regev/cellranger_mkfastq_count**.
+	In FireCloud, select the ``Method Configurations`` tab then click ``Import Configuration``. Click ``Import From Method Repository``. Type **scCloud/cellranger_orchestra**.
 
 #. Uncheck ``Configure inputs/outputs using the Workspace Data Model``.
 
 
 ---------------------------------
 
-Cell Ranger mkfastq/count/vdj inputs:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cellranger_orchestra inputs:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-``Cell Ranger mkfastq/count`` takes Illumina outputs as input and runs ``cellranger mkfastq`` and ``cellranger count``/``cellranger vdj``. Please see the description of inputs below. Note that required inputs are shown in bold.
+``cellranger_orchestra`` takes Illumina outputs as input and runs ``cellranger mkfastq``/``cellranger-atac mkfastq`` and ``cellranger count``/``cellranger vdj``/``cellranger-atac count``/scCloud feature extraction. Please see the description of inputs below. Note that required inputs are shown in bold.
 
 .. list-table::
 	:widths: 5 30 30 5
@@ -138,7 +143,7 @@ Cell Ranger mkfastq/count/vdj inputs:
 	  - Example
 	  - Default
 	* - **input_csv_file**
-	  - Sample Sheet (contains Sample, Reference, Flowcell, Lane, Index)
+	  - Sample Sheet (contains Sample, Reference, Flowcell, Lane, Index as required and Chemistry, DataType, FeatureBarcodeFile as optional)
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.csv"
 	  - 
 	* - **output_directory**
@@ -146,37 +151,29 @@ Cell Ranger mkfastq/count/vdj inputs:
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_output"
 	  -
 	* - run_mkfastq
-	  - If you want to run ``cellranger mkfastq``
+	  - If you want to run ``cellranger mkfastq`` or ``cellranger-atac mkfastq``
 	  - true
 	  - true
 	* - run_count
-	  - If you want to run ``cellranger count`` or ``cellranger vdj``
+	  - If you want to run steps after ``mkfastq``, such as ``cellranger count``, ``cellranger vdj``, ``cellranger-atac count`` or ``scCloud feature_extraction``
 	  - true
 	  - true
 	* - delete_input_directory
 	  - If delete BCL directories after demux. If false, you should delete this folder yourself so as to not incur storage charges 
 	  - false
 	  - false
-	* - do_force_cells
-	  - force cells
-	  - true
-	  - false
 	* - force_cells
 	  - Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells
-	  - 3000
 	  - 6000
+	  - 
 	* - expect_cells
 	  - Expected number of recovered cells. Mutually exclusive with force_cells
-	  - 1000
 	  - 3000
+	  - 
 	* - secondary
 	  - Perform cell ranger secondary analysis (dimensionality reduction, clustering, etc.)
 	  - false
 	  - false
-	* - vdj_force_cells
-	  - force pipeline to use this number of cells for the vdj task, bypassing the cell detection algorithm
-	  - 2000
-	  -
 	* - vdj_denovo
 	  - Do not align reads to reference V(D)J sequences before de novo assembly
 	  - true
@@ -190,13 +187,17 @@ Cell Ranger mkfastq/count/vdj inputs:
 	  - 3
 	  - 3
 	* - cellranger_version
-	  - Cellranger version, could be 2.11, 2.2.0, 3.0.0, 3.0.2
+	  - cellranger version, could be 2.11, 2.2.0, 3.0.0, 3.0.2
 	  - "2.2.0"
 	  - "2.2.0"
+	* - cellranger_atac_version
+	  - cellranger-atac version, could be 1.0.0 or 1.0.1
+	  - "1.0.1"
+	  - "1.0.1"
 	* - sccloud_version
 	  - scCloud version for extracting feature barcode matrix
-	  - "0.6.0"
-	  - "0.6.0"
+	  - "0.7.0"
+	  - "0.7.0"
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-b us-east1-c us-east1-d"
@@ -206,13 +207,13 @@ Cell Ranger mkfastq/count/vdj inputs:
 	  - 64
 	  - 64
 	* - memory
-	  - Memory in GB
-	  - 128
-	  - 128
+	  - Memory size string
+	  - "128G"
+	  - "128G"
 	* - feature_memory
-	  - Optional memory in GB for extracting feature count matrix
-	  - 32
-	  - 32
+	  - Optional memory string for extracting feature count matrix
+	  - "32G"
+	  - "32G"
 	* - mkfastq_disk_space
 	  - Optional disk space in gigabytes for mkfastq
 	  - 1500
@@ -229,6 +230,10 @@ Cell Ranger mkfastq/count/vdj inputs:
 	  - Disk space in gigabytes needed for extracting feature count matrix
 	  - 100
 	  - 100
+	* - atac_disk_space
+	  - Disk space in gigabytes needed for cellranger-atac count
+	  - 500
+	  - 500
 	* - preemptible
 	  - Number of preemptible tries
 	  - 2
@@ -236,8 +241,8 @@ Cell Ranger mkfastq/count/vdj inputs:
 
 ---------------------------------
 
-Cell Ranger mkfastq/count/vdj outputs:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cellranger_orchestra outputs:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 See the table below for important *Cell Ranger mkfastq/count* outputs.
 
@@ -261,6 +266,9 @@ See the table below for important *Cell Ranger mkfastq/count* outputs.
 	* - output_adt_directory
 	  - Array[String]
 	  - A list of google bucket urls containing adt count matrices, one url per sample.
+	* - output_atac_count_directory
+	  - Array[String]
+	  - A list of google bucket urls containing cellranger-atac count results, one url per sample.
 	* - metrics_summaries
 	  - File
 	  - A excel spreadsheet containing QCs for each sample.
@@ -273,10 +281,10 @@ See the table below for important *Cell Ranger mkfastq/count* outputs.
 
 ---------------------------------
 
-Only run ``cellranger count``
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Only run the count part
+^^^^^^^^^^^^^^^^^^^^^^^
 
-Sometimes, people might want to perform demultiplexing locally and only run ``cellranger count`` on the cloud. This section describes how to only run ``cellranger count``  via ``cellranger_mkfastq_count``.
+Sometimes, people might want to perform demultiplexing locally and only run the count part on the cloud. This section describes how to only run the count part via ``cellranger_orchestra``.
 
 #. Copy your FASTQ files to the workspace using gsutil in your unix terminal. 
 
@@ -315,9 +323,11 @@ Sometimes, people might want to perform demultiplexing locally and only run ``ce
 			| **GRCh38_premrna_and_mm10_premrna** for human and mouse, introns included, built from GRCh38_premrna and mm10_premrna,
 			| **GRCh38_vdj** for human V(D)J sequences, cellranger reference 2.0.0, annotation built from *Homo_sapiens.GRCh38.87.chr_patch_hapl_scaff.gtf* and *vdj_GRCh38_alts_ensembl_10x_genes-2.0.0.gtf*,
 			| **GRCm38_vdj** for mouse V(D)J sequences, cellranger reference 2.0.0, annotation built from *Mus_musculus.GRCm38.90.chr_patch_hapl_scaff.gtf*,
-			| **GRCh38v3.0.0** for human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation,
-			| **hg19v3.0.0** for human hg19, cellranger reference 3.0.0, Ensembl v87 gene annotation,
-			| **mm10v3.0.0** for mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation.
+			| **GRCh38_v3.0.0** for human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation,
+			| **hg19_v3.0.0** for human hg19, cellranger reference 3.0.0, Ensembl v87 gene annotation,
+			| **mm10_v3.0.0** for mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation,
+			| **GRCh38_atac_v1.0.1** for scATAC-Seq, human GRCh38, cellranger-atac reference 1.0.1, Gencode v28 basic annotation,
+			| **mm10_atac_v1.0.1** for scATAC-Seq, mouse mm10, cellranger-atac reference 1.0.1, Gencode v28 basic annotation.
 		* - **Flowcell**
 		  - Indicates the Google bucket URL of the uploaded FASTQ folders. The full path to the FASTQ files is FlowCell/Sample
 		* - Chemistry
@@ -340,8 +350,8 @@ Sometimes, people might want to perform demultiplexing locally and only run ``ce
 			| **count** refers to gene expression data (*cellranger count*), 
 			| **vdj** refers to V(D)J data (*cellranger vdj*), 
 			| **adt** refers to antibody tag data, which can be either CITE-Seq, cell-hashing, or nucleus-hashing, and
-			| **crispr** refers to Perturb-seq guide tag data.
-			| This column is optional and the default data type is *count*.
+			| **atac** refers to scATAC-Seq data (*cellranger-atac count*).
+			| This column is optional and the default data type is *rna*.
 		* - FeatureBarcodeFile
 		  - Google bucket urls pointing to feature barcode files for *adt* and *crispr* data. This column is optional provided no *adt* or *crispr* data are in the sample sheet.
 

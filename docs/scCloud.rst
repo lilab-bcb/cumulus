@@ -84,9 +84,9 @@ global inputs
 	  - 32
 	  - 64
 	* - memory
-	  - Memory size in GB
-	  - 200
-	  - 200
+	  - Memory size string
+	  - "200G"
+	  - "200G"
 	* - disk_space
 	  - Total disk space
 	  - 100
@@ -670,9 +670,9 @@ Note that we will make the required inputs/outputs bold and all other inputs/out
 	  - 32
 	  - 64
 	* - memory
-	  - Memory size in GB
-	  - 200
-	  - 200
+	  - Memory size string
+	  - "200G"
+	  - "200G"
 	* - disk_space
 	  - Total disk space
 	  - 100

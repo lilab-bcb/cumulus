@@ -97,9 +97,9 @@ scCloud_hashing_cite_seq inputs:
 	  - 8
 	  - 8
 	* - memory
-	  - Memory size in GB
-	  - 10
-	  - 10
+	  - Memory size string
+	  - "10G"
+	  - "10G"
 	* - disk_space
 	  - Total disk space
 	  - 20

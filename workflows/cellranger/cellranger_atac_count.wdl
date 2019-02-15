@@ -10,7 +10,7 @@ workflow cellranger_atac_count {
 	String genome
 
 
-	File acronym_file = "gs://regev-lab/resources/cellranger-atac/index.tsv"
+	File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
 	# File acronym_file = "index.tsv"
 	Map[String, String] acronym2gsurl = read_map(acronym_file)
 	# If reference is a url

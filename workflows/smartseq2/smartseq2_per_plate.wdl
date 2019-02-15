@@ -23,8 +23,8 @@ workflow smartseq2_per_plate {
 	String? zones = "us-central1-b"
 	# Number of cpus per job
 	Int? num_cpu = 4
-	# Memory in GB
-	Int? memory = 10
+	# Memory string
+	String? memory = "10G"
 	# disk space in GB
 	Int? disk_space = 10
 	# Number of preemptible tries 
@@ -109,7 +109,7 @@ task run_rsem {
 	String smartseq2_version
 	String zones	
 	Int num_cpu
-	Int memory
+	String memory
 	Int disk_space
 	Int preemptible
 
@@ -134,7 +134,7 @@ task run_rsem {
 	runtime {
 		docker: "regevlab/smartseq2-${smartseq2_version}"
 		zones: zones
-		memory: "${memory} GB"
+		memory: memory
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: "${num_cpu}"
@@ -147,7 +147,7 @@ task generate_count_matrix {
 	String output_name
 	String smartseq2_version
 	String zones
-	Int memory
+	String memory
 	Int disk_space
 	Int preemptible
 
@@ -187,7 +187,7 @@ task generate_count_matrix {
 	runtime {
 		docker: "regevlab/smartseq2-${smartseq2_version}"
 		zones: zones
-		memory: "${memory} GB"
+		memory: memory
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: 1
