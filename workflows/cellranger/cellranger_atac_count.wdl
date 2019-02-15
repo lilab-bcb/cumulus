@@ -30,7 +30,7 @@ workflow cellranger_atac_count {
 	# Number of cpus per cellranger job
 	Int? num_cpu = 64
 	# Memory string, e.g. 128G
-	String? memory = "128G"
+	String? memory = "57.6G"
 	# Disk space in GB
 	Int? disk_space = 500
 	# Number of preemptible tries 
