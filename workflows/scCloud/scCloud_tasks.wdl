@@ -6,7 +6,7 @@ task run_scCloud_aggregate_matrices {
 	String output_name
 	String sccloud_version
 	String zones
-	Int memory
+	String memory
 	Int disk_space
 	Int preemptible
 	String? restrictions
@@ -47,7 +47,7 @@ task run_scCloud_aggregate_matrices {
 	runtime {
 		docker: "regevlab/sccloud-${sccloud_version}"
 		zones: zones
-		memory: "${memory} GB"
+		memory: memory
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: 1
@@ -61,7 +61,7 @@ task run_scCloud_cluster {
 	String sccloud_version
 	String zones
 	Int num_cpu
-	Int memory
+	String memory
 	Int disk_space
 	Int preemptible
 	String? genome
@@ -231,7 +231,7 @@ task run_scCloud_cluster {
 	runtime {
 		docker: "regevlab/sccloud-${sccloud_version}"
 		zones: zones
-		memory: "${memory} GB"
+		memory: memory
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: num_cpu
@@ -245,7 +245,7 @@ task run_scCloud_de_analysis {
 	String sccloud_version
 	String zones	
 	Int num_cpu
-	Int memory
+	String memory
 	Int disk_space
 	Int preemptible
 	String? labels
@@ -320,7 +320,7 @@ task run_scCloud_de_analysis {
 	runtime {
 		docker: "regevlab/sccloud-${sccloud_version}"
 		zones: zones
-		memory: "${memory} GB"
+		memory: memory
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: num_cpu
@@ -333,7 +333,7 @@ task run_scCloud_plot {
 	String output_name
 	String sccloud_version
 	String zones
-	Int memory
+	String memory
 	Int disk_space
 	Int preemptible
 	String? plot_composition
@@ -389,7 +389,7 @@ task run_scCloud_plot {
 	runtime {
 		docker: "regevlab/sccloud-${sccloud_version}"
 		zones: zones
-		memory: "${memory} GB"
+		memory: memory
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: 1
@@ -403,7 +403,7 @@ task run_scCloud_scp_output {
 	Boolean output_dense
 	String sccloud_version
 	String zones
-	Int memory
+	String memory
 	Int disk_space
 	Int preemptible
 
@@ -420,7 +420,7 @@ task run_scCloud_scp_output {
 	runtime {
 		docker: "regevlab/sccloud-${sccloud_version}"
 		zones: zones
-		memory: "${memory} GB"
+		memory: memory
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: 1
@@ -434,7 +434,7 @@ task run_scCloud_subcluster {
 	String sccloud_version
 	String zones
 	Int num_cpu
-	Int memory
+	String memory
 	Int disk_space
 	Int preemptible
 	String subset_selections 
@@ -561,7 +561,7 @@ task run_scCloud_subcluster {
 	runtime {
 		docker: "regevlab/sccloud-${sccloud_version}"
 		zones: zones
-		memory: "${memory} GB"
+		memory: memory
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: num_cpu
@@ -678,7 +678,7 @@ task run_scCloud_demuxEM {
 	String sccloud_version
 	String zones
 	Int num_cpu
-	Int memory
+	String memory
 	Int disk_space
 	Int preemptible
 	String hash_type
@@ -732,7 +732,7 @@ task run_scCloud_demuxEM {
 	runtime {
 		docker: "regevlab/sccloud-${sccloud_version}"
 		zones: zones
-		memory: "${memory} GB"
+		memory: memory
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: num_cpu
@@ -748,7 +748,7 @@ task run_scCloud_merge_rna_adt {
 	String output_name
 	String sccloud_version
 	String zones
-	Int memory
+	String memory
 	Int disk_space
 	Int preemptible
 
@@ -772,7 +772,7 @@ task run_scCloud_merge_rna_adt {
 	runtime {
 		docker: "regevlab/sccloud-${sccloud_version}"
 		zones: zones
-		memory: "${memory} GB"
+		memory: memory
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: 1

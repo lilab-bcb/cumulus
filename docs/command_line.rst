@@ -61,8 +61,8 @@ Options
 	  - Description
 	* - | **-m**
 		| **--method**
-	  - | Method namespace/name (e.g. regev/cellranger_mkfastq_count).
-		| A version can optionally be specified (e.g. regev/cell_ranger_mkfastq_count/4), otherwise the latest version of the method is used
+	  - | Method namespace/name (e.g. regev/cellranger_orchestra).
+		| A version can optionally be specified (e.g. regev/cellranger_orchestra/4), otherwise the latest version of the method is used
 	* - | **-w**
 		| **--workspace**
 	  - Workspace name (e.g. foo/bar). The workspace will be created if it does not exist
@@ -99,17 +99,17 @@ inputs.json:
 .. code-block:: json
 
 	{
-		"cellranger_mkfastq_count.input_csv_file" : "mylocalpath/sample_sheet.csv",
-		"cellranger_mkfastq_count.output_directory" : "gs://url/outputs",
-		"cellranger_mkfastq_count.delete_input_bcl_directory": true
+		"cellranger_orchestra.input_csv_file" : "mylocalpath/sample_sheet.csv",
+		"cellranger_orchestra.output_directory" : "gs://url/outputs",
+		"cellranger_orchestra.delete_input_bcl_directory": true
 	}
 
 Run the following command to kick off your FireCloud pipeline::
 
-	kco fc_run -m regev/cellranger_mkfastq_count -i inputs.json -w myworkspace_namespace/myworkspace_name --bucket-folder inputs -o inputs_updated.json
+	kco fc_run -m regev/cellranger_orchestra -i inputs.json -w myworkspace_namespace/myworkspace_name --bucket-folder inputs -o inputs_updated.json
 
 Upon success, **kco fc_run** returns a url pointing the the submitted FireCloud job. 
 
 If for any reason, your job failed. You could rerun it without uploading files again via the following command::
 
-	kco fc_run -m regev/cellranger_mkfastq_count -i inputs_updated.json -w myworkspace_namespace/myworkspace_name
+	kco fc_run -m regev/cellranger_orchestra -i inputs_updated.json -w myworkspace_namespace/myworkspace_name

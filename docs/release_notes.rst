@@ -1,4 +1,9 @@
-Version 0.6.0 `January 31, 2018`
+Version 0.7.0 `Feburary 14, 2019`
+---------------------------------
+
+Added support for 10x genomics scATAC assays.
+
+Version 0.6.0 `January 31, 2019`
 --------------------------------
 
 Added support for 10x genomics V3 chemistry.
