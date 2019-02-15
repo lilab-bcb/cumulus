@@ -72,6 +72,12 @@ workflow cellranger_orchestra {
 	Int? num_cpu = 64
 	# Memory string
 	String? memory = "128G"
+
+	# Number of cpus for cellranger-atac count
+	Int? atac_num_cpu = 64
+    # Memory string for cellranger-atac count
+    String? atac_memory = "57.6G"
+
 	# Optional memory string for scCloud_adt
 	String? feature_memory = "32G"
 	# Optional disk space for mkfastq.
@@ -241,8 +247,8 @@ workflow cellranger_orchestra {
 						dim_reduce = atac_dim_reduce,
 						cellranger_atac_version = cellranger_atac_version,
 						zones = zones,
-						num_cpu = num_cpu,
-						memory = memory,
+						num_cpu = atac_num_cpu,
+						memory = atac_memory,
 						disk_space = atac_disk_space,
 						preemptible = preemptible
 				}
