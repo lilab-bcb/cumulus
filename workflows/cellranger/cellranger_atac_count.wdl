@@ -65,8 +65,8 @@ task run_cellranger_atac_count {
 	String input_fastqs_directories
 	String output_directory
 	File genome_file
-	Int force_cells
-	String dim_reduce
+	Int? force_cells
+	String? dim_reduce
 	String cellranger_atac_version
 	String zones
 	Int num_cpu
