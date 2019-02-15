@@ -31,8 +31,8 @@ workflow cellranger_vdj {
 	String? zones = "us-central1-b"
 	# Number of cpus per cellranger job
 	Int? num_cpu = 64
-	# Memory in GB
-	Int? memory = 128
+	# Memory string, e.g. 128G
+	String? memory = "128G"
 	# Disk space in GB
 	Int? disk_space = 500
 	# Number of preemptible tries 
@@ -74,7 +74,7 @@ task run_cellranger_vdj {
 	String cellranger_version
 	String zones
 	Int num_cpu
-	Int memory
+	String memory
 	Int disk_space
 	Int preemptible
 
@@ -128,7 +128,7 @@ task run_cellranger_vdj {
 	runtime {
 		docker: "regevlab/cellranger-${cellranger_version}"
 		zones: zones
-		memory: "${memory} GB"
+		memory: memory
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: "${num_cpu}"

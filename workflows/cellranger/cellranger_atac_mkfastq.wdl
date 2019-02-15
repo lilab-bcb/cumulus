@@ -1,4 +1,4 @@
-workflow atac_mkfastq {
+workflow cellranger_atac_mkfastq {
 	# Input BCL directory, gs url
 	String input_bcl_directory
 	# 3 column CSV file (Lane, Sample, Index)
@@ -8,15 +8,18 @@ workflow atac_mkfastq {
 
 	# Whether to delete input bcl directory. If false, you should delete this folder yourself so as to not incur storage charges.
 	Boolean? delete_input_bcl_directory = true
-
-	# Number of cpus per cellranger job
-	Int cpu = 64
-	String memory = "128 GB"
+	# 1.0.0 or 1.0.1
+	String? cellranger_atac_version = "1.0.1"
+	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
+	String? zones = "us-central1-b"
+	# Number of cpus per cellranger-atac job
+	Int? num_cpu = 64
+	# Memory string, e.g. 128G
+	String? memory = "128G"
 	# Disk space in GB
-	Int disk_space = 1500
-	# Number of preemptible tries
-	Int preemptible = 2
-	String? cellranger_version = "1.0.1"
+	Int? disk_space = 1500
+	# Number of preemptible tries 
+	Int? preemptible = 2
 
 	call run_cellranger_atac_mkfastq {
 		input:
@@ -24,8 +27,9 @@ workflow atac_mkfastq {
 			input_csv_file = input_csv_file,
 			output_directory = sub(output_directory, "/+$", ""),
 			delete_input_bcl_directory = delete_input_bcl_directory,
-			cpu = cpu,
-			cellranger_version=cellranger_version,
+			cellranger_atac_version = cellranger_atac_version,
+			zones = zones,
+			num_cpu = num_cpu,
 			memory = memory,
 			disk_space = disk_space,
 			preemptible = preemptible
@@ -38,27 +42,26 @@ workflow atac_mkfastq {
 	}
 }
 
-
 task run_cellranger_atac_mkfastq {
 	String input_bcl_directory
-
 	File input_csv_file
 	String output_directory
 	Boolean delete_input_bcl_directory
-	Int cpu
+	String cellranger_atac_version
+	String zones
+	Int num_cpu
 	String memory
 	Int disk_space
 	Int preemptible
 
 	String run_id = basename(input_bcl_directory)
-	String cellranger_version
 
 	command {
 		set -e
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
 		gsutil -q -m cp -r ${input_bcl_directory} .
-
+		# cp -r ${input_bcl_directory} .
 		cellranger-atac mkfastq --id=results --run=${run_id} --csv=${input_csv_file} --jobmode=local --qc
 
 		python <<CODE
@@ -69,16 +72,6 @@ task run_cellranger_atac_mkfastq {
 		with open("output_fastqs_flowcell_directory.txt", "w") as fout:
 			flowcell = [name for name in os.listdir('results/outs/fastq_path') if name != 'Reports' and name != 'Stats' and os.path.isdir('results/outs/fastq_path/' + name)][0]
 			fout.write('${output_directory}/${run_id}_fastqs/fastq_path/' + flowcell + '\n')
-		prefix = 'results/outs/fastq_path/' + flowcell + '/'
-		df = pd.read_csv('${input_csv_file}', header = 0)
-		idx = df['Index'].apply(lambda x: x.find('-') < 0)
-		for sample_id in df[idx]['Sample']:
-			call_args = ['mkdir', '-p', prefix + sample_id]
-			check_call(call_args)
-			call_args = ['mv']
-			call_args.extend(glob.glob(prefix + sample_id + '_S*_L*_*_001.fastq.gz'))
-			call_args.append(prefix + sample_id);
-			check_call(call_args)
 		CODE
 
 		gsutil -q -m rsync -d -r results/outs ${output_directory}/${run_id}_fastqs
@@ -107,11 +100,12 @@ task run_cellranger_atac_mkfastq {
 	}
 
 	runtime {
-		docker: "regevlab/cellranger-atac-${cellranger_version}"
-		memory: "${memory}"
+		docker: "regevlab/cellranger-atac-${cellranger_atac_version}"
+		zones: zones
+		memory: memory
+		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
-		cpu: cpu
-		preemptible: preemptible
-		
+		cpu: num_cpu
+		preemptible: preemptible		
 	}
 }
