@@ -283,7 +283,9 @@ task generate_bcl_csv {
 		import pandas as pd 
 		from subprocess import check_call
 
-		df = pd.read_csv('${input_csv_file}', header = 0)
+		df = pd.read_csv('${input_csv_file}', header = 0, dtype=str)
+		for c in df.columns:
+			df[c] = df[c].str.strip()
 		df['Flowcell'] = df['Flowcell'].map(lambda x: re.sub('/+$', '', x)) # remove trailing slashes
 		with open('run_ids.txt', 'w') as fo1, open('inpdirs.txt', 'w') as fo2, open('bcls.txt', 'w') as fo3, open('run_ids_atac.txt', 'w') as fo4:
 			for input_dir in df['Flowcell'].unique():
@@ -338,9 +340,10 @@ task generate_count_config {
 		import pandas as pd
 		from subprocess import check_call
 
-		df = pd.read_csv('${input_csv_file}', header = 0)
-		df.fillna('', inplace = True)
-		df['Sample'] = df['Sample'].astype(str)
+		df = pd.read_csv('${input_csv_file}', header = 0, dtype=str)
+		for c in df.columns:
+			df[c] = df[c].str.strip()
+
 		df['Flowcell'] = df['Flowcell'].map(lambda x: re.sub('/+$', '', x)) # remove trailing slashes
 
 		run_ids = '${sep="," run_ids}'.split(',')
