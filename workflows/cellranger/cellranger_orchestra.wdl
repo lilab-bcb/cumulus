@@ -280,6 +280,7 @@ task generate_bcl_csv {
 		python <<CODE
 		import os
 		import re
+		import sys
 		import pandas as pd 
 		from subprocess import check_call
 
@@ -287,6 +288,10 @@ task generate_bcl_csv {
 		for c in df.columns:
 			df[c] = df[c].str.strip()
 		df['Flowcell'] = df['Flowcell'].map(lambda x: re.sub('/+$', '', x)) # remove trailing slashes
+		if any(df['Sample'].str.isalnum()==False):
+			print('Sample must contain only alphanumeric characters, hyphens, and underscores.')
+			print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &')
+			sys.exit(1)
 		with open('run_ids.txt', 'w') as fo1, open('inpdirs.txt', 'w') as fo2, open('bcls.txt', 'w') as fo3, open('run_ids_atac.txt', 'w') as fo4:
 			for input_dir in df['Flowcell'].unique():
 				run_id = os.path.basename(input_dir)
@@ -337,6 +342,7 @@ task generate_count_config {
 		python <<CODE
 		import os
 		import re
+		import sys
 		import pandas as pd
 		from subprocess import check_call
 
@@ -345,7 +351,10 @@ task generate_count_config {
 			df[c] = df[c].str.strip()
 
 		df['Flowcell'] = df['Flowcell'].map(lambda x: re.sub('/+$', '', x)) # remove trailing slashes
-
+		if any(df['Sample'].str.isalnum()==False):
+			print('Sample must contain only alphanumeric characters, hyphens, and underscores.')
+			print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &')
+			sys.exit(1)
 		run_ids = '${sep="," run_ids}'.split(',')
 		fastq_dirs = '${sep="," fastq_dirs}'.split(',')
 
@@ -366,8 +375,6 @@ task generate_count_config {
 			n_ref = n_chem = n_fbf = 0
 
 			for sample_id in df['Sample'].unique():
-				if sample_id.find(' ') != -1:
-					raise ValueError('Invalid sample id: ' + sample_id)
 				df_local = df.loc[df['Sample'] == sample_id]
 				
 				data_type = 'rna'
