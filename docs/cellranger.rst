@@ -120,7 +120,7 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on FireCloud.
 		gsutil cp /foo/bar/projects/sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
 
-#. Import cellranger_mkfastq_count method.
+#. Import cellranger_orchestra method.
 
 	In FireCloud, select the ``Method Configurations`` tab then click ``Import Configuration``. Click ``Import From Method Repository``. Type **scCloud/cellranger_orchestra**.
 
