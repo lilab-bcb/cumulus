@@ -288,7 +288,8 @@ task generate_bcl_csv {
 		for c in df.columns:
 			df[c] = df[c].str.strip()
 		df['Flowcell'] = df['Flowcell'].map(lambda x: re.sub('/+$', '', x)) # remove trailing slashes
-		if any(df['Sample'].str.isalnum()==False):
+		regex_pat = re.compile('[^a-zA-Z0-9_-]')
+		if any(df['Sample'].str.contains(regex_pat)):
 			print('Sample must contain only alphanumeric characters, hyphens, and underscores.')
 			print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &')
 			sys.exit(1)
@@ -351,10 +352,6 @@ task generate_count_config {
 			df[c] = df[c].str.strip()
 
 		df['Flowcell'] = df['Flowcell'].map(lambda x: re.sub('/+$', '', x)) # remove trailing slashes
-		if any(df['Sample'].str.isalnum()==False):
-			print('Sample must contain only alphanumeric characters, hyphens, and underscores.')
-			print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &')
-			sys.exit(1)
 		run_ids = '${sep="," run_ids}'.split(',')
 		fastq_dirs = '${sep="," fastq_dirs}'.split(',')
 
