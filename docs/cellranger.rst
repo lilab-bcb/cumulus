@@ -1,4 +1,4 @@
-Run Cell Ranger tools using cellranger_orchestra
+Run Cell Ranger tools using cellranger_workflow
 ------------------------------------------------
 
 Follow the steps below to run CellRanger mkfastq/count/vdj on FireCloud.
@@ -120,19 +120,19 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on FireCloud.
 		gsutil cp /foo/bar/projects/sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
 
-#. Import cellranger_orchestra method.
+#. Import cellranger_workflow method.
 
-	In FireCloud, select the ``Method Configurations`` tab then click ``Import Configuration``. Click ``Import From Method Repository``. Type **scCloud/cellranger_orchestra**.
+	In FireCloud, select the ``Method Configurations`` tab then click ``Import Configuration``. Click ``Import From Method Repository``. Type **scCloud/cellranger_workflow**.
 
 #. Uncheck ``Configure inputs/outputs using the Workspace Data Model``.
 
 
 ---------------------------------
 
-cellranger_orchestra inputs:
+cellranger_workflow inputs:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-``cellranger_orchestra`` takes Illumina outputs as input and runs ``cellranger mkfastq``/``cellranger-atac mkfastq`` and ``cellranger count``/``cellranger vdj``/``cellranger-atac count``/scCloud feature extraction. Please see the description of inputs below. Note that required inputs are shown in bold.
+``cellranger_workflow`` takes Illumina outputs as input and runs ``cellranger mkfastq``/``cellranger-atac mkfastq`` and ``cellranger count``/``cellranger vdj``/``cellranger-atac count``/scCloud feature extraction. Please see the description of inputs below. Note that required inputs are shown in bold.
 
 .. list-table::
 	:widths: 5 30 30 5
@@ -241,7 +241,7 @@ cellranger_orchestra inputs:
 
 ---------------------------------
 
-cellranger_orchestra outputs:
+cellranger_workflow outputs:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 See the table below for important *Cell Ranger mkfastq/count* outputs.
@@ -284,7 +284,7 @@ See the table below for important *Cell Ranger mkfastq/count* outputs.
 Only run the count part
 ^^^^^^^^^^^^^^^^^^^^^^^
 
-Sometimes, people might want to perform demultiplexing locally and only run the count part on the cloud. This section describes how to only run the count part via ``cellranger_orchestra``.
+Sometimes, people might want to perform demultiplexing locally and only run the count part on the cloud. This section describes how to only run the count part via ``cellranger_workflow``.
 
 #. Copy your FASTQ files to the workspace using gsutil in your unix terminal. 
 

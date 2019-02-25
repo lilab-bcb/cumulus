@@ -12,7 +12,7 @@ import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_count/v
 # import "../cellranger/cellranger_atac_mkfastq.wdl" as cram
 # import "../cellranger/cellranger_atac_count.wdl" as crac
 
-workflow cellranger_orchestra {
+workflow cellranger_workflow {
 	# 5 - 8 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry, DataType, FeatureBarcodeFile]). gs URL
 	File input_csv_file
 	# Output directory, gs URL
