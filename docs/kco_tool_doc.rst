@@ -99,7 +99,7 @@ Options
 
 	* - | **-m**
 	    | **--method**
-	  - Method namespace/name (e.g. regev/cellranger_mkfastq_count). A version can optionally be specified (e.g. regev/cell_ranger_mkfastq_count/4), otherwise the latest version of the method is used.
+	  - Method namespace/name (e.g. scCloud/cellranger_workflow). A version can optionally be specified (e.g. scCloud/cellranger_workflow/4), otherwise the latest version of the method is used.
 	* - | -c
 	    | --config
 	  - Repository config to use for generating input.json stub (e.g. regev/drop-seq-MMUL_8_0_1
