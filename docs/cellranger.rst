@@ -206,6 +206,10 @@ cellranger_workflow inputs:
 	  - Number of cpus to request for one node
 	  - 64
 	  - 64
+	* - atac_num_cpu
+	  - Number of cpus for cellranger-atac count
+	  - 64
+	  - 64
 	* - memory
 	  - Memory size string
 	  - "128G"
@@ -214,6 +218,10 @@ cellranger_workflow inputs:
 	  - Optional memory string for extracting feature count matrix
 	  - "32G"
 	  - "32G"
+	* - atac_memory
+	  - Memory string for cellranger-atac count
+	  - "57.6G"
+	  - "57.6G"
 	* - mkfastq_disk_space
 	  - Optional disk space in gigabytes for mkfastq
 	  - 1500
