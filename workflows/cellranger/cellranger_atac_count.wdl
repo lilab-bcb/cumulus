@@ -29,7 +29,7 @@ workflow cellranger_atac_count {
 	String? zones = "us-central1-b"
 	# Number of cpus per cellranger job
 	Int? num_cpu = 64
-	# Memory string, e.g. 128G
+	# Memory string, e.g. 57.6G
 	String? memory = "57.6G"
 	# Disk space in GB
 	Int? disk_space = 500
