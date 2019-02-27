@@ -105,7 +105,10 @@ task run_cellranger_count {
 			check_call(call_args)
 			fastqs.append('${sample_id}_' + str(i))
 	
-		call_args = ['cellranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=${sample_id}', '--chemistry=${chemistry}', '--jobmode=local']
+		call_args = ['cellranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=${sample_id}']
+		if '${cellranger_version}' != '2.0.2':
+			call_args.append('--chemistry=${chemistry}')
+			call_args.append('--jobmode=local')
 		if '${force_cells}' is not '':
 			call_args.append('--force-cells=${force_cells}')
 		if '${expect_cells}' is not '':
