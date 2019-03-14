@@ -264,6 +264,10 @@ workflow cellranger_workflow {
 			}		
 		}
 	}
+
+	output {
+		String? count_matrix = generate_count_config.count_matrix
+	}
 }
 
 task generate_bcl_csv {
