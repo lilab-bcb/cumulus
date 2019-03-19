@@ -24,14 +24,18 @@ RUN pip install --upgrade pip && \
 	pip install pybind11 && \
 	mkdir /software && \
 	git clone https://github.com/nmslib/hnsw.git /software/hnswlib && \
-	cd /software/hnswlib/python_bindings && python setup.py install && cd ../../..
+	cd /software/hnswlib/python_bindings && python setup.py install && cd ../../.. && \
+	git clone https://github.com/bli25broad/fishers_exact_test.git /software/fisher_test && \
+	cd /software/fisher_test && pip install . && cd ../.. && \
+	git clone https://github.com/bli25broad/louvain-igraph.git /software/louvain && \
+	cd /software/louvain && pip install . && cd ../..
 
-COPY scCloud-0.11.0.tar.gz /software
+COPY scCloud-0.12.0.tar.gz /software
 COPY extract_ADT_UMIs /software/extract_ADT_UMIs
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/monitor_script.sh /software
 
-RUN tar -xzf /software/scCloud-0.11.0.tar.gz -C /software && \
-	cd /software/scCloud-0.11.0 && pip install . && cd ../.. && \
+RUN tar -xzf /software/scCloud-0.12.0.tar.gz -C /software && \
+	cd /software/scCloud-0.12.0 && pip install . && cd ../.. && \
 	cd /software/extract_ADT_UMIs && make all && cd ../.. && \
 	chmod a+rx /software/monitor_script.sh
 
