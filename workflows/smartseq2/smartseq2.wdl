@@ -8,7 +8,7 @@ workflow smartseq2 {
 	String output_directory
 	# Output directory, with trailing slashes stripped
 	String output_directory_stripped = sub(output_directory, "/+$", "")
-	# Reference to align reads against, now only GRCm38 is available
+	# Reference to align reads against, GRCm38 or GRCh38
 	String reference
 
 	# smartseq2 version, default to "0.1.0"
