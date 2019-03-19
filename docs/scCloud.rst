@@ -719,9 +719,10 @@ scCloud_subcluster's outputs
 Load ``scCloud`` results into ``Seurat``  
 -----------------------------------------
 
-First, you need to set ``make_output_seurat_compatible`` to ``true`` in ``scCloud`` to make sure ``output_name.h5ad`` is seurat-compatible.
+First, you need to set ``make_output_seurat_compatible`` to ``true`` in ``scCloud`` to make sure ``output_name.h5ad`` is Seurat-compatible.
+Please note that python, the `anndata`_ python library, and the reticulate R library are required to load the result into Seurat.
 
-Then execute the code below to load the results into ``Seurat``::
+Execute the R code below to load the results into ``Seurat`` version 2::
 
 	library(Seurat)
 	library(reticulate)
@@ -759,3 +760,6 @@ UMAP colored by genes of interest::
 
 	fig = scCloud.plotting.plot_scatter_genes(adata, 'umap', ['CD4', 'CD8A'])
 	fig.savefig('output_file.pdf', dpi = 500)
+
+
+.. _anndata: https://anndata.readthedocs.io/en/latest/
