@@ -14,7 +14,7 @@ Latest version
 	  - Snapshot
 	  - Function
 	* - scCloud/cellranger_workflow
-	  - 1
+	  - 4
 	  - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
 	* - scCloud/smartseq2
 	  - 6

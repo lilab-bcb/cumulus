@@ -7,7 +7,7 @@ workflow cellranger_mkfastq {
 	String output_directory
 
 	# Whether to delete input bcl directory. If false, you should delete this folder yourself so as to not incur storage charges.
-	Boolean? delete_input_bcl_directory = true
+	Boolean? delete_input_bcl_directory = false
 	# 2.1.1, 2.2.0, 3.0.0, or 3.0.2
 	String? cellranger_version = "2.2.0"
 	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
@@ -76,12 +76,17 @@ task run_cellranger_mkfastq {
 		df = pd.read_csv('${input_csv_file}', header = 0)
 		idx = df['Index'].apply(lambda x: x.find('-') < 0)
 		for sample_id in df[idx]['Sample']:
-			call_args = ['mkdir', '-p', prefix + sample_id]
+			dir_name = prefix + sample_id
+			call_args = ['mkdir', '-p', dir_name]
 			check_call(call_args)
-			call_args = ['mv']
-			call_args.extend(glob.glob(prefix + sample_id + '_S*_L*_*_001.fastq.gz'))
-			call_args.append(prefix + sample_id);
-			check_call(call_args)
+			files = glob.glob(dir_name + '_S*_L*_*_001.fastq.gz')
+			if len(files) == 0:
+				print("Warning: cannot extract any reads for sample " + sample_id + "!")
+			else:
+				call_args = ['mv']
+				call_args.extend(files)
+				call_args.append(dir_name);
+				check_call(call_args)
 		CODE
 
 		gsutil -q -m rsync -d -r results/outs ${output_directory}/${run_id}_fastqs
