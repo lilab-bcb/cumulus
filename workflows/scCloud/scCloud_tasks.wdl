@@ -91,6 +91,7 @@ task run_scCloud_cluster {
 	Int? nDC
 	Float? diffmap_alpha
 	Int? diffmap_K
+	Boolean? diffmap_full_speed
 	Boolean? run_louvain
 	Float? louvain_resolution
 	String? louvain_affinity
@@ -99,17 +100,15 @@ task run_scCloud_cluster {
 	Int? approx_louvain_nclusters
 	Float? approx_louvain_resolution
 	Boolean? run_tsne
-	Float? tsne_perplexity
 	Boolean? run_fitsne
+	Float? tsne_perplexity
 	Boolean? run_umap
-	Boolean? umap_on_diffmap
 	Int? umap_K
 	Float? umap_min_dist
 	Float? umap_spread
 	Boolean? run_fle
 	Int? fle_K
 	Int? fle_n_steps
-	String? fle_affinity
 
 	command {
 		set -e
@@ -171,6 +170,8 @@ task run_scCloud_cluster {
 			call_args.extend(['--diffmap-alpha', '${diffmap_alpha}'])
 		if '${diffmap_K}' is not '':
 			call_args.extend(['--diffmap-K', '${diffmap_K}'])
+		if '${diffmap_full_speed}' is 'true':
+			call_args.append('--diffmap-full-speed')
 		if '${run_louvain}' is 'true':
 			call_args.append('--run-louvain')
 		if '${louvain_resolution}' is not '':
@@ -187,14 +188,12 @@ task run_scCloud_cluster {
 			call_args.extend(['--approx-louvain-resolution', '${approx_louvain_resolution}'])
 		if '${run_tsne}' is 'true':
 			call_args.append('--run-tsne')
-		if '${tsne_perplexity}' is not '':
-			call_args.extend(['--tsne-perplexity', '${tsne_perplexity}'])
 		if '${run_fitsne}' is 'true':
 			call_args.append('--run-fitsne')
+		if '${tsne_perplexity}' is not '':
+			call_args.extend(['--tsne-perplexity', '${tsne_perplexity}'])
 		if '${run_umap}' is 'true':
 			call_args.append('--run-umap')
-		if '${umap_on_diffmap}' is 'true':
-			call_args.append('--umap-on-diffmap')
 		if '${umap_K}' is not '':
 			call_args.extend(['--umap-K', '${umap_K}'])
 		if '${umap_min_dist}' is not '':
@@ -207,8 +206,6 @@ task run_scCloud_cluster {
 			call_args.extend(['--fle-K', '${fle_K}'])
 		if '${fle_n_steps}' is not '':
 			call_args.extend(['--fle-n-steps', '${fle_n_steps}'])
-		if '${fle_affinity}' is not '':
-			call_args.extend(['--fle-affinity', '${fle_affinity}'])
 		print(' '.join(call_args))
 		check_call(call_args)
 		if '${output_parquet}' is 'true':
@@ -449,6 +446,7 @@ task run_scCloud_subcluster {
 	Int? nDC
 	Float? diffmap_alpha
 	Int? diffmap_K
+	Boolean? diffmap_full_speed
 	String? calculate_pseudotime
 	Boolean? run_louvain
 	Float? louvain_resolution
@@ -458,17 +456,15 @@ task run_scCloud_subcluster {
 	Int? approx_louvain_nclusters
 	Float? approx_louvain_resolution
 	Boolean? run_tsne
-	Float? tsne_perplexity
 	Boolean? run_fitsne
+	Float? tsne_perplexity
 	Boolean? run_umap
-	Boolean? umap_on_diffmap
 	Int? umap_K
 	Float? umap_min_dist
 	Float? umap_spread
 	Boolean? run_fle
 	Int? fle_K
 	Int? fle_n_steps
-	String? fle_affinity
 
 	command {
 		set -e
@@ -502,6 +498,8 @@ task run_scCloud_subcluster {
 			call_args.extend(['--diffmap-alpha', '${diffmap_alpha}'])
 		if '${diffmap_K}' is not '':
 			call_args.extend(['--diffmap-K', '${diffmap_K}'])
+		if '${diffmap_full_speed}' is 'true':
+			call_args.append('--diffmap-full-speed')
 		if '${calculate_pseudotime}' is not '':
 			call_args.extend(['--calculate-pseudotime', '${calculate_pseudotime}'])
 		if '${run_louvain}' is 'true':
@@ -520,14 +518,12 @@ task run_scCloud_subcluster {
 			call_args.extend(['--approx-louvain-resolution', '${approx_louvain_resolution}'])
 		if '${run_tsne}' is 'true':
 			call_args.append('--run-tsne')
-		if '${tsne_perplexity}' is not '':
-			call_args.extend(['--tsne-perplexity', '${tsne_perplexity}'])
 		if '${run_fitsne}' is 'true':
 			call_args.append('--run-fitsne')
+		if '${tsne_perplexity}' is not '':
+			call_args.extend(['--tsne-perplexity', '${tsne_perplexity}'])
 		if '${run_umap}' is 'true':
 			call_args.append('--run-umap')
-		if '${umap_on_diffmap}' is 'true':
-			call_args.append('--umap-on-diffmap')
 		if '${umap_K}' is not '':
 			call_args.extend(['--umap-K', '${umap_K}'])
 		if '${umap_min_dist}' is not '':
@@ -540,8 +536,6 @@ task run_scCloud_subcluster {
 			call_args.extend(['--fle-K', '${fle_K}'])
 		if '${fle_n_steps}' is not '':
 			call_args.extend(['--fle-n-steps', '${fle_n_steps}'])
-		if '${fle_affinity}' is not '':
-			call_args.extend(['--fle-affinity', '${fle_affinity}'])
 		print(' '.join(call_args))
 		check_call(call_args)
 		if '${output_parquet}' is 'true':
@@ -684,7 +678,7 @@ task run_scCloud_demuxEM {
 	String hash_type
 	String? genome
 	Int? min_num_genes
-	Float? max_background_probability
+	Float? min_signal_hashtag
 	Int? random_state
 	Boolean? generate_diagnostic_plots
 	String? generate_gender_plot
@@ -701,8 +695,8 @@ task run_scCloud_demuxEM {
 			call_args.extend(['--genome', '${genome}'])
 		if '${min_num_genes}' is not '':
 			call_args.extend(['--min-num-genes', '${min_num_genes}'])
-		if '${max_background_probability}' is not '':
-			call_args.extend(['--max-background-probability', '${max_background_probability}'])
+		if '${min_signal_hashtag}' is not '':
+			call_args.extend(['--min-signal-hashtag', '${min_signal_hashtag}'])
 		if '${random_state}' is not '':
 			call_args.extend(['--random-state', '${random_state}'])
 		if '${generate_diagnostic_plots}' is 'true':

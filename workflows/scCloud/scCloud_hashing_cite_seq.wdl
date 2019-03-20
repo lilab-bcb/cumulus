@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/14/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/15/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud_hashing_cite_seq {
@@ -7,8 +7,8 @@ workflow scCloud_hashing_cite_seq {
 	# Output directory, gs url
 	String output_directory
 
-	# scCloud version, default to "0.6.0"
-	String? sccloud_version = "0.6.0"
+	# scCloud version, default to "0.7.0"
+	String? sccloud_version = "0.7.0"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus
@@ -26,8 +26,8 @@ workflow scCloud_hashing_cite_seq {
 	# demuxEM parameters
 	# Only demultiplex cells/nuclei with at least <demuxEM_min_num_genes> expressed genes
 	Int? demuxEM_min_num_genes
-	# Any cell/nucleus with no less than <demuxEM_max_background_probability> background probability will be marked as unknown. [default: 0.8]
-	Float? demuxEM_max_background_probability
+	# Any cell/nucleus with less than <count> hashtags from the signal will be marked as unknown. [default: 10.0]
+	Float? demuxEM_min_signal_hashtag
 	# The random seed used in the KMeans algorithm to separate empty ADT droplets from others. [default: 0]
 	Int? demuxEM_random_state
 	# Generate a series of diagnostic plots, including the background/signal between HTO counts, estimated background probabilities, HTO distributions of cells and non-cells etc. [default: true]
@@ -58,7 +58,7 @@ workflow scCloud_hashing_cite_seq {
 					hash_type = generate_hashing_cite_seq_tasks.id2type[hashing_id],
 					genome = genome,
 					min_num_genes = demuxEM_min_num_genes,
-					max_background_probability = demuxEM_max_background_probability,
+					min_signal_hashtag = demuxEM_min_signal_hashtag,
 					random_state = demuxEM_random_state,
 					generate_diagnostic_plots = demuxEM_generate_diagnostic_plots,
 					generate_gender_plot = demuxEM_generate_gender_plot,
