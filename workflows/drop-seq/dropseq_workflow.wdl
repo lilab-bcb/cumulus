@@ -1,8 +1,8 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/jgould2:dropseq_align/versions/4/plain-WDL/descriptor" as dropseq_align_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/jgould2:dropseq_bcl2fastq/versions/2/plain-WDL/descriptor" as bcl2fastq_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/jgould2:dropseq_count/versions/3/plain-WDL/descriptor" as dropseq_count_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/jgould2:dropseq_prepare_fastq/versions/3/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/jgould2:dropseq_qc/versions/2/plain-WDL/descriptor" as dropseq_qc_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:dropseq_align/versions/1/plain-WDL/descriptor" as dropseq_align_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:dropseq_bcl2fastq/versions/1/plain-WDL/descriptor" as bcl2fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:dropseq_count/versions/1/plain-WDL/descriptor" as dropseq_count_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:dropseq_prepare_fastq/versions/1/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/regev:dropseq_qc/versions/1/plain-WDL/descriptor" as dropseq_qc_wdl
 
 workflow dropseq_workflow {
 	# Either a list of flowcell URLS or sample_id tab r1 tab r2
