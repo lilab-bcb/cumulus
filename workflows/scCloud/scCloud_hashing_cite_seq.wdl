@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/15/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/16/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud_hashing_cite_seq {
@@ -44,6 +44,8 @@ workflow scCloud_hashing_cite_seq {
 	call tasks.generate_hashing_cite_seq_tasks as generate_hashing_cite_seq_tasks {
 		input:
 			input_sample_sheet = input_sample_sheet,
+			sccloud_version = sccloud_version,
+			zones = zones,
 			preemptible = preemptible
 	}
 

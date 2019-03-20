@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/15/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/16/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud_subcluster {
@@ -117,6 +117,8 @@ workflow scCloud_subcluster {
 	String? plot_composition
 	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored tSNEs side by side. 
 	String? plot_tsne
+	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FItSNEs side by side.
+	String? plot_fitsne
 	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored UMAPs side by side.
 	String? plot_umap
 	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FLEs side by side.
@@ -199,13 +201,14 @@ workflow scCloud_subcluster {
 		}
 	}
 
-	if (defined(plot_composition) || defined(plot_tsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_diffmap)) {
+	if (defined(plot_composition) || defined(plot_tsne) || defined(plot_fitsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_diffmap)) {
 		call tasks.run_scCloud_plot as plot {
 			input:
 				input_h5ad = subcluster.output_h5ad,
 				output_name = out_name,
 				plot_composition = plot_composition,
 				plot_tsne = plot_tsne,
+				plot_fitsne = plot_fitsne,
 				plot_umap = plot_umap,
 				plot_fle = plot_fle,
 				plot_diffmap = plot_diffmap,

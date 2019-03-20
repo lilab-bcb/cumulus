@@ -335,6 +335,7 @@ task run_scCloud_plot {
 	Int preemptible
 	String? plot_composition
 	String? plot_tsne
+	String? plot_fitsne
 	String? plot_umap
 	String? plot_fle
 	String? plot_diffmap
@@ -355,6 +356,10 @@ task run_scCloud_plot {
 				check_call(call_args)
 		if '${plot_tsne}' is not '':
 			call_args = ['scCloud', 'plot', 'scatter', '--attributes', '${plot_tsne}', '${input_h5ad}', '${output_name}.tsne.pdf']
+			print(' '.join(call_args))
+			check_call(call_args)
+		if '${plot_fitsne}' is not '':
+			call_args = ['scCloud', 'plot', 'scatter', '--basis', 'fitsne', '--attributes', '${plot_fitsne}', '${input_h5ad}', '${output_name}.fitsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '${plot_umap}' is not '':
