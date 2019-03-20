@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/14/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/15/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud {
@@ -9,8 +9,8 @@ workflow scCloud {
 	# Reference genome name, can be None if you want scCloud to infer it from data for you
 	String genome = ""
 
-	# scCloud version, default to "0.6.0"
-	String? sccloud_version = "0.6.0"
+	# scCloud version, default to "0.7.0"
+	String? sccloud_version = "0.7.0"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus per scCloud job
@@ -93,6 +93,8 @@ workflow scCloud {
 	Float? diffmap_alpha
 	# Number of neighbors used for constructing affinity matrix. [default: 100]
 	Int? diffmap_K
+	# For the sake of reproducibility, we only run one thread for building kNN indices. Turn on this option will allow multiple threads to be used for index building. However, it will also reduce reproducibility due to the racing between multiple threads. [default: false]
+	Boolean? diffmap_full_speed
 	# Run louvain clustering algorithm.
 	Boolean? run_louvain = true
 	# Resolution parameter for the louvain clustering algorithm. [default: 1.3]
@@ -114,8 +116,6 @@ workflow scCloud {
 	# Run umap for visualization.
 	Boolean? run_umap
 	# Run umap on diffusion components.
-	Boolean? umap_on_diffmap
-	# K neighbors for umap. [default: 15]
 	Int? umap_K
 	# Umap parameter. [default: 0.1]
 	Float? umap_min_dist
@@ -228,6 +228,7 @@ workflow scCloud {
 			nDC = nDC,
 			diffmap_alpha = diffmap_alpha,
 			diffmap_K = diffmap_K,
+			diffmap_full_speed = diffmap_full_speed,
 			run_louvain = run_louvain,
 			louvain_resolution = louvain_resolution,
 			run_approximated_louvain = run_approximated_louvain,
@@ -238,7 +239,6 @@ workflow scCloud {
 			tsne_perplexity = tsne_perplexity,
 			run_fitsne = run_fitsne,
 			run_umap = run_umap,
-			umap_on_diffmap = umap_on_diffmap,
 			umap_K = umap_K,
 			umap_min_dist = umap_min_dist,
 			umap_spread = umap_spread,

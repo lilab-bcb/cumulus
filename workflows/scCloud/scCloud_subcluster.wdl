@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/14/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/15/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud_subcluster {
@@ -8,8 +8,8 @@ workflow scCloud_subcluster {
 	# Specify which cells will be included in the subcluster analysis. This field contains one or more <subset_selection> strings separated by ';'. Each <subset_selection> string takes the format of ‘attr:value,…,value’, which means select cells with attr in the values. If multiple <subset_selection> strings are specified, the subset of cells selected is the intersection of these strings.
 	String subset_selections
 
-	# scCloud version, default to "0.6.0"
-	String? sccloud_version = "0.6.0"
+	# scCloud version, default to "0.7.0"
+	String? sccloud_version = "0.7.0"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus per scCloud job
@@ -43,6 +43,8 @@ workflow scCloud_subcluster {
 	Float? diffmap_alpha
 	# Number of neighbors used for constructing affinity matrix. [default: 100]
 	Int? diffmap_K
+	# For the sake of reproducibility, we only run one thread for building kNN indices. Turn on this option will allow multiple threads to be used for index building. However, it will also reduce reproducibility due to the racing between multiple threads. [default: false]
+	Boolean? diffmap_full_speed
 	# Calculate diffusion-based pseudotimes based on <roots>. <roots> should be a comma-separated list of cell barcodes.
 	String? calculate_pseudotime
 	# Run louvain clustering algorithm.
@@ -65,8 +67,6 @@ workflow scCloud_subcluster {
 	Boolean? run_fitsne
 	# Run umap for visualization.
 	Boolean? run_umap
-	# Run umap on diffusion components.
-	Boolean? umap_on_diffmap
 	# K neighbors for umap. [default: 15]
 	Int? umap_K
 	# Umap parameter. [default: 0.1]
@@ -147,6 +147,7 @@ workflow scCloud_subcluster {
 			nDC = nDC,
 			diffmap_alpha = diffmap_alpha,
 			diffmap_K = diffmap_K,
+			diffmap_full_speed = diffmap_full_speed,
 			calculate_pseudotime = calculate_pseudotime,
 			run_louvain = run_louvain,
 			louvain_resolution = louvain_resolution,
@@ -158,7 +159,6 @@ workflow scCloud_subcluster {
 			tsne_perplexity = tsne_perplexity,
 			run_fitsne = run_fitsne,
 			run_umap = run_umap,
-			umap_on_diffmap = umap_on_diffmap,
 			umap_K = umap_K,
 			umap_min_dist = umap_min_dist,
 			umap_spread = umap_spread,
