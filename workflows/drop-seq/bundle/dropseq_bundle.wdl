@@ -7,16 +7,19 @@ workflow dropseq_bundle {
 #   If more than one species, fasta and gtf files need to be in the same order
     Array[File] gtf_file
 
-    String bundle_name
-
 #   length (bases) of the SA pre-indexing string. Typically between 10 and 15.
 #   Longer strings will use much more memory, but allow faster searches.
 #   For small genomes, the parameter --genomeSAindexNbases must be scaled down to min(14, log2(GenomeLength)/2 - 1)
     Int genomeSAindexNbases = 14
-    Int star_threads = 6
-    String star_memory = "40 GB"
-
-
+	Int star_cpus = 64
+	String star_memory = "57.6G"
+    String? multi_species_bundle_name
+	String bundle_name = if(length(fasta_file)>1) then multi_species_bundle_name else sub(basename(fasta_file[0]), "\\.fasta$|\\.fa$", "")
+	File gtf = fix_gtf.fixed_gtf
+	File? fasta = if(length(fasta_file)>1) then add_fasta_prefix.merged_fasta else fasta_file[0]
+	String? zones = "us-east1-d us-west1-a us-west1-b"
+	# Number of preemptible tries
+    Int? preemptible = 2
     if(length(fasta_file)>1) {
         call add_fasta_prefix {
             input:
@@ -32,8 +35,6 @@ workflow dropseq_bundle {
             fasta=fasta_file
     }
 
-    File gtf = fix_gtf.fixed_gtf
-    File? fasta = if(length(fasta_file)>1) then add_fasta_prefix.merged_fasta else fasta_file[0]
 
     call create_sequence_dictionary {
         input:
@@ -60,19 +61,33 @@ workflow dropseq_bundle {
     }
     call star_index {
         input:
-          fasta=fasta,
-          gtf=gtf,
-          genomeSAindexNbases=genomeSAindexNbases,
-          threads=star_threads,
-          memory=star_memory,
-          prefix=bundle_name
+			fasta=fasta,
+			gtf=gtf,
+			genomeSAindexNbases=genomeSAindexNbases,
+			threads=star_cpus,
+			memory=star_memory,
+			prefix=bundle_name
+    }
+
+    output {
+		File genes_intervals =create_intervals.genes_intervals
+		File exons_intervals = create_intervals.exons_intervals
+		File rrna_intervals = create_intervals.rrna_intervals
+		File consensus_intervals = create_intervals.consensus_intervals
+		File intergenic_intervals = create_intervals.intergenic_intervals
+		File dict = create_sequence_dictionary.dict
+		File output_fastq = if(length(fasta_file)>1) then add_fasta_prefix.merged_fasta else fasta_file[0]
+		File index_tar_gz = star_index.index_tar_gz
+		File ref_flat = convert_to_ref_flat.ref_flat
     }
 }
 
 task add_fasta_prefix {
     Array[File] fasta
     String output_name
-
+	Int preemptible
+	String zones
+	
     command {
         add_fasta_prefix.py --output ${output_name} ${sep=' ' fasta}
     }
@@ -80,11 +95,12 @@ task add_fasta_prefix {
         File merged_fasta="${output_name}"
     }
     runtime {
-        docker: "regevlab/dropseq_v5"
-        preemptible: 2
-        memory: "2 GB"
-        disks: "local-disk " + ceil(size(fasta[0],"GB")*(length(fasta)+1)) + " HDD"
-        cpu: 1
+		docker: "regevlab/dropseq-0.0.1"
+		preemptible: "${preemptible}"
+		zones: zones
+		memory: "2 GB"
+		disks: "local-disk " + ceil(size(fasta[0],"GB")*(length(fasta)+1)) + " HDD"
+		cpu: 1
     }
 }
 
@@ -92,7 +108,10 @@ task fix_gtf {
     Array[File] gtf
     String output_name
     Array[String] fasta_file
-
+    Int preemptible
+    String zones
+    	
+	
     command {
         fix_gtf.py --prefix ${sep=',' fasta_file} --output ${output_name} ${sep=' ' gtf}
     }
@@ -100,18 +119,21 @@ task fix_gtf {
         File fixed_gtf="${output_name}"
     }
     runtime {
-        docker: "regevlab/dropseq_v5"
-        preemptible: 2
-        memory: "2 GB"
-        disks: "local-disk " + ceil(size(gtf[0],"GB")*(1+length(gtf))) + " HDD"
-        cpu: 1
+		docker: "regevlab/dropseq-0.0.1"
+		preemptible: "${preemptible}"
+		zones: zones
+		memory: "2 GB"
+		disks: "local-disk " + ceil(size(gtf[0],"GB")*(1+length(gtf))) + " HDD"
+		cpu: 1
   }
 }
 
 task create_sequence_dictionary {
     File fasta
     String output_name
-
+	Int preemptible
+	String zones
+	
     command {
         java -Xmx2g -jar /home/picard-tools-1.141/picard.jar CreateSequenceDictionary R=${fasta} O=${output_name}
     }
@@ -120,11 +142,12 @@ task create_sequence_dictionary {
         File dict="${output_name}"
     }
     runtime {
-        docker: "regevlab/dropseq_v5"
-        preemptible: 2
-        memory: "2 GB"
-        disks: "local-disk " + ceil(size(fasta,"GB")*2)  + " HDD"
-        cpu: 1
+		docker: "regevlab/dropseq-0.0.1"
+		preemptible: "${preemptible}"
+		zones: zones
+		memory: "2 GB"
+		disks: "local-disk " + ceil(size(fasta,"GB")*2)  + " HDD"
+		cpu: 1
   }
 }
 
@@ -132,7 +155,9 @@ task convert_to_ref_flat {
     File gtf
     File dict
     String output_name
-
+	Int preemptible
+	String zones
+	
     command {
         java -Xmx4g -jar /home/Drop-seq_tools-1.13/jar/dropseq.jar ConvertToRefFlat ANNOTATIONS_FILE=${gtf} SEQUENCE_DICTIONARY=${dict} O=${output_name}
     }
@@ -140,11 +165,12 @@ task convert_to_ref_flat {
         File ref_flat="${output_name}"
     }
     runtime {
-        docker: "regevlab/dropseq_v5"
-        preemptible: 2
-        memory: "4 GB"
-        disks: "local-disk " + ceil(size(gtf,"GB")*2 + size(dict,"GB"))  + " HDD"
-        cpu: 1
+		docker: "regevlab/dropseq-0.0.1"
+		preemptible: "${preemptible}"
+		zones: zones
+		memory: "4 GB"
+		disks: "local-disk " + ceil(size(gtf,"GB")*2 + size(dict,"GB"))  + " HDD"
+		cpu: 1
     }
 }
 
@@ -152,7 +178,9 @@ task reduce_gtf {
     File gtf
     File dict
     String output_name
-
+	Int preemptible
+	String zones
+	
     command {
         java -Xmx4g -jar /home/Drop-seq_tools-1.13/jar/dropseq.jar ReduceGTF GTF=${gtf} SEQUENCE_DICTIONARY=${dict} O=${output_name}
     }
@@ -160,11 +188,12 @@ task reduce_gtf {
         File reduced_gtf="${output_name}"
     }
     runtime {
-        docker: "regevlab/dropseq_v5"
-        preemptible: 2
-        memory: "4 GB"
-        disks: "local-disk " + ceil(size(gtf,"GB")*2 + size(dict,"GB"))  + " HDD"
-        cpu: 1
+		docker: "regevlab/dropseq-0.0.1"
+		preemptible: "${preemptible}"
+		zones: zones
+		memory: "4 GB"
+		disks: "local-disk " + ceil(size(gtf,"GB")*2 + size(dict,"GB"))  + " HDD"
+		cpu: 1
     }
 }
 
@@ -172,7 +201,9 @@ task create_intervals {
     File reduced_gtf
     File sequence_dictionary
     String prefix
-
+	Int preemptible
+	String zones
+	
     command {
         java -Xmx4g -jar /home/Drop-seq_tools-1.13/jar/dropseq.jar CreateIntervalsFiles SD=${sequence_dictionary} REDUCED_GTF=${reduced_gtf} OUTPUT=. PREFIX=${prefix}
     }
@@ -185,11 +216,12 @@ task create_intervals {
     }
 
     runtime {
-        docker: "regevlab/dropseq_v5"
-        preemptible: 2
-        memory: "4 GB"
-        disks: "local-disk " + ceil(size(reduced_gtf,"GB")*2 + size(sequence_dictionary,"GB"))  + " HDD"
-        cpu: 1
+		docker: "regevlab/dropseq-0.0.1"
+		preemptible: "${preemptible}"
+		zones: zones
+		memory: "4 GB"
+		disks: "local-disk " + ceil(size(reduced_gtf,"GB")*2 + size(sequence_dictionary,"GB"))  + " HDD"
+		cpu: 1
     }
 }
 
@@ -200,6 +232,8 @@ task star_index {
     String prefix
     Int threads
     String memory
+	Int preemptible
+	String zones
 
     command {
         mkdir ${prefix}
@@ -213,11 +247,12 @@ task star_index {
         tar czf "${prefix}.tgz" ${prefix}
     }
     output {
-        File star_index="${prefix}.tar.gz"
+        File index_tar_gz ="${prefix}.tar.gz"
     }
     runtime {
-        docker: "regevlab/dropseq_v5"
-        preemptible: 2
+       	docker: "regevlab/dropseq-0.0.1"
+		preemptible: "${preemptible}"
+		zones: zones
         memory: "${memory}"
         disks: "local-disk " + ceil(5 + size(gtf,"GB") + 20*size(fasta,"GB"))  + " HDD"
         cpu: "${threads}"
