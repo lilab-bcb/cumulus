@@ -18,7 +18,6 @@ workflow dropseq {
     String primer = "AAGCAGTGGTATCAACGCAGAGTAC"
     String? java_memory
     Int collapse_barcodes_threads = 2
-    Int star_threads = 6
     Int base_qc = 10
     Int min_core_reads = 3000
     Int core_barcodes = 1000
@@ -28,7 +27,10 @@ workflow dropseq {
     # maximum available RAM for sorting BAM
     String limitBAMsortRAM = "45000000000"
     # runtime node memory
-    String star_memory = "100 GB"
+
+	Int star_cpus = 64
+	String star_memory = "57.6G"
+
     # max number of collapsed junctions
     Int limitOutSJcollapsed = 1000000
     Int max_records = 10000000
@@ -150,7 +152,7 @@ workflow dropseq {
            call star_align {
                input:
                     star_genome_refs_zipped=star_genome_refs_zipped,
-                    star_threads=star_threads,
+                    star_threads=star_cpus,
                     align_fastq=SamToFastq.Polya_Trim_Unaligned_Fq,
                     limitBAMsortRAM=limitBAMsortRAM,
                     star_memory=star_memory,
@@ -809,9 +811,11 @@ task star_align {
 
  command {
 
- tar xvzf ${star_genome_refs_zipped}
+ mkdir -p genome_dir
+ tar xf ${star_genome_refs_zipped} -C genome_dir --strip-components 1
+ rm -f ${star_genome_refs_zipped}
 
-  STAR --genomeDir STAR2_5 \
+  STAR --genomeDir genome_dir \
   --runThreadN ${star_threads} \
   --readFilesIn ${align_fastq} \
   --readFilesCommand "gunzip -c" \
