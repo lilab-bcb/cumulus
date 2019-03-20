@@ -534,6 +534,11 @@ For each cluster, putative cell types with scores larger than *minimum_report_sc
 plot
 ^^^^
 
+The h5ad file will contain a default attribute ``Channel``, which records which channel each single cell comes from. The ``Channel`` attribute matches the ``Sample`` column in the **count_matrix.csv** file. 
+
+Other attributes used in plot must be added using the ``attributes`` input in the ``aggregate_matrix`` section.
+
+
 plot inputs
 +++++++++++
 
@@ -555,6 +560,11 @@ plot inputs
 	  - | Takes the format of "attr,attr,...,attr". 
 	    | If non-empty, plot attr colored t-SNEs side by side
 	  - "louvain_labels,Donor"
+	  - None
+	* - plot_tsne
+	  - | Takes the format of "attr,attr,...,attr". 
+	    | If non-empty, plot attr colored t-SNEs side by side
+	  - "louvain_labels,Channel"
 	  - None
 	* - plot_umap
 	  - | Takes the format of "attr,attr,...,attr". 
