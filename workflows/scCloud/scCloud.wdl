@@ -337,4 +337,21 @@ workflow scCloud {
 			disk_space = disk_space,
 			preemptible = preemptible
 	}
+
+	output {
+		File output_10x_h5 = aggregate_matrices.output_10x_h5
+		File output_h5ad = cluster.output_h5ad
+		Array[File] output_seurat_h5ad = cluster.output_seurat_h5ad
+		Array[File] output_filt_xlsx = cluster.output_filt_xlsx
+		Array[File] output_filt_plot = cluster.output_filt_plot
+		Array[File] output_loom_file = cluster.output_loom_file
+		Array[File] output_parquet_file = cluster.output_parquet_file
+		File? output_de_h5ad = de_analysis.output_de_h5ad
+		File? output_de_xlsx =  de_analysis.output_de_xlsx
+		Array[File]? output_markers_xlsx =  de_analysis.output_markers_xlsx
+		Array[File]? output_anno_file =  de_analysis.output_anno_file
+		Array[File]? output_pdfs = plot.output_pdfs
+		Array[File]? output_htmls = plot.output_htmls
+		Array[File]? output_scp_files= scp_output.output_scp_files
+	}
 }
