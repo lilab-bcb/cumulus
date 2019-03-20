@@ -66,7 +66,10 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on FireCloud.
 		* - **Lane**
 		  - Tells which lanes the sample was pooled into.
 		* - **Index**
-		  - Contains 10x sample index set names (e.g. SI-GA-A12).
+		  - 
+			| Contains 10x sample index set names (e.g. SI-GA-A12). 
+			| For cell-hashing/nucleus-hashing/CITE-Seq, this field should be the index sequence. 
+			| Note that all index sequences (including 10x's) should have the same length (8 bases). If one index sequence is shorter (e.g. ATCACG), pad it with P7 sequence (e.g. ATCACGAT).
 		* - Chemistry
 		  - 
 			| Describes the 10x chemistry used for the sample. 
