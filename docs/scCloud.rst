@@ -268,7 +268,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - Power parameter for diffusion-based pseudotime
 	  - 0.5
 	  - 0.5
-	* - diffmap-full-speed
+	* - diffmap_full_speed
 	  - For the sake of reproducibility, we only run one thread for building kNN indices. Turn on this option will allow multiple threads to be used for index building. However, it will also reduce reproducibility due to the racing between multiple threads
 	  - true
 	  - false
