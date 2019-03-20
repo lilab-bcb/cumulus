@@ -20,13 +20,13 @@ Latest version
 	  - 6
 	  - Run Bowtie2 and RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files
 	* - scCloud/scCloud
-	  - 15
+	  - 16
 	  - Run scCloud analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering and more
 	* - scCloud/scCloud_subcluster
-	  - 10
+	  - 11
 	  - Run subcluster analysis using scCloud
 	* - scCloud/scCloud_hashing_cite_seq
-	  - 10
+	  - 11
 	  - Run scCloud for cell-hashing/nucleus-hashing/CITE-Seq analysis
 
 Stable version - HTAPP v2

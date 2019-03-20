@@ -64,10 +64,10 @@ scCloud_hashing_cite_seq inputs:
 	  - demuxEM parameter. Only demultiplex cells/nuclei with at least <demuxEM_min_num_genes> expressed genes
 	  - 200
 	  - 100
-	* - demuxEM_max_background_probability
-	  - demuxEM parameter. Any cell/nucleus with no less than <demuxEM_max_background_probability> background probability will be marked as unknown
-	  - 0.8
-	  - 0.8
+	* - demuxEM_min_signal_hashtag
+	  - demuxEM parameter. Any cell/nucleus with less than <count> hashtags from the signal will be marked as unknown. [default: 10.0]
+	  - 10.0
+	  - 10.0
 	* - demuxEM_random_state
 	  - demuxEM parameter. The random seed used in the KMeans algorithm to separate empty ADT droplets from others
 	  - 0
@@ -86,8 +86,8 @@ scCloud_hashing_cite_seq inputs:
 	  - 
 	* - sccloud_version
 	  - scCloud version
-	  - "0.6.0"
-	  - "0.6.0"
+	  - "0.7.0"
+	  - "0.7.0"
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-b us-east1-c us-east1-d"

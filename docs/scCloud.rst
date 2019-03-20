@@ -73,8 +73,8 @@ global inputs
 	  - 
 	* - sccloud_version
 	  - scCloud version
-	  - "0.6.0"
-	  - "0.6.0"
+	  - "0.7.0"
+	  - "0.7.0"
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-b us-east1-c us-east1-d"
@@ -268,6 +268,10 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - Power parameter for diffusion-based pseudotime
 	  - 0.5
 	  - 0.5
+	* - diffmap-full-speed
+	  - For the sake of reproducibility, we only run one thread for building kNN indices. Turn on this option will allow multiple threads to be used for index building. However, it will also reduce reproducibility due to the racing between multiple threads
+	  - true
+	  - false
 	* - run_louvain
 	  - Run louvain clustering algorithm
 	  - true
@@ -307,10 +311,6 @@ Note that we will only list important inputs here. For other inputs, please refe
 	* - run_umap
 	  - Run umap for visualization
 	  - true
-	  - false
-	* - umap_on_diffmap
-	  - Run umap on diffusion components
-	  - ture
 	  - false
 	* - run_fle
 	  - Run force-directed layout embedding
