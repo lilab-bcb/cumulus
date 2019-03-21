@@ -81,7 +81,7 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on FireCloud.
 			| **fiveprime** for Single Cell 5′,
 			| **SC3Pv1** for Single Cell 3′ v1,
 			| **SC3Pv2** for Single Cell 3′ v2,
-			| **SC3Pv3** for Single Cell 3′ v3,
+			| **SC3Pv3** for Single Cell 3′ v3 (set cellranger version input parameter to >= 3.0.2),
 			| **SC5P-PE** for Single Cell 5′ paired-end (both R1 and R2 are used for alignment),
 			| **SC5P-R2** for Single Cell 5′ R2-only (where only R2 is used for alignment).
 		* - DataType
