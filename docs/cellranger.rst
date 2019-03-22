@@ -335,6 +335,7 @@ Sometimes, people might want to perform demultiplexing locally and only run the 
 			| **GRCh38_vdj** for human V(D)J sequences, cellranger reference 2.0.0, annotation built from *Homo_sapiens.GRCh38.87.chr_patch_hapl_scaff.gtf* and *vdj_GRCh38_alts_ensembl_10x_genes-2.0.0.gtf*,
 			| **GRCm38_vdj** for mouse V(D)J sequences, cellranger reference 2.0.0, annotation built from *Mus_musculus.GRCm38.90.chr_patch_hapl_scaff.gtf*,
 			| **GRCh38_v3.0.0** for human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation,
+			| **GRCh38_premrna_v3.0.0** for human GRCh38, introns included, cellranger reference 3.0.0, Ensembl v93 gene annotation, treating annotated transcripts as exons,
 			| **hg19_v3.0.0** for human hg19, cellranger reference 3.0.0, Ensembl v87 gene annotation,
 			| **mm10_v3.0.0** for mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation,
 			| **GRCh38_atac_v1.0.1** for scATAC-Seq, human GRCh38, cellranger-atac reference 1.0.1, Gencode v28 basic annotation,
