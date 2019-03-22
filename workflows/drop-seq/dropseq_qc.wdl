@@ -62,7 +62,7 @@ task SingleCellRnaSeqMetricsCollector {
 
 	runtime {
 		docker: "regevlab/dropseq-${workflow_version}"
-		disks: "local-disk " + ceil(2 + size(input_bam,"GB") + size(cell_barcodes, "GB") + size(refflat,"GB")) + " HDD"
+		disks: "local-disk " + ceil(1 + 2*size(input_bam,"GB") + size(cell_barcodes, "GB") + size(refflat,"GB")) + " HDD"
 		memory :"${memory}"
 		preemptible: "${preemptible}"
 		zones: zones

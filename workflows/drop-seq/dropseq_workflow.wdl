@@ -2,7 +2,7 @@ import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_align/versions/
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_bcl2fastq/versions/1/plain-WDL/descriptor" as bcl2fastq_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_count/versions/1/plain-WDL/descriptor" as dropseq_count_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_prepare_fastq/versions/1/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_qc/versions/1/plain-WDL/descriptor" as dropseq_qc_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_qc/versions/2/plain-WDL/descriptor" as dropseq_qc_wdl
 
 workflow dropseq_workflow {
 	# Either a list of flowcell URLS or sample_id tab r1 tab r2
