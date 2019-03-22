@@ -119,7 +119,8 @@ task run_rsem {
 		monitor_script.sh > monitoring.log &
 		mkdir -p rsem_ref
 		tar xf ${reference} -C rsem_ref --strip-components 1
-		rsem-calculate-expression --bowtie2 --paired-end -p ${num_cpu} --append-names --time ${read1} ${read2} rsem_ref/rsem_ref ${sample_name}
+		REFERENCE_NAME="$(basename `ls rsem_ref/*.grp` .grp)"
+		rsem-calculate-expression --bowtie2 --paired-end -p ${num_cpu} --append-names --time ${read1} ${read2} rsem_ref/$REFERENCE_NAME ${sample_name}
 	}
 
 	output {
