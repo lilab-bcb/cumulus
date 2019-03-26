@@ -1,6 +1,5 @@
 FROM continuumio/miniconda3:latest
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/monitor_script.sh /software/
-ADD ./summary.py /software/
+RUN mkdir /software
 RUN apt-get update && \
 apt-get install --no-install-recommends -y curl dpkg-dev gnupg lsb-release procps && \
 export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
@@ -12,10 +11,10 @@ RUN apt-get -qq update && apt-get -qq -y install --no-install-recommends default
 && conda install -y pandas numpy \
 && pip install --upgrade pip \
 && pip install cufflinks plotly \
-&& curl -L -s -o "/Drop-seq_tools-2.1.0.zip" "https://github.com/broadinstitute/Drop-seq/releases/download/v2.1.0/Drop-seq_tools-2.1.0.zip" \
-&& unzip /Drop-seq_tools-2.1.0.zip \
-&& rm /Drop-seq_tools-2.1.0.zip \
-&& mv /Drop-seq_tools-2.1.0 /software/Drop-seq_tools-2.1.0 \
+&& curl -L -s -o "/Drop-seq_tools.zip" "https://github.com/broadinstitute/Drop-seq/releases/download/v2.1.0/Drop-seq_tools-2.1.0.zip" \
+&& unzip /Drop-seq_tools.zip \
+&& rm /Drop-seq_tools.zip \
+&& mv /Drop-seq_tools-2.1.0 /software/Drop-seq_tools \
 && echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile \
 && Rscript -e "install.packages(c('ineq', 'optparse'))" \
 && curl -L -s -o /software/v1.0.3.zip https://github.com/broadinstitute/DropSeq_utility/archive/v1.0.3.zip \
@@ -27,14 +26,11 @@ RUN apt-get -qq update && apt-get -qq -y install --no-install-recommends default
 && mv /STAR-2.7.0c /software/ \
 && rm -f /2.7.0c.tar.gz \
 && curl -L -s -o "/software/picard.jar" "https://github.com/broadinstitute/picard/releases/download/2.18.26/picard.jar" \
-&& curl -L -s -o "/samtools-1.9.tar.bz2" "https://github.com/samtools/samtools/releases/download/1.9/samtools-1.9.tar.bz2" \
-&& tar xf /samtools-1.9.tar.bz2 \
-&& cd /samtools-1.9 && ./configure --disable-lzma --disable-bz2 --without-curses --prefix=/software/ && make && make install && rm -rf /samtools-1.9 /samtools-1.9.tar.bz2 \
 && apt-get -qq -y remove curl build-essential \
 && apt-get -qq -y autoremove \
 && apt-get autoclean \
 && rm -rf /var/lib/apt/lists/* \
 && chmod a+rx /software/* \
 && chmod a+rx /software/DropSeq_utility-1.0.3/* \
-&& chmod a+rx /software/Drop-seq_tools-2.1.0/*
-ENV PATH=/software/bin/:/software/:/software/STAR-2.7.0c/bin/Linux_x86_64/:/software/DropSeq_utility-1.0.3/:/software/Drop-seq_tools-2.1.0/:${PATH}
+&& chmod a+rx /software/Drop-seq_tools/*
+ENV PATH=/software/bin/:/software/:/software/STAR-2.7.0c/bin/Linux_x86_64/:/software/DropSeq_utility-1.0.3/:/software/Drop-seq_tools/:${PATH}

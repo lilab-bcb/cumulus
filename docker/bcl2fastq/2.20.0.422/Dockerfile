@@ -13,7 +13,6 @@ pip install pandas
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/cellranger/bcl2fastq2_0v2.20.0.422-2_amd64.deb /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/monitor_script.sh /software
 
 RUN dpkg -i /software/bcl2fastq2_0v2.20.0.422-2_amd64.deb && chmod a+rx /software/monitor_script.sh
 ENV PATH=/software:$PATH
