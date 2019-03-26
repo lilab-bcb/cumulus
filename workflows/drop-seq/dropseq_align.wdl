@@ -77,7 +77,6 @@ task STAR {
 		set -o pipefail
 		set -e
 
-		monitor_script.sh > monitoring.log &
 		mkdir -p genome_dir
 		tar xf ${genome_tar} -C genome_dir --strip-components 1
 
@@ -97,7 +96,7 @@ task STAR {
 	}
 
 	output {
-		File monitoringLog = "monitoring.log"
+
 		String bam="${output_directory}/${sample_id}_Aligned.out.bam"
 		String star_log_final="${output_directory}/${sample_id}_Log.final.out"
 	}
@@ -133,8 +132,6 @@ task AddTags {
 		set -o pipefail
     	set -e
 
-		monitor_script.sh > monitoring.log &
-
 		mkfifo pipe1 pipe2 pipe3
 
 		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/picard.jar SortSam VALIDATION_STRINGENCY=SILENT \
@@ -150,12 +147,12 @@ task AddTags {
 		INCLUDE_SECONDARY_ALIGNMENTS=false \
 		PAIRED_RUN=false \
 		CLIP_ADAPTERS=false | \
-		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/Drop-seq_tools-2.1.0/jar/dropseq.jar TagReadWithInterval VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar TagReadWithInterval VALIDATION_STRINGENCY=SILENT \
 		I=pipe2 \
 		O=pipe3 \
 		INTERVALS=${gene_intervals} \
 		TAG=XG | \
-		java -Dsamjdk.compression_level=2 -Xmx3000m -jar /software/Drop-seq_tools-2.1.0/jar/dropseq.jar TagReadWithGeneFunction VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=2 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar TagReadWithGeneFunction VALIDATION_STRINGENCY=SILENT \
 		INPUT=pipe3 \
 		O=${sample_id}_aligned_tagged.bam \
 		ANNOTATIONS_FILE=${refflat}
@@ -164,7 +161,7 @@ task AddTags {
 	}
 
 	output {
-		File monitoringLog = "monitoring.log"
+
 		String bam="${output_directory}/${sample_id}_aligned_tagged.bam"
 		String output_sample_id = "${sample_id}"
 	}

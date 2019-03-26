@@ -13,6 +13,7 @@ workflow dropseq_prepare_fastq {
 		input:
 			preemptible=preemptible,
 			memory="3750M",
+			cpu=1,
 			r1=r1,
 			r2=r2,
 			sample_id=sample_id,
@@ -34,6 +35,7 @@ workflow dropseq_prepare_fastq {
 
 task PrepareFastq {
 	String memory
+	Int cpu
 	String r1
 	String r2
 	Int disk_space
@@ -46,7 +48,6 @@ task PrepareFastq {
 	command {
 		set -o pipefail
 		set -e
-		monitor_script.sh > monitoring.log &
 
 		python <<CODE
 		import os
@@ -66,7 +67,7 @@ task PrepareFastq {
 
 		mkfifo pipe1 pipe2 pipe3 pipe4 pipe5
 
-		java -Xmx3000m -jar /software/picard.jar FastqToSam \
+		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/picard.jar FastqToSam \
 		OUTPUT=pipe1 \
 		USE_SEQUENTIAL_FASTQS=true \
 		FASTQ=S_R1_001.fastq.gz \
@@ -74,7 +75,7 @@ task PrepareFastq {
 		QUALITY_FORMAT=Standard \
 		SAMPLE_NAME=${sample_id} \
 		SORT_ORDER=queryname | \
-		TagBamWithReadSequenceExtended -m 3000m VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar TagBamWithReadSequenceExtended VALIDATION_STRINGENCY=SILENT \
 		INPUT=pipe1 \
 		OUTPUT=pipe2 \
 		SUMMARY=${sample_id}_tagged_cellular_summary.txt \
@@ -84,7 +85,7 @@ task PrepareFastq {
 		DISCARD_READ=false \
 		TAG_NAME=XC \
 		NUM_BASES_BELOW_QUALITY=1 | \
-		TagBamWithReadSequenceExtended -m 3000m VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar TagBamWithReadSequenceExtended VALIDATION_STRINGENCY=SILENT \
 		INPUT=pipe2 \
 		OUTPUT=pipe3 \
 		SUMMARY="${sample_id}_tagged_molecular_summary.txt" \
@@ -94,18 +95,18 @@ task PrepareFastq {
 		DISCARD_READ=true \
 		TAG_NAME=XM \
 		NUM_BASES_BELOW_QUALITY=1 | \
-		FilterBam -m 3000m VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar FilterBam VALIDATION_STRINGENCY=SILENT \
 		INPUT=pipe3 \
 		OUTPUT=pipe4 \
 		TAG_REJECT=XQ | \
-		TrimStartingSequence -m 3000m VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar TrimStartingSequence VALIDATION_STRINGENCY=SILENT \
 		INPUT=pipe4 \
 		OUTPUT=pipe5 \
 		OUTPUT_SUMMARY="${sample_id}_adapter_trimming_report.txt" \
 		SEQUENCE=AAGCAGTGGTATCAACGCAGAGTGAATGGG \
 		MISMATCHES=0 \
 		NUM_BASES=5 | \
-		PolyATrimmer -m 3000m VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=2 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar PolyATrimmer VALIDATION_STRINGENCY=SILENT \
 		INPUT=pipe5 \
 		OUTPUT="${sample_id}_aligner_input.bam" \
 		OUTPUT_SUMMARY="${sample_id}_polyA_trimming_report.txt" \
@@ -118,7 +119,7 @@ task PrepareFastq {
 	}
 
 	output {
-		File monitoringLog = "monitoring.log"
+
 		String bam="${output_directory}/${sample_id}_aligner_input.bam"
 		String cellular_tag_summary="${output_directory}/${sample_id}_tagged_cellular_summary.txt"
 		String molecular_tag_summary="${output_directory}/${sample_id}_tagged_molecular_summary.txt"
@@ -130,6 +131,7 @@ task PrepareFastq {
 		docker: "regevlab/dropseq-${workflow_version}"
 		disks: "local-disk ${disk_space} HDD"
 		memory :"${memory}"
+		cpu:"${cpu}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}

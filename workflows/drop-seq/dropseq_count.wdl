@@ -72,7 +72,6 @@ task CollectCellBarcodes {
 	String workflow_version
 	command {
 		set -e
-		monitor_script.sh > monitoring.log &
 
 		collect_cell_barcodes.R \
 		${histogram} \
@@ -83,7 +82,7 @@ task CollectCellBarcodes {
 	}
 
 	output {
-		File monitoringLog = "monitoring.log"
+
 		String cell_barcodes="${output_directory}/${sample_id}_barcodes_use.txt"
 	}
 	runtime {
@@ -108,15 +107,15 @@ task DigitalExpression {
 
 	command {
 		set -e
-		monitor_script.sh > monitoring.log &
+
 		# CODING+UTR regions on the SENSE strand by default
-		java -Dsamjdk.compression_level=2 -Xmx3000m -jar /software/Drop-seq_tools-2.1.0/jar/dropseq.jar DigitalExpression VALIDATION_STRINGENCY=SILENT \
+		java -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar DigitalExpression VALIDATION_STRINGENCY=SILENT \
 		I=${input_bam} \
 		O="${sample_id}_dge.txt.gz" \
 		SUMMARY="${sample_id}_dge.summary.txt" \
 		CELL_BC_FILE=${barcodes}
 
-		java -Dsamjdk.compression_level=2 -Xmx3000m -jar /software/Drop-seq_tools-2.1.0/jar/dropseq.jar DigitalExpression VALIDATION_STRINGENCY=SILENT \
+		java -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar DigitalExpression VALIDATION_STRINGENCY=SILENT \
 		I=${input_bam} \
 		O="${sample_id}_dge_reads.txt.gz" \
 		SUMMARY="${sample_id}_dge_reads.summary.txt" \
@@ -127,7 +126,7 @@ task DigitalExpression {
 	}
 
 	output {
-		File monitoringLog = "monitoring.log"
+
 		String dge="${output_directory}/${sample_id}_dge.txt.gz"
 		String dge_summary = "${output_directory}/${sample_id}_dge.summary.txt"
 		String dge_reads="${output_directory}/${sample_id}_dge_reads.txt.gz"
@@ -155,9 +154,8 @@ task DigitalExpressionPrep {
 
 	command {
 		set -e
-		monitor_script.sh > monitoring.log &
 
-		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/Drop-seq_tools-2.1.0/jar/dropseq.jar DetectBeadSynthesisErrors VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar DetectBeadSynthesisErrors VALIDATION_STRINGENCY=SILENT \
 		INPUT=${input_bam} \
 		MIN_UMIS_PER_CELL=20 \
         OUTPUT_STATS=${sample_id}_synthesis_error_stats.txt \
@@ -165,13 +163,13 @@ task DigitalExpressionPrep {
 		REPORT=${sample_id}_synthesis_error_report.txt \
 		OUTPUT=temp.bam
 
-		java -Dsamjdk.compression_level=2 -Xmx3000m -jar /software/Drop-seq_tools-2.1.0/jar/dropseq.jar DetectBeadSubstitutionErrors VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=2 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar DetectBeadSubstitutionErrors VALIDATION_STRINGENCY=SILENT \
 		INPUT=temp.bam \
 		OUTPUT="${sample_id}_aligned_tagged_repaired.bam" \
 		MIN_UMIS_PER_CELL=20 \
 		OUTPUT_REPORT="${sample_id}_substitution_error_report.txt"
 
-		java -Dsamjdk.compression_level=2 -Xmx3000m -jar /software/Drop-seq_tools-2.1.0/jar/dropseq.jar BamTagHistogram VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=2 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar BamTagHistogram VALIDATION_STRINGENCY=SILENT \
 		I="${sample_id}_aligned_tagged_repaired.bam" \
 		O=${sample_id}_tag.txt.gz \
 		TAG=XC
@@ -187,7 +185,7 @@ task DigitalExpressionPrep {
 	}
 
 	output {
-		File monitoringLog = "monitoring.log"
+
 		String bam="${output_directory}/${sample_id}_aligned_tagged_repaired.bam"
 		String bead_synthesis_stats = "${output_directory}/${sample_id}_synthesis_error_stats.txt"
 		String bead_synthesis_summary = "${output_directory}/${sample_id}_synthesis_error_summary.txt"

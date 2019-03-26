@@ -44,9 +44,8 @@ task SingleCellRnaSeqMetricsCollector {
 
 	command {
     	set -e
-		monitor_script.sh > monitoring.log &
 
-		java -Xmx3000m -jar /software/Drop-seq_tools-2.1.0/jar/dropseq.jar SingleCellRnaSeqMetricsCollector VALIDATION_STRINGENCY=SILENT \
+		java -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar SingleCellRnaSeqMetricsCollector VALIDATION_STRINGENCY=SILENT \
 		INPUT=${input_bam} \
 		OUTPUT=${sample_id}_rnaseq_metrics.txt \
 		ANNOTATIONS_FILE=${refflat} \
@@ -56,13 +55,13 @@ task SingleCellRnaSeqMetricsCollector {
 	}
 
 	output {
-		File monitoringLog = "monitoring.log"
+
 		File sc_rnaseq_metrics_report = "${sample_id}_rnaseq_metrics.txt"
 	}
 
 	runtime {
 		docker: "regevlab/dropseq-${workflow_version}"
-		disks: "local-disk " + ceil(1 + 2*size(input_bam,"GB") + size(cell_barcodes, "GB") + size(refflat,"GB")) + " HDD"
+		disks: "local-disk " + ceil(20 + 3.25*size(input_bam,"GB") + size(cell_barcodes, "GB") + size(refflat,"GB")) + " HDD"
 		memory :"${memory}"
 		preemptible: "${preemptible}"
 		zones: zones
