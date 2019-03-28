@@ -52,7 +52,6 @@ task run_bcl2fastq {
 	command {
 		set -e
 		export TMPDIR=/tmp
-		monitor_script.sh > monitoring.log &
 
 		gsutil -q -m cp -r ${input_bcl_directory} .
 
@@ -101,7 +100,7 @@ task run_bcl2fastq {
 
 	output {
 		String fastqs = "${output_directory}/${run_id}_fastqs.txt"
-		File monitoringLog = "monitoring.log"
+
 	}
 
 	runtime {

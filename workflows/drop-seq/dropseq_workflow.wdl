@@ -1,8 +1,8 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_align/versions/1/plain-WDL/descriptor" as dropseq_align_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_bcl2fastq/versions/1/plain-WDL/descriptor" as bcl2fastq_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_count/versions/1/plain-WDL/descriptor" as dropseq_count_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_prepare_fastq/versions/1/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_qc/versions/1/plain-WDL/descriptor" as dropseq_qc_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_align/versions/3/plain-WDL/descriptor" as dropseq_align_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_bcl2fastq/versions/2/plain-WDL/descriptor" as bcl2fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_count/versions/2/plain-WDL/descriptor" as dropseq_count_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_prepare_fastq/versions/2/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_qc/versions/4/plain-WDL/descriptor" as dropseq_qc_wdl
 
 workflow dropseq_workflow {
 	# Either a list of flowcell URLS or sample_id tab r1 tab r2
@@ -11,20 +11,18 @@ workflow dropseq_workflow {
 	String output_directory
 	# Output directory, with trailing slashes stripped
 	String output_directory_stripped = sub(output_directory, "/+$", "")
-	Boolean run_bcl2fastq = true
+	Boolean run_bcl2fastq = false
 	Array[Array[String]] input_tsv = read_tsv(input_csv_file)
 	Boolean run_dropseq = true
 
-	# for large genomes (e.g. human and mouse combined genome, use 96 cpus, "86.4G", or 32 cpus, 120G, or 64 cpus, 240GB - https://cloud.google.com/compute/docs/machine-types
-	# STAR will take forever ($$$) without enough RAM
-	Int star_cpus = 64
-	String star_memory = "57.6G"
+	Int? star_cpus
+	String? star_memory
 	String star_flags = "--limitOutSJcollapsed 1000000 --twopassMode Basic"
-	File star_genome_file
-	File refflat
-	File gene_intervals
-	File genome_fasta
-	File genome_dict
+
+	# hg19, mm10, hg19_mm10, mmul_8.0.1 or a path to a custom reference JSON file
+	String reference
+	File? acronym_file = "gs://regev-lab/resources/DropSeq/index.json"
+
 	Int? bcl2fastq_cpu = 64
 	String? bcl2fastq_memory = "57.6G"
 
@@ -35,7 +33,7 @@ workflow dropseq_workflow {
 
 	String? workflow_version = "0.0.1"
 
-	# Whether to delete input_bcl_directory, default: false
+	# Whether to delete input_bcl_directory
 	Boolean? delete_input_bcl_directory = false
 	# Number of preemptible tries
 	Int? preemptible = 2
@@ -68,7 +66,11 @@ workflow dropseq_workflow {
 				workflow_version=workflow_version,
 				bcl2fastq_sample_sheets = bcl2fastq.fastqs,
 				zones = zones,
-				preemptible = preemptible
+				preemptible = preemptible,
+				acronym_file=acronym_file,
+				star_cpus = star_cpus,
+				star_memory = star_memory,
+				reference=reference
 		}
 
 		scatter (row in generate_count_config.grouped_sample_sheet) {
@@ -92,14 +94,14 @@ workflow dropseq_workflow {
 					add_bam_tags_disk_space_multiplier=add_bam_tags_disk_space_multiplier,
 					output_directory = output_directory_stripped + '/' + row[0],
 					input_bam = dropseq_prepare_fastq.bam,
-					star_cpus = star_cpus,
-					star_memory = star_memory,
+					star_cpus = generate_count_config.star_cpus_output,
+					star_memory = generate_count_config.star_memory_output,
 					star_flags = star_flags,
-					star_genome_file=star_genome_file,
-					refflat=refflat,
-					gene_intervals=gene_intervals,
-					genome_fasta=genome_fasta,
-					genome_dict=genome_dict,
+					star_genome_file= generate_count_config.star_genome,
+					refflat=generate_count_config.refflat,
+					gene_intervals=generate_count_config.gene_intervals,
+					genome_fasta=generate_count_config.genome_fasta,
+					genome_dict=generate_count_config.genome_dict,
 					zones = zones,
 					preemptible = preemptible
 			}
@@ -120,7 +122,7 @@ workflow dropseq_workflow {
 					sample_id = row[0],
 					input_bam = dropseq_align.aligned_tagged_bam,
 					cell_barcodes=dropseq_count.cell_barcodes,
-					refflat=refflat,
+					refflat=generate_count_config.refflat,
 					workflow_version=workflow_version,
 					output_directory = output_directory_stripped + '/' + row[0],
 					zones = zones,
@@ -154,11 +156,11 @@ workflow dropseq_workflow {
 task collect_summary {
 	Array[String] sample_id
 	Array[String] dge_summary
-    Array[String] star_log_final
-    Array[String] adapter_trimming_report
-    Array[String] polyA_trimming_report
-    Array[String] sc_rnaseq_metrics_report
-    Array[String] bead_synthesis_summary
+	Array[String] star_log_final
+	Array[String] adapter_trimming_report
+	Array[String] polyA_trimming_report
+	Array[String] sc_rnaseq_metrics_report
+	Array[String] bead_synthesis_summary
 	String output_directory
 	String zones
 	Int preemptible
@@ -202,21 +204,28 @@ task generate_count_config {
 	Array[File]? bcl2fastq_sample_sheets
 	String zones
 	Int preemptible
+	String acronym_file
 	String workflow_version
+	String reference
+	Int? star_cpus
+	String? star_memory
+
 
 	command {
 		set -e
 
 		python <<CODE
 
-		import pandas as pd
-		import numpy as np
+		import json
 		from subprocess import check_call
 
+		import numpy as np
+		import pandas as pd
+
 		bcl2fastq_sample_sheets = '${sep="," bcl2fastq_sample_sheets}'.split(',')
-		bcl2fastq_sample_sheets = list(filter(lambda x:x.strip() !='', bcl2fastq_sample_sheets))
-			
-		if len(bcl2fastq_sample_sheets) == 0: # no bcl2fastq run, already a sample sheet with name, r1, r2
+		bcl2fastq_sample_sheets = list(filter(lambda x: x.strip() != '', bcl2fastq_sample_sheets))
+
+		if len(bcl2fastq_sample_sheets) == 0:  # no bcl2fastq run, already a sample sheet with name, r1, r2
 			df = pd.read_csv('${input_csv_file}', header=None, dtype=str, sep=None, engine='python')
 			for c in df.columns:
 				df[c] = df[c].str.strip()
@@ -235,7 +244,7 @@ task generate_count_config {
 				total = total
 				sizes.append(total)
 			df[3] = sizes
-			df[3] = np.ceil(1 + 4*(df[3]/1e9)).astype(int)
+			df[3] = np.ceil(1 + 4 * (df[3] / 1e9)).astype(int)
 			df.to_csv('grouped_sample_sheet.txt', index=True, header=False, sep='\t')
 		else:
 			df = None
@@ -247,15 +256,47 @@ task generate_count_config {
 			agg_dict[2] = lambda col: ','.join(col)
 			agg_dict[3] = 'sum'
 			df = df.groupby(0).agg(agg_dict)
-			df[3] = np.ceil(1 + 4*(df[3]/1e9)).astype(int)
+			df[3] = np.ceil(1 + 4 * (df[3] / 1e9)).astype(int)
 			df.to_csv('grouped_sample_sheet.txt', index=True, header=False, sep='\t')
 
+		reference = '${reference}'.strip()
+		is_custom = reference.lower().startswith('gs:')
+		json_file = reference if is_custom else '${acronym_file}'
+
+		check_call(['gsutil', '-q', 'cp', json_file, 'config.json'])
+		with open('config.json', 'r') as f:
+			config = json.load(f)
+		if not is_custom:
+			config = config[reference.lower()]
+		with open('star_genome.txt', 'wt') as w1, open('refflat.txt', 'wt') as w2, open('gene_intervals.txt', 'wt') as w3, \
+			open('genome_fasta.txt', 'wt') as w4, open('genome_dict.txt', 'wt') as w5, open('star_memory.txt', 'wt') as w6, \
+			open('star_cpu.txt', 'wt') as w7:
+			w1.write(config['star_genome'])
+			w2.write(config['refflat'])
+			w3.write(config['gene_intervals'])
+			w4.write(config['genome_fasta'])
+			w5.write(config['genome_dict'])
+			memory = config.get('star_memory', '57.6G')
+			star_memory = '${star_memory}'.strip()
+			if star_memory != '':
+				memory = star_memory
+			w6.write(str(memory))
+			cpu = config.get('star_cpus', '64')
+			star_cpus = '${star_cpus}'.strip()
+			if star_cpus != '':
+				cpu = star_cpus
+			w7.write(str(cpu))
 		CODE
-
-
 	}
 
 	output {
+		String star_genome = read_string('star_genome.txt')
+		String refflat = read_string('refflat.txt')
+		String gene_intervals = read_string('gene_intervals.txt')
+		String genome_fasta = read_string('genome_fasta.txt')
+		String genome_dict = read_string('genome_dict.txt')
+		String star_memory_output = read_string('star_memory.txt')
+		Int star_cpus_output = read_int('star_cpu.txt')
 		Array[Array[String]] grouped_sample_sheet = read_tsv('grouped_sample_sheet.txt')
 	}
 

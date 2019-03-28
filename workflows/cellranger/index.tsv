@@ -12,3 +12,4 @@ hg19_v3.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-hg19-3.0.0.ta
 mm10_v3.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-mm10-3.0.0.tar.gz
 GRCh38_atac_v1.0.1	gs://regev-lab/resources/cellranger/refdata-cellranger-atac-GRCh38-1.0.1.tar.gz
 mm10_atac_v1.0.1	gs://regev-lab/resources/cellranger/refdata-cellranger-atac-mm10-1.0.1.tar.gz
+GRCh38_premrna_v3.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38_premrna-3.0.0.tar.gz

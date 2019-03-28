@@ -150,4 +150,20 @@ TPM-normalized counts are calculated as follows: We first estimate the gene expr
 TPM-normalized counts reflect both the relative expression levels and the cell sequencing depth.
 
 
+
+---------------------------------
+
+Custom Genome:
+^^^^^^^^^^^^^^
+#. Install RSEM 1.3.1 and Bowtie 2 v2.3.4.3.
+#. Download a genome fasta file (e.g. Homo_sapiens.GRCh38.dna.primary_assembly.fa) and a GTF gene annotation file (e.g. Homo_sapiens.GRCh38.83.gtf).
+#. Run the following, substituting your fasta file, GTF file, and the number of threads to use::
+
+	mkdir rsem_ref
+	rsem-prepare-reference --gtf Homo_sapiens.GRCh38.83.gtf --bowtie2 -p n_threads Homo_sapiens.GRCh38.dna.primary_assembly.fa rsem_ref/rsem_ref
+	tar -czf rsem_ref.tar.gz rsem_ref
+
+#. Upload the rsem_ref.tar.gz to your google bucket and set the URL to this file as the reference input field value.
+
+
 .. _FireCloud instructions: https://software.broadinstitute.org/firecloud/documentation/article?id=10574
