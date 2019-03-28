@@ -75,7 +75,7 @@ task run_cellranger_mkfastq {
 		prefix = 'results/outs/fastq_path/' + flowcell + '/'
 		df = pd.read_csv('${input_csv_file}', header = 0)
 		idx = df['Index'].apply(lambda x: x.find('-') < 0)
-		for sample_id in df[idx]['Sample']:
+		for sample_id in df[idx]['Sample'].unique():
 			dir_name = prefix + sample_id
 			call_args = ['mkdir', '-p', dir_name]
 			check_call(call_args)
