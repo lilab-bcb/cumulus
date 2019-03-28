@@ -641,7 +641,7 @@ task generate_hashing_cite_seq_tasks {
 		from subprocess import check_call
 
 		df = pd.read_csv('${input_sample_sheet}', header = 0, index_col = 0)
-		with open('hashing.txt', 'w') as fo1, open('cite_seq.txt', 'w') as fo2, open('id2rna.txt', 'w') as fo3, open('id2adt.txt', 'w') as fo4, open('id2type.txt', 'w') as fo5:
+		with open('hashing.txt', 'w') as fo1, open('cite_seq.txt', 'w') as fo2, open('id2rna.txt', 'w') as fo3, open('id2adt.txt', 'w') as fo4:
 			for outname, row in df.iterrows():
 				if row['TYPE'] == 'cite-seq':
 					fo2.write(outname + '\n')
@@ -650,7 +650,6 @@ task generate_hashing_cite_seq_tasks {
 					fo1.write(outname + '\n')
 				fo3.write(outname + '\t' + row['RNA'] + '\n')
 				fo4.write(outname + '\t' + row['ADT'] + '\n')
-				fo5.write(outname + '\t' + row['TYPE'] + '\n')
 		CODE
 	}
 
@@ -659,7 +658,6 @@ task generate_hashing_cite_seq_tasks {
 		Array[String] cite_seq_ids = read_lines('cite_seq.txt')
 		Map[String, String] id2rna = read_map('id2rna.txt')
 		Map[String, String] id2adt = read_map('id2adt.txt')
-		Map[String, String] id2type = read_map('id2type.txt')
 	}
 
 	runtime {

@@ -142,7 +142,7 @@ workflow scCloud {
 	# Calculate Mann-Whitney U test.
 	Boolean? mwu
 	# Calculate area under curve in ROC curve.
-	Boolean? roc
+	Boolean? roc = true
 
 	# If also detect markers using LightGBM
 	Boolean? find_markers_lightgbm

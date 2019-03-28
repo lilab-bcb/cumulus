@@ -425,7 +425,7 @@ de_analysis inputs
 	* - roc
 	  - Calculate area under curve in ROC curve
 	  - true
-	  - false
+	  - true
 	* - find_markers_lightgbm
 	  - If also detect markers using LightGBM
 	  - true
