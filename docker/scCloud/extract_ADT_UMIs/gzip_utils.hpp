@@ -3,6 +3,8 @@
 
 #include <cctype>
 #include <string>
+#include <istream>
+#include <streambuf>
 #include <fstream>
 
 #include <boost/iostreams/filtering_stream.hpp>
@@ -63,10 +65,28 @@ struct iGZipFile {
 	}
 
 	bool getline(std::string& line) {
-		bool success = (bool)std::getline(gin, line);
-		if (success) 
-			while (iscntrl(line.back())) line.pop_back(); // remove \r 		
-		return success;
+		line.clear();
+
+		std::istream::sentry se(gin, true);
+		std::streambuf* sb = gin.rdbuf();
+
+		int c;
+		do {
+			c = sb->sbumpc();
+			if (c == '\n') return true;
+			if (c == '\r') {
+				if (sb->sgetc() == '\n') sb->sbumpc();
+				return true;
+			}
+			if (c == std::streambuf::traits_type::eof()) {
+				if (line.empty()) {
+					gin.setstate(std::ios::eofbit);
+					return false;
+				}
+				return true;				
+			}
+			if (isprint(c)) line += (char)c;
+		} while (true);
 	}
 };
 

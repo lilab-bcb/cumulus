@@ -57,7 +57,6 @@ workflow scCloud_hashing_cite_seq {
 					input_raw_gene_bc_matrices_h5 = generate_hashing_cite_seq_tasks.id2rna[hashing_id],
 					output_dir = sub(output_directory, "/+$", ""),
 					output_name = hashing_id,
-					hash_type = generate_hashing_cite_seq_tasks.id2type[hashing_id],
 					genome = genome,
 					min_num_genes = demuxEM_min_num_genes,
 					min_signal_hashtag = demuxEM_min_signal_hashtag,
