@@ -60,8 +60,16 @@ scCloud_hashing_cite_seq inputs:
 	  - Reference genome name. If not provided, scCloud will infer the genome name from data
 	  - "GRCh38"
 	  - 
+	* - demuxEM_alpha_on_samples
+	  - demuxEM parameter. The Dirichlet prior concentration parameter (alpha) on samples. An alpha value < 1.0 will make the prior sparse.
+	  - 2.0
+	  - 0.0
 	* - demuxEM_min_num_genes
 	  - demuxEM parameter. Only demultiplex cells/nuclei with at least <demuxEM_min_num_genes> expressed genes
+	  - 200
+	  - 100
+	* - demuxEM_min_num_umis
+	  - demuxEM parameter. Only demultiplex cells/nuclei with at least <demuxEM_min_num_umis> of UMIs.
 	  - 200
 	  - 100
 	* - demuxEM_min_signal_hashtag

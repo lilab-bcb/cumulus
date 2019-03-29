@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/16/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/17/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud_hashing_cite_seq {
@@ -24,8 +24,12 @@ workflow scCloud_hashing_cite_seq {
 	String? genome
 
 	# demuxEM parameters
-	# Only demultiplex cells/nuclei with at least <demuxEM_min_num_genes> expressed genes
+	# Only demultiplex cells/nuclei with at least <demuxEM_min_num_genes> expressed genes. [default: 100]
 	Int? demuxEM_min_num_genes
+	# The Dirichlet prior concentration parameter (alpha) on samples. An alpha value < 1.0 will make the prior sparse.
+	Float? demuxEM_alpha_on_samples
+	# Only demultiplex cells/nuclei with at least <demuxEM_min_num_umis> of UMIs. [default: 100]
+	Int? demuxEM_min_num_umis
 	# Any cell/nucleus with less than <count> hashtags from the signal will be marked as unknown. [default: 10.0]
 	Float? demuxEM_min_signal_hashtag
 	# The random seed used in the KMeans algorithm to separate empty ADT droplets from others. [default: 0]
@@ -58,7 +62,9 @@ workflow scCloud_hashing_cite_seq {
 					output_dir = sub(output_directory, "/+$", ""),
 					output_name = hashing_id,
 					genome = genome,
+					alpha_on_samples = demuxEM_alpha_on_samples,
 					min_num_genes = demuxEM_min_num_genes,
+					min_num_umis = demuxEM_min_num_umis,
 					min_signal_hashtag = demuxEM_min_signal_hashtag,
 					random_state = demuxEM_random_state,
 					generate_diagnostic_plots = demuxEM_generate_diagnostic_plots,

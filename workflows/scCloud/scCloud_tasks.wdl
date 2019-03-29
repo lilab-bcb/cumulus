@@ -22,6 +22,7 @@ task run_scCloud_aggregate_matrices {
 		python <<CODE
 		from subprocess import check_call
 		call_args = ['scCloud', 'aggregate_matrix', '${input_count_matrix_csv}', '${output_name}', '--google-cloud']
+		# call_args = ['scCloud', 'aggregate_matrix', '${input_count_matrix_csv}', '${output_name}']
 		if '${restrictions}' is not '':
 			ress = '${restrictions}'.split(';')
 			for res in ress:
@@ -66,6 +67,7 @@ task run_scCloud_cluster {
 	Int preemptible
 	String? genome
 	Boolean? cite_seq
+	Float? cite_seq_capping
 	Boolean? output_filtration_results
 	Boolean? plot_filtration_results
 	String? plot_filtration_figsize
@@ -122,6 +124,8 @@ task run_scCloud_cluster {
 			call_args.extend(['--genome', '${genome}'])
 		if '${cite_seq}' is 'true':
 			call_args.append('--cite-seq')
+		if '${cite_seq_capping}' is not '':
+			call_args.extend(['--cite-seq-capping', '${cite_seq_capping}'])
 		if '${output_filtration_results}' is 'true':
 			call_args.append('--output-filtration-results')
 		if '${plot_filtration_results}' is 'true':
@@ -339,7 +343,7 @@ task run_scCloud_plot {
 	String? plot_umap
 	String? plot_fle
 	String? plot_diffmap
-	String? plot_citeseq_tsne
+	String? plot_citeseq_fitsne
 
 	command {
 		set -e
@@ -376,8 +380,8 @@ task run_scCloud_plot {
 				call_args = ['scCloud', 'iplot', '--attribute', attr, 'diffmap_pca', '${input_h5ad}', '${output_name}.' + attr + '.diffmap_pca.html']
 				print(' '.join(call_args))
 				check_call(call_args)
-		if '${plot_citeseq_tsne}' is not '':
-			call_args = ['scCloud', 'plot', 'scatter', '--basis', 'citeseq_tsne', '--attributes', '${plot_citeseq_tsne}', '${input_h5ad}', '${output_name}.epitope.tsne.pdf']
+		if '${plot_citeseq_fitsne}' is not '':
+			call_args = ['scCloud', 'plot', 'scatter', '--basis', 'citeseq_fitsne', '--attributes', '${plot_citeseq_fitsne}', '${input_h5ad}', '${output_name}.citeseq.fitsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		CODE
@@ -678,9 +682,10 @@ task run_scCloud_demuxEM {
 	String memory
 	Int disk_space
 	Int preemptible
-	String hash_type
 	String? genome
+	Float? alpha_on_samples
 	Int? min_num_genes
+	Int? min_num_umis
 	Float? min_signal_hashtag
 	Int? random_state
 	Boolean? generate_diagnostic_plots
@@ -693,11 +698,15 @@ task run_scCloud_demuxEM {
 
 		python <<CODE
 		from subprocess import check_call
-		call_args = ['scCloud', 'demuxEM', '${input_adt_csv}', '${input_raw_gene_bc_matrices_h5}', '${output_name}', '-p', '${num_cpu}', '--hash-type', '${hash_type}']
+		call_args = ['scCloud', 'demuxEM', '${input_adt_csv}', '${input_raw_gene_bc_matrices_h5}', '${output_name}', '-p', '${num_cpu}']
 		if '${genome}' is not '':
 			call_args.extend(['--genome', '${genome}'])
+		if '${alpha_on_samples}' is not '':
+			call_args.extend(['--alpha_on_samples', '${alpha_on_samples}'])
 		if '${min_num_genes}' is not '':
 			call_args.extend(['--min-num-genes', '${min_num_genes}'])
+		if '${min_num_umis}' is not '':
+			call_args.extend(['--min-num-umis', '${min_num_umis}'])
 		if '${min_signal_hashtag}' is not '':
 			call_args.extend(['--min-signal-hashtag', '${min_signal_hashtag}'])
 		if '${random_state}' is not '':
