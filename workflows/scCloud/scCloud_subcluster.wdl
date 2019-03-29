@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/16/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/17/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud_subcluster {
@@ -60,11 +60,11 @@ workflow scCloud_subcluster {
 	# Resolution parameter for louvain. [default: 1.3]
 	Float? approx_louvain_resolution
 	# Run multi-core tSNE for visualization.
-	Boolean? run_tsne = true
+	Boolean? run_tsne
 	# tSNE’s perplexity parameter. [default: 30]
 	Float? tsne_perplexity
 	# Run FItSNE for visualization.
-	Boolean? run_fitsne
+	Boolean? run_fitsne = true
 	# Run umap for visualization.
 	Boolean? run_umap
 	# K neighbors for umap. [default: 15]
