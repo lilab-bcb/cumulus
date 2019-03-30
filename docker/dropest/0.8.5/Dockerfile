@@ -51,8 +51,8 @@ RUN \
 
 
 RUN mkdir -p /home/user/software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/dropest/dropest_umi_correct.R /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/dropest/dropseq_config.xml /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/dropest/dropest_umi_correct.R /home/user/software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/dropest/dropseq_config.xml /home/user/software
 
 
 ENV PATH=/home/user/dropEst/build:$PATH \
