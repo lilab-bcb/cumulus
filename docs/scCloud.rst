@@ -168,9 +168,13 @@ Note that we will only list important inputs here. For other inputs, please refe
 	* - cite_seq
 	  - | Data are CITE-Seq data. scCloud will perform analyses on RNA count matrix first. 
 	    | Then it will attach the ADT matrix to the RNA matrix with all antibody names changing to 'AD-' + antibody_name. 
-	    | Lastly, it will embed the antibody expression using t-SNE (the basis used for plotting is 'citeseq_tsne')
+	    | Lastly, it will embed the antibody expression using FIt-SNE (the basis used for plotting is 'citeseq_fitsne')
 	  - true
 	  - false
+	* - cite_seq_capping
+	  - For CITE-Seq surface protein expression, make all cells with expression > <percentile> to the value at <percentile> to smooth outlier. Set <percentile> to 100.0 to turn this option off.
+	  - 10.0
+	  - 99.99
 	* - output_filtration_results
 	  - If output cell and gene filtration results to a spreadsheet
 	  - true
@@ -299,7 +303,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	* - run_tsne
 	  - Run multi-core t-SNE for visualization
 	  - true
-	  - true
+	  - false
 	* - tsne_perplexity
 	  - t-SNE’s perplexity parameter
 	  - 30
@@ -307,7 +311,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	* - run_fitsne
 	  - Run FIt-SNE for visualization
 	  - true
-	  - false
+	  - true
 	* - run_umap
 	  - Run umap for visualization
 	  - true
@@ -425,7 +429,7 @@ de_analysis inputs
 	* - roc
 	  - Calculate area under curve in ROC curve
 	  - true
-	  - false
+	  - true
 	* - find_markers_lightgbm
 	  - If also detect markers using LightGBM
 	  - true
@@ -556,9 +560,9 @@ plot inputs
 	    | "label" refers to cluster labels and "attr" refers to sample conditions
 	  - "louvain_labels:Donor"
 	  - None
-	* - plot_tsne
+	* - plot_fitsne
 	  - | Takes the format of "attr,attr,...,attr". 
-	    | If non-empty, plot attr colored t-SNEs side by side
+	    | If non-empty, plot attr colored FIt-SNEs side by side
 	  - "louvain_labels,Donor"
 	  - None
 	* - plot_tsne
@@ -582,11 +586,11 @@ plot inputs
 	    | The 3 coordinates are the first 3 PCs of all diffusion components
 	  - "louvain_labels,Donor"
 	  - None
-	* - plot_citeseq_tsne
-	  - | plot cells based on t-SNE coordinates estimated from antibody expressions.
+	* - plot_citeseq_fitsne
+	  - | plot cells based on FIt-SNE coordinates estimated from antibody expressions.
 		| Takes the format of "attr,attr,...,attr". 
-	    | If non-empty, plot attr colored t-SNEs side by side
-	  - "louvain_labels"
+	    | If non-empty, plot attr colored FIt-SNEs side by side
+	  - "louvain_labels,Donor"
 	  - None
 
 plot outputs

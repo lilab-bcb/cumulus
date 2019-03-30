@@ -3,6 +3,8 @@ Version 0.7.0 `Feburary 14, 2019`
 
 Added support for 10x genomics scATAC assays.
 
+scCloud runs FIt-SNE as default.
+
 Version 0.6.0 `January 31, 2019`
 --------------------------------
 
