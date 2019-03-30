@@ -2,7 +2,7 @@ Drop-seq pipeline
 -------------------------------------------------------------
 
 Follow the steps below to extract gene-count matrices from Drop-seq data.
-This WDL follows the steps outlined in the `Drop-seq alignment cookbook`_ from the `McCarroll lab`_.
+This WDL follows the steps outlined in the `Drop-seq alignment cookbook`_ from the `McCarroll lab`.
 
 #. Copy your sequencing output to your workspace bucket using gsutil in your unix terminal. You can obtain your bucket URL in the workspace summary tab in FireCloud under Google Bucket. You can also read `FireCloud instructions`_ on uploading data.
 
@@ -88,22 +88,15 @@ Please see the description of important inputs below.
 	  - Sample Sheet (contains Name, Read1, Read2 or a list of BCL directories e.g. "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.csv")
 	* - output_directory
 	  - Pipeline output directory (gs URL e.g. "gs://fc-e0000000-0000-0000-0000-000000000000/dropseq_output")
+	* - reference
+	  - hg19, mm10, hg19_mm10, mmul_8.0.1 or a path to a custom reference JSON file
 	* - run_bcl2fastq
 	  - Whether your sample sheet contains one BCL directory per line or one sample per line
-	* - star_memory
-	  - For large genomes (e.g. human and mouse combined genome), enter "120G" or else the STAR aligner will take forever ($$$)
-	* - force_cells
+ 	* - run_dropseq_tools
+	  - Whether to generate count matrixes using Drop-Seq tools from the `McCarroll lab`_.
+	* - drop_seq_tools_force_cells
 	  - If supplied, bypass the cell detection algorithm and use this number of cells
-	* - star_genome_file
-	  - "gs://regev-lab/resources/DropSeq/human/STAR2_5_index_hg19.tar.gz" or "gs://regev-lab/resources/DropSeq/mouse/STAR2_5_index_mm10.tar.gz"
-	* - refflat
-	  - "gs://regev-lab/resources/DropSeq/human/hg19.refFlat" or "gs://regev-lab/resources/DropSeq/mouse/mm10.refFlat"
-	* - gene_intervals
-	  - :"gs://regev-lab/resources/DropSeq/human/hg19.genes.intervals" or "gs://regev-lab/resources/DropSeq/mouse/mm10.genes.intervals"
-	* - genome_fasta
-	  - "gs://regev-lab/resources/DropSeq/human/hg19.fasta" or "gs://regev-lab/resources/DropSeq/mouse/mm10.fasta"
-	* - genome_dict
-	  - "gs://regev-lab/resources/DropSeq/human/hg19.dict" or "gs://regev-lab/resources/DropSeq/mouse/mm10.dict"
+
 
 
 ---------------------------------
@@ -111,8 +104,9 @@ Please see the description of important inputs below.
 Outputs:
 ^^^^^^^^
 
-The pipeline outputs a list of google bucket urls containing one gene-count matrix per sample. Each gene-count matrix file has the suffix 'dge.txt.gz'.
+The pipeline outputs a list of google bucket urls containing one gene-count matrix per sample. Each gene-count matrix file produced by Drop-seq tools has the suffix 'dge.txt.gz', matrices produced by dropEst have the extension .rds.
 
 .. _FireCloud instructions: https://software.broadinstitute.org/firecloud/documentation/article?id=10574
 .. _Drop-seq alignment cookbook: https://github.com/broadinstitute/Drop-seq/blob/master/doc/Drop-seq_Alignment_Cookbook.pdf
 .. _McCarroll lab: http://mccarrolllab.org/dropseq-1/
+.. _dropEst: https://github.com/hms-dbmi/dropEst
