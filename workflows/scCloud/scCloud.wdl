@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/16/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/17/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud {
@@ -49,6 +49,8 @@ workflow scCloud {
 
 	# If input data are CITE-Seq data
 	Boolean? cite_seq = false
+	# For CITE-Seq surface protein expression, make all cells with expression > <percentile> to the value at <percentile> to smooth outlier. Set <percentile> to 100.0 to turn this option off. [default: 99.99]
+	Float? cite_seq_capping
 	# If output cell and gene filtration results as a spreadsheet. [default: true]
 	Boolean? output_filtration_results = true
 	# If plot filtration results as PDF files. [default: true]
@@ -108,11 +110,11 @@ workflow scCloud {
 	# Resolution parameter for louvain. [default: 1.3]
 	Float? approx_louvain_resolution
 	# Run multi-core tSNE for visualization.
-	Boolean? run_tsne = true
+	Boolean? run_tsne
 	# tSNE’s perplexity parameter. [default: 30]
 	Float? tsne_perplexity
 	# Run FItSNE for visualization.
-	Boolean? run_fitsne
+	Boolean? run_fitsne = true
 	# Run umap for visualization.
 	Boolean? run_umap
 	# Run umap on diffusion components.
@@ -142,7 +144,7 @@ workflow scCloud {
 	# Calculate Mann-Whitney U test.
 	Boolean? mwu
 	# Calculate area under curve in ROC curve.
-	Boolean? roc
+	Boolean? roc = true
 
 	# If also detect markers using LightGBM
 	Boolean? find_markers_lightgbm
@@ -173,8 +175,8 @@ workflow scCloud {
 	String? plot_fle
 	# Takes the format of "attr,attr,...,attr". If non-empty, generate attr colored 3D interactive plot. The 3 coordinates are the first 3 PCs of all diffusion components.
 	String? plot_diffmap
-	# Plot cells based on t-SNE coordinates estimated from antibody expressions. Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored t-SNEs side by side.
-	String? plot_citeseq_tsne
+	# Plot cells based on FIt-SNE coordinates estimated from antibody expressions. Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FIt-SNEs side by side.
+	String? plot_citeseq_fitsne
 
 
 	# for scp_output
@@ -208,6 +210,7 @@ workflow scCloud {
 			output_name = out_name,
 			genome = genome,
 			cite_seq = cite_seq,
+			cite_seq_capping = cite_seq_capping,
 			output_filtration_results = output_filtration_results,
 			plot_filtration_results = plot_filtration_results,
 			plot_filtration_figsize = plot_filtration_figsize,
@@ -281,7 +284,7 @@ workflow scCloud {
 		}
 	}
 
-	if (defined(plot_composition) || defined(plot_tsne) || defined(plot_fitsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_diffmap) || defined(plot_citeseq_tsne)) {
+	if (defined(plot_composition) || defined(plot_tsne) || defined(plot_fitsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_diffmap) || defined(plot_citeseq_fitsne)) {
 		call tasks.run_scCloud_plot as plot {
 			input:
 				input_h5ad = cluster.output_h5ad,
@@ -292,7 +295,7 @@ workflow scCloud {
 				plot_umap = plot_umap,
 				plot_fle = plot_fle,
 				plot_diffmap = plot_diffmap,
-				plot_citeseq_tsne = plot_citeseq_tsne,
+				plot_citeseq_fitsne = plot_citeseq_fitsne,
 				sccloud_version = sccloud_version,
 				zones = zones,
 				memory = memory,
