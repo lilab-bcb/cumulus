@@ -359,7 +359,7 @@ task run_scCloud_plot {
 				print(' '.join(call_args))
 				check_call(call_args)
 		if '${plot_tsne}' is not '':
-			call_args = ['scCloud', 'plot', 'scatter', '--attributes', '${plot_tsne}', '${input_h5ad}', '${output_name}.tsne.pdf']
+			call_args = ['scCloud', 'plot', 'scatter',  '--basis', 'tsne', '--attributes', '${plot_tsne}', '${input_h5ad}', '${output_name}.tsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '${plot_fitsne}' is not '':
