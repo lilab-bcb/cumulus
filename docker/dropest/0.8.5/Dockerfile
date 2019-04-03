@@ -1,5 +1,4 @@
 FROM rocker/r-ver:3.4
-MAINTAINER Viktor Petukhov "viktor.s.petuhov@ya.ru"
 
 RUN apt-get update && \
 apt-get install --no-install-recommends -y curl dpkg-dev gnupg lsb-release procps && \
@@ -29,10 +28,9 @@ RUN apt-get update --yes && apt-get install --no-install-recommends --yes \
 RUN \
   R -e 'chooseCRANmirror(ind=52); install.packages(c("devtools", "Rcpp","RcppEigen", "RInside", "Matrix", "optparse", "rmarkdown", "withr"))'
 
-RUN useradd -m user
-USER user
+RUN mkdir -p /software
 ENTRYPOINT ["/bin/bash"]
-WORKDIR "/home/user"
+WORKDIR "/software"
 
 RUN \
   git clone https://github.com/hms-dbmi/dropEst.git && \
@@ -41,7 +39,7 @@ RUN \
 RUN \
   echo '.libPaths(c("~/R/x86_64-redhat-linux-gnu-library/3.4", .libPaths()))' > .Rprofile && \
   R -e 'chooseCRANmirror(ind=52); install.packages("ks", dependencies=c("Depends", "Imports", "LinkingTo"))' && \
-  R -e 'devtools::install_local("~/dropEst/dropestr/", dependencies=T)' \
+  R -e 'devtools::install_local("/software/dropEst/dropestr/", dependencies=T)' \
   R -e 'install.packages(c("optparse","rmarkdown"))'
 RUN \
   mkdir -p dropEst/build && \
@@ -50,11 +48,15 @@ RUN \
   make
 
 
-RUN mkdir -p /home/user/software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/dropest/dropest_umi_correct.R /home/user/software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/dropest/dropseq_config.xml /home/user/software
 
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/dropest/dropest_umi_correct.R /software/
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/dropest/dropseq_config.xml /software/
+RUN chmod +x /software/*
+RUN apt-get -qq -y remove git cmake build-essential \
+&& apt-get -qq -y autoremove \
+&& apt-get autoclean \
+&& rm -rf /var/lib/apt/lists/*
 
-ENV PATH=/home/user/dropEst/build:$PATH \
+ENV PATH=/software/dropEst/build:$PATH \
   LD_LIBRARY_PATH=/usr/local/lib/R/lib/:$LD_LIBRARY_PATH \
   R_PROFILE=~/.Rprofile
