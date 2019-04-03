@@ -11,7 +11,7 @@ workflow dropseq_bcl2fastq {
 	Int? preemptible = 2
 	Int minimum_trimmed_read_length = 10
 	Int mask_short_adapter_reads = 10
-	String? bcl2fastq_version = "2.20.0.422-2"
+	String? bcl2fastq_version = "2.20.0.422"
 
 	call run_bcl2fastq {
 		input:
@@ -30,7 +30,6 @@ workflow dropseq_bcl2fastq {
 
 	output {
 		String fastqs = run_bcl2fastq.fastqs
-		File monitoringLog = run_bcl2fastq.monitoringLog
 	}
 }
 

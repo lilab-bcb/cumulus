@@ -1,5 +1,6 @@
 FROM continuumio/miniconda3:latest
 RUN mkdir /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/drop-seq/summary.py /software/
 RUN apt-get update && \
 apt-get install --no-install-recommends -y curl dpkg-dev gnupg lsb-release procps && \
 export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
