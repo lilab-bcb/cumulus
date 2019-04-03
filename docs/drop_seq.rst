@@ -104,7 +104,7 @@ Please see the description of important inputs below.
 Outputs:
 ^^^^^^^^
 
-The pipeline outputs a list of google bucket urls containing one gene-count matrix per sample. Each gene-count matrix file produced by Drop-seq tools has the suffix 'dge.txt.gz', matrices produced by dropEst have the extension .rds.
+The pipeline outputs a list of google bucket urls containing one gene-count matrix per sample. Each gene-count matrix file produced by Drop-seq tools has the suffix 'dge.txt.gz'
 
 .. _FireCloud instructions: https://software.broadinstitute.org/firecloud/documentation/article?id=10574
 .. _Drop-seq alignment cookbook: https://github.com/broadinstitute/Drop-seq/blob/master/doc/Drop-seq_Alignment_Cookbook.pdf
