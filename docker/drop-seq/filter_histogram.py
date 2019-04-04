@@ -17,5 +17,5 @@ if args.whitelist != '':
     whitelist = pd.read_csv(args.whitelist, sep='\n', header=None, index_col=0)
     histogram = pd.read_csv(args.histogram, sep='\t', header=None, comment='#')
     histogram = histogram[histogram[1].isin(whitelist.index)]
-    os.rename(args.histogram, histogram.histogram.replace('_tag.txt', '_unfiltered_tag.txt'))
+    os.rename(args.histogram, args.histogram.replace('_tag.txt', '_unfiltered_tag.txt'))
     histogram.to_csv(args.output, sep='\t', index=False, header=False)
