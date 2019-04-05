@@ -13,7 +13,7 @@ parser.add_argument('--remove', help='Optionally remove invalid lines and print 
                     action='store_true')
 
 args = parser.parse_args()
-sheet = pd.read_table(args.file, header=None)
+sheet = pd.read_csv(args.file, header=None, sep = '\t')
 ids = {}
 nerrors = 0
 ncols = sheet.shape[1]

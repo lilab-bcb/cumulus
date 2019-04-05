@@ -56,7 +56,7 @@ def do_fc_upload(inputs, workspace, dry_run, bucket_folder):
             if input_path_extension in search_inside_file_whitelist:
                 # look inside input file to see if there are file paths within
                 try:
-                    df = pd.read_table(input_path, sep=None, engine='python', header=None, index_col=False)
+                    df = pd.read_csv(input_path, sep=None, engine='python', header=None, index_col=False)
                 except Exception:
                     pass
                 for c in df.columns:
