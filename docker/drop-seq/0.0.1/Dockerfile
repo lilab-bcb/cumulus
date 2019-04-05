@@ -27,6 +27,7 @@ RUN apt-get -qq update && apt-get -qq -y install --no-install-recommends default
 && mv /STAR-2.7.0c /software/ \
 && rm -f /2.7.0c.tar.gz \
 && curl -L -s -o "/software/picard.jar" "https://github.com/broadinstitute/picard/releases/download/2.18.26/picard.jar" \
+&& curl -L -s -o "/software/filter_histogram.py" "https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/drop-seq/filter_histogram.py" \
 && apt-get -qq -y remove curl build-essential \
 && apt-get -qq -y autoremove \
 && apt-get autoclean \
