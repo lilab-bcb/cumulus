@@ -30,7 +30,9 @@ RUN pip install --upgrade pip && \
 	git clone https://github.com/bli25broad/louvain-igraph.git /software/louvain && \
 	cd /software/louvain && pip install . && cd ../.. && \
 	git clone https://github.com/bli25broad/Multicore-TSNE.git /software/MulticoreTSNE && \
-	cd /software/MulticoreTSNE && pip install . && cd ../..
+	cd /software/MulticoreTSNE && pip install . && cd ../.. && \
+	git clone https://github.com/bli25broad/umap.git /software/umap && \
+	cd /software/umap && pip install . && cd ../..
 
 COPY scCloud-0.13.0.tar.gz /software
 COPY extract_ADT_UMIs /software/extract_ADT_UMIs
