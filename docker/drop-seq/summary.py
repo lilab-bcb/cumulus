@@ -81,6 +81,11 @@ def read_picard_files(files):
     return df1, df2
 
 
+def lines_only(fig):
+    for i in range(len(fig['data'])):
+        fig['data'][i]['mode'] = 'lines'
+
+
 def dge_summary(files):
     df, hist = read_picard_files(files)
     df['Sample'] = df.index
@@ -92,8 +97,7 @@ def dge_summary(files):
                    x='index',
                    y='NUM_GENES', xTitle='Cell Barcode', yTitle='# Genes',
                    asFigure=True)
-    for i in range(len(fig['data'])):
-        fig['data'][i]['mode'] = 'lines'
+    lines_only(fig)
     writer.write(plotly.offline.plot(fig, auto_open=False, include_plotlyjs=False, output_type='div'))
 
 
@@ -104,6 +108,7 @@ def polya_trimmer(files):
                      x='BIN',
                      y='VALUE', xTitle='1st base of polyA tail trimmed', yTitle='# of reads',
                      asFigure=True)
+    lines_only(fig)
     writer.write(plotly.offline.plot(fig, auto_open=False, include_plotlyjs=False, output_type='div'))
 
 
@@ -114,6 +119,7 @@ def adapter_trimmer(files):
                      x='BIN',
                      y='VALUE', xTitle='# bases trimmed 5\'', yTitle='# of reads',
                      asFigure=True)
+    lines_only(fig)
     writer.write(plotly.offline.plot(fig, auto_open=False, include_plotlyjs=False, output_type='div'))
 
 
