@@ -17,8 +17,8 @@ workflow smartseq2_per_plate {
 
 	File reference_file = (if is_url then reference else acronym2gsurl[reference])
 
-	# smartseq2 version, default to "0.1.0"
-	String? smartseq2_version = "0.1.0"
+	# smartseq2 version, default to "0.2.0"
+	String? smartseq2_version = "0.2.0"
 	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 	String? zones = "us-central1-b"
 	# Number of cpus per job
@@ -57,6 +57,7 @@ workflow smartseq2_per_plate {
 	call generate_count_matrix {
 		input:
 			gene_results = run_rsem.rsem_gene,
+			count_results = run_rsem.rsem_cnt,
 			output_name = output_directory + "/" + plate_name,
 			smartseq2_version = smartseq2_version,
 			zones = zones,
@@ -64,7 +65,14 @@ workflow smartseq2_per_plate {
 			disk_space = disk_space,
 			preemptible = preemptible
 	}
+
+	output {
+		String output_count_matrix = generate_count_matrix.output_count_matrix
+		String output_qc_report = generate_count_matrix.output_qc_report
+	}
 }
+
+
 
 task parse_sample_sheet {
 	File sample_sheet
@@ -145,6 +153,7 @@ task run_rsem {
 
 task generate_count_matrix {
 	Array[File] gene_results
+	Array[File] count_results
 	String output_name
 	String smartseq2_version
 	String zones
@@ -175,14 +184,30 @@ task generate_count_matrix {
 		df_idx = pd.Index(gene_names, name = 'GENE')
 		df_out = pd.DataFrame(data = np.stack(cntmat, axis = 1), index = df_idx, columns = barcodes)
 		df_out.to_csv('results.dge.txt.gz', sep = '\t', compression = 'gzip')
+
+		arr = []
+		barcodes = []
+		for result_file in "${sep=',' count_results}".split(','):
+			barcodes.append(os.path.basename(result_file)[:-len('.cnt')])
+			with open(result_file) as fin:
+				Ns = [int(x) for x in next(fin).strip().split(' ')]
+				align_values = [int(x) for x in next(fin).strip().split(' ')]
+				res = [str(Ns[3]), str(round(Ns[1] * 100.0 / Ns[3], 2)) + "%", str(round(align_values[0] * 100.0 / Ns[3], 2)) + "%"]
+				arr.append(res)
+		df = pd.DataFrame(data = np.array(arr), index = barcodes, columns = ["Total reads", "Alignment rate", "Unique rate"])
+		df.index.name = "Cell"
+		df.to_csv('results.qc.stat.tsv', sep = '\t')
 		CODE
 
 		gsutil cp results.dge.txt.gz ${output_name}.dge.txt.gz
+		gsutil cp results.qc.stat.tsv ${output_name}.qc.stat.tsv
 		# cp results.dge.txt.gz ${output_name}.dge.txt.gz
+		# cp results.qc.stat.tsv ${output_name}.qc.stat.tsv
 	}
 
 	output {
 		String output_count_matrix = "${output_name}.dge.txt.gz"
+		String output_qc_report = "${output_name}.qc.stat.tsv"
 	}
 
 	runtime {

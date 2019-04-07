@@ -41,13 +41,13 @@ def do_fc_run(method: str, workspace: str, wdl_inputs: Union[str, dict], out_jso
     method_namespace, method_name, method_version = kco.fs_split(method)
     if method_version is None:
         version = -1
-        list_methods = fapi.list_repository_methods(method_name)
+        list_methods = fapi.list_repository_methods(namespace = method_namespace, name = method_name)
         if list_methods.status_code != 200:
             raise ValueError('Unable to list methods ' + ' - ' + str(list_methods.json))
         methods = list_methods.json()
         for method in methods:
-            if method['namespace'] == method_namespace:
-                version = max(version, method['snapshotId'])
+            assert method['namespace'] == method_namespace
+            version = max(version, method['snapshotId'])
         if version == -1:
             raise ValueError(method_name + ' not found')
         method_version = version
