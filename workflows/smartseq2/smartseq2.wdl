@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:smartseq2_per_plate/versions/7/plain-WDL/descriptor" as ss2pp
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:smartseq2_per_plate/versions/9/plain-WDL/descriptor" as ss2pp
 # import "../smartseq2/smartseq2_per_plate.wdl" as ss2pp
 
 workflow smartseq2 {
@@ -11,8 +11,8 @@ workflow smartseq2 {
 	# Reference to align reads against, GRCm38 or GRCh38
 	String reference
 
-	# smartseq2 version, default to "0.1.0"
-	String? smartseq2_version = "0.1.0"
+	# smartseq2 version, default to "0.2.0"
+	String? smartseq2_version = "0.2.0"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus per job
