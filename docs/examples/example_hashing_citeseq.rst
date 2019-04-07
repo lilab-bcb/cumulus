@@ -185,7 +185,7 @@ The following steps are done on your local machine:
 
 		{
 			"scCloud.input_count_matrix_csv" : "count_matrix_03.csv",
-			"scCloud.output_name" : "exp_merged_out",
+			"scCloud.output_name" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/results/exp_merged_out",
 			"scCloud.num_cpu" : 8,
 			"scCloud.select_only_singlets" : true,
 			"scCloud.cite_seq" : true,
@@ -206,7 +206,7 @@ The following steps are done on your local machine:
 
 	#. In the same directory on your local machine, type the following command::
 
-		kco fc_run -m scCloud/scCloud -w ws-lab/ws-01 --bucket-folder my-dir/results/ -i input_03.json -o input_03_updated.json
+		kco fc_run -m scCloud/scCloud -w ws-lab/ws-01 --bucket-folder my-dir/results -i input_03.json -o input_03_updated.json
 
 	   Notice that the method is changed to ``scCloud/scCloud``, and the input file after ``-i`` is now ``input_03.json``.
 
