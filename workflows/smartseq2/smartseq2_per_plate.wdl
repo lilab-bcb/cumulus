@@ -179,7 +179,9 @@ task generate_count_matrix {
 				gene_names = np.array(['_'.join(x.split('_')[1:]) for x in df.index])
 			tot_counts = df['expected_count'].sum()
 			counts = df['TPM'].values.copy()
-			counts = (counts / counts.sum() * tot_counts + 0.5).astype(int)
+			denom = counts.sum()
+			if denom > 0:
+				counts = (counts / denom * tot_counts + 0.5).astype(int)
 			cntmat.append(counts)
 		df_idx = pd.Index(gene_names, name = 'GENE')
 		df_out = pd.DataFrame(data = np.stack(cntmat, axis = 1), index = df_idx, columns = barcodes)

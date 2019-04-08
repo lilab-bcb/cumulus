@@ -64,8 +64,8 @@ workflow cellranger_workflow {
 	String? cellranger_version = "2.2.0"
 	# 1.0.0, 1.0.1
 	String? cellranger_atac_version = "1.0.1"
-	# scCloud version, default to "0.7.0"
-	String? sccloud_version = "0.7.0"
+	# scCloud version, default to "0.8.0"
+	String? sccloud_version = "0.8.0"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus per cellranger job
