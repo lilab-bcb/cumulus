@@ -118,8 +118,8 @@ Please see the description of important inputs below.
 	  - the base location of the molecular barcode (default 13-20)
 	* - cellular_barcode_base_range
 	  - the base location of the cell barcode (default 1-12)
-	* - workflow_version
-	  - The workflow version to use (default "2.2.0")
+	* - drop_seq_tools_version
+	  - The Drop-seq tools version to use (default "2.2.0")
 
 
 Please note that run_bcl2fastq must be set to true if you're starting from BCL files instead of FASTQs.
