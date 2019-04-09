@@ -14,7 +14,7 @@ workflow dropseq_align {
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	Int preemptible = 2
 	String output_directory
-	String workflow_version
+	String drop_seq_tools_version
 	Int add_bam_tags_disk_space_multiplier = 25
 
 	call STAR {
@@ -28,12 +28,13 @@ workflow dropseq_align {
 			cpu=star_cpus,
 			zones=zones,
 			output_directory=output_directory,
-			workflow_version=workflow_version
+			drop_seq_tools_version=drop_seq_tools_version
 	}
 
 	call AddTags {
 		input:
-			memory="7.5GB",
+			memory="3750M",
+            cpu=1,
 			aligned_bam=STAR.bam,
 			unaligned_bam=input_bam,
 			sample_id=sample_id,
@@ -44,7 +45,7 @@ workflow dropseq_align {
 			gene_intervals=gene_intervals,
 			zones=zones,
 			output_directory=output_directory,
-			workflow_version=workflow_version,
+			drop_seq_tools_version=drop_seq_tools_version,
 			disk_space_multiplier=add_bam_tags_disk_space_multiplier
 	}
 
@@ -70,7 +71,7 @@ task STAR {
 	Int preemptible
 	String zones
 	String output_directory
-	String workflow_version
+	String drop_seq_tools_version
 
 
 	command {
@@ -102,7 +103,7 @@ task STAR {
 	}
 
 	runtime {
-		docker: "regevlab/dropseq-${workflow_version}"
+		docker: "regevlab/dropseq-${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
         zones: zones
 		disks: "local-disk " + ceil(size(genome_tar, "GB")*5 + (3.25 * size(input_bam, "GB")) + 1)+ " HDD"
@@ -124,9 +125,9 @@ task AddTags {
 	File refflat
 	File gene_intervals
 	String output_directory
-	String workflow_version
+	String drop_seq_tools_version
 	Int disk_space_multiplier
-
+	Int cpu
 
 	command {
 		set -o pipefail
@@ -167,12 +168,12 @@ task AddTags {
 	}
 
 	runtime {
-		docker: "regevlab/dropseq-${workflow_version}"
+		docker: "regevlab/dropseq-${drop_seq_tools_version}"
 		disks: "local-disk " + ceil(20 + size(genome_fasta,"GB") + size(gene_intervals,"GB") + size(genome_dict,"GB") + size(refflat,"GB") +  size(unaligned_bam,"GB")*2 + size(aligned_bam,"GB")*disk_space_multiplier) + " HDD"
 		memory :"${memory}"
 		preemptible: "${preemptible}"
 		zones: zones
-		cpu:1
+		cpu:"${cpu}"
 	}
 }
 

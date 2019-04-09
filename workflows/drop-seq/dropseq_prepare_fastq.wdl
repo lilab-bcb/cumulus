@@ -7,7 +7,12 @@ workflow dropseq_prepare_fastq {
 	Int disk_space
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	String output_directory
-	String workflow_version
+	String drop_seq_tools_version
+	Boolean quality_tags
+	String umi_base_range
+	String cellular_barcode_base_range
+	String trim_sequence
+    Int trim_num_bases
 
 	call PrepareFastq {
 		input:
@@ -17,10 +22,15 @@ workflow dropseq_prepare_fastq {
 			r1=r1,
 			r2=r2,
 			sample_id=sample_id,
+			umi_base_range=umi_base_range,
+			cellular_barcode_base_range=cellular_barcode_base_range,
+			quality_tags=quality_tags,
+			trim_sequence=trim_sequence,
+            trim_num_bases=trim_num_bases,
 			disk_space=disk_space,
 			output_directory=output_directory,
 			zones= zones,
-			workflow_version=workflow_version
+			drop_seq_tools_version=drop_seq_tools_version
 	}
 
 	output {
@@ -43,8 +53,12 @@ task PrepareFastq {
 	Int preemptible
 	String zones
 	String output_directory
-	String workflow_version
-
+	String drop_seq_tools_version
+	Boolean quality_tags
+	String umi_base_range
+    String cellular_barcode_base_range
+	String trim_sequence
+    Int trim_num_bases
 	command {
 		set -o pipefail
 		set -e
@@ -78,8 +92,9 @@ task PrepareFastq {
 		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar TagBamWithReadSequenceExtended VALIDATION_STRINGENCY=SILENT \
 		INPUT=pipe1 \
 		OUTPUT=pipe2 \
+		${true='BARCODE_QUALITY_TAG=CY' false='' quality_tags} \
 		SUMMARY=${sample_id}_tagged_cellular_summary.txt \
-		BASE_RANGE=1-12 \
+		BASE_RANGE=${cellular_barcode_base_range} \
 		BASE_QUALITY=10 \
 		BARCODED_READ=1 \
 		DISCARD_READ=false \
@@ -88,8 +103,9 @@ task PrepareFastq {
 		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar TagBamWithReadSequenceExtended VALIDATION_STRINGENCY=SILENT \
 		INPUT=pipe2 \
 		OUTPUT=pipe3 \
+		${true='BARCODE_QUALITY_TAG=UY' false='' quality_tags} \
 		SUMMARY="${sample_id}_tagged_molecular_summary.txt" \
-		BASE_RANGE=13-20 \
+		BASE_RANGE=${umi_base_range} \
 		BASE_QUALITY=10 \
 		BARCODED_READ=1 \
 		DISCARD_READ=true \
@@ -103,9 +119,9 @@ task PrepareFastq {
 		INPUT=pipe4 \
 		OUTPUT=pipe5 \
 		OUTPUT_SUMMARY="${sample_id}_adapter_trimming_report.txt" \
-		SEQUENCE=AAGCAGTGGTATCAACGCAGAGTGAATGGG \
+		SEQUENCE=${trim_sequence} \
 		MISMATCHES=0 \
-		NUM_BASES=5 | \
+		NUM_BASES=${trim_num_bases} | \
 		java -Dsamjdk.compression_level=2 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar PolyATrimmer VALIDATION_STRINGENCY=SILENT \
 		INPUT=pipe5 \
 		OUTPUT="${sample_id}_aligner_input.bam" \
@@ -128,7 +144,7 @@ task PrepareFastq {
 	}
 
 	runtime {
-		docker: "regevlab/dropseq-${workflow_version}"
+		docker: "regevlab/dropseq-${drop_seq_tools_version}"
 		disks: "local-disk ${disk_space} HDD"
 		memory :"${memory}"
 		cpu:"${cpu}"

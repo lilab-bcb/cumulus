@@ -1,8 +1,10 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_align/versions/3/plain-WDL/descriptor" as dropseq_align_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_bcl2fastq/versions/2/plain-WDL/descriptor" as bcl2fastq_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_count/versions/2/plain-WDL/descriptor" as dropseq_count_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_prepare_fastq/versions/2/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_qc/versions/4/plain-WDL/descriptor" as dropseq_qc_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_align/versions/4/plain-WDL/descriptor" as dropseq_align_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_bcl2fastq/versions/4/plain-WDL/descriptor" as bcl2fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_count/versions/3/plain-WDL/descriptor" as dropseq_count_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_prepare_fastq/versions/3/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_qc/versions/5/plain-WDL/descriptor" as dropseq_qc_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/sccloud:dropest/versions/1/plain-WDL/descriptor" as dropest_wdl
+
 
 workflow dropseq_workflow {
 	# Either a list of flowcell URLS or sample_id tab r1 tab r2
@@ -11,34 +13,62 @@ workflow dropseq_workflow {
 	String output_directory
 	# Output directory, with trailing slashes stripped
 	String output_directory_stripped = sub(output_directory, "/+$", "")
-	Boolean run_bcl2fastq = false
-	Array[Array[String]] input_tsv = read_tsv(input_csv_file)
-	Boolean run_dropseq = true
 
-	Int? star_cpus
-	String? star_memory
+	Array[Array[String]] input_tsv = read_tsv(input_csv_file)
+	Boolean run_bcl2fastq = false
+	Boolean run_dropseq_tools = true
+	Boolean run_dropest = false
+	Boolean run_aligner = true
+
 	String star_flags = "--limitOutSJcollapsed 1000000 --twopassMode Basic"
 
 	# hg19, mm10, hg19_mm10, mmul_8.0.1 or a path to a custom reference JSON file
 	String reference
 	File? acronym_file = "gs://regev-lab/resources/DropSeq/index.json"
 
-	Int? bcl2fastq_cpu = 64
-	String? bcl2fastq_memory = "57.6G"
 
-	Int? bcl2fastq_disk_space = 1500
-	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# use ncells value directly instead of estimating from elbow plot
-	Int? force_cells
+	Int? drop_seq_tools_force_cells
+	File? cellular_barcode_whitelist
 
-	String? workflow_version = "0.0.1"
+	# minimal number of genes in output cells
+	Int? dropest_genes_min = 1
+	# maximal number of output cells
+	Int? dropest_cells_max
+	#Boolean? dropest_apply_directional_umi_correction = false
+    # use precise merge strategy (can be slow), recommended to use when the list of real barcodes is not available
+    Boolean? dropest_merge_barcodes_precise = true
 
 	# Whether to delete input_bcl_directory
 	Boolean? delete_input_bcl_directory = false
 	# Number of preemptible tries
 	Int? preemptible = 2
-	String? bcl2fastq_version = "2.20.0.422-2"
+
+	String? umi_base_range="13-20"
+    String? cellular_barcode_base_range = "1-12"
+
+	# The sequence to look for at the start of reads for trimming
+    String? trim_sequence = "AAGCAGTGGTATCAACGCAGAGTGAATGGG"
+
+    # How many bases at the begining of the sequence must match before trimming occurs
+    Int? trim_num_bases = 5
+
 	Int? add_bam_tags_disk_space_multiplier = 25
+
+	Int? star_cpus
+	# specify memory to override default for genome
+	String? star_memory
+	Int? bcl2fastq_cpu = 64
+	String? bcl2fastq_memory = "57.6G"
+	Int? bcl2fastq_disk_space = 1500
+	String? dropest_memory = "104G"
+#	Int? dropest_cpu = 1
+#	String? dropest_umi_correct_memory = "120G"
+#	Int? dropest_umi_correct_cpu = 32
+	String? zones = "us-east1-d us-west1-a us-west1-b"
+	String? drop_seq_tools_version = "2.2.0"
+	String? bcl2fastq_version = "2.20.0.422"
+	String? dropest_version = "0.8.5"
 
 	if (run_bcl2fastq) {
 		scatter (row in input_tsv) {
@@ -58,12 +88,12 @@ workflow dropseq_workflow {
 
 	}
 
-	if(run_dropseq) {
+	if(run_aligner) {
 
 		call generate_count_config {
 			input:
 				input_csv_file = input_csv_file,
-				workflow_version=workflow_version,
+				drop_seq_tools_version=drop_seq_tools_version,
 				bcl2fastq_sample_sheets = bcl2fastq.fastqs,
 				zones = zones,
 				preemptible = preemptible,
@@ -80,7 +110,12 @@ workflow dropseq_workflow {
 					r2 = row[2],
 					disk_space = row[3],
 					sample_id = row[0],
-					workflow_version=workflow_version,
+					umi_base_range=umi_base_range,
+					trim_sequence = trim_sequence,
+                    trim_num_bases = trim_num_bases,
+                    cellular_barcode_base_range=cellular_barcode_base_range,
+					quality_tags = drop_seq_tools_version != "2.1.0",
+					drop_seq_tools_version=drop_seq_tools_version,
 					output_directory = output_directory_stripped + '/' + row[0],
 					zones = zones,
 					preemptible = preemptible
@@ -90,7 +125,7 @@ workflow dropseq_workflow {
 			call dropseq_align_wdl.dropseq_align as dropseq_align {
 				input:
 					sample_id = row[0],
-					workflow_version=workflow_version,
+					drop_seq_tools_version=drop_seq_tools_version,
 					add_bam_tags_disk_space_multiplier=add_bam_tags_disk_space_multiplier,
 					output_directory = output_directory_stripped + '/' + row[0],
 					input_bam = dropseq_prepare_fastq.bam,
@@ -106,16 +141,42 @@ workflow dropseq_workflow {
 					preemptible = preemptible
 			}
 
-			call dropseq_count_wdl.dropseq_count as dropseq_count {
-				input:
-					sample_id = row[0],
-					workflow_version=workflow_version,
-					output_directory = output_directory_stripped + '/' + row[0],
-					input_bam = dropseq_align.aligned_tagged_bam,
-					force_cells = force_cells,
-					zones = zones,
-					preemptible = preemptible
+			if(run_dropest) {
+				call dropest_wdl.dropest as dropest {
+					input:
+						sample_id = row[0],
+						output_directory = output_directory_stripped + '/' + row[0],
+						input_bam = dropseq_align.aligned_tagged_bam,
+						genes_min = dropest_genes_min,
+                        cells_max = dropest_cells_max,
+                       	dropest_memory = dropest_memory,
+#						dropest_cpu = dropest_cpu,
+#						apply_directional_umi_correction = dropest_apply_directional_umi_correction,
+                        merge_barcodes_precise = dropest_merge_barcodes_precise,
+						cellular_barcode_whitelist=cellular_barcode_whitelist,
+#						dropest_umi_correct_memory = dropest_umi_correct_memory,
+#						dropest_umi_correct_cpu = dropest_umi_correct_cpu,
+
+                        dropest_version=dropest_version,
+						zones = zones,
+						preemptible = preemptible
+				}
 			}
+
+			if(run_dropseq_tools) {
+				call dropseq_count_wdl.dropseq_count as dropseq_count {
+					input:
+						sample_id = row[0],
+						drop_seq_tools_version=drop_seq_tools_version,
+						output_directory = output_directory_stripped + '/' + row[0],
+						input_bam = dropseq_align.aligned_tagged_bam,
+						force_cells = drop_seq_tools_force_cells,
+						cellular_barcode_whitelist=cellular_barcode_whitelist,
+						zones = zones,
+						preemptible = preemptible
+				}
+			}
+
 
 			call dropseq_qc_wdl.dropseq_qc as dropseq_qc {
 				input:
@@ -123,7 +184,7 @@ workflow dropseq_workflow {
 					input_bam = dropseq_align.aligned_tagged_bam,
 					cell_barcodes=dropseq_count.cell_barcodes,
 					refflat=generate_count_config.refflat,
-					workflow_version=workflow_version,
+					drop_seq_tools_version=drop_seq_tools_version,
 					output_directory = output_directory_stripped + '/' + row[0],
 					zones = zones,
 					preemptible = preemptible
@@ -135,12 +196,12 @@ workflow dropseq_workflow {
 		call collect_summary {
 			input:
 				dge_summary=dropseq_count.dge_summary,
+				bead_synthesis_summary=dropseq_count.bead_synthesis_summary,
 				star_log_final=dropseq_align.star_log_final,
 				adapter_trimming_report=dropseq_prepare_fastq.adapter_trimming_report,
 				polyA_trimming_report= dropseq_prepare_fastq.polyA_trimming_report,
 				sc_rnaseq_metrics_report=dropseq_qc.sc_rnaseq_metrics_report,
-				bead_synthesis_summary=dropseq_count.bead_synthesis_summary,
-				workflow_version=workflow_version,
+				drop_seq_tools_version=drop_seq_tools_version,
 				zones = zones,
 				preemptible = preemptible,
 				sample_id=dropseq_align.output_sample_id,
@@ -155,16 +216,17 @@ workflow dropseq_workflow {
 
 task collect_summary {
 	Array[String] sample_id
-	Array[String] dge_summary
+	Array[String?] dge_summary
+	Array[String?] bead_synthesis_summary
 	Array[String] star_log_final
 	Array[String] adapter_trimming_report
 	Array[String] polyA_trimming_report
 	Array[String] sc_rnaseq_metrics_report
-	Array[String] bead_synthesis_summary
+
 	String output_directory
 	String zones
 	Int preemptible
-	String workflow_version
+	String drop_seq_tools_version
 
 	command {
 		set -e
@@ -190,7 +252,7 @@ task collect_summary {
 		bootDiskSizeGb: 12
 		disks: "local-disk 2 HDD"
 		memory:"1GB"
-		docker: "regevlab/dropseq-${workflow_version}"
+		docker: "regevlab/dropseq-${drop_seq_tools_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}
@@ -205,7 +267,7 @@ task generate_count_config {
 	String zones
 	Int preemptible
 	String acronym_file
-	String workflow_version
+	String drop_seq_tools_version
 	String reference
 	Int? star_cpus
 	String? star_memory
@@ -240,6 +302,9 @@ task generate_count_config {
 				output = open('tmp.txt', 'w')
 				check_call(disk_size_call, stdout=output)
 				output_df = pd.read_csv('tmp.txt', sep=' ', engine='python')
+				if output_df.shape[0] == 0:
+					print(df.index[i] + ' fastqs not found')
+					exit(1)
 				total = output_df.iloc[output_df.shape[0] - 1][0]
 				total = total
 				sizes.append(total)
@@ -305,7 +370,7 @@ task generate_count_config {
 		bootDiskSizeGb: 12
 		disks: "local-disk 1 HDD"
 		memory:"1GB"
-		docker: "regevlab/dropseq-${workflow_version}"
+		docker: "regevlab/dropseq-${drop_seq_tools_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}
