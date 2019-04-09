@@ -1,11 +1,12 @@
 Drop-seq pipeline
 -------------------------------------------------------------
 
-Follow the steps below to extract gene-count matrices from Drop-seq data.
-This WDL follows the steps outlined in the `Drop-seq alignment cookbook`_ from the `McCarroll lab`_ while additionally
-providing the option to generate count matrices using  `dropEst`_. Please note that run cost has not yet been optimized for dropEst and so runs using dropEst might be expensive.
+This workflow follows the steps outlined in the `Drop-seq alignment cookbook`_ from the `McCarroll lab`_ , except the default STAR aligner flags are *--limitOutSJcollapsed 1000000 --twopassMode Basic*.
+Additionally the pipeline provides the option to generate count matrices using  `dropEst`_.
 
-#. Copy your sequencing output to your workspace bucket using gsutil in your unix terminal. You can obtain your bucket URL in the workspace summary tab in FireCloud under Google Bucket. You can also read `FireCloud instructions`_ on uploading data.
+#. Copy your sequencing output to your workspace bucket using gsutil in your unix terminal.
+
+	You can obtain your bucket URL in the workspace summary tab in FireCloud under Google Bucket. You can also read `FireCloud instructions`_ on uploading data.
 
 	Example of copying the directory at /foo/bar/nextseq/Data/VK18WBC6Z4 to a Google Cloud bucket::
 
@@ -49,8 +50,7 @@ providing the option to generate count matrices using  `dropEst`_. Please note t
 		* - Read2
 		  - Location of the FASTQ file for read2 in the cloud (gsurl).
 
-	Example::
-
+	Example using FASTQ input files::
 
 		sample-1,gs://fc-e0000000-0000-0000-0000-000000000000/dropseq-1/sample1-1_L001_R1_001.fastq.gz,gs://fc-e0000000-0000-0000-0000-000000000000/dropseq-1/sample-1_L001_R2_001.fastq.gz
 		sample-2,gs://fc-e0000000-0000-0000-0000-000000000000/dropseq-1/sample-2_L001_R1_001.fastq.gz,gs://fc-e0000000-0000-0000-0000-000000000000/dropseq-1/sample-2_L001_R2_001.fastq.gz
@@ -58,6 +58,15 @@ providing the option to generate count matrices using  `dropEst`_. Please note t
 
 
 	Note that in this example, sample-1 was sequenced across two flowcells.
+
+
+	Example using BCL input directories::
+
+		gs://fc-e0000000-0000-0000-0000-000000000000/flowcell-1
+		gs://fc-e0000000-0000-0000-0000-000000000000/flowcell-2
+
+
+	Note that the flow cell directory must contain a bcl2fastq sample sheet named SampleSheet.csv.
 
 #. Upload your sample sheet to the workspace bucket.
 
@@ -93,11 +102,11 @@ Please see the description of important inputs below.
 	* - reference
 	  - hg19, mm10, hg19_mm10, mmul_8.0.1 or a path to a custom reference JSON file
 	* - run_bcl2fastq
-	  - Whether your sample sheet contains one BCL directory per line or one sample per line
+	  - Whether your sample sheet contains one BCL directory per line or one sample per line (default false)
 	* - run_dropseq_tools
-	  - Whether to generate count matrixes using Drop-Seq tools from the `McCarroll lab`_.
+	  - Whether to generate count matrixes using Drop-Seq tools from the `McCarroll lab`_ (default true)
 	* - run_dropest
-	  - Whether to generate count matrixes using `dropEst`_.
+	  - Whether to generate count matrixes using `dropEst`_ (default false)
 	* - cellular_barcode_whitelist
 	  - Optional whitelist of known cellular barcodes
 	* - drop_seq_tools_force_cells
@@ -105,21 +114,21 @@ Please see the description of important inputs below.
 	* - dropest_cells_max
 	  - Maximal number of output cells
 	* - dropest_genes_min
-	  - Minimal number of genes in output cells
-	* - dropest_apply_directional_umi_correction
-	  - Apply 'directional' correction of UMI errors
+	  - Minimal number of genes in output cells (default 1)
 	* - dropest_merge_barcodes_precise
-	  - Use precise merge strategy (can be slow), recommended to use when the list of real barcodes is not available
+	  - Use precise merge strategy (can be slow), recommended to use when the list of real barcodes is not available (default true)
 	* - trim_sequence
 	  - The sequence to look for at the start of reads for trimming (default "AAGCAGTGGTATCAACGCAGAGTGAATGGG")
 	* - trim_num_bases
-	  - How many bases at the begining of the sequence must match before trimming occur (default 5)
+	  - How many bases at the beginning of the sequence must match before trimming occur (default 5)
 	* - umi_base_range
 	  - the base location of the molecular barcode (default 13-20)
 	* - cellular_barcode_base_range
 	  - the base location of the cell barcode (default 1-12)
 	* - drop_seq_tools_version
 	  - The Drop-seq tools version to use (default "2.2.0")
+	* - star_flags
+	  - Options to pass to STAR aligner (default "--limitOutSJcollapsed 1000000 --twopassMode Basic")
 
 
 Please note that run_bcl2fastq must be set to true if you're starting from BCL files instead of FASTQs.
