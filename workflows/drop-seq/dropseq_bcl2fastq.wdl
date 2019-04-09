@@ -73,33 +73,47 @@ task run_bcl2fastq {
 		from subprocess import check_call
 		gs_url = '${output_directory}/${run_id}_fastqs/'
 
+		samples_found = 0
 		with open('../../sample_sheet.txt', 'w') as sample_sheet_writer:
-            for project_dir in os.listdir('.'):
-                if os.path.isdir(os.path.join(project_dir)) and project_dir != 'Reports' and project_dir != 'Stats':
-                    for sample_id_dir in os.listdir(os.path.join(project_dir)):
-                        fastq_files = os.listdir(os.path.join(project_dir, sample_id_dir))
-                        if len(fastq_files) != 2:
-                            raise ValueError(str(len(fastq_files)) + ' fastq files found')
-                        fastq_files.sort()
-                        fastq_path = gs_url + project_dir + '/' + sample_id_dir + '/'
-                        sample_id = re.sub('_S[0-9]+_R1_001.fastq.gz', '',fastq_files[0])
-                        sample_sheet_writer.write(sample_id)
-                        sample_sheet_writer.write('\t' + fastq_path + fastq_files[0])
-                        sample_sheet_writer.write('\t' + fastq_path + fastq_files[1])
-                        sample_sheet_writer.write('\t' + str(os.path.getsize(fastq_files[0]) + os.path.getsize(fastq_files[1])))
-                        sample_sheet_writer.write('\n')
+			for project_dir in os.listdir('.'):
+				if os.path.isdir(os.path.join(project_dir)) and project_dir != 'Reports' and project_dir != 'Stats':
+					for sample_id_dir in os.listdir(os.path.join(project_dir)):
+						fastq_files = os.listdir(os.path.join(project_dir, sample_id_dir))
+						if len(fastq_files) != 2:
+							raise ValueError(str(len(fastq_files)) + ' fastq files found')
+						fastq_files.sort()
+						fastq_path = gs_url + project_dir + '/' + sample_id_dir + '/'
+						sample_id = re.sub('_S[0-9]+_R1_001.fastq.gz', '',fastq_files[0])
+						sample_sheet_writer.write(sample_id)
+						sample_sheet_writer.write('\t' + fastq_path + fastq_files[0])
+						sample_sheet_writer.write('\t' + fastq_path + fastq_files[1])
+						sample_sheet_writer.write('\t' + str(os.path.getsize(fastq_files[0]) + os.path.getsize(fastq_files[1])))
+						sample_sheet_writer.write('\n')
+						samples_found += 1
+			# if no fastq files found, assume no project was specified in the sample sheet
+			if samples_found == 0:
+				files = os.listdir('.')
+				for file in files:
+					if not file.startswith('Undetermined_') and file.endswith('_R1_001.fastq.gz'):
+						fastq_path = gs_url + '/'
+						fastq_files = [file, file.replace('_R1_001.fastq.gz', '_R2_001.fastq.gz')]
+						sample_id = re.sub('_S[0-9]+_R1_001.fastq.gz', '',fastq_files[0])
+						sample_sheet_writer.write(sample_id)
+						sample_sheet_writer.write('\t' + fastq_path + fastq_files[0])
+						sample_sheet_writer.write('\t' + fastq_path + fastq_files[1])
+						sample_sheet_writer.write('\t' + str(os.path.getsize(fastq_files[0]) + os.path.getsize(fastq_files[1])))
+						sample_sheet_writer.write('\n')
 
 		if '${delete_input_bcl_directory}' is 'true':
 			call_args = ['gsutil', '-q', '-m', 'rm', '-r', '${input_bcl_directory}']
 			check_call(call_args)
 		CODE
 
-		gsutil -q -m cp  ../../sample_sheet.txt "${output_directory}/${run_id}_fastqs.txt"
+		gsutil -q -m cp	 ../../sample_sheet.txt "${output_directory}/${run_id}_fastqs.txt"
 	}
 
 	output {
 		String fastqs = "${output_directory}/${run_id}_fastqs.txt"
-
 	}
 
 	runtime {

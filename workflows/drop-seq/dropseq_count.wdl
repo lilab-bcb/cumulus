@@ -1,11 +1,12 @@
 workflow dropseq_count {
-   	String sample_id
+	String sample_id
 	File input_bam
 	Int? force_cells
 	Int preemptible = 2
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	String output_directory
-	String workflow_version
+	String drop_seq_tools_version
+	File? cellular_barcode_whitelist
 
 	call DigitalExpressionPrep {
 		input:
@@ -13,9 +14,10 @@ workflow dropseq_count {
 			output_directory=output_directory,
 			input_bam=input_bam,
 			sample_id=sample_id,
+			cellular_barcode_whitelist=cellular_barcode_whitelist,
 			memory="3750M",
 			zones=zones,
-			workflow_version=workflow_version
+			drop_seq_tools_version=drop_seq_tools_version
 	}
 
 	call CollectCellBarcodes {
@@ -23,10 +25,10 @@ workflow dropseq_count {
 			preemptible=preemptible,
 			output_directory=output_directory,
 			histogram=DigitalExpressionPrep.histogram,
-			ncells=if defined(force_cells) then force_cells  else read_int(DigitalExpressionPrep.ncells),
+			ncells=if defined(force_cells) then force_cells	 else read_int(DigitalExpressionPrep.ncells),
 			sample_id=sample_id,
 			zones=zones,
-			workflow_version=workflow_version
+			drop_seq_tools_version=drop_seq_tools_version
 	}
 
 	call DigitalExpression {
@@ -38,11 +40,9 @@ workflow dropseq_count {
 			barcodes=CollectCellBarcodes.cell_barcodes,
 			memory="3750M",
 			zones=zones,
-			workflow_version=workflow_version
+			drop_seq_tools_version=drop_seq_tools_version
 	}
 	output {
-
-
 		String bead_synthesis_stats = DigitalExpressionPrep.bead_synthesis_stats
 		String bead_synthesis_summary = DigitalExpressionPrep.bead_synthesis_summary
 		String bead_synthesis_report = DigitalExpressionPrep.bead_synthesis_report
@@ -69,7 +69,8 @@ task CollectCellBarcodes {
 	Int preemptible
 	String zones
 	String output_directory
-	String workflow_version
+	String drop_seq_tools_version
+
 	command {
 		set -e
 
@@ -86,7 +87,7 @@ task CollectCellBarcodes {
 		String cell_barcodes="${output_directory}/${sample_id}_barcodes_use.txt"
 	}
 	runtime {
-		docker: "regevlab/dropseq-${workflow_version}"
+		docker: "regevlab/dropseq-${drop_seq_tools_version}"
 		zones: zones
 		disks: "local-disk " + sub(((size(histogram,"GB")+1)*2),"\\..*","") + " HDD"
 		preemptible: "${preemptible}"
@@ -103,7 +104,8 @@ task DigitalExpression {
 	Int preemptible
 	String zones
 	String output_directory
-	String workflow_version
+	String drop_seq_tools_version
+
 
 	command {
 		set -e
@@ -130,11 +132,11 @@ task DigitalExpression {
 		String dge="${output_directory}/${sample_id}_dge.txt.gz"
 		String dge_summary = "${output_directory}/${sample_id}_dge.summary.txt"
 		String dge_reads="${output_directory}/${sample_id}_dge_reads.txt.gz"
-   		String dge_summary_reads = "${output_directory}/${sample_id}_dge_reads.summary.txt"
+		String dge_summary_reads = "${output_directory}/${sample_id}_dge_reads.summary.txt"
 	}
 
 	runtime {
-		docker: "regevlab/dropseq-${workflow_version}"
+		docker: "regevlab/dropseq-${drop_seq_tools_version}"
 		disks: "local-disk " + sub(((size(input_bam,"GB")+1)*3.25),"\\..*","") + " HDD"
 		memory :"${memory}"
 		zones: zones
@@ -150,7 +152,8 @@ task DigitalExpressionPrep {
 	Int preemptible
 	String zones
 	String output_directory
-	String workflow_version
+	String drop_seq_tools_version
+	File? cellular_barcode_whitelist
 
 	command {
 		set -e
@@ -158,8 +161,8 @@ task DigitalExpressionPrep {
 		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar DetectBeadSynthesisErrors VALIDATION_STRINGENCY=SILENT \
 		INPUT=${input_bam} \
 		MIN_UMIS_PER_CELL=20 \
-        OUTPUT_STATS=${sample_id}_synthesis_error_stats.txt \
-        SUMMARY=${sample_id}_synthesis_error_summary.txt \
+		OUTPUT_STATS=${sample_id}_synthesis_error_stats.txt \
+		SUMMARY=${sample_id}_synthesis_error_summary.txt \
 		REPORT=${sample_id}_synthesis_error_report.txt \
 		OUTPUT=temp.bam
 
@@ -173,6 +176,13 @@ task DigitalExpressionPrep {
 		I="${sample_id}_aligned_tagged_repaired.bam" \
 		O=${sample_id}_tag.txt.gz \
 		TAG=XC
+
+		python <<CODE
+		from subprocess import check_call
+		whitelist = '${cellular_barcode_whitelist}'
+		if whitelist !='':
+			check_call(['filter_histogram.py', '--histogram', '"${sample_id}_tag.txt.gz"', '--whitelist', '${cellular_barcode_whitelist}', '--output', '"${sample_id}_tag.txt.gz"'])
+		CODE
 
 		DropSeqCumuPlot.R \
 		--collapsed "${sample_id}_tag.txt.gz" \
@@ -192,13 +202,14 @@ task DigitalExpressionPrep {
 		String bead_synthesis_report = "${output_directory}/${sample_id}_synthesis_error_report.txt"
 		String bead_substitution_report = "${output_directory}/${sample_id}_substitution_error_report.txt"
 		String histogram="${output_directory}/${sample_id}_tag.txt.gz"
+		String? unfiltered_histogram="${output_directory}/${sample_id}_unfiltered_tag.txt.gz"
 		String ncells="${output_directory}/${sample_id}_ncells.txt"
 		String cumplot="${output_directory}/${sample_id}_cumplot.pdf"
 		String reads_plot="${output_directory}/${sample_id}_NreadsHiToLo.pdf"
 	}
 
 	runtime {
-		docker: "regevlab/dropseq-${workflow_version}"
+		docker: "regevlab/dropseq-${drop_seq_tools_version}"
 		disks: "local-disk " + ceil(3.5 * size(input_bam, "GB") + 2)+ " HDD"
 		memory :"${memory}"
 		zones: zones
