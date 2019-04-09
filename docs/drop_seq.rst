@@ -28,7 +28,8 @@ providing the option to generate count matrices using  `dropEst`_. Please note t
 	to make the Google Cloud tools available
 
 
-#. Create a `sample sheet`_.
+
+#. Create a sample sheet.
 
 	Please note that the columns in the CSV must be in the order shown below and does not contain a header line.
 	The sample sheet provides either the FASTQ files for each sample if you've already run bcl2fastq or a list of BCL directories if you're starting from BCL directories.
@@ -86,14 +87,14 @@ Please see the description of important inputs below.
 	* - Name
 	  - Description
 	* - input_csv_file
-	  - CSV file containing sample name, read1, and read2 or a list of BCL directories, `sample sheet`_.
+	  - CSV file containing sample name, read1, and read2 or a list of BCL directories.
 	* - output_directory
 	  - Pipeline output directory (gs URL e.g. "gs://fc-e0000000-0000-0000-0000-000000000000/dropseq_output")
 	* - reference
 	  - hg19, mm10, hg19_mm10, mmul_8.0.1 or a path to a custom reference JSON file
 	* - run_bcl2fastq
 	  - Whether your sample sheet contains one BCL directory per line or one sample per line
- 	* - run_dropseq_tools
+	* - run_dropseq_tools
 	  - Whether to generate count matrixes using Drop-Seq tools from the `McCarroll lab`_.
 	* - run_dropest
 	  - Whether to generate count matrixes using `dropEst`_.
@@ -110,15 +111,16 @@ Please see the description of important inputs below.
 	* - dropest_merge_barcodes_precise
 	  - Use precise merge strategy (can be slow), recommended to use when the list of real barcodes is not available
 	* - trim_sequence
-      - The sequence to look for at the start of reads for trimming (default "AAGCAGTGGTATCAACGCAGAGTGAATGGG")
+	  - The sequence to look for at the start of reads for trimming (default "AAGCAGTGGTATCAACGCAGAGTGAATGGG")
 	* - trim_num_bases
-      - How many bases at the begining of the sequence must match before trimming occur (default 5)
+	  - How many bases at the begining of the sequence must match before trimming occur (default 5)
 	* - umi_base_range
 	  - the base location of the molecular barcode (default 13-20)
 	* - cellular_barcode_base_range
-      - the base location of the cell barcode (default 1-12)
+	  - the base location of the cell barcode (default 1-12)
 	* - workflow_version
-	  - The workflow version to use (default  "2.2.0").
+	  - The workflow version to use (default "2.2.0")
+
 
 Please note that run_bcl2fastq must be set to true if you're starting from BCL files instead of FASTQs.
 
@@ -128,11 +130,11 @@ Custom Genome JSON
 If you're reference is not one of the predefined choices, you can create a custom JSON file. Example::
 
 	{
-		"refflat":    "gs://fc-e0000000-0000-0000-0000-000000000000/human_mouse/hg19_mm10_transgenes.refFlat",
-		"genome_fasta":    "gs://fc-e0000000-0000-0000-0000-000000000000/human_mouse/hg19_mm10_transgenes.fasta",
-		"star_genome":    "gs://fc-e0000000-0000-0000-0000-000000000000/human_mouse/STAR2_5_index_hg19_mm10.tar.gz",
-		"gene_intervals":    "gs://fc-e0000000-0000-0000-0000-000000000000/human_mouse/hg19_mm10_transgenes.genes.intervals",
-		"genome_dict":    "gs://fc-e0000000-0000-0000-0000-000000000000/human_mouse/hg19_mm10_transgenes.dict",
+		"refflat":	  "gs://fc-e0000000-0000-0000-0000-000000000000/human_mouse/hg19_mm10_transgenes.refFlat",
+		"genome_fasta":	   "gs://fc-e0000000-0000-0000-0000-000000000000/human_mouse/hg19_mm10_transgenes.fasta",
+		"star_genome":	  "gs://fc-e0000000-0000-0000-0000-000000000000/human_mouse/STAR2_5_index_hg19_mm10.tar.gz",
+		"gene_intervals":	 "gs://fc-e0000000-0000-0000-0000-000000000000/human_mouse/hg19_mm10_transgenes.genes.intervals",
+		"genome_dict":	  "gs://fc-e0000000-0000-0000-0000-000000000000/human_mouse/hg19_mm10_transgenes.dict",
 		"star_cpus": 32,
 		"star_memory": "120G"
 	}
@@ -149,7 +151,7 @@ The pipeline outputs a list of google bucket urls containing one gene-count matr
 .. _Drop-seq alignment cookbook: https://github.com/broadinstitute/Drop-seq/blob/master/doc/Drop-seq_Alignment_Cookbook.pdf
 .. _McCarroll lab: http://mccarrolllab.org/dropseq-1/
 .. _dropEst: https://github.com/hms-dbmi/dropEst
-.. _sample sheet:
+
 
 
 
