@@ -110,7 +110,7 @@ Please see the description of important inputs below.
 	* - cellular_barcode_whitelist
 	  - Optional whitelist of known cellular barcodes
 	* - drop_seq_tools_force_cells
-	  - If supplied, bypass the cell detection algorithm and use this number of cells
+	  - If supplied, bypass the cell detection algorithm (the elbow method) and use this number of cells.
 	* - dropest_cells_max
 	  - Maximal number of output cells
 	* - dropest_genes_min
