@@ -3,7 +3,7 @@ import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_bcl2fastq/versi
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_count/versions/3/plain-WDL/descriptor" as dropseq_count_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_prepare_fastq/versions/3/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_qc/versions/5/plain-WDL/descriptor" as dropseq_qc_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/sccloud:dropest/versions/1/plain-WDL/descriptor" as dropest_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/sccloud:dropest/versions/2/plain-WDL/descriptor" as dropest_wdl
 
 
 workflow dropseq_workflow {
