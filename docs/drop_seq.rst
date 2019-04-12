@@ -125,7 +125,7 @@ Please see the description of important inputs below.
 	  - Minimal number of genes for cells before the merge procedure. Used mostly for optimization. (default 10)
 	* - dropest_merge_barcodes_precise
 	  - Use precise merge strategy (can be slow), recommended to use when the list of real barcodes is not available (default true)
-	* - velocyto
+	* - dropest_velocyto
 	  - Save separate count matrices for exons, introns and exon/intron spanning reads (default true)
 	* - trim_sequence
 	  - The sequence to look for at the start of reads for trimming (default "AAGCAGTGGTATCAACGCAGAGTGAATGGG")
