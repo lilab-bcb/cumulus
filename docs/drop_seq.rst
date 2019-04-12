@@ -132,9 +132,9 @@ Please see the description of important inputs below.
 	* - trim_num_bases
 	  - How many bases at the beginning of the sequence must match before trimming occur (default 5)
 	* - umi_base_range
-	  - the base location of the molecular barcode (default 13-20)
+	  - The base location of the molecular barcode (default 13-20)
 	* - cellular_barcode_base_range
-	  - the base location of the cell barcode (default 1-12)
+	  - The base location of the cell barcode (default 1-12)
 	* - star_flags
 	  - Options to pass to STAR aligner (default "--limitOutSJcollapsed 1000000 --twopassMode Basic")
 
