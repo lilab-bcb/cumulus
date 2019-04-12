@@ -31,14 +31,26 @@ workflow dropseq_workflow {
 	Int? drop_seq_tools_force_cells
 	File? cellular_barcode_whitelist
 
-	# minimal number of genes in output cells
-	Int? dropest_genes_min = 1
+	# Minimal number of genes for cells after the merge procedure
+	Int? dropest_genes_min = 100
 	# maximal number of output cells
 	Int? dropest_cells_max
-	#Boolean? dropest_apply_directional_umi_correction = false
+	#  Threshold for the merge procedure
+	Float dropest_min_merge_fraction  = 0.2
+	# Max edit distance between barcodes.
+	Int? dropest_max_cb_merge_edit_distance = 2
+
+	# Max edit distance between UMIs
+	Int? dropest_max_umi_merge_edit_distance = 1
+
+	# Minimal number of genes for cells before the merge procedure. Used mostly for optimization.
+	Int? dropest_min_genes_before_merge = 10
+
     # use precise merge strategy (can be slow), recommended to use when the list of real barcodes is not available
     Boolean? dropest_merge_barcodes_precise = true
 
+	# save separate count matrices for exons, introns and exon/intron spanning reads
+    Boolean? dropest_velocyto = true
 	# Whether to delete input_bcl_directory
 	Boolean? delete_input_bcl_directory = false
 	# Number of preemptible tries
@@ -147,16 +159,16 @@ workflow dropseq_workflow {
 						sample_id = row[0],
 						output_directory = output_directory_stripped + '/' + row[0],
 						input_bam = dropseq_align.aligned_tagged_bam,
+						velocyto=dropest_velocyto,
 						genes_min = dropest_genes_min,
                         cells_max = dropest_cells_max,
+                        min_merge_fraction=dropest_min_merge_fraction,
+                        max_cb_merge_edit_distance=dropest_max_cb_merge_edit_distance,
+                        max_umi_merge_edit_distance=dropest_max_umi_merge_edit_distance,
+                        min_genes_before_merge=dropest_min_genes_before_merge,
                        	dropest_memory = dropest_memory,
-#						dropest_cpu = dropest_cpu,
-#						apply_directional_umi_correction = dropest_apply_directional_umi_correction,
                         merge_barcodes_precise = dropest_merge_barcodes_precise,
 						cellular_barcode_whitelist=cellular_barcode_whitelist,
-#						dropest_umi_correct_memory = dropest_umi_correct_memory,
-#						dropest_umi_correct_cpu = dropest_umi_correct_cpu,
-
                         dropest_version=dropest_version,
 						zones = zones,
 						preemptible = preemptible

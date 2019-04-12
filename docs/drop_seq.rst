@@ -114,9 +114,19 @@ Please see the description of important inputs below.
 	* - dropest_cells_max
 	  - Maximal number of output cells
 	* - dropest_genes_min
-	  - Minimal number of genes in output cells (default 1)
+	  - Minimal number of genes for cells after the merge procedure (default 100)
+	* - dropest_min_merge_fraction
+	  - Threshold for the merge procedure (default 0.2)
+	* - dropest_max_cb_merge_edit_distance
+	  - Max edit distance between barcodes (default 2)
+	* - dropest_max_umi_merge_edit_distance
+	  - Max edit distance between UMIs (default 1)
+	* - dropest_min_genes_before_merge
+	  - Minimal number of genes for cells before the merge procedure. Used mostly for optimization. (default 10)
 	* - dropest_merge_barcodes_precise
 	  - Use precise merge strategy (can be slow), recommended to use when the list of real barcodes is not available (default true)
+	* - velocyto
+	  - Save separate count matrices for exons, introns and exon/intron spanning reads (default true)
 	* - trim_sequence
 	  - The sequence to look for at the start of reads for trimming (default "AAGCAGTGGTATCAACGCAGAGTGAATGGG")
 	* - trim_num_bases
@@ -125,8 +135,6 @@ Please see the description of important inputs below.
 	  - the base location of the molecular barcode (default 13-20)
 	* - cellular_barcode_base_range
 	  - the base location of the cell barcode (default 1-12)
-	* - drop_seq_tools_version
-	  - The Drop-seq tools version to use (default "2.2.0")
 	* - star_flags
 	  - Options to pass to STAR aligner (default "--limitOutSJcollapsed 1000000 --twopassMode Basic")
 
