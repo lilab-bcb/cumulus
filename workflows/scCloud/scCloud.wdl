@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/18/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/19/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud {
@@ -87,6 +87,12 @@ workflow scCloud {
 	Float? counts_per_cell_after
 	# Random number generator seed. [default: 0]
 	Int? random_state
+	# Run uncentered PCA.
+	Boolean? run_uncentered_pca
+	# Do not select variable genes.
+	Boolean? no_variable_gene_selection
+	# Do not convert variable-gene-selected submatrix to a dense matrix.
+	Boolean? no_submat_to_dense
 	# Number of PCs. [default: 50]
 	Int? nPC
 	# Number of diffusion components. [default: 50]
@@ -101,14 +107,30 @@ workflow scCloud {
 	Boolean? run_louvain = true
 	# Resolution parameter for the louvain clustering algorithm. [default: 1.3]
 	Float? louvain_resolution
+	# Louvain cluster label name in AnnData. [default: louvain_labels]
+	String? louvain_class_label
+	# Run leiden clustering algorithm.
+	Boolean? run_leiden
+	# Resolution parameter for the leiden clustering algorithm. [default: 1.3]
+	Float? leiden_resolution
+	# Leiden cluster label name in AnnData. [default: leiden_labels]
+	String? leiden_class_label
 	# Run approximated louvain clustering algorithm.
 	Boolean? run_approximated_louvain
-	# Number of Kmeans tries. [default: 20]
-	Int? approx_louvain_ninit
-	# Number of clusters for Kmeans initialization. [default: 30]
-	Int? approx_louvain_nclusters
+	# Basis used for KMeans clustering. Can be 'pca', 'rpca', or 'diffmap'. [default: diffmap]
+	String? approx_louvain_basis
 	# Resolution parameter for louvain. [default: 1.3]
 	Float? approx_louvain_resolution
+	# Approximated louvain label name in AnnData. [default: approx_louvain_labels]
+	String? approx_louvain_class_label
+	# Run approximated leiden clustering algorithm.
+	Boolean? run_approximated_leiden
+	# Basis used for KMeans clustering. Can be 'pca', 'rpca', or 'diffmap'. [default: diffmap]
+	String? approx_leiden_basis
+	# Resolution parameter for leiden. [default: 1.3]
+	Float? approx_leiden_resolution
+	# Approximated leiden label name in AnnData. [default: approx_louvain_labels]
+	String? approx_leiden_class_label
 	# Run multi-core tSNE for visualization.
 	Boolean? run_tsne
 	# tSNE’s perplexity parameter. [default: 30]
@@ -127,8 +149,34 @@ workflow scCloud {
 	Boolean? run_fle
 	# K neighbors for building graph for FLE. [default: 50]
 	Int? fle_K
-	# Number of iterations for FLE. [default: 10000]
-	Int? fle_n_steps
+	# Target change per node to stop forceAtlas2. [default: 2.0]
+	Float? fle_target_change_per_node
+	# Maximum number of iterations before stopping the forceAtlas2 algoritm. [default: 5000]
+	Int? fle_target_steps
+	# Calculate 3D force-directed layout.
+	Boolean? fle_3D
+	# Down sampling fraction for net-related visualization. [default: 0.1]
+	Float? net_down_sample_fraction
+	# For net-UMAP and net-FLE, use full speed for the down-sampled data.
+	Boolean? net_ds_full_speed
+	# Run net tSNE for visualization.
+	Boolean? run_net_tsne
+	# Output basis for net-tSNE. [default: net_tsne]
+	String? net_tsne_out_basis
+	# Run net FIt-SNE for visualization.
+	Boolean? run_net_fitsne
+	# Output basis for net-FItSNE. [default: net_fitsne]
+	String? net_fitsne_out_basis
+	# Run net umap for visualization.
+	Boolean? run_net_umap
+	# Output basis for net-UMAP. [default: net_umap]
+	String? net_umap_out_basis
+	# Run net FLE.
+	Boolean? run_net_fle
+	# If run full-speed kNN on down-sampled data points.
+	Boolean? net_fle_ds_full_speed
+	# Output basis for net-FLE. [default: net_fle]
+	String? net_fle_out_basis
 
 
 	# for de_analysis and annotate_cluster
@@ -177,6 +225,14 @@ workflow scCloud {
 	String? plot_diffmap
 	# Plot cells based on FIt-SNE coordinates estimated from antibody expressions. Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FIt-SNEs side by side.
 	String? plot_citeseq_fitsne
+	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored tSNEs side by side based on net tSNE result.
+	String? plot_net_tsne
+	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FItSNEs side by side based on net FItSNE result.
+	String? plot_net_fitsne
+	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored UMAPs side by side based on net UMAP result.
+	String? plot_net_umap
+	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FLEs side by side based on net FLE result.
+	String? plot_net_fle
 
 
 	# for scp_output
@@ -229,6 +285,9 @@ workflow scCloud {
 			min_genes_on_raw = min_genes_on_raw,
 			counts_per_cell_after = counts_per_cell_after,
 			random_state = random_state,
+			run_uncentered_pca = run_uncentered_pca,
+			no_variable_gene_selection = no_variable_gene_selection,
+			no_submat_to_dense = no_submat_to_dense,
 			nPC = nPC,
 			nDC = nDC,
 			diffmap_alpha = diffmap_alpha,
@@ -236,10 +295,18 @@ workflow scCloud {
 			diffmap_full_speed = diffmap_full_speed,
 			run_louvain = run_louvain,
 			louvain_resolution = louvain_resolution,
+			louvain_class_label = louvain_class_label,
+			run_leiden = run_leiden,
+			leiden_resolution = leiden_resolution,
+			leiden_class_label = leiden_class_label,
 			run_approximated_louvain = run_approximated_louvain,
-			approx_louvain_ninit = approx_louvain_ninit,
-			approx_louvain_nclusters = approx_louvain_nclusters,
+			approx_louvain_basis = approx_louvain_basis,
 			approx_louvain_resolution = approx_louvain_resolution,
+			approx_louvain_class_label = approx_louvain_class_label,
+			run_approximated_leiden = run_approximated_leiden,
+			approx_leiden_basis = approx_leiden_basis,
+			approx_leiden_resolution = approx_leiden_resolution,
+			approx_leiden_class_label = approx_leiden_class_label,
 			run_tsne = run_tsne,
 			tsne_perplexity = tsne_perplexity,
 			run_fitsne = run_fitsne,
@@ -249,7 +316,20 @@ workflow scCloud {
 			umap_spread = umap_spread,
 			run_fle = run_fle,
 			fle_K = fle_K,
-			fle_n_steps = fle_n_steps,
+			fle_target_change_per_node = fle_target_change_per_node,
+			fle_target_steps = fle_target_steps,
+			fle_3D = fle_3D,
+			net_down_sample_fraction = net_down_sample_fraction,
+			net_ds_full_speed = net_ds_full_speed,
+			run_net_tsne = run_net_tsne,
+			net_tsne_out_basis = net_tsne_out_basis,
+			run_net_fitsne = run_net_fitsne,
+			net_fitsne_out_basis = net_fitsne_out_basis,
+			run_net_umap = run_net_umap,
+			net_umap_out_basis = net_umap_out_basis,
+			run_net_fle = run_net_fle,
+			net_fle_ds_full_speed = net_fle_ds_full_speed,
+			net_fle_out_basis = net_fle_out_basis,
 			sccloud_version = sccloud_version,
 			zones = zones,			
 			num_cpu = num_cpu,
@@ -296,6 +376,10 @@ workflow scCloud {
 				plot_fle = plot_fle,
 				plot_diffmap = plot_diffmap,
 				plot_citeseq_fitsne = plot_citeseq_fitsne,
+				plot_net_tsne = plot_net_tsne,
+				plot_net_fitsne = plot_net_fitsne,
+				plot_net_umap = plot_net_umap,
+				plot_net_fle = plot_net_fle,
 				sccloud_version = sccloud_version,
 				zones = zones,
 				memory = memory,

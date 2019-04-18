@@ -96,11 +96,18 @@ task run_scCloud_cluster {
 	Boolean? diffmap_full_speed
 	Boolean? run_louvain
 	Float? louvain_resolution
-	String? louvain_affinity
+	String? louvain_class_label
+	Boolean? run_leiden
+	Float? leiden_resolution
+	String? leiden_class_label
 	Boolean? run_approximated_louvain
-	Int? approx_louvain_ninit
-	Int? approx_louvain_nclusters
+	String? approx_louvain_basis
 	Float? approx_louvain_resolution
+	String? approx_louvain_class_label
+	Boolean? run_approximated_leiden
+	String? approx_leiden_basis
+	Float? approx_leiden_resolution
+	String? approx_leiden_class_label
 	Boolean? run_tsne
 	Boolean? run_fitsne
 	Float? tsne_perplexity
@@ -110,7 +117,20 @@ task run_scCloud_cluster {
 	Float? umap_spread
 	Boolean? run_fle
 	Int? fle_K
-	Int? fle_n_steps
+	Float? fle_target_change_per_node
+	Int? fle_target_steps
+	Boolean? fle_3D
+	Float? net_down_sample_fraction
+	Boolean? net_ds_full_speed
+	Boolean? run_net_tsne
+	String? net_tsne_out_basis
+	Boolean? run_net_fitsne
+	String? net_fitsne_out_basis
+	Boolean? run_net_umap
+	String? net_umap_out_basis
+	Boolean? run_net_fle
+	Boolean? net_fle_ds_full_speed
+	String? net_fle_out_basis
 
 	command {
 		set -e
@@ -180,16 +200,30 @@ task run_scCloud_cluster {
 			call_args.append('--run-louvain')
 		if '${louvain_resolution}' is not '':
 			call_args.extend(['--louvain-resolution', '${louvain_resolution}'])
-		if '${louvain_affinity}' is not '':
-			call_args.extend(['--louvain-affinity', '${louvain_affinity}'])
+		if '${louvain_class_label}' is not '':
+			call_args.extend(['--louvain-class-label', '${louvain_class_label}'])
+		if '${run_leiden}' is 'true':
+			call_args.append('--run-leiden')
+		if '${leiden_resolution}' is not '':
+			call_args.extend(['--leiden-resolution', '${leiden_resolution}'])
+		if '${leiden_class_label}' is not '':
+			call_args.extend(['--leiden-class-label', '${leiden_class_label}'])
 		if '${run_approximated_louvain}' is 'true':
 			call_args.append('--run-approximated-louvain')
-		if '${approx_louvain_ninit}' is not '':
-			call_args.extend(['--approx-louvain-ninit', '${approx_louvain_ninit}'])
-		if '${approx_louvain_nclusters}' is not '':
-			call_args.extend(['--approx-louvain-nclusters', '${approx_louvain_nclusters}'])
+		if '${approx_louvain_basis}' is not '':
+			call_args.extend(['--approx-louvain-basis', '${approx_louvain_basis}'])
 		if '${approx_louvain_resolution}' is not '':
 			call_args.extend(['--approx-louvain-resolution', '${approx_louvain_resolution}'])
+		if '${approx_louvain_class_label}' is not '':
+			call_args.extend(['--approx-louvain-class-label', '${approx_louvain_class_label}'])
+		if '${run_approximated_leiden}' is 'true':
+			call_args.append('--run-approximated-leiden')
+		if '${approx_leiden_basis}' is not '':
+			call_args.extend(['--approx-leiden-basis', '${approx_leiden_basis}'])
+		if '${approx_leiden_resolution}' is not '':
+			call_args.extend(['--approx-leiden-resolution', '${approx_leiden_resolution}'])
+		if '${approx_leiden_class_label}' is not '':
+			call_args.extend(['--approx-leiden-class-label', '${approx_leiden_class_label}'])
 		if '${run_tsne}' is 'true':
 			call_args.append('--run-tsne')
 		if '${run_fitsne}' is 'true':
@@ -208,8 +242,34 @@ task run_scCloud_cluster {
 			call_args.append('--run-fle')
 		if '${fle_K}' is not '':
 			call_args.extend(['--fle-K', '${fle_K}'])
-		if '${fle_n_steps}' is not '':
-			call_args.extend(['--fle-n-steps', '${fle_n_steps}'])
+		if '${fle_target_change_per_node}' is not '':
+			call_args.extend(['--fle-target-change-per-node', '${fle_target_change_per_node}'])
+		if '${fle_target_steps}' is not '':
+			call_args.extend(['--fle-target-steps', '${fle_target_steps}'])
+		if '${fle_3D}' is 'true':
+			call_args.append('--fle-3D')
+		if '${net_down_sample_fraction}' is not '':
+			call_args.extend(['--net-down-sample-fraction', '${net_down_sample_fraction}'])
+		if '${net_ds_full_speed}' is 'true':
+			call_args.append('--net-ds-full-speed')
+		if '${run_net_tsne}' is 'true':
+			call_args.append('--run-net-tsne')
+		if '${net_tsne_out_basis}' is not '':
+			call_args.extend(['--net-tsne-out-basis', '${net_tsne_out_basis}'])
+		if '${run_net_fitsne}' is 'true':
+			call_args.append('--run-net-fitsne')
+		if '${net_fitsne_out_basis}' is not '':
+			call_args.extend(['--net-fitsne-out-basis', '${net_fitsne_out_basis}'])
+		if '${run_net_umap}' is 'true':
+			call_args.append('--run-net-umap')
+		if '${net_umap_out_basis}' is not '':
+			call_args.extend(['--net-umap-out-basis', '${net_umap_out_basis}'])
+		if '${run_net_fle}' is 'true':
+			call_args.append('--run-net-fle')
+		if '${net_fle_ds_full_speed}' is 'true':
+			call_args.append('--net-fle-ds-full-speed')
+		if '${net_fle_out_basis}' is not '':
+			call_args.extend(['--net-fle-out-basis', '${net_fle_out_basis}'])
 		print(' '.join(call_args))
 		check_call(call_args)
 		if '${output_parquet}' is 'true':
@@ -344,6 +404,10 @@ task run_scCloud_plot {
 	String? plot_fle
 	String? plot_diffmap
 	String? plot_citeseq_fitsne
+	String? plot_net_tsne
+	String? plot_net_fitsne
+	String? plot_net_umap
+	String? plot_net_fle
 
 	command {
 		set -e
@@ -382,6 +446,22 @@ task run_scCloud_plot {
 				check_call(call_args)
 		if '${plot_citeseq_fitsne}' is not '':
 			call_args = ['scCloud', 'plot', 'scatter', '--basis', 'citeseq_fitsne', '--attributes', '${plot_citeseq_fitsne}', '${input_h5ad}', '${output_name}.citeseq.fitsne.pdf']
+			print(' '.join(call_args))
+			check_call(call_args)
+		if '${plot_net_tsne}' is not '':
+			call_args = ['scCloud', 'plot', 'scatter', '--basis', 'net_tsne', '--attributes', '${plot_net_tsne}', '${input_h5ad}', '${output_name}.net.tsne.pdf']
+			print(' '.join(call_args))
+			check_call(call_args)
+		if '${plot_net_fitsne}' is not '':
+			call_args = ['scCloud', 'plot', 'scatter', '--basis', 'net_fitsne', '--attributes', '${plot_net_fitsne}', '${input_h5ad}', '${output_name}.net.fitsne.pdf']
+			print(' '.join(call_args))
+			check_call(call_args)
+		if '${plot_net_umap}' is not '':
+			call_args = ['scCloud', 'plot', 'scatter', '--basis', 'net_umap', '--attributes', '${plot_net_umap}', '${input_h5ad}', '${output_name}.net.umap.pdf']
+			print(' '.join(call_args))
+			check_call(call_args)
+		if '${plot_net_fle}' is not '':
+			call_args = ['scCloud', 'plot', 'scatter', '--basis', 'net_fle', '--attributes', '${plot_net_fle}', '${input_h5ad}', '${output_name}.net.fle.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		CODE
@@ -459,11 +539,18 @@ task run_scCloud_subcluster {
 	String? calculate_pseudotime
 	Boolean? run_louvain
 	Float? louvain_resolution
-	String? louvain_affinity
+	String? louvain_class_label
+	Boolean? run_leiden
+	Float? leiden_resolution
+	String? leiden_class_label
 	Boolean? run_approximated_louvain
-	Int? approx_louvain_ninit
-	Int? approx_louvain_nclusters
+	String? approx_louvain_basis
 	Float? approx_louvain_resolution
+	String? approx_louvain_class_label
+	Boolean? run_approximated_leiden
+	String? approx_leiden_basis
+	Float? approx_leiden_resolution
+	String approx_leiden_class_label
 	Boolean? run_tsne
 	Boolean? run_fitsne
 	Float? tsne_perplexity
@@ -473,7 +560,20 @@ task run_scCloud_subcluster {
 	Float? umap_spread
 	Boolean? run_fle
 	Int? fle_K
-	Int? fle_n_steps
+	Float? fle_target_change_per_node
+	Int? fle_target_steps
+	Boolean? fle_3D
+	Float? net_down_sample_fraction
+	Boolean? net_ds_full_speed
+	Boolean? run_net_tsne
+	String? net_tsne_out_basis
+	Boolean? run_net_fitsne
+	String? net_fitsne_out_basis
+	Boolean? run_net_umap
+	String? net_umap_out_basis
+	Boolean? run_net_fle
+	Boolean? net_fle_ds_full_speed
+	String? net_fle_out_basis
 
 	command {
 		set -e
@@ -515,16 +615,30 @@ task run_scCloud_subcluster {
 			call_args.append('--run-louvain')
 		if '${louvain_resolution}' is not '':
 			call_args.extend(['--louvain-resolution', '${louvain_resolution}'])
-		if '${louvain_affinity}' is not '':
-			call_args.extend(['--louvain-affinity', '${louvain_affinity}'])
+		if '${louvain_class_label}' is not '':
+			call_args.extend(['--louvain-class-label', '${louvain_class_label}'])
+		if '${run_leiden}' is 'true':
+			call_args.append('--run-leiden')
+		if '${leiden_resolution}' is not '':
+			call_args.extend(['--leiden-resolution', '${leiden_resolution}'])
+		if '${leiden_class_label}' is not '':
+			call_args.extend(['--leiden-class-label', '${leiden_class_label}'])
 		if '${run_approximated_louvain}' is 'true':
 			call_args.append('--run-approximated-louvain')
-		if '${approx_louvain_ninit}' is not '':
-			call_args.extend(['--approx-louvain-ninit', '${approx_louvain_ninit}'])
-		if '${approx_louvain_nclusters}' is not '':
-			call_args.extend(['--approx-louvain-nclusters', '${approx_louvain_nclusters}'])
+		if '${approx_louvain_basis}' is not '':
+			call_args.extend(['--approx-louvain-basis', '${approx_louvain_basis}'])
 		if '${approx_louvain_resolution}' is not '':
 			call_args.extend(['--approx-louvain-resolution', '${approx_louvain_resolution}'])
+		if '${approx_louvain_class_label}' is not '':
+			call_args.extend(['--approx-louvain-class-label', '${approx_louvain_class_label}'])
+		if '${run_approximated_leiden}' is 'true':
+			call_args.append('--run-approximated-leiden')
+		if '${approx_leiden_basis}' is not '':
+			call_args.extend(['--approx-leiden-basis', '${approx_leiden_basis}'])
+		if '${approx_leiden_resolution}' is not '':
+			call_args.extend(['--approx-leiden-resolution', '${approx_leiden_resolution}'])
+		if '${approx_leiden_class_label}' is not '':
+			call_args.extend(['--approx-leiden-class-label', '${approx_leiden_class_label}'])
 		if '${run_tsne}' is 'true':
 			call_args.append('--run-tsne')
 		if '${run_fitsne}' is 'true':
@@ -543,8 +657,34 @@ task run_scCloud_subcluster {
 			call_args.append('--run-fle')
 		if '${fle_K}' is not '':
 			call_args.extend(['--fle-K', '${fle_K}'])
-		if '${fle_n_steps}' is not '':
-			call_args.extend(['--fle-n-steps', '${fle_n_steps}'])
+		if '${fle_target_change_per_node}' is not '':
+			call_args.extend(['--fle-target-change-per-node', '${fle_target_change_per_node}'])
+		if '${fle_target_steps}' is not '':
+			call_args.extend(['--fle-target-steps', '${fle_target_steps}'])
+		if '${fle_3D}' is 'true':
+			call_args.append('--fle-3D')
+		if '${net_down_sample_fraction}' is not '':
+			call_args.extend(['--net-down-sample-fraction', '${net_down_sample_fraction}'])
+		if '${net_ds_full_speed}' is 'true':
+			call_args.append('--net-ds-full-speed')
+		if '${run_net_tsne}' is 'true':
+			call_args.append('--run-net-tsne')
+		if '${net_tsne_out_basis}' is not '':
+			call_args.extend(['--net-tsne-out-basis', '${net_tsne_out_basis}'])
+		if '${run_net_fitsne}' is 'true':
+			call_args.append('--run-net-fitsne')
+		if '${net_fitsne_out_basis}' is not '':
+			call_args.extend(['--net-fitsne-out-basis', '${net_fitsne_out_basis}'])
+		if '${run_net_umap}' is 'true':
+			call_args.append('--run-net-umap')
+		if '${net_umap_out_basis}' is not '':
+			call_args.extend(['--net-umap-out-basis', '${net_umap_out_basis}'])
+		if '${run_net_fle}' is 'true':
+			call_args.append('--run-net-fle')
+		if '${net_fle_ds_full_speed}' is 'true':
+			call_args.append('--net-fle-ds-full-speed')
+		if '${net_fle_out_basis}' is not '':
+			call_args.extend(['--net-fle-out-basis', '${net_fle_out_basis}'])
 		print(' '.join(call_args))
 		check_call(call_args)
 		if '${output_parquet}' is 'true':
