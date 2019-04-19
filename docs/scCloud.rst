@@ -73,8 +73,8 @@ global inputs
 	  - 
 	* - sccloud_version
 	  - scCloud version
-	  - "0.7.0"
-	  - "0.7.0"
+	  - "0.8.0"
+	  - "0.8.0"
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-b us-east1-c us-east1-d"
@@ -256,6 +256,18 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - Random number generator seed
 	  - 0
 	  - 0
+	* - run_uncentered_pca
+	  - Run uncentered PCA.
+	  - true
+	  - false
+	* - no_variable_gene_selection
+	  - Do not select variable genes.
+	  - true
+	  - false
+	* - no_submat_to_dense
+	  - Do not convert variable-gene-selected submatrix to a dense matrix.
+	  - true
+	  - false
 	* - nPC
 	  - Number of principal components
 	  - 50
@@ -284,22 +296,54 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - Resolution parameter for the louvain clustering algorithm
 	  - 1.3
 	  - 1.3
+	* - louvain_class_label
+	  - Louvain cluster label name in AnnData.
+	  - "louvain_labels"
+	  - "louvain_labels"
+	* - run_leiden
+	  - Run leiden clustering algorithm.
+	  - true
+	  - false
+	* - leiden_resolution
+	  - Resolution parameter for the leiden clustering algorithm.
+	  - 1.3
+	  - 1.3
+	* - leiden_class_label
+	  - Leiden cluster label name in AnnData.
+	  - "leiden_labels"
+	  - "leiden_labels"
 	* - run_approximated_louvain
 	  - Run approximated louvain clustering algorithm
 	  - true
 	  - false
-	* - approx_louvain_ninit
-	  - Number of Kmeans tries
-	  - 30
-	  - 20
-	* - approx_louvain_nclusters
-	  - Number of clusters for Kmeans initialization
-	  - 40
-	  - 30
+	* - approx_louvain_basis
+	  - Basis used for KMeans clustering. Can be "pca", "rpca", or "diffmap".
+	  - "diffmap"
+	  - "diffmap"
 	* - approx_louvain_resolution
-	  - Resolution parameter for louvain
+	  - Resolution parameter for louvain.
 	  - 1.3
 	  - 1.3
+	* - approx_louvain_class_label
+	  - Approximated louvain label name in AnnData.
+	  - "approx_louvain_labels"
+	  - "approx_louvain_labels"
+	* - run_approximated_leiden
+	  - Run approximated leiden clustering algorithm.
+	  - true
+	  - false
+	* - approx_leiden_basis
+	  - Basis used for KMeans clustering. Can be "pca", "rpca", or "diffmap".
+	  - "diffmap"
+	  - "diffmap"
+	* - approx_leiden_resolution
+	  - Resolution parameter for leiden.
+	  - 1.3
+	  - 1.3
+	* - approx_leiden_class_label
+	  - Approximated leiden label name in AnnData.
+	  - "approx_leiden_labels"
+	  - "approx_leiden_labels"
 	* - run_tsne
 	  - Run multi-core t-SNE for visualization
 	  - true
@@ -316,6 +360,18 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - Run umap for visualization
 	  - true
 	  - false
+	* - umap_K
+	  - K neighbors for umap.
+	  - 15
+	  - 15
+	* - umap_min_dist
+	  - Umap parameter.
+	  - 0.1
+	  - 1.0
+	* - umap_spread
+	  - Umap parameter.
+	  - 1.0
+	  - 1.0
 	* - run_fle
 	  - Run force-directed layout embedding
 	  - true
@@ -324,10 +380,62 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - K neighbors for building graph for FLE
 	  - 50
 	  - 50
-	* - fle_n_steps
-	  - Number of iterations for FLE
-	  - 10000
-	  - 10000
+	* - fle_target_change_per_node
+	  - Target change per node to stop forceAtlas2.
+	  - 2.0
+	  - 2.0
+	* - fle_target_steps
+	  - Maximum number of iterations before stopping the forceAtlas2 algoritm.
+	  - 5000
+	  - 5000
+	* - fle_3D
+	  - Calculate 3D force-directed layout.
+	  - true
+	  - false
+	* - net_down_sample_fraction
+	  - Down sampling fraction for net-related visualization.
+	  - 0.1
+	  - 0.1
+	* - net_ds_full_speed
+	  - For net-UMAP and net-FLE, use full speed for the down-sampled data.
+	  - true
+	  - false
+	* - run_net_tsne
+	  - Run net tSNE for visualization.
+	  - true
+	  - false
+	* - net_tsne_out_basis
+	  - Output basis for net-tSNE.
+	  - "net_tsne"
+	  - "net_tsne"
+	* - run_net_fitsne
+	  - Run net FIt-SNE for visualization.
+	  - true
+	  - true
+	* - net_fitsne_out_basis
+	  - Output basis for net-FItSNE.
+	  - "net_fitsne"
+	  - "net_fitsne"
+	* - run_net_umap
+	  - Run net umap for visualization.
+	  - true
+	  - false
+	* - net_umap_out_basis
+	  - Output basis for net-UMAP.
+	  - "net_umap"
+	  - "net_umap"
+	* - run_net_fle
+	  - Run net FLE.
+	  - true
+	  - false
+	* - net_fle_ds_full_speed
+	  - If run full-speed kNN on down-sampled data points.
+	  - true
+	  - false
+	* - net_fle_out_basis
+	  - Output basis for net-FLE.
+	  - "net_fle"
+	  - "net_fle"
 
 cluster outputs
 +++++++++++++++
@@ -588,9 +696,30 @@ plot inputs
 	  - None
 	* - plot_citeseq_fitsne
 	  - | plot cells based on FIt-SNE coordinates estimated from antibody expressions.
-		| Takes the format of "attr,attr,...,attr". 
+	    | Takes the format of "attr,attr,...,attr". 
 	    | If non-empty, plot attr colored FIt-SNEs side by side
 	  - "louvain_labels,Donor"
+	  - None
+	* - plot_net_fitsne
+	  - | Takes the format of "attr,attr,...,attr". 
+	    | If non-empty, plot attr colored FIt-SNEs side by side based on net FIt-SNE result.
+	  - "leiden_labels,Channel"
+	  - None
+	* - plot_net_tsne
+	  - | Takes the format of "attr,attr,...,attr". 
+	    | If non-empty, plot attr colored t-SNEs side by side based on net t-SNE result.
+	  - "leiden_labels,Channel"
+	  - None
+	* - plot_net_umap
+	  - | Takes the format of "attr,attr,...,attr". 
+	    | If non-empty, plot attr colored UMAP side by side based on net UMAP result.
+	  - "leiden_labels,Donor"
+	  - None
+	* - plot_net_fle
+	  - | Takes the format of "attr,attr,...,attr". 
+	    | If non-empty, plot attr colored FLE (force-directed layout embedding) side by side
+	    | based on net FLE result.
+	  - "leiden_labels,Donor"
 	  - None
 
 plot outputs
@@ -648,7 +777,7 @@ scCloud_subcluster steps:
 scCloud_subcluster's inputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Since **scCloud_subcluster** shares many inputs/outputs with **scCloud**, we will only cover inputs/outputs that are specific to **scCloud_subcluster**.
+**scCloud_subcluster** shares many inputs/outputs with **scCloud**, we will only cover inputs/outputs that are specific to **scCloud_subcluster** in this section.
 
 Note that we will make the required inputs/outputs bold and all other inputs/outputs are optional.
 
@@ -695,6 +824,30 @@ Note that we will make the required inputs/outputs bold and all other inputs/out
 	  - Number of preemptible tries
 	  - 2
 	  - 2
+
+.. role:: red-bold
+
+For other **scCloud_subcluster** inputs, please refer to `scCloud cluster inputs list`_ for details. Notice that some inputs (as listed below) in **scCloud cluster** inputs list are :red-bold:`DISABLED` for **scCloud_subcluster**:
+	
+	- cite_seq
+	- cite_seq_capping
+	- output_filtration_results
+	- plot_filtration_results
+	- plot_filtration_figsize
+	- output_seurat_compatible
+	- batch_group_by
+	- min_genes
+	- max_genes
+	- min_umis
+	- max_umis
+	- mito_prefix
+	- percent_mito
+	- gene_percent_cells
+	- min_genes_on_raw
+	- counts_per_cell_after
+
+.. _scCloud cluster inputs list: ./scCloud.html#cluster
+
 
 scCloud_subcluster's outputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
