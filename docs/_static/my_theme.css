@@ -11,3 +11,12 @@
     max-width: 100%;
     overflow: visible;
 }
+
+.red {
+	color: red;
+}
+
+.red-bold {
+	color: red;
+	font-weight: bold;
+}
