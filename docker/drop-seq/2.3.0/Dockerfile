@@ -1,7 +1,7 @@
 FROM continuumio/miniconda3:latest
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/drop-seq/summary.py /software/
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/monitor_script.sh /software/
-ADD https://github.com/broadinstitute/picard/releases/download/2.19.0/picard.jar /software/
+ADD https://github.com/broadinstitute/picard/releases/download/2.18.26/picard.jar /software/
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/drop-seq/filter_histogram.py /software/
 
 RUN apt-get update && \
