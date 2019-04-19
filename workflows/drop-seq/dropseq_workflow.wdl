@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_align/versions/4/plain-WDL/descriptor" as dropseq_align_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_align/versions/5/plain-WDL/descriptor" as dropseq_align_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_bcl2fastq/versions/4/plain-WDL/descriptor" as bcl2fastq_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_count/versions/3/plain-WDL/descriptor" as dropseq_count_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_prepare_fastq/versions/3/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
@@ -78,7 +78,8 @@ workflow dropseq_workflow {
 	String? drop_seq_tools_version = "2.3.0"
 	String? bcl2fastq_version = "2.20.0.422"
 	String? dropest_version = "0.8.5"
-
+	String? merge_bam_alignment_memory="13G"
+	Int? sort_bam_max_records_in_ram = 2000000
 	if (run_bcl2fastq) {
 		scatter (row in input_tsv) {
 			call bcl2fastq_wdl.dropseq_bcl2fastq as bcl2fastq {
@@ -146,6 +147,8 @@ workflow dropseq_workflow {
 					gene_intervals=generate_count_config.gene_intervals,
 					genome_fasta=generate_count_config.genome_fasta,
 					genome_dict=generate_count_config.genome_dict,
+					merge_bam_alignment_memory=merge_bam_alignment_memory,
+                    sort_bam_max_records_in_ram =sort_bam_max_records_in_ram,
 					zones = zones,
 					preemptible = preemptible
 			}

@@ -16,6 +16,8 @@ workflow dropseq_align {
 	String output_directory
 	String drop_seq_tools_version
 	Int add_bam_tags_disk_space_multiplier = 25
+	String? merge_bam_alignment_memory="13G"
+	Int? sort_bam_max_records_in_ram = 2000000
 
 	call STAR {
 		input:
@@ -33,7 +35,8 @@ workflow dropseq_align {
 
 	call AddTags {
 		input:
-			memory="3750M",
+			memory=merge_bam_alignment_memory,
+			sort_bam_max_records_in_ram=sort_bam_max_records_in_ram,
             cpu=1,
 			aligned_bam=STAR.bam,
 			unaligned_bam=input_bam,
@@ -128,6 +131,7 @@ task AddTags {
 	String drop_seq_tools_version
 	Int disk_space_multiplier
 	Int cpu
+	Int sort_bam_max_records_in_ram
 
 	command {
 		set -o pipefail
@@ -135,12 +139,12 @@ task AddTags {
 
 		mkfifo pipe1 pipe2 pipe3
 
-		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/picard.jar SortSam VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=1 -Xms3000m -jar /software/picard.jar SortSam VALIDATION_STRINGENCY=SILENT \
 		INPUT=${aligned_bam} \
 		OUTPUT=pipe1 \
-		MAX_RECORDS_IN_RAM=2000000 \
+		MAX_RECORDS_IN_RAM=${sort_bam_max_records_in_ram} \
 		SORT_ORDER=queryname | \
-		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/picard.jar MergeBamAlignment VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=1 -Xms3000m -jar /software/picard.jar MergeBamAlignment VALIDATION_STRINGENCY=SILENT \
 		ALIGNED_BAM=pipe1 \
 		UNMAPPED_BAM=${unaligned_bam} \
 		OUTPUT=pipe2 \
@@ -148,12 +152,12 @@ task AddTags {
 		INCLUDE_SECONDARY_ALIGNMENTS=false \
 		PAIRED_RUN=false \
 		CLIP_ADAPTERS=false | \
-		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar TagReadWithInterval VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=1 -Xms3000m -jar /software/Drop-seq_tools/jar/dropseq.jar TagReadWithInterval VALIDATION_STRINGENCY=SILENT \
 		I=pipe2 \
 		O=pipe3 \
 		INTERVALS=${gene_intervals} \
 		TAG=XG | \
-		java -Dsamjdk.compression_level=2 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar TagReadWithGeneFunction VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=2 -Xms3000m -jar /software/Drop-seq_tools/jar/dropseq.jar TagReadWithGeneFunction VALIDATION_STRINGENCY=SILENT \
 		INPUT=pipe3 \
 		O=${sample_id}_aligned_tagged.bam \
 		ANNOTATIONS_FILE=${refflat}
