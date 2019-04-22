@@ -7,6 +7,7 @@ workflow dropseq_count {
 	String output_directory
 	String drop_seq_tools_version
 	File? cellular_barcode_whitelist
+	Float? disk_multiplier = 3.5
 
 	call DigitalExpressionPrep {
 		input:
@@ -16,6 +17,7 @@ workflow dropseq_count {
 			sample_id=sample_id,
 			cellular_barcode_whitelist=cellular_barcode_whitelist,
 			memory="3750M",
+			disk_multiplier=disk_multiplier,
 			zones=zones,
 			drop_seq_tools_version=drop_seq_tools_version
 	}
@@ -154,7 +156,7 @@ task DigitalExpressionPrep {
 	String output_directory
 	String drop_seq_tools_version
 	File? cellular_barcode_whitelist
-
+	Float disk_multiplier
 	command {
 		set -e
 
@@ -210,7 +212,7 @@ task DigitalExpressionPrep {
 
 	runtime {
 		docker: "regevlab/dropseq-${drop_seq_tools_version}"
-		disks: "local-disk " + ceil(3.5 * size(input_bam, "GB") + 2)+ " HDD"
+		disks: "local-disk " + ceil(disk_multiplier * size(input_bam, "GB") + 20)+ " HDD"
 		memory :"${memory}"
 		zones: zones
 		preemptible: "${preemptible}"
