@@ -73,10 +73,11 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on FireCloud.
 		* - Chemistry
 		  - 
 			| Describes the 10x chemistry used for the sample. 
-			| This column is optional. If omitted, *cellranger count* will try to determine the chemistry automatically.
+			| This column is optional. The default chemistry for **rna** data (see DataType column below) is **auto**, which will try to detect the chemistry automatically. 
+			| The default chemistry for **adt** and **crispr** is **sC3Pv3**, which stands for single cell 3' v3. 
 			| Note that if the index read has extra bases besides cell barcode and UMI, autodetection might fail. In this case, please specify the chemistry.
 			| According to *cellranger count*'s documentation, chemistry can be
-			| **auto** for autodetection (default),
+			| **auto** for autodetection,
 			| **threeprime** for Single Cell 3′,
 			| **fiveprime** for Single Cell 5′,
 			| **SC3Pv1** for Single Cell 3′ v1,
