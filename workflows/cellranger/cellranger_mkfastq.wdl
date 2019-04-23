@@ -9,7 +9,7 @@ workflow cellranger_mkfastq {
 	# Whether to delete input bcl directory. If false, you should delete this folder yourself so as to not incur storage charges.
 	Boolean? delete_input_bcl_directory = false
 	# 2.1.1, 2.2.0, 3.0.0, or 3.0.2
-	String? cellranger_version = "2.2.0"
+	String? cellranger_version = "3.0.2"
 	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 	String? zones = "us-central1-b"
 	# Number of cpus per cellranger job
