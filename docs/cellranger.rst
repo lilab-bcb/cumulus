@@ -191,8 +191,8 @@ cellranger_workflow inputs:
 	  - 3
 	* - cellranger_version
 	  - cellranger version, could be 2.0.2 (count only), 2.11, 2.2.0, 3.0.0, 3.0.2
-	  - "2.2.0"
-	  - "2.2.0"
+	  - "3.0.2"
+	  - "3.0.2"
 	* - cellranger_atac_version
 	  - cellranger-atac version, could be 1.0.0 or 1.0.1
 	  - "1.0.1"
@@ -345,10 +345,11 @@ Sometimes, people might want to perform demultiplexing locally and only run the 
 		* - Chemistry
 		  -
 			| Describes the 10x chemistry used for the sample. 
-			| This column is optional. If omitted, *cellranger count* will try to determine the chemistry automatically.
+			| This column is optional. The default chemistry for **rna** data (see DataType column below) is **auto**, which will try to detect the chemistry automatically. 
+			| The default chemistry for **adt** and **crispr** is **sC3Pv3**, which stands for single cell 3' v3. 
 			| Note that if the index read has extra bases besides cell barcode and UMI, autodetection might fail. In this case, please specify the chemistry.
 			| According to *cellranger count*'s documentation, chemistry can be
-			| **auto** for autodetection (default),
+			| **auto** for autodetection,
 			| **threeprime** for Single Cell 3′,
 			| **fiveprime** for Single Cell 5′,
 			| **SC3Pv1** for Single Cell 3′ v1,
@@ -358,10 +359,11 @@ Sometimes, people might want to perform demultiplexing locally and only run the 
 			| **SC5P-R2** for Single Cell 5′ R2-only (where only R2 is used for alignment).
 		* - DataType
 		  -
-			| Describes the data type of the sample --- *count*, *vdj*, *adt*, or *crispr*. 
+			| Describes the data type of the sample --- *count*, *vdj*, *adt*, *crispr*, or *atac*. 
 			| **count** refers to gene expression data (*cellranger count*), 
 			| **vdj** refers to V(D)J data (*cellranger vdj*), 
-			| **adt** refers to antibody tag data, which can be either CITE-Seq, cell-hashing, or nucleus-hashing, and
+			| **adt** refers to antibody tag data, which can be either CITE-Seq, cell-hashing, or nucleus-hashing,
+			| **crispr** refers to Perturb-seq data, and
 			| **atac** refers to scATAC-Seq data (*cellranger-atac count*).
 			| This column is optional and the default data type is *rna*.
 		* - FeatureBarcodeFile

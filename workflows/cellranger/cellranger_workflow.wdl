@@ -1,6 +1,6 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_mkfastq/versions/2/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_count/versions/1/plain-WDL/descriptor" as crc
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_vdj/versions/3/plain-WDL/descriptor" as crv
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_mkfastq/versions/3/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_count/versions/3/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_vdj/versions/4/plain-WDL/descriptor" as crv
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/11/plain-WDL/descriptor" as sa
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_mkfastq/versions/1/plain-WDL/descriptor" as cram
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_count/versions/4/plain-WDL/descriptor" as crac
@@ -61,7 +61,7 @@ workflow cellranger_workflow {
 
 
 	# 2.1.1, 2.2.0, 3.0.0, or 3.0.2
-	String? cellranger_version = "2.2.0"
+	String? cellranger_version = "3.0.2"
 	# 1.0.0, 1.0.1
 	String? cellranger_atac_version = "1.0.1"
 	# scCloud version, default to "0.8.0"
@@ -404,7 +404,7 @@ task generate_count_config {
 					n_ref += 1
 
 				if data_type == 'rna' or data_type == 'adt' or data_type == 'crispr':
-					chemistry = 'auto'
+					chemistry = 'auto' if data_type == 'rna' else 'SC3Pv3'
 					if 'Chemistry' in df_local.columns:
 						assert df_local['Chemistry'].unique().size == 1
 						chemistry = df_local['Chemistry'].iat[0]
