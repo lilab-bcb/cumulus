@@ -40,7 +40,7 @@ ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker
 
 RUN tar -xzf /software/scCloud-0.13.0.tar.gz -C /software && \
 	cd /software/scCloud-0.13.0 && pip install . && cd ../.. && \
-	cd /software/extract_ADT_UMIs && make all && cd ../.. && \
+	cd /software/extract_ADT_UMIs && make clean && make all && cd ../.. && \
 	chmod a+rx /software/monitor_script.sh
 
 ENV PATH=/software:/software/extract_ADT_UMIs:$PATH
