@@ -25,7 +25,7 @@ struct InputFile{
 };
 
 int max_mismatch_cell, max_mismatch_feature, umi_len;
-string feature_type;
+string feature_type, extra_info;
 int min_reads_per_umi;
 double min_ratio_per_umi;
 
@@ -105,38 +105,57 @@ inline bool validate_pattern_antibody(const string& tag, int pos, int lenA, int 
 	return true;
 }
 
-inline int locate_feature_start_crispr(const string& sequence, int range, const string& pattern, int max_mismatch) {
-	int best_pos = -1, best_nmis = max_mismatch + 1, npat = pattern.length(), n_mis;
-	range -= npat - 1;
-	for (int i = 0; i < range; ++i) {
-		n_mis = 0;
-		for (int j = 0; j < npat; ++j) {
-			n_mis += (sequence[i + j] != pattern[j]);
-			if (n_mis > max_mismatch) break;
-		}
-		if (best_nmis > n_mis) {
-			best_pos = i;
-			best_nmis = n_mis;
-		}
+// [start, end)
+inline int locate_scaffold_sequence(const string& sequence, const string& scaffold, int start, int end, int max_mismatch) {
+	int i, j, npat = scaffold.length(), n_mis = max_mismatch + 1;
+	
+	for (i = start; n_mis > max_mismatch && i < end; ++i) {
+		for (j = 0, n_mis = 0; j < npat && n_mis <= max_mismatch; ++j)
+			n_mis += (sequence[i + j] != scaffold[j]);
 	}
-	return best_pos >= 0 ? best_pos + npat : -1;
+
+	return i < end ? i : -1;
 }
 
-inline bool extract_feature_barcode(const string& sequence, int feature_length, const string& feature_type, string& feature_barcode) {
+// extra_info is the skeleton sequence for crispr and total-A/B/C for antibody
+inline bool extract_feature_barcode(const string& sequence, int feature_length, const string& feature_type, const string& extra_info, string& feature_barcode) {
 	bool success;
 
 	if (feature_type == "antibody") {
-		success = validate_pattern_antibody(sequence, feature_length, 7, 1);
-		if (success) feature_barcode = sequence.substr(0, feature_length);
+		if (extra_info == "TotalSeq-A") {
+			success = validate_pattern_antibody(sequence, feature_length, 7, 1);
+			if (success) feature_barcode = sequence.substr(0, feature_length);			
+		}
+		else {
+			success = true;
+			feature_barcode = sequence.substr(10, feature_length);
+		}
 	}
 	else {
-		assert(feature_type == "crispr");
-		int pos = locate_feature_start_crispr(sequence, sequence.length() - feature_length, "GGAAAGGACGAAACACCG", 1);
+		int pos = locate_scaffold_sequence(sequence, extra_info, feature_length, sequence.length() - extra_info.length(), 1);
 		success = pos >= 0;
-		if (success) feature_barcode = sequence.substr(pos, feature_length);
+		if (success) feature_barcode = sequence.substr(pos - feature_length, feature_length);
 	}
 
 	return success;
+}
+
+void detect_totalseq_type(string& extra_info) {
+	int numer, cnt, denom = 1000;
+
+	cnt = numer = 0;
+	for (auto&& input_fastq : inputs) {
+		gzip_in_r2.open(input_fastq.input_r2.c_str());
+		while (gzip_in_r2.next(read2) == 4 && cnt < denom) {
+			numer += validate_pattern_antibody(read2.seq, feature_blen, 7, 1);
+			++cnt;
+		}
+		gzip_in_r2.close();
+		if (cnt == denom) {
+			extra_info = (numer * 1.0 / denom > 0.8 ? "TotalSeq-A" : "TotalSeq-B or TotalSeq-C");
+			return;
+		}		
+	}
 }
 
 int main(int argc, char* argv[]) {
@@ -148,6 +167,7 @@ int main(int argc, char* argv[]) {
 		printf("\toutput_name\toutput file name prefix;output_name.csv and output_name.stat.csv\n");
 		printf("Options:\n\t--max-mismatch-cell #\tmaximum number of mismatches allowed for cell barcodes [default: 1]\n");
 		printf("\t--feature feature_type\tfeature type can be either antibody or crispr [default: antibody]\n");
+		printf("\t--scaffold-sequence sequence\tscaffold sequence used to locate the protospacer for sgRNA\n");
 		printf("\t--max-mismatch-feature #\tmaximum number of mismatches allowed for feature barcodes [default: 3]\n");
 		printf("\t--umi-length len\tlength of the UMI sequence [default: 10]\n");
 		printf("\t--min-reads-per-umi min_reads\tminimum number of reads required to keep one UMI as true signal [default: 1]\n");
@@ -167,6 +187,7 @@ int main(int argc, char* argv[]) {
 	umi_len = 10;
 	min_reads_per_umi = 1;
 	min_ratio_per_umi = 0.0;
+	extra_info = "";
 
 	for (int i = 5; i < argc; ++i) {
 		if (!strcmp(argv[i], "--max-mismatch-cell")) {
@@ -174,6 +195,9 @@ int main(int argc, char* argv[]) {
 		}
 		if (!strcmp(argv[i], "--feature")) {
 			feature_type = argv[i + 1];
+		}
+		if (!strcmp(argv[i], "--scaffold-sequence")) {
+			extra_info = argv[i + 1];
 		}
 		if (!strcmp(argv[i], "--max-mismatch-feature")) {
 			max_mismatch_feature = atoi(argv[i + 1]);
@@ -195,6 +219,20 @@ int main(int argc, char* argv[]) {
 
 	parse_input_directory(argv[3]);
 
+	if (feature_type == "antibody") {
+		detect_totalseq_type(extra_info);
+		printf("TotalSeq type is automatically detected as %s.\n", extra_info.c_str());
+	} else {
+		if (feature_type != "crispr") {
+			printf("Do not support unknown feature type %s!\n", feature_type.c_str());
+			exit(-1);
+		}
+		if (extra_info == "") {
+			printf("Scaffold sequence is required for feature type crispr!\n");
+			exit(-1);
+		}
+	}
+
 	int cnt = 0;
 	string cell_barcode, umi, feature_barcode;
 	uint64_t binary_cell, binary_umi, binary_feature;
@@ -213,7 +251,7 @@ int main(int argc, char* argv[]) {
 			cell_iter = cell_index.find(binary_cell);
 
 			if (cell_iter != cell_index.end() && cell_iter->second.item_id >= 0) {
-				if (extract_feature_barcode(read2.seq, feature_blen, feature_type, feature_barcode)) {
+				if (extract_feature_barcode(read2.seq, feature_blen, feature_type, extra_info, feature_barcode)) {
 					binary_feature = barcode_to_binary(feature_barcode);
 					feature_iter = feature_index.find(binary_feature);
 
