@@ -65,7 +65,7 @@ task parse_input_csv {
 		import pandas as pd 
 		from subprocess import check_call
 
-		df = pd.read_csv('${input_csv_file}', header = 0, index_col = 0)
+		df = pd.read_csv('${input_csv_file}', header = 0, dtype=str, index_col = 0)
 		with open('plate_names.txt', 'w') as fo1, open('pn2ss.txt', 'w') as fo2:
 			for plate_name in df['Plate'].unique():
 				plate_df = df.loc[df['Plate'] == plate_name, ['Read1', 'Read2']]
