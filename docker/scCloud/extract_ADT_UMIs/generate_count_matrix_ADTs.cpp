@@ -153,6 +153,7 @@ void detect_totalseq_type(string& extra_info) {
 		gzip_in_r2.close();
 		if (cnt == denom) {
 			extra_info = (numer * 1.0 / denom > 0.8 ? "TotalSeq-A" : "TotalSeq-B or TotalSeq-C");
+			printf("extra_ratio = %.2f\n", numer * 1.0 / denom);
 			return;
 		}		
 	}
