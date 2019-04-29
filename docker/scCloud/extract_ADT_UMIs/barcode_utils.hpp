@@ -101,7 +101,7 @@ inline void mutate_index_one_mismatch(HashType& index_dict, std::string& barcode
 		for (int j = 0; j < NNUC; ++j)
 			if (val != aux_arr[i][j]) {
 				insert(index_dict, binary_id - val + aux_arr[i][j], ValueType(item_id, 1));
-			} 
+			}
 	}
 }
 

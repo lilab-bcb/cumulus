@@ -7,6 +7,7 @@
 #include <string>
 #include <vector>
 #include <fstream>
+#include <algorithm>
 
 #include "dirent.h"
 
@@ -17,6 +18,8 @@
 using namespace std;
 
 const int STRLEN = 1005;
+const string TSO = "AAGCAGTGGTATCAACGCAGAGTACATGGG"; // For Perturb-seq
+
 
 struct InputFile{
 	string input_r1, input_r2;
@@ -41,6 +44,10 @@ HashType cell_index, feature_index;
 HashIterType cell_iter, feature_iter;
 
 DataCollector dataCollector;
+
+int f[2][7]; // for banded dynamic programming, max allowed mismatch = 3
+
+
 
 void parse_input_directory(char* input_dirs) {
 	DIR *dir;
@@ -105,21 +112,55 @@ inline bool validate_pattern_antibody(const string& tag, int pos, int lenA, int 
 	return true;
 }
 
-// [start, end)
-inline int locate_scaffold_sequence(const string& sequence, const string& scaffold, int start, int end, int max_mismatch) {
-	int i, j, npat = scaffold.length(), n_mis = max_mismatch + 1;
-	
-	for (i = start; n_mis > max_mismatch && i < end; ++i) {
-		for (j = 0, n_mis = 0; j < npat && n_mis <= max_mismatch; ++j)
-			n_mis += (sequence[i + j] != scaffold[j]);
+// return rightmost position
+inline int matching(const string& readseq, const string& pattern, int nmax_mis, int pos) {
+	int nmax_size = nmax_mis * 2 + 1;
+	// f[x][y] : x, pattern, y, readseq
+	// f[x][y] = min(f[x - 1][y - 1] + delta, f[x][y - 1] + 1, f[x - 1][y] + 1)
+	int rlen = readseq.length(), plen = pattern.length();
+	int prev, curr, rpos;
+	int value, best_value, best_j;
+
+	// init f[-1], do not allow insertion at the beginning
+	for (int j = 0; j < nmax_size; ++j) f[1][j] = nmax_mis + 1;
+	f[1][nmax_mis] = 0;
+
+	// Dynamic Programming
+	prev = 1; curr = 0;
+	best_value = 0;
+	int i;
+	for (i = 0; i < plen && best_value <= nmax_mis; ++i) {
+		best_value = nmax_mis + 1; best_j = -1;
+		for (int j = 0; j < nmax_size; ++j) {
+			value = nmax_mis + 1;
+			rpos = pos + i + (j - nmax_mis);
+			if (rpos >= 0 && rpos < rlen) value = min(value, f[prev][j] + (pattern[i] != readseq[rpos])); // match/mismatch
+			if (j > 0) value = min(value, f[curr][j - 1] + 1); // insertion
+			if (j + 1 < nmax_size) value = min(value, f[prev][j + 1] + 1); // deletion
+			f[curr][j] = value;
+			if (best_value > value) { best_value = value; best_j = j; }
+		}
+		prev = curr; curr ^= 1;
 	}
 
-	return i < end ? i : -1;
+	// printf("line %d: i = %d, best_value = %d, best_j = %d\n", line_no, i, best_value, best_j);
+	return best_value <= nmax_mis ? pos + i + (best_j - nmax_mis) : -1;
+}
+
+// [start, end]
+inline int locate_scaffold_sequence(const string& sequence, const string& scaffold, int start, int end, int max_mismatch) {
+	int i, pos;
+	
+	for (i = start; pos < 0 && i <= end; ++i)
+		pos = matching(sequence, scaffold, max_mismatch, i);
+
+	return i <= end ? i : -1;
 }
 
 // extra_info is the skeleton sequence for crispr and total-A/B/C for antibody
 inline bool extract_feature_barcode(const string& sequence, int feature_length, const string& feature_type, const string& extra_info, string& feature_barcode) {
 	bool success;
+	int start_pos, end_pos;
 
 	if (feature_type == "antibody") {
 		if (extra_info == "TotalSeq-A") {
@@ -132,9 +173,19 @@ inline bool extract_feature_barcode(const string& sequence, int feature_length, 
 		}
 	}
 	else {
-		int pos = locate_scaffold_sequence(sequence, extra_info, feature_length, sequence.length() - extra_info.length(), 1);
-		success = pos >= 0;
-		if (success) feature_barcode = sequence.substr(pos - feature_length, feature_length);
+		start_pos = matching(sequence, TSO, 3, 0); // match template switch oligo
+		success = start_pos >= 0;
+		if (success) {
+			++start_pos;
+			end_pos = locate_scaffold_sequence(sequence, extra_info, start_pos + feature_length - max_mismatch_feature, sequence.length() - (extra_info.length() - 2), 2);
+			success = end_pos >= 0;
+			if (success) {
+				if (end_pos - start_pos >= feature_length) 
+					feature_barcode = sequence.substr(end_pos - feature_length, feature_length);
+				else 
+					feature_barcode = string(feature_length - (end_pos - start_pos), 'N') + sequence.substr(start_pos, end_pos - start_pos);
+			}
+		}
 	}
 
 	return success;
@@ -152,8 +203,9 @@ void detect_totalseq_type(string& extra_info) {
 		}
 		gzip_in_r2.close();
 		if (cnt == denom) {
-			extra_info = (numer * 1.0 / denom > 0.8 ? "TotalSeq-A" : "TotalSeq-B or TotalSeq-C");
-			printf("extra_ratio = %.2f\n", numer * 1.0 / denom);
+			double ratio = numer * 1.0 / denom;
+			printf("Ratio of having poly(A) tails: %.2f.\n", ratio); 
+			extra_info = (ratio > 0.5 ? "TotalSeq-A" : "TotalSeq-B or TotalSeq-C");
 			return;
 		}		
 	}
