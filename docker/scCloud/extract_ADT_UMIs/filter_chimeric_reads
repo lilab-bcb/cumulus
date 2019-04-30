@@ -1,0 +1,73 @@
+#!/usr/bin/env python
+
+import matplotlib
+matplotlib.use('Agg')
+
+from sys import argv, exit
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+from numba import njit
+
+if len(argv) != 6:
+	print("Usage: filter_chimeric_reads feature_type feature_index.csv input.stat.csv.gz min_ratio(non-includsive) output_name")
+	exit(-1)
+
+
+
+def detect_background_signal_boundary(df):
+	count_vec = df['Count'].value_counts().sort_index()
+	
+	ninc = 0
+	for i in range(count_vec.size):
+		ninc = ninc + 1 if i > 0 and count_vec.iat[i] > count_vec.iat[i - 1] else 0
+		if ninc >= 2:
+			break
+		prev_count = count_vec.iat[i]
+	
+	count_threshold = count_vec.index[i - 2] if ninc >= 2 and i - 2 <= 10 else 2
+
+	return count_vec, count_threshold
+
+def generate_umi_count_plot(count_vec, count_threshold, output_name):
+	idx = count_vec.index >= count_threshold
+	background = plt.bar(count_vec.index[~idx], count_vec.values[~idx], linewidth = 0, color = 'blue')
+	signal = plt.bar(count_vec.index[idx], count_vec.values[idx], linewidth = 0, color = 'red')
+	plt.legend([background, signal], ["background", "signal"], loc = 'upper right')
+	plt.xlim(0, count_vec.index.max() + 1)
+	plt.xlabel('UMI with certain number of reads')
+	plt.ylabel('Number of UMIs')
+	plt.savefig(output_name + '.umi_count.pdf', dpi = 500)
+	plt.close()
+
+def load_feature_names(feature_file):
+	return pd.read_csv(feature_file, header = None, index_col = 0, squeeze = True).values
+
+def write_csv(new_barcodes, feature_names, tot_umis, output_file):
+	with open(output_file, 'w') as fout:
+		fout.write('CRISPR,' + ','.join(new_barcodes) + '\n')
+		for name in feature_names:
+			fout.write(name + ',' + ','.join(tot_umis.reindex(zip(new_barcodes, np.full(new_barcodes.size, name)), fill_value = 0).astype(str)) + '\n')
+
+
+
+if argv[1] == 'crispr':
+	df = pd.read_csv(argv[3], header = 0)
+	count_vec, count_threshold = detect_background_signal_boundary(df)
+	generate_umi_count_plot(count_vec, count_threshold, argv[5])
+	print("Keep UMIs with at least {} reads.".format(count_threshold))
+
+	tot_reads = df.groupby(['Barcode', 'UMI'])['Count'].sum()
+	df['Ratio'] = df['Count'] / tot_reads[df[['Barcode', 'UMI']].values].values
+	idx = (df['Count'].values >= count_threshold) & (df['Ratio'].values > float(argv[4]))
+
+	new_df = df[idx]
+	new_df.to_csv(argv[5] + '.filt.stat.csv.gz', index = False)
+
+	new_barcodes = new_df['Barcode'].unique()
+	feature_names = load_feature_names(argv[2])
+
+	tot_umis = new_df.groupby(['Barcode', 'Feature'])['UMI'].count()
+	write_csv(new_barcodes, feature_names, tot_umis, argv[5] + '.filt.csv')
+
+	print("Done.")
