@@ -39,6 +39,7 @@ public:
 		std::vector<int> dummy(cell_ids.size(), 0), tot_umis(cell_ids.size(), 0);
 		std::vector<std::vector<int> > ADTs(n_feature, dummy);
 		double denom;
+		int total_reads = 0, total_umis = 0;
 
 		fstat.open(output_name + ".stat.csv.gz");
 		fstat() << "Barcode,UMI,Feature,Count"<< std::endl;
@@ -49,6 +50,8 @@ public:
 				for (auto&& kv2 : kv1.second) denom += kv2.second;
 				for (auto&& kv2 : kv1.second) {
 					fstat()<< cell_names[cell_ids[i]]<< ","<<  binary_to_barcode(kv1.first, umi_len)<< ","<< feature_names[kv2.first]<< ","<< kv2.second<< std::endl;
+					total_reads += kv2.second;
+					++total_umis;
 					if (kv2.second >= min_reads_per_umi && kv2.second / denom > min_ratio_per_umi) {
 						++ADTs[kv2.first][i];
 						++tot_umis[i];
@@ -72,6 +75,8 @@ public:
 		}
 		fout.close();
 		printf("%s.csv is written.\n", output_name.c_str());
+
+		printf("Sequencing saturation = %.2f%%, total_umis = %d, total_reads = %d.\n", (100.0 - total_umis * 100.0 / total_reads), total_umis, total_reads);
 	}
 
 private:
