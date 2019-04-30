@@ -112,14 +112,14 @@ inline bool validate_pattern_antibody(const string& tag, int pos, int lenA, int 
 	return true;
 }
 
-// return rightmost position
-inline int matching(const string& readseq, const string& pattern, int nmax_mis, int pos) {
+// return rightmost position + 1
+inline int matching(const string& readseq, const string& pattern, int nmax_mis, int pos, int& best_value) {
 	int nmax_size = nmax_mis * 2 + 1;
 	// f[x][y] : x, pattern, y, readseq
 	// f[x][y] = min(f[x - 1][y - 1] + delta, f[x][y - 1] + 1, f[x - 1][y] + 1)
 	int rlen = readseq.length(), plen = pattern.length();
 	int prev, curr, rpos;
-	int value, best_value, best_j;
+	int value, best_j;
 
 	// init f[-1], do not allow insertion at the beginning
 	for (int j = 0; j < nmax_size; ++j) f[1][j] = nmax_mis + 1;
@@ -129,7 +129,7 @@ inline int matching(const string& readseq, const string& pattern, int nmax_mis, 
 	prev = 1; curr = 0;
 	best_value = 0;
 	int i;
-	for (i = 0; i < plen && best_value <= nmax_mis; ++i) {
+	for (i = 0; i < plen; ++i) {
 		best_value = nmax_mis + 1; best_j = -1;
 		for (int j = 0; j < nmax_size; ++j) {
 			value = nmax_mis + 1;
@@ -140,19 +140,28 @@ inline int matching(const string& readseq, const string& pattern, int nmax_mis, 
 			f[curr][j] = value;
 			if (best_value > value) { best_value = value; best_j = j; }
 		}
+		if (best_value > nmax_mis) break;
 		prev = curr; curr ^= 1;
 	}
 
-	// printf("line %d: i = %d, best_value = %d, best_j = %d\n", line_no, i, best_value, best_j);
 	return best_value <= nmax_mis ? pos + i + (best_j - nmax_mis) : -1;
 }
 
 // [start, end]
 inline int locate_scaffold_sequence(const string& sequence, const string& scaffold, int start, int end, int max_mismatch) {
-	int i, pos;
-	
-	for (i = start; pos < 0 && i <= end; ++i)
-		pos = matching(sequence, scaffold, max_mismatch, i);
+	int i, pos, best_value, value;
+
+	for (i = start; i <= end; ++i) {
+		pos = matching(sequence, scaffold, max_mismatch, i, best_value);
+		if (pos >= 0) break;
+	}
+
+	if (best_value > 0) {
+		for (int j = i + 1; j <= i + max_mismatch; ++j) {
+			pos = matching(sequence, scaffold, max_mismatch, j, value);
+			if (best_value > value) best_value = value, i = j;
+		}
+	}
 
 	return i <= end ? i : -1;
 }
@@ -160,7 +169,7 @@ inline int locate_scaffold_sequence(const string& sequence, const string& scaffo
 // extra_info is the skeleton sequence for crispr and total-A/B/C for antibody
 inline bool extract_feature_barcode(const string& sequence, int feature_length, const string& feature_type, const string& extra_info, string& feature_barcode) {
 	bool success;
-	int start_pos, end_pos;
+	int start_pos, end_pos, best_value;
 
 	if (feature_type == "antibody") {
 		if (extra_info == "TotalSeq-A") {
@@ -173,10 +182,9 @@ inline bool extract_feature_barcode(const string& sequence, int feature_length, 
 		}
 	}
 	else {
-		start_pos = matching(sequence, TSO, 3, 0); // match template switch oligo
+		start_pos = matching(sequence, TSO, 3, 0, best_value); // match template switch oligo
 		success = start_pos >= 0;
 		if (success) {
-			++start_pos;
 			end_pos = locate_scaffold_sequence(sequence, extra_info, start_pos + feature_length - max_mismatch_feature, sequence.length() - (extra_info.length() - 2), 2);
 			success = end_pos >= 0;
 			if (success) {
@@ -213,7 +221,7 @@ void detect_totalseq_type(string& extra_info) {
 
 int main(int argc, char* argv[]) {
 	if (argc < 5) {
-		printf("Usage: generate_count_matrix_ADTs cell_barcodes.txt[.gz] feature_barcodes.csv fastq_folders output_name [--max-mismatch-cell #] [--feature feature_type] [--max-mismatch-feature #] [--umi-length len] [--min-reads-per-umi min_reads] [--min-ratio-per-umi ratio]\n");
+		printf("Usage: generate_count_matrix_ADTs cell_barcodes.txt[.gz] feature_barcodes.csv fastq_folders output_name [--max-mismatch-cell #] [--feature feature_type] [--scaffold-sequence sequence] [--max-mismatch-feature #] [--umi-length len] [--min-reads-per-umi min_reads] [--min-ratio-per-umi ratio]\n");
 		printf("Arguments:\n\tcell_barcodes.txt[.gz]\t10x genomics barcode white list\n");
 		printf("\tfeature_barcodes.csv\tfeature barcode file;barcode,feature_name\n");
 		printf("\tfastq_folders\tfolder contain all R1 and R2 FASTQ files ending with 001.fastq.gz\n");
@@ -307,7 +315,6 @@ int main(int argc, char* argv[]) {
 				if (extract_feature_barcode(read2.seq, feature_blen, feature_type, extra_info, feature_barcode)) {
 					binary_feature = barcode_to_binary(feature_barcode);
 					feature_iter = feature_index.find(binary_feature);
-
 					if (feature_iter != feature_index.end() && feature_iter->second.item_id >= 0) {
 						umi = read1.seq.substr(cell_blen, umi_len);
 						binary_umi = barcode_to_binary(umi);
@@ -317,6 +324,7 @@ int main(int argc, char* argv[]) {
 				}
 			}
 
+			if (cnt > 10000) exit(-1);
 			if (cnt % 1000000 == 0) printf("Processed %d reads.\n", cnt);
 		}
 
