@@ -1,7 +1,7 @@
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_mkfastq/versions/3/plain-WDL/descriptor" as crm
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_count/versions/3/plain-WDL/descriptor" as crc
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_vdj/versions/4/plain-WDL/descriptor" as crv
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/11/plain-WDL/descriptor" as sa
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/12/plain-WDL/descriptor" as sa
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_mkfastq/versions/1/plain-WDL/descriptor" as cram
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_count/versions/4/plain-WDL/descriptor" as crac
 
@@ -51,8 +51,12 @@ workflow cellranger_workflow {
 
 	# For extracting ADT count
 
-	# maximum hamming distance in antibody barcodes
+	# scaffold sequence for Perturb-seq, set to "" for adt
+	String? scaffold_sequence
+	# maximum hamming distance in feature barcodes
 	Int? max_mismatch = 3
+	# minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for data type crispr
+	Float? min_read_ratio = 0.1
 
 	# For atac
 
@@ -225,7 +229,9 @@ workflow cellranger_workflow {
 						chemistry = generate_count_config.sample2chemistry[sample_id],
 						data_type = generate_count_config.sample2datatype[sample_id],
 						feature_barcode_file = generate_count_config.sample2fbf[sample_id],
+						scaffold_sequence = scaffold_sequence, 
 						max_mismatch = max_mismatch,
+						min_read_ratio = min_read_ratio,
 						sccloud_version = sccloud_version,
 						zones = zones,
 						memory = feature_memory,

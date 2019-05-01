@@ -13,15 +13,18 @@ workflow scCloud_adt {
 	String data_type
 
 	# cell barcodes white list, from 10x genomics, can be either v2 or v3 chemistry
-	# File cell_barcode_file = (if chemistry == "SC3Pv3" then "gs://regev-lab/resources/cellranger/3M-february-2018.txt.gz" else "gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz")
-	File cell_barcode_file = (if chemistry == "SC3Pv3" then "3M-february-2018.txt.gz" else "737K-august-2016.txt.gz")
+	File cell_barcode_file = (if chemistry == "SC3Pv3" then "gs://regev-lab/resources/cellranger/3M-february-2018.txt.gz" else "gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz")
+	# File cell_barcode_file = (if chemistry == "SC3Pv3" then "3M-february-2018.txt.gz" else "737K-august-2016.txt.gz")
 
 	# feature barcodes in csv format
 	File feature_barcode_file
 
+	# scaffold sequence for Perturb-seq, set it to "" for adt
+	String scaffold_sequence
+
 	# maximum hamming distance in feature barcodes
 	Int? max_mismatch = 3
-	# minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination
+	# minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for crispr
 	Float? min_read_ratio = 0.1
 
 	# scCloud version
@@ -44,6 +47,7 @@ workflow scCloud_adt {
 			data_type = data_type,
 			cell_barcodes = cell_barcode_file,
 			feature_barcodes = feature_barcode_file,
+			scaffold_sequence = scaffold_sequence,
 			max_mismatch = max_mismatch,
 			min_read_ratio = min_read_ratio,
 			sccloud_version = sccloud_version,
@@ -67,6 +71,7 @@ task run_generate_count_matrix_ADTs {
 	String data_type
 	File cell_barcodes
 	File feature_barcodes
+	String scaffold_sequence
 	Int max_mismatch
 	Float min_read_ratio
 	String sccloud_version
@@ -87,8 +92,8 @@ task run_generate_count_matrix_ADTs {
 		fastqs = []
 		for i, directory in enumerate('${input_fastqs_directories}'.split(',')):
 			directory = re.sub('/+$', '', directory) # remove trailing slashes 
-			# call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/${sample_id}', '.']
-			call_args = ['cp', '-r', directory + '/${sample_id}', '.']
+			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/${sample_id}', '.']
+			# call_args = ['cp', '-r', directory + '/${sample_id}', '.']
 			print(' '.join(call_args))
 			check_call(call_args)
 			call_args = ['mv', '${sample_id}', '${sample_id}_' + str(i)]
@@ -98,7 +103,7 @@ task run_generate_count_matrix_ADTs {
 	
 		call_args = ['generate_count_matrix_ADTs', '${cell_barcodes}', '${feature_barcodes}', ','.join(fastqs), '${sample_id}', '--max-mismatch-feature', '${max_mismatch}']
 		if '${data_type}' is 'crispr':
-			call_args.extend(['--feature', 'crispr', '--min-reads-per-umi', '11', '--min-ratio-per-umi', '0.25'])
+			call_args.extend(['--feature', 'crispr', '--scaffold-sequence', '${scaffold_sequence}'])
 		else:
 			call_args.extend(['--feature', 'antibody'])
 		if '${chemistry}' is 'SC3Pv3':
