@@ -29,8 +29,6 @@ struct InputFile{
 
 int max_mismatch_cell, max_mismatch_feature, umi_len;
 string feature_type, extra_info;
-int min_reads_per_umi;
-double min_ratio_per_umi;
 
 vector<InputFile> inputs; 
 
@@ -221,7 +219,7 @@ void detect_totalseq_type(string& extra_info) {
 
 int main(int argc, char* argv[]) {
 	if (argc < 5) {
-		printf("Usage: generate_count_matrix_ADTs cell_barcodes.txt[.gz] feature_barcodes.csv fastq_folders output_name [--max-mismatch-cell #] [--feature feature_type] [--scaffold-sequence sequence] [--max-mismatch-feature #] [--umi-length len] [--min-reads-per-umi min_reads] [--min-ratio-per-umi ratio]\n");
+		printf("Usage: generate_count_matrix_ADTs cell_barcodes.txt[.gz] feature_barcodes.csv fastq_folders output_name [--max-mismatch-cell #] [--feature feature_type] [--scaffold-sequence sequence] [--max-mismatch-feature #] [--umi-length len]\n");
 		printf("Arguments:\n\tcell_barcodes.txt[.gz]\t10x genomics barcode white list\n");
 		printf("\tfeature_barcodes.csv\tfeature barcode file;barcode,feature_name\n");
 		printf("\tfastq_folders\tfolder contain all R1 and R2 FASTQ files ending with 001.fastq.gz\n");
@@ -231,8 +229,6 @@ int main(int argc, char* argv[]) {
 		printf("\t--scaffold-sequence sequence\tscaffold sequence used to locate the protospacer for sgRNA\n");
 		printf("\t--max-mismatch-feature #\tmaximum number of mismatches allowed for feature barcodes [default: 3]\n");
 		printf("\t--umi-length len\tlength of the UMI sequence [default: 10]\n");
-		printf("\t--min-reads-per-umi min_reads\tminimum number of reads required to keep one UMI as true signal [default: 1]\n");
-		printf("\t--min-ratio-per-umi ratio\tif one barcode-umi combination has multiple features, only features with percentage of reads in the combination > ratio [default: 0.0]\n");
 		printf("Outputs:\n\toutput_name.csv\tfeature-cell count matrix. First row: [Antibody/CRISPR],barcode_1,...,barcode_n;Other rows: feature_name,feature_count_1,...,feature_count_n\n");
 		printf("\toutput_name.stat.csv.gz\tgzipped sufficient statistics file. First row: Barcode,UMI,Feature,Count; Other rows: each row describe the read count for one barcode-umi-feature combination\n");
 		exit(-1);
@@ -246,8 +242,6 @@ int main(int argc, char* argv[]) {
 	feature_type = "antibody";
 	max_mismatch_feature = 3;
 	umi_len = 10;
-	min_reads_per_umi = 1;
-	min_ratio_per_umi = 0.0;
 	extra_info = "";
 
 	for (int i = 5; i < argc; ++i) {
@@ -265,12 +259,6 @@ int main(int argc, char* argv[]) {
 		}
 		if (!strcmp(argv[i], "--umi-length")) {
 			umi_len = atoi(argv[i + 1]);
-		}
-		if (!strcmp(argv[i], "--min-reads-per-umi")) {
-			min_reads_per_umi = atoi(argv[i + 1]);
-		}
-		if (!strcmp(argv[i], "--min-ratio-per-umi")) {
-			min_ratio_per_umi = atof(argv[i + 1]);
 		}
 	}
 
@@ -333,7 +321,7 @@ int main(int argc, char* argv[]) {
 
 	printf("Parsing input data is finished.\n");
 
-	dataCollector.output(argv[4], feature_type, n_feature, cell_names, umi_len, feature_names, min_reads_per_umi, min_ratio_per_umi);
+	dataCollector.output(argv[4], feature_type, n_feature, cell_names, umi_len, feature_names);
 
 	b = time(NULL);
 	printf("Time spent = %.2fs.\n", difftime(b, a));
