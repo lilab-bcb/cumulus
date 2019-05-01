@@ -29,7 +29,7 @@ def detect_background_signal_boundary(df):
 
 	return count_vec, count_threshold
 
-def generate_umi_count_plot(count_vec, count_threshold, output_name):
+def generate_umi_count_plot(count_vec, count_threshold, output_file):
 	idx = count_vec.index >= count_threshold
 	background = plt.bar(count_vec.index[~idx], count_vec.values[~idx], linewidth = 0, color = 'blue')
 	signal = plt.bar(count_vec.index[idx], count_vec.values[idx], linewidth = 0, color = 'red')
@@ -37,7 +37,7 @@ def generate_umi_count_plot(count_vec, count_threshold, output_name):
 	plt.xlim(0, count_vec.index.max() + 1)
 	plt.xlabel('UMI with certain number of reads')
 	plt.ylabel('Number of UMIs')
-	plt.savefig(output_name + '.umi_count.pdf', dpi = 500)
+	plt.savefig(output_file, dpi = 500)
 	plt.close()
 
 def load_feature_names(feature_file):
@@ -54,7 +54,7 @@ def write_csv(new_barcodes, feature_names, tot_umis, output_file):
 if argv[1] == 'crispr':
 	df = pd.read_csv(argv[3], header = 0)
 	count_vec, count_threshold = detect_background_signal_boundary(df)
-	generate_umi_count_plot(count_vec, count_threshold, argv[5])
+	generate_umi_count_plot(count_vec, count_threshold, argv[5] + '.umi_count.pdf')
 	print("Keep UMIs with at least {} reads.".format(count_threshold))
 
 	tot_reads = df.groupby(['Barcode', 'UMI'])['Count'].sum()

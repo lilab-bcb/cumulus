@@ -13,14 +13,16 @@ workflow scCloud_adt {
 	String data_type
 
 	# cell barcodes white list, from 10x genomics, can be either v2 or v3 chemistry
-	File cell_barcode_file = (if chemistry == "SC3Pv3" then "gs://regev-lab/resources/cellranger/3M-february-2018.txt.gz" else "gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz")
-	# File cell_barcode_file = (if chemistry == "SC3Pv3" then "3M-february-2018.txt.gz" else "737K-august-2016.txt.gz")
+	# File cell_barcode_file = (if chemistry == "SC3Pv3" then "gs://regev-lab/resources/cellranger/3M-february-2018.txt.gz" else "gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz")
+	File cell_barcode_file = (if chemistry == "SC3Pv3" then "3M-february-2018.txt.gz" else "737K-august-2016.txt.gz")
 
 	# feature barcodes in csv format
 	File feature_barcode_file
 
 	# maximum hamming distance in feature barcodes
 	Int? max_mismatch = 3
+	# minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination
+	Float? min_read_ratio = 0.1
 
 	# scCloud version
 	String sccloud_version
@@ -43,6 +45,7 @@ workflow scCloud_adt {
 			cell_barcodes = cell_barcode_file,
 			feature_barcodes = feature_barcode_file,
 			max_mismatch = max_mismatch,
+			min_read_ratio = min_read_ratio,
 			sccloud_version = sccloud_version,
 			zones = zones,
 			memory = memory,
@@ -65,6 +68,7 @@ task run_generate_count_matrix_ADTs {
 	File cell_barcodes
 	File feature_barcodes
 	Int max_mismatch
+	Float min_read_ratio
 	String sccloud_version
 	String zones
 	String memory
@@ -83,8 +87,8 @@ task run_generate_count_matrix_ADTs {
 		fastqs = []
 		for i, directory in enumerate('${input_fastqs_directories}'.split(',')):
 			directory = re.sub('/+$', '', directory) # remove trailing slashes 
-			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/${sample_id}', '.']
-			# call_args = ['cp', '-r', directory + '/${sample_id}', '.']
+			# call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/${sample_id}', '.']
+			call_args = ['cp', '-r', directory + '/${sample_id}', '.']
 			print(' '.join(call_args))
 			check_call(call_args)
 			call_args = ['mv', '${sample_id}', '${sample_id}_' + str(i)]
@@ -105,9 +109,17 @@ task run_generate_count_matrix_ADTs {
 		check_call(call_args)
 		CODE
 
+		filter_chimeric_reads ${data_type} ${feature_barcodes} ${sample_id}.stat.csv.gz ${min_read_ratio} ${sample_id}
+
 		gsutil -q -m cp ${sample_id}.*csv* ${output_directory}/${sample_id}/
 		# mkdir -p ${output_directory}/${sample_id}
 		# cp -f ${sample_id}.*csv* ${output_directory}/${sample_id}/
+
+		if [ -f ${sample_id}.umi_count.pdf ]
+		then
+			gsutil -q cp ${sample_id}.umi_count.pdf ${output_directory}/${sample_id}/
+			# cp -f ${sample_id}.umi_count.pdf ${output_directory}/${sample_id}/
+		fi
 	}
 
 	output {
