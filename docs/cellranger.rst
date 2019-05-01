@@ -186,10 +186,18 @@ cellranger_workflow inputs:
 	  - Force the web summary HTML and metrics summary CSV to only report on a particular chain type. The accepted values are: auto for autodetection based on TR vs IG representation, TR for T cell receptors, IG for B cell receptors, all for all chain types
 	  - TR
 	  - 
+	* - scaffold_sequence
+	  - Scaffold sequence in sgRNA for Purturb-seq, only used for crispr data type
+	  - "GTTTAAGAGCTAAGCTGGAA"
+	  - 
 	* - max_mismatch
 	  - Maximum hamming distance in feature barcodes for the adt task
 	  - 3
 	  - 3
+	* - min_read_ratio
+	  - Minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for the adt task and crispr data type
+	  - 0.1
+	  - 0.1
 	* - cellranger_version
 	  - cellranger version, could be 2.0.2 (count only), 2.11, 2.2.0, 3.0.0, 3.0.2
 	  - "3.0.2"
@@ -423,10 +431,18 @@ Instructions to configure ``cellranger_mkfastq_count``
 		  - Description
 		  - Example
 		  - Default
+		* - scaffold_sequence
+		  - Scaffold sequence in sgRNA for Purturb-seq, only used for crispr data type
+		  - "GTTTAAGAGCTAAGCTGGAA"
+		  - 
 		* - max_mismatch
-		  - Maximum hamming distance in matching feature barcodes
+		  - Maximum hamming distance in feature barcodes for the adt task
 		  - 3
 		  - 3
+		* - min_read_ratio
+		  - Minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for the adt task and crispr data type
+		  - 0.1
+		  - 0.1
 		* - adt_memory
 		  - Optional memory in GB for extracting ADT count matrix
 		  - 32
@@ -442,16 +458,28 @@ Parameters used for feature count matrix extraction
 If the chemistry is V2, `10x genomics v2 cell barcode white list`_ will be used, a hamming distance of 1 is allowed for matching cell barcodes, and the UMI length is 10. 
 If the chemistry is V3, `10x genomics v3 cell barcode white list`_ will be used, a hamming distance of 0 is allowed for matching cell barcodes, and the UMI length is 12.
 
-For Perturb-seq data, a small number of gRNA guide barcode sequences will be sequenced ultra-deeply and we may have PCR chimeric reads. Therefore, we only keep barcode-feature-UMI combinations supported by more than 10 reads and additionally require the read support ratio, defined as total reads supporting barcode-feature-UMI over total reads supporting barcode-UMI for one feature be larger than 0.25. 
+For Perturb-seq data, a small number of sgRNA protospace sequences will be sequenced ultra-deeply and we may have PCR chimeric reads. Therefore, we generate filtered feature count matrices as well in a data driven manner: 
+
+We first plot the histogram of UMIs with certain number of read counts. The number of UMIs with x supporting reads decreases when x increases. We start from x = 1 and if we find that count[x] < count[x + 1] < count[x + 2], we detect a valley between two peaks. We filter out all UMIs with < x supporting reads since they are likely formed due to chimeric reads. 
+
+In addition, we also filter out barcode-feature-UMI combinations that have their read count ratio, which is defined as total reads supporting barcode-feature-UMI over total reads supporting barcode-UMI, no larger than *min_read_ratio*.
 
 Extracted feature count matrix output
 +++++++++++++++++++++++++++++++++++++
 
-For each antibody tag or crispr tag sample, a folder with the sample ID is generated under ``cellranger_output_directory``. In the folder, two files --- ``sample_id.csv`` and ``sample_id.stat.csv.gz`` are generated.
+For each antibody tag or crispr tag sample, a folder with the sample ID is generated under ``cellranger_output_directory``. In the folder, two files --- ``sample_id.csv`` and ``sample_id.stat.csv.gz`` --- are generated.
 
 ``sample_id.csv`` is the feature count matrix. It has the following format. The first line describes the column names: ``Antibody/CRISPR,cell_barcode_1,cell_barcode_2,...,cell_barcode_n``. The following lines describe UMI counts for each feature barcode, with the following format: ``feature_name,umi_count_1,umi_count_2,...,umi_count_n``.
 
 ``sample_id.stat.csv.gz`` stores the gzipped sufficient statistics. It has the following format. The first line describes the column names: ``Barcode,UMI,Feature,Count``. The following lines describe the read counts for every barcode-umi-feature combination.
+
+If data type is ``crispr``, three additional files, ``sample_id.umi_count.pdf``, ``sample_id.filt.csv`` and ``sample_id.filt.stat.csv.gz``, are generated.
+
+``sample_id.umi_count.pdf`` plots number of UMIs against UMI with certain number of reads and colors UMIs with high likelihood of being chimeric in blue and other UMIs in red. This plot is generated purely based on number of reads each UMI has.
+
+``sample_id.filt.csv`` is the filtered feature count matrix. It has the same format as ``sample_id.csv``.
+
+``sample_id.filt.stat.csv.gz`` is the filtered sufficient statistics. It has the same format as ``sample_id.stat.csv.gz``.
 
 
 
