@@ -6,7 +6,7 @@ workflow dropest {
 	String output_directory
 	String? dropest_version = "0.8.5"
 
-	String? dropest_memory = "52G"
+	String? dropest_memory = "104G"
 	Int dropest_cpu = 1
    	File? cellular_barcode_whitelist
 	Boolean? apply_directional_umi_correction = true
