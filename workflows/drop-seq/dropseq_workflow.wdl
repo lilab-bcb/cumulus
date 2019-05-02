@@ -73,7 +73,7 @@ workflow dropseq_workflow {
 	Int? bcl2fastq_cpu = 64
 	String? bcl2fastq_memory = "57.6G"
 	Int? bcl2fastq_disk_space = 1500
-	String? dropest_memory = "52G"
+	String? dropest_memory = "104G"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	String? drop_seq_tools_version = "2.3.0"
 	String? bcl2fastq_version = "2.20.0.422"
