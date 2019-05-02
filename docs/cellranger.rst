@@ -208,8 +208,8 @@ cellranger_workflow inputs:
 	  - "1.0.1"
 	* - sccloud_version
 	  - scCloud version for extracting feature barcode matrix
-	  - "0.7.0"
-	  - "0.7.0"
+	  - "0.8.0"
+	  - "0.8.0"
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-b us-east1-c us-east1-d"
