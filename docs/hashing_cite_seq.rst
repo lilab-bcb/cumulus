@@ -100,8 +100,8 @@ scCloud_hashing_cite_seq inputs:
 	  - 
 	* - sccloud_version
 	  - scCloud version
-	  - "0.7.0"
-	  - "0.7.0"
+	  - "0.8.0"
+	  - "0.8.0"
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-b us-east1-c us-east1-d"
