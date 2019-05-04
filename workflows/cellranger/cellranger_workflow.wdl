@@ -52,7 +52,7 @@ workflow cellranger_workflow {
 	# For extracting ADT count
 
 	# scaffold sequence for Perturb-seq, set to "" for adt
-	String? scaffold_sequence
+	String? scaffold_sequence = ""
 	# maximum hamming distance in feature barcodes
 	Int? max_mismatch = 3
 	# minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for data type crispr
