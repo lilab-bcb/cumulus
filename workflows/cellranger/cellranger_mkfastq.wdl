@@ -62,13 +62,25 @@ task run_cellranger_mkfastq {
 		monitor_script.sh > monitoring.log &
 		gsutil -q -m cp -r ${input_bcl_directory} .
 		# cp -r ${input_bcl_directory} .
-		cellranger mkfastq --id=results --run=${run_id} --csv=${input_csv_file} --jobmode=local --ignore-dual-index --qc
+
 
 		python <<CODE
 		import os
 		import glob
+		import sys
 		import pandas as pd
-		from subprocess import check_call
+		import subprocess
+		p = subprocess.run(['cellranger', 'mkfastq', '--id=results', '--run=${run_id}', '--csv=${input_csv_file}', '--jobmode=local', '--ignore-dual-index', '--qc'])
+		if p.returncode != 0: # ./MAKE_FASTQS_CS/MAKE_FASTQS/BCL2FASTQ_WITH_SAMPLESHEET/fork0/chnk0-u8d92d5526b/_stderr
+			if os.path.exists('results/MAKE_FASTQS_CS/MAKE_FASTQS/BCL2FASTQ_WITH_SAMPLESHEET/fork0/'):
+				output_dirs = os.listdir('results/MAKE_FASTQS_CS/MAKE_FASTQS/BCL2FASTQ_WITH_SAMPLESHEET/fork0/')
+				for output in output_dirs:
+					if output.startswith('chnk0-'):
+						break
+				with open(os.path.join('results/MAKE_FASTQS_CS/MAKE_FASTQS/BCL2FASTQ_WITH_SAMPLESHEET/fork0/', output, '_stderr'), "r") as error_in:
+					for line in error_in:
+						print(line, file=sys.stderr)
+			sys.exit(1)
 		with open("output_fastqs_flowcell_directory.txt", "w") as fout:
 			flowcell = [name for name in os.listdir('results/outs/fastq_path') if name != 'Reports' and name != 'Stats' and os.path.isdir('results/outs/fastq_path/' + name)][0]
 			fout.write('${output_directory}/${run_id}_fastqs/fastq_path/' + flowcell + '\n')
@@ -78,7 +90,7 @@ task run_cellranger_mkfastq {
 		for sample_id in df[idx]['Sample'].unique():
 			dir_name = prefix + sample_id
 			call_args = ['mkdir', '-p', dir_name]
-			check_call(call_args)
+			subprocess.check_call(call_args)
 			files = glob.glob(dir_name + '_S*_L*_*_001.fastq.gz')
 			if len(files) == 0:
 				print("Warning: cannot extract any reads for sample " + sample_id + "!")
@@ -86,7 +98,7 @@ task run_cellranger_mkfastq {
 				call_args = ['mv']
 				call_args.extend(files)
 				call_args.append(dir_name);
-				check_call(call_args)
+				subprocess.check_call(call_args)
 		CODE
 
 		gsutil -q -m rsync -d -r results/outs ${output_directory}/${run_id}_fastqs
@@ -104,7 +116,7 @@ task run_cellranger_mkfastq {
 				check_call(call_args)
 				print('${input_bcl_directory} is deleted!')
 			except CalledProcessError:
-				print("Failed to move outputs to Google bucket.")
+				print("Failed to delete BCL directory from Google bucket.")
 		CODE
 	}
 
