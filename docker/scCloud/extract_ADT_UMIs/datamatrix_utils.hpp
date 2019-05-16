@@ -47,7 +47,7 @@ public:
 			auto& one_cell = data_container[cell_ids[i]];
 			for (auto&& kv1 : one_cell) {
 				for (auto&& kv2 : kv1.second) {
-					fstat()<< cell_names[cell_ids[i]]<< ","<<  binary_to_barcode(kv1.first, umi_len)<< ","<< feature_names[kv2.first]<< ","<< kv2.second<< std::endl;
+					fstat()<< cell_names[cell_ids[i]]<< ","<< binary_to_barcode(kv1.first, umi_len)<< ","<< feature_names[kv2.first]<< ","<< kv2.second<< std::endl;
 					total_reads += kv2.second;
 					++total_umis;
 					++ADTs[kv2.first][i];
