@@ -262,7 +262,7 @@ int main(int argc, char* argv[]) {
 		}
 	}
 
-	parse_sample_sheet(argv[1], n_cell, cell_blen, cell_index, cell_names, max_mismatch_cell);
+	parse_sample_sheet(argv[1], n_cell, cell_blen, cell_index, cell_names, max_mismatch_cell, (feature_type == "crispr" ? true: false));
 	printf("Time spent on parsing cell barcodes = %.2fs.\n", difftime(time(NULL), a));
 	parse_sample_sheet(argv[2], n_feature, feature_blen, feature_index, feature_names, max_mismatch_feature);
 
