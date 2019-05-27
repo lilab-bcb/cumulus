@@ -410,10 +410,12 @@ task generate_count_config {
 					n_ref += 1
 
 				if data_type == 'rna' or data_type == 'adt' or data_type == 'crispr':
-					chemistry = 'auto' if data_type == 'rna' else 'SC3Pv3'
+					chemistry = 'auto'
 					if 'Chemistry' in df_local.columns:
 						assert df_local['Chemistry'].unique().size == 1
 						chemistry = df_local['Chemistry'].iat[0]
+					if chemistry == 'auto' && data_type != 'rna':
+						chemistry = 'SC3Pv3'
 					fo4.write(sample_id + '\t' + chemistry + '\n')
 					n_chem += 1
 
