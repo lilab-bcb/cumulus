@@ -141,7 +141,7 @@ workflow scCloud {
 	Boolean? run_umap
 	# Run umap on diffusion components.
 	Int? umap_K
-	# Umap parameter. [default: 0.1]
+	# Umap parameter. [default: 0.5]
 	Float? umap_min_dist
 	# Umap parameter. [default: 1.0]
 	Float? umap_spread
