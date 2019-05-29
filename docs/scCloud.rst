@@ -367,7 +367,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	* - umap_min_dist
 	  - Umap parameter.
 	  - 0.1
-	  - 1.0
+	  - 0.5
 	* - umap_spread
 	  - Umap parameter.
 	  - 1.0
