@@ -14,7 +14,7 @@ Latest version
 	  - Snapshot
 	  - Function
 	* - scCloud/cellranger_workflow
-	  - 11
+	  - 12
 	  - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
 	* - scCloud/smartseq2
 	  - 9
@@ -23,10 +23,10 @@ Latest version
 	  - 22
 	  - Run scCloud analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering and more
 	* - scCloud/scCloud_subcluster
-	  - 13
+	  - 14
 	  - Run subcluster analysis using scCloud
 	* - scCloud/scCloud_hashing_cite_seq
-	  - 14
+	  - 15
 	  - Run scCloud for cell-hashing/nucleus-hashing/CITE-Seq analysis
 
 Stable version - HTAPP v2
