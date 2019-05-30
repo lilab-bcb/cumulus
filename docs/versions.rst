@@ -20,7 +20,7 @@ Latest version
 	  - 9
 	  - Run Bowtie2 and RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files
 	* - scCloud/scCloud
-	  - 21
+	  - 22
 	  - Run scCloud analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering and more
 	* - scCloud/scCloud_subcluster
 	  - 13
