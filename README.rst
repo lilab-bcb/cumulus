@@ -1,5 +1,5 @@
 ====================================
-KCO tools, workflows, and spells
+KCO tools and workflows
 ====================================
 
 KCO tools for cloud computing!
