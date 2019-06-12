@@ -29,6 +29,7 @@ struct InputFile{
 
 int max_mismatch_cell, max_mismatch_feature, umi_len;
 string feature_type, extra_info;
+bool match_tso;
 
 vector<InputFile> inputs; 
 
@@ -180,7 +181,7 @@ inline bool extract_feature_barcode(const string& sequence, int feature_length, 
 		}
 	}
 	else {
-		start_pos = matching(sequence, TSO, 3, 0, best_value); // match template switch oligo
+		start_pos = match_tso ? matching(sequence, TSO, 3, 0, best_value) : 0; // match template switch oligo
 		success = start_pos >= 0;
 		if (success) {
 			end_pos = locate_scaffold_sequence(sequence, extra_info, start_pos + feature_length - max_mismatch_feature, sequence.length() - (extra_info.length() - 2), 2);
@@ -219,16 +220,17 @@ void detect_totalseq_type(string& extra_info) {
 
 int main(int argc, char* argv[]) {
 	if (argc < 5) {
-		printf("Usage: generate_count_matrix_ADTs cell_barcodes.txt[.gz] feature_barcodes.csv fastq_folders output_name [--max-mismatch-cell #] [--feature feature_type] [--scaffold-sequence sequence] [--max-mismatch-feature #] [--umi-length len]\n");
+		printf("Usage: generate_count_matrix_ADTs cell_barcodes.txt[.gz] feature_barcodes.csv fastq_folders output_name [--max-mismatch-cell #] [--feature feature_type] [--max-mismatch-feature #] [--umi-length len] [--scaffold-sequence sequence] [--no-match-tso]\n");
 		printf("Arguments:\n\tcell_barcodes.txt[.gz]\t10x genomics barcode white list\n");
 		printf("\tfeature_barcodes.csv\tfeature barcode file;barcode,feature_name\n");
 		printf("\tfastq_folders\tfolder contain all R1 and R2 FASTQ files ending with 001.fastq.gz\n");
 		printf("\toutput_name\toutput file name prefix;output_name.csv and output_name.stat.csv\n");
 		printf("Options:\n\t--max-mismatch-cell #\tmaximum number of mismatches allowed for cell barcodes [default: 1]\n");
 		printf("\t--feature feature_type\tfeature type can be either antibody or crispr [default: antibody]\n");
-		printf("\t--scaffold-sequence sequence\tscaffold sequence used to locate the protospacer for sgRNA\n");
 		printf("\t--max-mismatch-feature #\tmaximum number of mismatches allowed for feature barcodes [default: 3]\n");
 		printf("\t--umi-length len\tlength of the UMI sequence [default: 10]\n");
+		printf("\t--scaffold-sequence sequence\tscaffold sequence used to locate the protospacer for sgRNA\n");
+		printf("\t--no-match-tso\tdo not match template switching oligo for crispr data\n");
 		printf("Outputs:\n\toutput_name.csv\tfeature-cell count matrix. First row: [Antibody/CRISPR],barcode_1,...,barcode_n;Other rows: feature_name,feature_count_1,...,feature_count_n\n");
 		printf("\toutput_name.stat.csv.gz\tgzipped sufficient statistics file. First row: Barcode,UMI,Feature,Count; Other rows: each row describe the read count for one barcode-umi-feature combination\n");
 		exit(-1);
@@ -243,6 +245,7 @@ int main(int argc, char* argv[]) {
 	max_mismatch_feature = 3;
 	umi_len = 10;
 	extra_info = "";
+	match_tso = true;
 
 	for (int i = 5; i < argc; ++i) {
 		if (!strcmp(argv[i], "--max-mismatch-cell")) {
@@ -251,14 +254,17 @@ int main(int argc, char* argv[]) {
 		if (!strcmp(argv[i], "--feature")) {
 			feature_type = argv[i + 1];
 		}
-		if (!strcmp(argv[i], "--scaffold-sequence")) {
-			extra_info = argv[i + 1];
-		}
 		if (!strcmp(argv[i], "--max-mismatch-feature")) {
 			max_mismatch_feature = atoi(argv[i + 1]);
 		}
 		if (!strcmp(argv[i], "--umi-length")) {
 			umi_len = atoi(argv[i + 1]);
+		}
+		if (!strcmp(argv[i], "--scaffold-sequence")) {
+			extra_info = argv[i + 1];
+		}
+		if (!strcmp(argv[i], "--no-match-tso")) {
+			match_tso = false;
 		}
 	}
 
