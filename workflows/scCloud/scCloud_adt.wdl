@@ -104,6 +104,8 @@ task run_generate_count_matrix_ADTs {
 		call_args = ['generate_count_matrix_ADTs', '${cell_barcodes}', '${feature_barcodes}', ','.join(fastqs), '${sample_id}', '--max-mismatch-feature', '${max_mismatch}']
 		if '${data_type}' is 'crispr':
 			call_args.extend(['--feature', 'crispr', '--scaffold-sequence', '${scaffold_sequence}'])
+			if '${chemistry}' is not 'SC3Pv3':
+				call_args.append('--no-match-tso')
 		else:
 			call_args.extend(['--feature', 'antibody'])
 		if '${chemistry}' is 'SC3Pv3':
