@@ -1,8 +1,8 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_mkfastq/versions/3/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_mkfastq/versions/4/plain-WDL/descriptor" as crm
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_count/versions/3/plain-WDL/descriptor" as crc
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_vdj/versions/4/plain-WDL/descriptor" as crv
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/13/plain-WDL/descriptor" as sa
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_mkfastq/versions/1/plain-WDL/descriptor" as cram
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_mkfastq/versions/2/plain-WDL/descriptor" as cram
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_count/versions/4/plain-WDL/descriptor" as crac
 
 # import "../cellranger/cellranger_mkfastq.wdl" as crm
@@ -29,6 +29,8 @@ workflow cellranger_workflow {
 
 	# Whether to delete input_bcl_directory, default: false
 	Boolean? delete_input_bcl_directory = false
+	# Number of allowed mismatches per index
+    Int? mkfastq_barcode_mismatches
 
 	# common to cellranger count/vdj and cellranger-atac count
 
@@ -115,6 +117,7 @@ workflow cellranger_workflow {
 						input_csv_file = generate_bcl_csv.bcls[run_id],
 						output_directory = output_directory_stripped,
 						delete_input_bcl_directory = delete_input_bcl_directory,
+						barcode_mismatches = mkfastq_barcode_mismatches,
 						cellranger_version = cellranger_version,
 						zones = zones,
 						num_cpu = num_cpu,
@@ -133,6 +136,7 @@ workflow cellranger_workflow {
 						input_csv_file = generate_bcl_csv.bcls[run_id],
 						output_directory = output_directory_stripped,
 						delete_input_bcl_directory = delete_input_bcl_directory,
+						barcode_mismatches = mkfastq_barcode_mismatches,
 						cellranger_atac_version = cellranger_atac_version,
 						zones = zones,
 						num_cpu = num_cpu,

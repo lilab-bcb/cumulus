@@ -21,6 +21,9 @@ workflow cellranger_mkfastq {
 	# Number of preemptible tries 
 	Int? preemptible = 2
 
+	# Number of allowed mismatches per index
+	Int? barcode_mismatches
+
 	call run_cellranger_mkfastq {
 		input:
 			input_bcl_directory = sub(input_bcl_directory, "/+$", ""),
@@ -28,6 +31,7 @@ workflow cellranger_mkfastq {
 			output_directory = sub(output_directory, "/+$", ""),
 			delete_input_bcl_directory = delete_input_bcl_directory,
 			cellranger_version = cellranger_version,
+			barcode_mismatches=barcode_mismatches,
 			zones = zones,
 			num_cpu = num_cpu,
 			memory = memory,
@@ -53,7 +57,7 @@ task run_cellranger_mkfastq {
 	String memory
 	Int disk_space
 	Int preemptible
-
+	Int? barcode_mismatches
 	String run_id = basename(input_bcl_directory)
 
 	command {
@@ -70,7 +74,11 @@ task run_cellranger_mkfastq {
 		import sys
 		import pandas as pd
 		import subprocess
-		p = subprocess.run(['cellranger', 'mkfastq', '--id=results', '--run=${run_id}', '--csv=${input_csv_file}', '--jobmode=local', '--ignore-dual-index', '--qc'])
+		barcode_mismatches = '${barcode_mismatches}'
+		mkfastq_args = ['cellranger', 'mkfastq', '--id=results', '--run=${run_id}', '--csv=${input_csv_file}', '--jobmode=local', '--ignore-dual-index', '--qc']
+		if barcode_mismatches != '':
+			mkfastq_args += ['--barcode-mismatches', barcode_mismatches]
+		p = subprocess.run(mkfastq_args)
 		if p.returncode != 0: # ./MAKE_FASTQS_CS/MAKE_FASTQS/BCL2FASTQ_WITH_SAMPLESHEET/fork0/chnk0-u8d92d5526b/_stderr
 			if os.path.exists('results/MAKE_FASTQS_CS/MAKE_FASTQS/BCL2FASTQ_WITH_SAMPLESHEET/fork0/'):
 				output_dirs = os.listdir('results/MAKE_FASTQS_CS/MAKE_FASTQS/BCL2FASTQ_WITH_SAMPLESHEET/fork0/')

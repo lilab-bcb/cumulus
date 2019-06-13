@@ -20,6 +20,8 @@ workflow cellranger_atac_mkfastq {
 	Int? disk_space = 1500
 	# Number of preemptible tries 
 	Int? preemptible = 2
+	# Number of allowed mismatches per index
+    Int? barcode_mismatches
 
 	call run_cellranger_atac_mkfastq {
 		input:
@@ -27,6 +29,7 @@ workflow cellranger_atac_mkfastq {
 			input_csv_file = input_csv_file,
 			output_directory = sub(output_directory, "/+$", ""),
 			delete_input_bcl_directory = delete_input_bcl_directory,
+			barcode_mismatches = barcode_mismatches,
 			cellranger_atac_version = cellranger_atac_version,
 			zones = zones,
 			num_cpu = num_cpu,
@@ -53,7 +56,7 @@ task run_cellranger_atac_mkfastq {
 	String memory
 	Int disk_space
 	Int preemptible
-
+	Int? barcode_mismatches
 	String run_id = basename(input_bcl_directory)
 
 	command {
@@ -62,7 +65,7 @@ task run_cellranger_atac_mkfastq {
 		monitor_script.sh > monitoring.log &
 		gsutil -q -m cp -r ${input_bcl_directory} .
 		# cp -r ${input_bcl_directory} .
-		cellranger-atac mkfastq --id=results --run=${run_id} --csv=${input_csv_file} --jobmode=local --qc
+		cellranger-atac mkfastq --id=results --run=${run_id} --csv=${input_csv_file} --jobmode=local --qc ${"--barcode-mismatches " + barcode_mismatches}
 
 		python <<CODE
 		import os
@@ -89,7 +92,7 @@ task run_cellranger_atac_mkfastq {
 				check_call(call_args)
 				print('${input_bcl_directory} is deleted!')
 			except CalledProcessError:
-				print("Failed to move outputs to Google bucket.")
+				print("Failed to delete BCL directory.")
 		CODE
 	}
 
