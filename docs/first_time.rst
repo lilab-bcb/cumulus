@@ -24,13 +24,13 @@ If you've done this before you can skip this step - you only need to do this onc
 
 ---------------------------------
 
-Create a FireCloud workspace
+Create a Terra workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-#. Create a new FireCloud_ workspace by clicking Create New Workspace in FireCloud
+#. Create a new Terra_ workspace by clicking Create New Workspace in Terra
 
 For more detailed instructions please see this document_
 
-.. _document: https://software.broadinstitute.org/firecloud/documentation/article?id=10746
-.. _FireCloud: https://portal.firecloud.org
+.. _document: https://support.terra.bio/hc/en-us/articles/360022716811-The-Workspace-Organize-Data-Organize-and-Run-Analysis-Tools
+.. _Terra: https://app.terra.bio/
 

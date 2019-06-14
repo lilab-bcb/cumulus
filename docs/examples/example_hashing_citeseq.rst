@@ -1,17 +1,17 @@
 Example of Cell-Hashing and CITE-Seq Analysis on Cloud
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-In this example, you'll learn how to perform Cell-Hashing and CITE-Seq analysis using **scCloud** on FireCloud.
+In this example, you'll learn how to perform Cell-Hashing and CITE-Seq analysis using **scCloud** on Terra_.
 
 -----------------------------
 
-0. Create FireCloud Workspace
+0. Create Terra Workspace
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-After registering on FireCloud and creating a workspace there, you'll need the following two information:
+After registering on Terra and creating a workspace there, you'll need the following two information:
 
-	* **FireCloud workspace name**. This is shown on your FireCloud workspace webpage, with format *"<workspace-namespace>/<workspace-name>"*. Let it be ``ws-lab/ws-01`` in this example, which means that your workspace has namespace **ws-lab** and name **ws-01**.
-	* The corresponding **Google Cloud Bucket location**. You can check it by clicking the link under **"Google Bucket"** title on your FireCloud workspace webpage. Let it be ``gs://fc-e0000000-0000-0000-0000-000000000000`` in this example.
+	* **Terra workspace name**. This is shown on your Terra workspace webpage, with format *"<workspace-namespace>/<workspace-name>"*. Let it be ``ws-lab/ws-01`` in this example, which means that your workspace has namespace **ws-lab** and name **ws-01**.
+	* The corresponding **Google Cloud Bucket location**. You can check it by clicking the link under **"Google Bucket"** title on your Terra workspace webpage. Let it be ``gs://fc-e0000000-0000-0000-0000-000000000000`` in this example.
 
 
 
@@ -74,7 +74,7 @@ Now run the following KCO command in the same directory on your local machine::
 where options
 
 	   	* ``-m`` specifies the method to be used, 
-	   	* ``-w`` specifies the FireCloud workspace name, 
+	   	* ``-w`` specifies the Terra workspace name,
 	   	* ``--bucket-folder`` specifies the working directory on your Google Bucket, 
 	   	* ``-i`` specifies which input JSON file to be used, 
 	   	* ``-o`` specifies the filename of updated JSON file after execution, which can be renamed at your will.
@@ -221,3 +221,5 @@ When the execution is done, you'll get the following results stored on cloud ``g
 	* ``exp_merged_out.louvain_labels+assignment.composition.pdf``: Composition plot.
 
 You can directly go to your Google Bucket to view or download these results.
+
+.. _Terra: https://app.terra.bio/

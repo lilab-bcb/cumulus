@@ -1,11 +1,11 @@
-Run above FireCloud pipelines via command line
+Run Terra pipelines via command line
 ----------------------------------------------
 
-You can run FireCloud pipelines via the command line by installing the **kco** tools.
+You can run Terra pipelines via the command line by installing the **kco** tools.
 
 Install ``kco`` tools for Broad users
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Request an UGER server::
+Request an UGER node::
 
 	reuse UGER
 	qrsh -q interactive -l h_vmem=4g -pe smp 8 -binding linear:8 -P regevlab
@@ -39,10 +39,10 @@ Next, create an virtual environment ``kco`` and install ``kco`` tools::
 
 ---------------------------------
 
-Run FireCloud pipelines via ``kco fc_run``
+Run Terra pipelines via ``kco fc_run``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**kco fc_run** runs a FireCloud method. Features:
+**kco fc_run** runs a Terra method. Features:
 
 #. Uploads local files/directories in your inputs to a Google Cloud bucket updates the file paths to point to the Google Cloud bucket. Your sample sheet can point to local file paths and kco run will take care of uploading directories (e.g. fastq directories) and modifying the sample sheet to point to a Google Cloud bucket.
 
@@ -104,11 +104,11 @@ inputs.json:
 		"cellranger_workflow.delete_input_bcl_directory": true
 	}
 
-Run the following command to kick off your FireCloud pipeline::
+Run the following command to kick off your Terra pipeline::
 
 	kco fc_run -m scCloud/cellranger_workflow -i inputs.json -w myworkspace_namespace/myworkspace_name --bucket-folder inputs -o inputs_updated.json
 
-Upon success, **kco fc_run** returns a url pointing the the submitted FireCloud job. 
+Upon success, **kco fc_run** returns a url pointing the the submitted Terra job.
 
 If for any reason, your job failed. You could rerun it without uploading files again via the following command::
 

@@ -4,29 +4,31 @@ Drop-seq pipeline
 This workflow follows the steps outlined in the `Drop-seq alignment cookbook`_ from the `McCarroll lab`_ , except the default STAR aligner flags are *--limitOutSJcollapsed 1000000 --twopassMode Basic*.
 Additionally the pipeline provides the option to generate count matrices using  `dropEst`_.
 
-#. Copy your sequencing output to your workspace bucket using gsutil in your unix terminal.
+#. Copy your sequencing output to your workspace bucket using gsutil_ in your unix terminal.
 
-	You can obtain your bucket URL in the workspace summary tab in FireCloud under Google Bucket. You can also read `FireCloud instructions`_ on uploading data.
+	You can obtain your bucket URL in the dashboard tab of your Terra workspace under the information panel.
 
-	Example of copying the directory at /foo/bar/nextseq/Data/VK18WBC6Z4 to a Google Cloud bucket::
-
-		gsutil -m cp -r /foo/bar/Data/dropseq gs://fc-e0000000-0000-0000-0000-000000000000/dropseq
-
-	``-m`` means copy in parallel, ``-r`` means copy the directory recursively.
+	.. image:: images/google_bucket_link.png
 
 	Note: Broad users need to be on an UGER node (not a login node) in order to use the ``-m`` flag
 
-	Request an UGER server::
+	Request an UGER node::
 
 		reuse UGER
 		qrsh -q interactive -l h_vmem=4g -pe smp 8 -binding linear:8 -P regevlab
 
-	The above command requests an interactive shell with 4G memory per thread and 8 threads. Feel free to change the memory, thread, and project parameters.
+	The above command requests an interactive node with 4G memory per thread and 8 threads. Feel free to change the memory, thread, and project parameters.
 
-	Once you've connected to an UGER node run::
+	Once you're connected to an UGER node, you can make gsutil_ available by running::
+
 		reuse Google-Cloud-SDK
 
-	to make the Google Cloud tools available
+	Use ``gsutil cp [OPTION]... src_url dst_url`` to copy data to your workspace bucket.
+	For example, the following command copies the directory at /foo/bar/nextseq/Data/VK18WBC6Z4 to a Google bucket::
+
+		gsutil -m cp -r /foo/bar/nextseq/Data/VK18WBC6Z4 gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4
+
+	``-m`` means copy in parallel, ``-r`` means copy the directory recursively.
 
 
 
@@ -75,12 +77,14 @@ Additionally the pipeline provides the option to generate count matrices using  
 		gsutil cp /foo/bar/projects/sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
 
-#. Import dropseq_workflow method.
+#. Import dropseq_workflow tool.
 
-	In FireCloud, select the ``Method Configurations`` tab then click ``Import Configuration``. Click ``Import From Method Repository``. Type **scCloud/dropseq_workflow**.
+	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **scCloud/dropseq_workflow**.
+ 	You can also see the Terra documentation for `adding a tool`_.
 
-#. Uncheck ``Configure inputs/outputs using the Workspace Data Model``.
+#. Select ``Process single workflow from files``.
 
+	.. image:: images/single_workflow.png
 
 ---------------------------------
 
@@ -164,11 +168,12 @@ Outputs:
 
 The pipeline outputs a list of google bucket urls containing one gene-count matrix per sample. Each gene-count matrix file produced by Drop-seq tools has the suffix 'dge.txt.gz', matrices produced by dropEst have the extension .rds.
 
-.. _FireCloud instructions: https://software.broadinstitute.org/firecloud/documentation/article?id=10574
 .. _Drop-seq alignment cookbook: https://github.com/broadinstitute/Drop-seq/blob/master/doc/Drop-seq_Alignment_Cookbook.pdf
 .. _McCarroll lab: http://mccarrolllab.org/dropseq-1/
 .. _dropEst: https://github.com/hms-dbmi/dropEst
-
+.. _gsutil: https://cloud.google.com/storage/docs/gsutil
+.. _adding a tool: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
+.. _Terra: https://app.terra.bio/
 
 
 

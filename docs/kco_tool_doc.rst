@@ -33,7 +33,7 @@ Options
 kco fc-upload
 -------------
 
-*kco fc-upload* uploads local files/directories to your FireCloud workspace Google Cloud bucket.
+*kco fc-upload* uploads local files/directories to your Terra workspace Google Cloud bucket.
  
 Your sample sheet can point to local file paths and kco upload will take care of uploading directories (e.g. fastq directories) and modifying the sample sheet to point to a Google Cloud bucket.
 

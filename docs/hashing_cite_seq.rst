@@ -1,13 +1,15 @@
 Demultiplex cell-hashing/nuclei-hashing data using demuxEM or prepare for CITE-Seq analysis
 -------------------------------------------------------------------------------------------
 
-Follow the steps below to run **scCloud** for cell-hashing/nuclei-hashing/CITE-Seq data on FireCloud.
+Follow the steps below to run **scCloud** for cell-hashing/nuclei-hashing/CITE-Seq data on Terra_.
 
-#. Run Cell Ranger tool to generate raw gene count matrices and antibody hashtag data. Please refer to `cellranger_workflow Tutorial`_ for details.
+#. Run Cell Ranger tool to generate raw gene count matrices and antibody hashtag data.
 
-	.. _cellranger_workflow Tutorial: ./cellranger.html
+	Please refer to the `cellranger_workflow tutorial`_ for details.
 
-   When finished, you should be able to find the raw gene count matrix (e.g. ``raw_gene_be_matrices_h5.h5``) and ADT count matrix (e.g. ``sample_1_ADT.csv``) for each sample.
+	.. _cellranger_workflow tutorial: ./cellranger.html
+
+	When finished, you should be able to find the raw gene count matrix (e.g. ``raw_gene_be_matrices_h5.h5``) and ADT count matrix (e.g. ``sample_1_ADT.csv``) for each sample.
 
 #. Create a sample sheet, **sample_sheet_hashing.csv**, which describes the metadata for each pair of RNA and antibody hashtag data. The sample sheet should contain 4 columns --- *OUTNAME*, *RNA*, *ADT*, and *TYPE*. *OUTNAME* is the output name for one pair of RNA and ADT data. *RNA* is the raw gene count matrix generated in the above step. *ADT* is the ADT count matrix also generated in the above step. *TYPE* is the assay type, which can be *cell-hashing*, *nuclei-hashing*, or *cite-seq*.
 
@@ -35,11 +37,14 @@ Follow the steps below to run **scCloud** for cell-hashing/nuclei-hashing/CITE-S
 		gsutil cp /foo/bar/projects/my_sample_sheet_hashing.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 		gsutil cp /foo/bar/projects/antibody_control.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
-#. Import **scCloud_hashing_cite_seq** method.
 
-	In FireCloud, select the "Method Configurations" tab then click "Import Configuration". Click "Import From Method Repository". Type **scCloud/scCloud_hashing_cite_seq**.
+#. Import scCloud_hashing_cite_seq tool.
 
-#. Uncheck "Configure inputs/outputs using the Workspace Data Model"
+	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **scCloud/scCloud_hashing_cite_seq**.
+ 	You can also see the Terra documentation for `adding a tool`_.
+
+#. Select ``Process single workflow from files``.
+
 
 ---------------------------------
 
@@ -196,3 +201,8 @@ To load the results into ``R``, you need to install R package ``reticulate`` in 
 	data <- ad$read_h5ad("output_name_demux.h5ad")
 
 Results are in ``data$obs['demux_type']``, ``data$obs['assignment']``, and ``data$obsm['raw_probs']``.
+
+
+.. _gsutil: https://cloud.google.com/storage/docs/gsutil
+.. _adding a tool: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
+.. _Terra: https://app.terra.bio/

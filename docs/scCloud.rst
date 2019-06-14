@@ -1,7 +1,7 @@
 Run single-cell cloud-based analysis module (scCloud) for scRNA-Seq data analysis
 ---------------------------------------------------------------------------------
 
-Follow the steps below to run **scCloud** on FireCloud.
+Follow the steps below to run **scCloud** on Terra_.
 
 #. Create a sample sheet, **count_matrix.csv**, which describes the metadata for each 10x channel. The sample sheet should at least contain 2 columns --- *Sample* and *Location*. *Sample* refers to sample names and *Location* refers to the location of the channel-specific count matrix in either 10x format (e.g. ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_gene_bc_matrices_h5.h5`` for v2 chemistry, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_feature_bc_matrices.h5``) for v3 chemistry or dropseq format (e.g. ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_2/sample_2.umi.dge.txt.gz``). You are free to add any other columns and these columns will be used in selecting channels for futher analysis. In the example below, we have *Source*, which refers to the tissue of origin, *Platform*, which refers to the sequencing platform, *Donor*, which refers to the donor ID, and *Reference*, which refers to the reference genome.
 
@@ -21,11 +21,14 @@ Follow the steps below to run **scCloud** on FireCloud.
 	
 		gsutil cp /foo/bar/projects/my_count_matrix.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
-#. Import **scCloud** method.
+#. Import scCloud tool.
 
-	In FireCloud, select the "Method Configurations" tab then click "Import Configuration". Click "Import From Method Repository". Type **scCloud/scCloud**.
+	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **scCloud/scCloud**.
+ 	You can also see the Terra documentation for `adding a tool`_.
 
-#. Uncheck "Configure inputs/outputs using the Workspace Data Model"
+#. Select ``Process single workflow from files``.
+
+	.. image:: images/single_workflow.png
 
 ---------------------------------
 
@@ -42,7 +45,7 @@ scCloud steps:
 
 #. **plot**. This step is optional. In this step, **scCloud** could generate 6 types of figures based on the **cluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne**, **umap**, **fle** plots show the same t-SNE/UMAP/FLE (force-directed layout embedding) colored by different attributes (e.g. cluster labels, conditions) side-by-side. Third, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components. Lastly, if input is CITE-Seq data, **citeseq_tsne** plots tSNEs based on epitope expression.
 
-In the following, we will first introduce global inputs and then introduce the WDL inputs and outputs for each step separately. But please note that you need to set inputs from all steps simultaneously in the FireCloud WDL. 
+In the following, we will first introduce global inputs and then introduce the WDL inputs and outputs for each step separately. But please note that you need to set inputs from all steps simultaneously in the Terra WDL.
 
 Note that we will make the required inputs/outputs bold and all other inputs/outputs are optional.
 
@@ -759,9 +762,10 @@ Once we have **scCloud** outputs, we could further analyze a subset of cells by 
 
 #. Import **scCloud_subcluster** method.
 
-	In FireCloud, select the "Method Configurations" tab then click "Import Configuration". Click "Import From Method Repository". Type **scCloud/scCloud_subcluster**.
+	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``.
+	Type **scCloud/scCloud_subcluster**. You can also see the Terra documentation for `adding a tool`_.
 
-#. Uncheck "Configure inputs/outputs using the Workspace Data Model".
+#. Select ``Process single workflow from files``.
 
 scCloud_subcluster steps:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -930,3 +934,6 @@ UMAP colored by genes of interest::
 
 
 .. _anndata: https://anndata.readthedocs.io/en/latest/
+.. _gsutil: https://cloud.google.com/storage/docs/gsutil
+.. _adding a tool: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
+.. _Terra: https://app.terra.bio/
