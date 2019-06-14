@@ -23,7 +23,7 @@ Activate the kco virtual environment::
 Install ``kco`` tools for non-Broad users
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Make sure you have ``conda`` installed. If you haven't installed ``conda``, use the following commands to install::
+Make sure you have ``conda`` installed. If you haven't installed conda_, use the following commands to install::
 
 	wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh .
 	bash Miniconda3-latest-Linux-x86_64.sh -p /users/foo/miniconda3
@@ -113,3 +113,6 @@ Upon success, **kco fc_run** returns a url pointing the the submitted Terra job.
 If for any reason, your job failed. You could rerun it without uploading files again via the following command::
 
 	kco fc_run -m scCloud/cellranger_workflow -i inputs_updated.json -w myworkspace_namespace/myworkspace_name
+
+
+.. _conda: https://docs.conda.io/en/latest/miniconda.html
