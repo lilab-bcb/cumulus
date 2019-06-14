@@ -1,7 +1,7 @@
-Latest and stable versions on FireCloud
+Latest and stable versions on Terra
 ---------------------------------------
 
-scCloud is a fast growing project. As a result, we frequently update WDL snapshot versions on FireCloud. See below for latest and stable WDL versions you can use.
+scCloud is a fast growing project. As a result, we frequently update WDL snapshot versions on Terra. See below for latest and stable WDL versions you can use.
 
 Latest version
 ^^^^^^^^^^^^^^
