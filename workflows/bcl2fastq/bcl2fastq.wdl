@@ -95,7 +95,7 @@ task run_bcl2fastq {
 							fastqs = []
 							sample_name_to_fastqs[sample_name] = fastqs
 						fastq_path = os.path.normpath(os.path.join(root, name))
-						fastqs.append(fastq)
+						fastqs.append(fastq_path)
 			for sample_name in sample_name_to_fastqs:
 				fastqs = sample_name_to_fastqs[sample_name]
 				fastqs.sort()
