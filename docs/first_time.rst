@@ -29,7 +29,7 @@ Create a Terra workspace
 
 #. Create a new Terra_ workspace by clicking Create New Workspace in Terra
 
-For more detailed instructions please see this document_
+	For more detailed instructions please see this document_
 
 .. _document: https://support.terra.bio/hc/en-us/articles/360022716811-The-Workspace-Organize-Data-Organize-and-Run-Analysis-Tools
 .. _Terra: https://app.terra.bio/
