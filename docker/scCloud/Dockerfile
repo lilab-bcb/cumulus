@@ -19,9 +19,21 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 	apt-get update && apt-get install -y google-cloud-sdk
 
 RUN pip install --upgrade pip && \
-	pip install numpy && \
-	pip install Cython && \
-	pip install pybind11 && \
+	pip install numpy==1.16.4 && \
+	pip install Cython==0.29.9 && \
+	pip install pybind11==2.2.4 && \
+	pip install h5py==2.9.0 && \
+	pip install joblib==0.13.2 && \
+	pip install leidenalg==0.7.0 && \
+	pip install lightgbm==2.2.3 && \
+	pip install loompy==2.0.17 && \
+	pip install natsort==6.0.0 && \
+	pip install numba==0.43.1 && \
+	pip install pandas==0.24.2 && \
+	pip install scikit-learn==0.21.2 && \
+	pip install scipy==1.2.1 && \
+	pip install statsmodels==0.9.0 && \
+	pip install tables==3.5.2 && \
 	mkdir /software && \
 	git clone https://github.com/nmslib/hnsw.git /software/hnswlib && \
 	cd /software/hnswlib/python_bindings && python setup.py install && cd ../../.. && \
