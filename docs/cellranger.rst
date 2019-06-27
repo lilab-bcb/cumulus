@@ -66,6 +66,7 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on Terra_.
 			| **mm10_v3.0.0** for mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation,
 			| **GRCh38_atac_v1.0.1** for scATAC-Seq, human GRCh38, cellranger-atac reference 1.0.1, Gencode v28 basic annotation,
 			| **mm10_atac_v1.0.1** for scATAC-Seq, mouse mm10, cellranger-atac reference 1.0.1, Gencode v28 basic annotation.
+			| **hg19_atac_v1.0.1** for scATAC-Seq, mouse hg19, cellranger-atac reference 1.0.1, Gencode v28 basic annotation.
 		* - **Flowcell**
 		  - Indicates the Google bucket URL of uploaded BCL folders.
 		* - **Lane**
