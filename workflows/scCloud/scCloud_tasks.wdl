@@ -889,7 +889,7 @@ task run_scCloud_demuxEM {
 task run_scCloud_merge_rna_adt {
 	File input_raw_gene_bc_matrices_h5
 	File input_adt_csv
-	File antibody_control_csv
+	File? antibody_control_csv
 	String output_dir
 	String output_name
 	String sccloud_version
@@ -903,7 +903,14 @@ task run_scCloud_merge_rna_adt {
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
 
-		scCloud merge_rna_adt ${input_raw_gene_bc_matrices_h5} ${input_adt_csv} ${antibody_control_csv} ${output_name}_merged_10x.h5
+		python <<CODE
+		from subprocess import check_call
+		call_args = ['scCloud', 'merge_rna_adt', '${input_raw_gene_bc_matrices_h5}', '${input_adt_csv}', '${output_name}_merged_10x.h5']
+		if '${antibody_control_csv}' is not '':
+			call_args.extend('--antibody-control-csv', '${antibody_control_csv}')
+		print(' '.join(call_args))
+		check_call(call_args)
+		CODE
 
 		gsutil -q cp ${output_name}_merged_10x.h5 ${output_dir}/${output_name}/
 		# mkdir -p ${output_dir}/${output_name}

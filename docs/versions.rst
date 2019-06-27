@@ -26,7 +26,7 @@ Latest version
 	  - 14
 	  - Run subcluster analysis using scCloud
 	* - scCloud/scCloud_hashing_cite_seq
-	  - 15
+	  - 16
 	  - Run scCloud for cell-hashing/nucleus-hashing/CITE-Seq analysis
 
 Stable version - HTAPP v2
