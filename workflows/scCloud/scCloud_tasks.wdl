@@ -419,7 +419,7 @@ task run_scCloud_plot {
 			pairs = '${plot_composition}'.split(',')
 			for pair in pairs:
 				lab, attr = pair.split(':')
-				call_args = ['scCloud', 'plot', 'composition', '--cluster-labels', lab, '--attribute', attr, '--style', 'normalized', '--not-stacked', '${input_h5ad}', '${output_name}.' + lab + '+' + attr + '.composition.pdf']
+				call_args = ['scCloud', 'plot', 'composition', '--cluster-labels', lab, '--attribute', attr, '--style', 'normalized', '--not-stacked', '${input_h5ad}', '${output_name}.' + lab + '.' + attr + '.composition.pdf']
 				print(' '.join(call_args))
 				check_call(call_args)
 		if '${plot_tsne}' is not '':
