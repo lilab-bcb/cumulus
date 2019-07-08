@@ -907,7 +907,7 @@ task run_scCloud_merge_rna_adt {
 		from subprocess import check_call
 		call_args = ['scCloud', 'merge_rna_adt', '${input_raw_gene_bc_matrices_h5}', '${input_adt_csv}', '${output_name}_merged_10x.h5']
 		if '${antibody_control_csv}' is not '':
-			call_args.extend('--antibody-control-csv', '${antibody_control_csv}')
+			call_args.extend(['--antibody-control-csv', '${antibody_control_csv}'])
 		print(' '.join(call_args))
 		check_call(call_args)
 		CODE
