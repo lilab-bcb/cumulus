@@ -287,7 +287,7 @@ task generate_count_config {
 
 	command {
 		set -e
-
+		export GCLOUD_PROJECT_ID=$(gcloud config list --format 'value(core.project)')
 		python <<CODE
 
 		import json
@@ -295,6 +295,7 @@ task generate_count_config {
 
 		import numpy as np
 		import pandas as pd
+		import os
 
 		bcl2fastq_sample_sheets = '${sep="," bcl2fastq_sample_sheets}'.split(',')
 		bcl2fastq_sample_sheets = list(filter(lambda x: x.strip() != '', bcl2fastq_sample_sheets))
@@ -340,7 +341,7 @@ task generate_count_config {
 		is_custom = reference.lower().startswith('gs:')
 		json_file = reference if is_custom else '${acronym_file}'
 
-		check_call(['gsutil', '-q', 'cp', json_file, 'config.json'])
+		check_call(['gsutil', '-q', '-u', os.getenv('GCLOUD_PROJECT_ID'), 'cp', json_file, 'config.json'])
 		with open('config.json', 'r') as f:
 			config = json.load(f)
 		if not is_custom:
