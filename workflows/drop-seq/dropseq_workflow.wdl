@@ -278,16 +278,17 @@ task generate_count_config {
 	Array[File]? bcl2fastq_sample_sheets
 	String zones
 	Int preemptible
-	String acronym_file
+	File acronym_file
 	String drop_seq_tools_version
 	String reference
 	Int? star_cpus
 	String? star_memory
-
+	Boolean is_reference_url = sub(reference, "^gs://.+", "URL") == "URL"
+	File config_file = (if is_reference_url then reference else acronym_file)
 
 	command {
 		set -e
-		export GCLOUD_PROJECT_ID=$(gcloud config list --format 'value(core.project)')
+
 		python <<CODE
 
 		import json
@@ -338,13 +339,9 @@ task generate_count_config {
 			df.to_csv('grouped_sample_sheet.txt', index=True, header=False, sep='\t')
 
 		reference = '${reference}'.strip()
-		is_custom = reference.lower().startswith('gs:')
-		json_file = reference if is_custom else '${acronym_file}'
-
-		check_call(['gsutil', '-q', '-u', os.getenv('GCLOUD_PROJECT_ID'), 'cp', json_file, 'config.json'])
-		with open('config.json', 'r') as f:
+		with open('${config_file}', 'r') as f:
 			config = json.load(f)
-		if not is_custom:
+		if '${is_reference_url}' == 'false':
 			config = config[reference.lower()]
 		with open('star_genome.txt', 'wt') as w1, open('refflat.txt', 'wt') as w2, open('gene_intervals.txt', 'wt') as w3, \
 			open('genome_fasta.txt', 'wt') as w4, open('genome_dict.txt', 'wt') as w5, open('star_memory.txt', 'wt') as w6, \
