@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:smartseq2_per_plate/versions/10/plain-WDL/descriptor" as ss2pp
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:smartseq2_per_plate/versions/11/plain-WDL/descriptor" as ss2pp
 # import "../smartseq2/smartseq2_per_plate.wdl" as ss2pp
 
 workflow smartseq2 {
@@ -8,7 +8,7 @@ workflow smartseq2 {
 	String output_directory
 	# Output directory, with trailing slashes stripped
 	String output_directory_stripped = sub(output_directory, "/+$", "")
-	# Reference to align reads against, GRCm38 or GRCh38
+	# Reference to align reads against, GRCm38, GRCh38, or mm10
 	String reference
 
 	# smartseq2 version, default to "0.2.0"
@@ -18,11 +18,13 @@ workflow smartseq2 {
 	# Number of cpus per job
 	Int? num_cpu = 4
 	# Memory string
-	String? memory = "10G"
-	# disk space in GB
-	Int? disk_space = 10
+	String? memory = "3.60G"
+	# factor to multiply size of R1 and R2 by for RSEM
+	Float? disk_space_multiplier = 10
 	# Number of preemptible tries 
 	Int? preemptible = 2
+
+    Int? generate_count_matrix_disk_space = 10
 
 	call parse_input_csv {
 		input:
@@ -44,10 +46,23 @@ workflow smartseq2 {
 				zones = zones,
 				num_cpu = num_cpu,
 				memory = memory,
-				disk_space = disk_space,
+				disk_space_multiplier = disk_space_multiplier,
+				generate_count_matrix_disk_space=generate_count_matrix_disk_space,
 				preemptible = preemptible
 		}
 	}
+
+	output {
+        Array[Array[File]] rsem_gene = smartseq2_per_plate.rsem_gene
+        Array[Array[File]] rsem_isoform = smartseq2_per_plate.rsem_isoform
+        Array[Array[File]] rsem_time = smartseq2_per_plate.rsem_time
+        Array[Array[File]] rsem_cnt =smartseq2_per_plate.rsem_cnt
+        Array[Array[File]] rsem_model = smartseq2_per_plate.rsem_model
+        Array[Array[File]] rsem_theta = smartseq2_per_plate.rsem_theta
+
+        Array[String] output_count_matrix = smartseq2_per_plate.output_count_matrix
+        Array[String] output_qc_report = smartseq2_per_plate.output_qc_report
+    }
 }
 
 task parse_input_csv {

@@ -24,11 +24,13 @@ workflow smartseq2_per_plate {
 	# Number of cpus per job
 	Int? num_cpu = 4
 	# Memory string
-	String? memory = "10G"
-	# disk space in GB
-	Int? disk_space = 10
+	String? memory = "3.60G"
+	# factor to multiply size of R1 and R2 by
+    Float? disk_space_multiplier = 10
+    Int? generate_count_matrix_disk_space = 10
 	# Number of preemptible tries 
 	Int? preemptible = 2
+
 
 	call parse_sample_sheet {
 		input:
@@ -49,7 +51,7 @@ workflow smartseq2_per_plate {
 				zones = zones,
 				num_cpu = num_cpu,
 				memory = memory,
-				disk_space = disk_space,
+				disk_space_multiplier = disk_space_multiplier,
 				preemptible = preemptible
 		}
 	}
@@ -62,11 +64,17 @@ workflow smartseq2_per_plate {
 			smartseq2_version = smartseq2_version,
 			zones = zones,
 			memory = memory,
-			disk_space = disk_space,
+			disk_space = generate_count_matrix_disk_space,
 			preemptible = preemptible
 	}
 
 	output {
+	    Array[File] rsem_gene = run_rsem.rsem_gene
+        Array[File] rsem_isoform = run_rsem.rsem_isoform
+        Array[File] rsem_time = run_rsem.rsem_time
+        Array[File] rsem_cnt =run_rsem.rsem_cnt
+        Array[File] rsem_model = run_rsem.rsem_model
+        Array[File] rsem_theta = run_rsem.rsem_theta
 		String output_count_matrix = generate_count_matrix.output_count_matrix
 		String output_qc_report = generate_count_matrix.output_qc_report
 	}
@@ -118,13 +126,13 @@ task run_rsem {
 	String zones	
 	Int num_cpu
 	String memory
-	Int disk_space
+	Float? disk_space_multiplier
 	Int preemptible
 
 	command {
 		set -e
 		export TMPDIR=/tmp
-		monitor_script.sh > monitoring.log &
+
 		mkdir -p rsem_ref
 		tar xf ${reference} -C rsem_ref --strip-components 1
 		REFERENCE_NAME="$(basename `ls rsem_ref/*.grp` .grp)"
@@ -145,7 +153,7 @@ task run_rsem {
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
-		disks: "local-disk ${disk_space} HDD"
+		disks: "local-disk " + ceil(size(reference, "GB")*5 + (disk_space_multiplier * (size(read1, "GB") + size(read2, "GB"))) + 1)+ " HDD"
 		cpu: "${num_cpu}"
 		preemptible: "${preemptible}"
 	}
