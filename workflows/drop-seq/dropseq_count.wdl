@@ -8,6 +8,8 @@ workflow dropseq_count {
 	String drop_seq_tools_version
 	File? cellular_barcode_whitelist
 	Float? disk_multiplier = 3.5
+	String? dge_prep_memory = "3750M"
+	String? dge_memory = "3750M"
 
 	call DigitalExpressionPrep {
 		input:
@@ -16,7 +18,7 @@ workflow dropseq_count {
 			input_bam=input_bam,
 			sample_id=sample_id,
 			cellular_barcode_whitelist=cellular_barcode_whitelist,
-			memory="3750M",
+			memory=dge_prep_memory,
 			disk_multiplier=disk_multiplier,
 			zones=zones,
 			drop_seq_tools_version=drop_seq_tools_version
@@ -40,7 +42,7 @@ workflow dropseq_count {
 			input_bam=DigitalExpressionPrep.bam,
 			sample_id=sample_id,
 			barcodes=CollectCellBarcodes.cell_barcodes,
-			memory="3750M",
+			memory=dge_memory,
 			zones=zones,
 			drop_seq_tools_version=drop_seq_tools_version
 	}

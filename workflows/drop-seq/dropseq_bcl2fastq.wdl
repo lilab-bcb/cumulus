@@ -5,8 +5,8 @@ workflow dropseq_bcl2fastq {
 	# Whether to delete input bcl directory. If false, you should delete this folder yourself so as to not incur storage charges.
 	Boolean? delete_input_bcl_directory = false
 	String? zones = "us-central1-b"
-	Int? num_cpu = 64
-	String? memory = "128G"
+	Int? num_cpu = 32
+	String? memory = "120G"
 	Int? disk_space = 1500
 	Int? preemptible = 2
 	Int minimum_trimmed_read_length = 10
