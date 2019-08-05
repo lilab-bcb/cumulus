@@ -13,9 +13,9 @@ workflow cellranger_mkfastq {
 	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 	String? zones = "us-central1-b"
 	# Number of cpus per cellranger job
-	Int? num_cpu = 64
-	# Memory string, e.g. 128G
-	String? memory = "128G"
+	Int? num_cpu = 32
+	# Memory string, e.g. 120G
+	String? memory = "120G"
 	# Disk space in GB
 	Int? disk_space = 1500
 	# Number of preemptible tries 

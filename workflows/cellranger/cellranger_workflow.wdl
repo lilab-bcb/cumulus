@@ -1,8 +1,8 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_mkfastq/versions/4/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_count/versions/3/plain-WDL/descriptor" as crc
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_vdj/versions/4/plain-WDL/descriptor" as crv
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_mkfastq/versions/5/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_count/versions/4/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_vdj/versions/5/plain-WDL/descriptor" as crv
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/13/plain-WDL/descriptor" as sa
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_mkfastq/versions/2/plain-WDL/descriptor" as cram
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_mkfastq/versions/3/plain-WDL/descriptor" as cram
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_count/versions/4/plain-WDL/descriptor" as crac
 
 # import "../cellranger/cellranger_mkfastq.wdl" as crm
@@ -75,9 +75,9 @@ workflow cellranger_workflow {
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus per cellranger job
-	Int? num_cpu = 64
+	Int? num_cpu = 32
 	# Memory string
-	String? memory = "128G"
+	String? memory = "120G"
 
 	# Number of cpus for cellranger-atac count
 	Int? atac_num_cpu = 64
