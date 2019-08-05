@@ -1,6 +1,6 @@
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_align/versions/5/plain-WDL/descriptor" as dropseq_align_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_bcl2fastq/versions/4/plain-WDL/descriptor" as bcl2fastq_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_count/versions/4/plain-WDL/descriptor" as dropseq_count_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_count/versions/5/plain-WDL/descriptor" as dropseq_count_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_prepare_fastq/versions/3/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_qc/versions/5/plain-WDL/descriptor" as dropseq_qc_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/sccloud:dropest/versions/2/plain-WDL/descriptor" as dropest_wdl
@@ -80,6 +80,9 @@ workflow dropseq_workflow {
 	String? dropest_version = "0.8.5"
 	String? merge_bam_alignment_memory="13G"
 	Int? sort_bam_max_records_in_ram = 2000000
+	String? drop_deq_tools_prep_bam_memory = "3750M"
+    String? drop_deq_tools_dge_memory = "3750M"
+
 	if (run_bcl2fastq) {
 		scatter (row in input_tsv) {
 			call bcl2fastq_wdl.dropseq_bcl2fastq as bcl2fastq {
@@ -179,6 +182,8 @@ workflow dropseq_workflow {
 				call dropseq_count_wdl.dropseq_count as dropseq_count {
 					input:
 						sample_id = row[0],
+						dge_prep_memory = drop_deq_tools_prep_bam_memory,
+                        dge_memory = drop_deq_tools_dge_memory,
 						drop_seq_tools_version=drop_seq_tools_version,
 						output_directory = output_directory_stripped + '/' + row[0],
 						input_bam = dropseq_align.aligned_tagged_bam,
