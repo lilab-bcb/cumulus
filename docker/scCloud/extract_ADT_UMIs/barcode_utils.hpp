@@ -135,6 +135,8 @@ void parse_sample_sheet(const char* sample_sheet_file, int& n_barcodes, int& bar
 	index_dict.clear();
 	index_names.clear();
 	while (fin.getline(line)) {
+		if (line.empty()) continue;
+
 		pos = line.find_first_of(',');
 
 		if (pos != std::string::npos) { index_seq = line.substr(0, pos); index_name = line.substr(pos + 1); }
