@@ -88,7 +88,7 @@ Additionally the pipeline provides the option to generate count matrices using  
 
 ---------------------------------
 
-Inputs:
+Inputs
 ^^^^^^^
 
 Please see the description of important inputs below.
@@ -145,6 +145,7 @@ Please see the description of important inputs below.
 
 Please note that run_bcl2fastq must be set to true if you're starting from BCL files instead of FASTQs.
 
+
 Custom Genome JSON
 ===================
 
@@ -163,7 +164,7 @@ If you're reference is not one of the predefined choices, you can create a custo
 The fields star_cpus and star_memory are optional and are used as the default cpus and memory for running STAR with your genome.
 
 
-Outputs:
+Outputs
 ^^^^^^^^
 
 The pipeline outputs a list of google bucket urls containing one gene-count matrix per sample. Each gene-count matrix file produced by Drop-seq tools has the suffix 'dge.txt.gz', matrices produced by dropEst have the extension .rds.
@@ -176,4 +177,23 @@ The pipeline outputs a list of google bucket urls containing one gene-count matr
 .. _Terra: https://app.terra.bio/
 
 
+
+Building a Custom Genome
+==========================
+
+The tool **scCloud/dropseq_bundle** can be used to build a custom genome.
+Please see the description of important inputs below.
+
+.. list-table::
+	:widths: 5 30
+	:header-rows: 1
+
+	* - Name
+	  - Description
+	* - fasta_file
+	  - Array of fasta files. If more than one species, fasta and gtf files need to be in the same order.
+	* - gtf_file
+	  - Array of gtf files. If more than one species, fasta and gtf files need to be in the same order.
+	* - genomeSAindexNbases
+	  - Length (bases) of the SA pre-indexing string. Typically between 10 and 15. Longer strings will use much more memory, but allow faster searches. For small genomes, must be scaled down to min(14, log2(GenomeLength)/2 - 1)
 
