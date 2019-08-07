@@ -240,7 +240,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - "mt-"
 	  - "MT-"
 	* - percent_mito
-	  - Only keep cells with mitochondrial ratio less than <percent_mito>
+	  - Only keep cells with mitochondrial ratio less than <percent_mito> of total counts
 	  - 0.1
 	  - 0.1
 	* - gene_percent_cells
