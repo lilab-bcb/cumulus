@@ -414,7 +414,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	* - run_net_fitsne
 	  - Run net FIt-SNE for visualization.
 	  - true
-	  - true
+	  - false
 	* - net_fitsne_out_basis
 	  - Output basis for net-FItSNE.
 	  - "net_fitsne"
