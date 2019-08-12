@@ -104,7 +104,7 @@ Please see the description of important inputs below.
 	* - output_directory
 	  - Pipeline output directory (gs URL e.g. "gs://fc-e0000000-0000-0000-0000-000000000000/dropseq_output")
 	* - reference
-	  - hg19, mm10, hg19_mm10, mmul_8.0.1 or a path to a custom reference JSON file
+	  - hg19, GRCh38, mm10, hg19_mm10, mmul_8.0.1 or a path to a custom reference JSON file
 	* - run_bcl2fastq
 	  - Whether your sample sheet contains one BCL directory per line or one sample per line (default false)
 	* - run_dropseq_tools
