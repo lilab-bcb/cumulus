@@ -1,39 +1,49 @@
 {
-	"hg19":
-	{
-		"refflat":	"gs://regev-lab/resources/DropSeq/human/hg19.refFlat",
-		"genome_fasta":	"gs://regev-lab/resources/DropSeq/human/hg19.fasta",
-		"star_genome":	"gs://regev-lab/resources/DropSeq/human/STAR2_5_index_hg19.tar.gz",
-		"gene_intervals":	"gs://regev-lab/resources/DropSeq/human/hg19.genes.intervals",
-		"genome_dict":	"gs://regev-lab/resources/DropSeq/human/hg19.dict"
-	},
-	"mm10":
-	{
-		"refflat":	"gs://regev-lab/resources/DropSeq/mouse/mm10.refFlat",
-		"genome_fasta":	"gs://regev-lab/resources/DropSeq/mouse/mm10.fasta",
-		"star_genome":	"gs://regev-lab/resources/DropSeq/mouse/STAR2_5_index_mm10.tar.gz",
-		"gene_intervals":	"gs://regev-lab/resources/DropSeq/mouse/mm10.genes.intervals",
-		"genome_dict":	"gs://regev-lab/resources/DropSeq/mouse/mm10.dict"
-	},
-	"hg19_mm10":
-	{
-		"refflat":	"gs://regev-lab/resources/DropSeq/human_mouse/hg19_mm10_transgenes.refFlat",
-		"genome_fasta":	"gs://regev-lab/resources/DropSeq/human_mouse/hg19_mm10_transgenes.fasta",
-		"star_genome":	"gs://regev-lab/resources/DropSeq/human_mouse/STAR2_5_index_hg19_mm10.tar.gz",
-		"gene_intervals":	"gs://regev-lab/resources/DropSeq/human_mouse/hg19_mm10_transgenes.genes.intervals",
-		"genome_dict":	"gs://regev-lab/resources/DropSeq/human_mouse/hg19_mm10_transgenes.dict",
-		"star_cpus": 32,
-		"star_memory": "120G"
-	},
-	"mmul_8.0.1":
-	{
-		"refflat":	"gs://regev-lab/resources/DropSeq/MMUL_8_0_1/MMUL_8_0_1.refFlat",
-		"genome_fasta":	"gs://regev-lab/resources/DropSeq/MMUL_8_0_1/MMUL_8_0_1.fasta",
-		"star_genome":	"gs://regev-lab/resources/DropSeq/MMUL_8_0_1/STAR2_5_index_MMUL_8_0_1.tar.gz",
-		"gene_intervals":	"gs://regev-lab/resources/DropSeq/MMUL_8_0_1/MMUL_8_0_1.genes.intervals",
-		"genome_dict":	"gs://regev-lab/resources/DropSeq/MMUL_8_0_1/MMUL_8_0_1.dict",
-		"star_memory": "120G"
-	}
+  "hg19": {
+    "refflat": "gs://regev-lab/resources/DropSeq/human/hg19.refFlat",
+    "genome_fasta": "gs://regev-lab/resources/DropSeq/human/hg19.fasta",
+    "star_genome": "gs://regev-lab/resources/DropSeq/human/STAR2_5_index_hg19.tar.gz",
+    "gene_intervals": "gs://regev-lab/resources/DropSeq/human/hg19.genes.intervals",
+    "genome_dict": "gs://regev-lab/resources/DropSeq/human/hg19.dict"
+  },
+  "mm10": {
+    "refflat": "gs://regev-lab/resources/DropSeq/mouse/mm10.refFlat",
+    "genome_fasta": "gs://regev-lab/resources/DropSeq/mouse/mm10.fasta",
+    "star_genome": "gs://regev-lab/resources/DropSeq/mouse/STAR2_5_index_mm10.tar.gz",
+    "gene_intervals": "gs://regev-lab/resources/DropSeq/mouse/mm10.genes.intervals",
+    "genome_dict": "gs://regev-lab/resources/DropSeq/mouse/mm10.dict"
+  },
+  "hg19_mm10": {
+    "refflat": "gs://regev-lab/resources/DropSeq/human_mouse/hg19_mm10_transgenes.refFlat",
+    "genome_fasta": "gs://regev-lab/resources/DropSeq/human_mouse/hg19_mm10_transgenes.fasta",
+    "star_genome": "gs://regev-lab/resources/DropSeq/human_mouse/STAR2_5_index_hg19_mm10.tar.gz",
+    "gene_intervals": "gs://regev-lab/resources/DropSeq/human_mouse/hg19_mm10_transgenes.genes.intervals",
+    "genome_dict": "gs://regev-lab/resources/DropSeq/human_mouse/hg19_mm10_transgenes.dict",
+    "star_cpus": 32,
+    "star_memory": "120G"
+  },
+  "mmul_8.0.1": {
+    "refflat": "gs://regev-lab/resources/DropSeq/MMUL_8_0_1/MMUL_8_0_1.refFlat",
+    "genome_fasta": "gs://regev-lab/resources/DropSeq/MMUL_8_0_1/MMUL_8_0_1.fasta",
+    "star_genome": "gs://regev-lab/resources/DropSeq/MMUL_8_0_1/STAR2_5_index_MMUL_8_0_1.tar.gz",
+    "gene_intervals": "gs://regev-lab/resources/DropSeq/MMUL_8_0_1/MMUL_8_0_1.genes.intervals",
+    "genome_dict": "gs://regev-lab/resources/DropSeq/MMUL_8_0_1/MMUL_8_0_1.dict",
+    "star_memory": "120G"
+  },
+  "GRCh38": {
+    "refflat": "gs://regev-lab/resources/DropSeq/human/GRCh38.refFlat",
+    "genome_fasta": "gs://regev-lab/resources/DropSeq/human/GRCh38.fasta",
+    "star_genome": "gs://regev-lab/resources/DropSeq/human/GRCh38.tgz",
+    "gene_intervals": "gs://regev-lab/resources/DropSeq/human/GRCh38.genes.intervals",
+    "genome_dict": "gs://regev-lab/resources/DropSeq/human/GRCh38.dict",
+    "build_steps": [
+      "wget ftp://ftp.ensembl.org/pub/release-97/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz",
+      "gunzip Homo_sapiens.GRCh38.dna.primary_assembly.fa.gz",
+      "wget ftp://ftp.ensembl.org/pub/release-97/gtf/homo_sapiens/Homo_sapiens.GRCh38.97.gtf.gz",
+      "gunzip Homo_sapiens.GRCh38.97.gtf.gz",
+      "scCloud/dropseq_bundle:1"
+    ]
+  }
 }
 
 
