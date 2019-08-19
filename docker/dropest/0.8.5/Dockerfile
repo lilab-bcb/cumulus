@@ -11,9 +11,9 @@ apt-get update && apt-get install -y google-cloud-sdk
 RUN apt-get update --yes && apt-get install --no-install-recommends --yes \
   build-essential \
   cmake \
-  git \
   libbamtools-dev \
   libboost-dev \
+  libxml2-dev \
   libboost-iostreams-dev \
   libboost-log-dev \
   libboost-system-dev \
@@ -22,7 +22,8 @@ RUN apt-get update --yes && apt-get install --no-install-recommends --yes \
   libssl-dev \
   libz-dev \
   libatlas3-base \
-  pandoc
+  pandoc \
+  wget
 
 RUN echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile && \
   R -e 'install.packages(c("devtools", "Rcpp","RcppEigen", "RInside", "Matrix", "optparse", "rmarkdown", "withr"), quiet=TRUE)' && \
@@ -31,15 +32,14 @@ RUN echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; 
 RUN mkdir -p /software
 WORKDIR "/software"
 
-RUN \
-  git clone https://github.com/hms-dbmi/dropEst.git
+RUN wget -q https://github.com/hms-dbmi/dropEst/archive/v0.8.5.tar.gz && tar xf v0.8.5.tar.gz
 
 RUN \
-  R -e 'devtools::install_local("/software/dropEst/dropestr/", dependencies=T)'
+  R -e 'devtools::install_local("/software/dropEst-0.8.5/dropestr/", dependencies=T)'
 
 RUN \
-  mkdir -p dropEst/build && \
-  cd dropEst/build && \
+  mkdir -p dropEst-0.8.5/build && \
+  cd dropEst-0.8.5/build && \
   cmake ../ && \
   make
 
@@ -50,7 +50,7 @@ ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker
 
 RUN rm ~/.Rprofile
 RUN chmod +x /software/*
-RUN apt-get -qq -y remove curl git cmake build-essential \
+RUN apt-get -qq -y remove curl cmake build-essential wget \
 && apt-get -qq -y autoremove \
 && apt-get autoclean \
 && rm -rf /var/lib/apt/lists/*

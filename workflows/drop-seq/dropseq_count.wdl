@@ -91,7 +91,7 @@ task CollectCellBarcodes {
 		String cell_barcodes="${output_directory}/${sample_id}_barcodes_use.txt"
 	}
 	runtime {
-		docker: "regevlab/dropseq-${drop_seq_tools_version}"
+		docker: "sccloud/dropseq:${drop_seq_tools_version}"
 		zones: zones
 		disks: "local-disk " + sub(((size(histogram,"GB")+1)*2),"\\..*","") + " HDD"
 		preemptible: "${preemptible}"
@@ -115,13 +115,13 @@ task DigitalExpression {
 		set -e
 
 		# CODING+UTR regions on the SENSE strand by default
-		java -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar DigitalExpression VALIDATION_STRINGENCY=SILENT \
+		java -Xmx${memory} -jar /software/Drop-seq_tools/jar/dropseq.jar DigitalExpression VALIDATION_STRINGENCY=SILENT \
 		I=${input_bam} \
 		O="${sample_id}_dge.txt.gz" \
 		SUMMARY="${sample_id}_dge.summary.txt" \
 		CELL_BC_FILE=${barcodes}
 
-		java -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar DigitalExpression VALIDATION_STRINGENCY=SILENT \
+		java -Xmx${memory} -jar /software/Drop-seq_tools/jar/dropseq.jar DigitalExpression VALIDATION_STRINGENCY=SILENT \
 		I=${input_bam} \
 		O="${sample_id}_dge_reads.txt.gz" \
 		SUMMARY="${sample_id}_dge_reads.summary.txt" \
@@ -140,7 +140,7 @@ task DigitalExpression {
 	}
 
 	runtime {
-		docker: "regevlab/dropseq-${drop_seq_tools_version}"
+		docker: "sccloud/dropseq:${drop_seq_tools_version}"
 		disks: "local-disk " + sub(((size(input_bam,"GB")+1)*3.25),"\\..*","") + " HDD"
 		memory :"${memory}"
 		zones: zones
@@ -162,7 +162,7 @@ task DigitalExpressionPrep {
 	command {
 		set -e
 
-		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar DetectBeadSynthesisErrors VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=1 -Xmx${memory} -jar /software/Drop-seq_tools/jar/dropseq.jar DetectBeadSynthesisErrors VALIDATION_STRINGENCY=SILENT \
 		INPUT=${input_bam} \
 		MIN_UMIS_PER_CELL=20 \
 		OUTPUT_STATS=${sample_id}_synthesis_error_stats.txt \
@@ -170,13 +170,13 @@ task DigitalExpressionPrep {
 		REPORT=${sample_id}_synthesis_error_report.txt \
 		OUTPUT=temp.bam
 
-		java -Dsamjdk.compression_level=2 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar DetectBeadSubstitutionErrors VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=2 -Xmx${memory} -jar /software/Drop-seq_tools/jar/dropseq.jar DetectBeadSubstitutionErrors VALIDATION_STRINGENCY=SILENT \
 		INPUT=temp.bam \
 		OUTPUT="${sample_id}_aligned_tagged_repaired.bam" \
 		MIN_UMIS_PER_CELL=20 \
 		OUTPUT_REPORT="${sample_id}_substitution_error_report.txt"
 
-		java -Dsamjdk.compression_level=2 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar BamTagHistogram VALIDATION_STRINGENCY=SILENT \
+		java -Dsamjdk.compression_level=2 -Xmx${memory} -jar /software/Drop-seq_tools/jar/dropseq.jar BamTagHistogram VALIDATION_STRINGENCY=SILENT \
 		I="${sample_id}_aligned_tagged_repaired.bam" \
 		O=${sample_id}_tag.txt.gz \
 		TAG=XC
@@ -185,7 +185,7 @@ task DigitalExpressionPrep {
 		from subprocess import check_call
 		whitelist = '${cellular_barcode_whitelist}'
 		if whitelist !='':
-			check_call(['filter_histogram.py', '--histogram', '"${sample_id}_tag.txt.gz"', '--whitelist', '${cellular_barcode_whitelist}', '--output', '"${sample_id}_tag.txt.gz"'])
+			check_call(['filter_histogram.py', '--histogram', '${sample_id}_tag.txt.gz', '--whitelist', '${cellular_barcode_whitelist}', '--output', '${sample_id}_tag.txt.gz'])
 		CODE
 
 		DropSeqCumuPlot.R \
@@ -213,7 +213,7 @@ task DigitalExpressionPrep {
 	}
 
 	runtime {
-		docker: "regevlab/dropseq-${drop_seq_tools_version}"
+		docker: "sccloud/dropseq:${drop_seq_tools_version}"
 		disks: "local-disk " + ceil(disk_multiplier * size(input_bam, "GB") + 20)+ " HDD"
 		memory :"${memory}"
 		zones: zones

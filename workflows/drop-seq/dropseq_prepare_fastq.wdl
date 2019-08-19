@@ -144,7 +144,7 @@ task PrepareFastq {
 	}
 
 	runtime {
-		docker: "regevlab/dropseq-${drop_seq_tools_version}"
+		docker: "sccloud/dropseq:${drop_seq_tools_version}"
 		disks: "local-disk ${disk_space} HDD"
 		memory :"${memory}"
 		cpu:"${cpu}"

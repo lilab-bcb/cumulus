@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3:latest
+FROM continuumio/miniconda3:4.6.14
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/drop-seq/summary.py /software/
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/monitor_script.sh /software/
 ADD https://github.com/broadinstitute/picard/releases/download/2.18.26/picard.jar /software/
@@ -14,7 +14,7 @@ apt-get update && apt-get install -y google-cloud-sdk
 RUN apt-get -qq update && apt-get -qq -y install --no-install-recommends default-jre ca-certificates curl r-base libgomp1 build-essential zlib1g-dev \
 && conda install -y pandas numpy \
 && pip install --upgrade pip \
-&& pip install cufflinks plotly \
+&& pip install cufflinks \
 && curl -L -s -o "/Drop-seq_tools-2.3.0.zip" "https://github.com/broadinstitute/Drop-seq/releases/download/v2.3.0/Drop-seq_tools-2.3.0.zip" \
 && unzip /Drop-seq_tools-2.3.0.zip \
 && rm /Drop-seq_tools-2.3.0.zip \
