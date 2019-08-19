@@ -1,10 +1,9 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_align/versions/5/plain-WDL/descriptor" as dropseq_align_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_bcl2fastq/versions/4/plain-WDL/descriptor" as bcl2fastq_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_count/versions/5/plain-WDL/descriptor" as dropseq_count_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_prepare_fastq/versions/3/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_qc/versions/5/plain-WDL/descriptor" as dropseq_qc_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/sccloud:dropest/versions/2/plain-WDL/descriptor" as dropest_wdl
-
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:bcl2fastq/versions/2/plain-WDL/descriptor" as bcl2fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropest/versions/4/plain-WDL/descriptor" as dropest_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_align/versions/6/plain-WDL/descriptor" as dropseq_align_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_count/versions/6/plain-WDL/descriptor" as dropseq_count_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_prepare_fastq/versions/4/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_qc/versions/6/plain-WDL/descriptor" as dropseq_qc_wdl
 
 workflow dropseq_workflow {
 	# Either a list of flowcell URLS or sample_id tab r1 tab r2
@@ -73,11 +72,13 @@ workflow dropseq_workflow {
 	Int? bcl2fastq_cpu = 64
 	String? bcl2fastq_memory = "57.6G"
 	Int? bcl2fastq_disk_space = 1500
+	Int bcl2fastq_minimum_trimmed_read_length = 10
+    Int bcl2fastq_mask_short_adapter_reads = 10
 	String? dropest_memory = "104G"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	String? drop_seq_tools_version = "2.3.0"
 	String? bcl2fastq_version = "2.20.0.422"
-	String? dropest_version = "0.8.5"
+	String? dropest_version = "0.8.6"
 	String? merge_bam_alignment_memory="13G"
 	Int? sort_bam_max_records_in_ram = 2000000
 	String? drop_deq_tools_prep_bam_memory = "3750M"
@@ -85,11 +86,13 @@ workflow dropseq_workflow {
 
 	if (run_bcl2fastq) {
 		scatter (row in input_tsv) {
-			call bcl2fastq_wdl.dropseq_bcl2fastq as bcl2fastq {
+			call bcl2fastq_wdl.bcl2fastq {
 				input:
 					input_bcl_directory = row[0],
 					output_directory = output_directory_stripped,
 					delete_input_bcl_directory = delete_input_bcl_directory,
+					minimum_trimmed_read_length = bcl2fastq_minimum_trimmed_read_length,
+                    mask_short_adapter_reads = bcl2fastq_mask_short_adapter_reads,
 					zones = zones,
 					num_cpu = bcl2fastq_cpu,
 					memory = bcl2fastq_memory,
@@ -269,7 +272,7 @@ task collect_summary {
 		bootDiskSizeGb: 12
 		disks: "local-disk 2 HDD"
 		memory:"1GB"
-		docker: "regevlab/dropseq-${drop_seq_tools_version}"
+		docker: "sccloud/dropseq:${drop_seq_tools_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}
@@ -340,7 +343,7 @@ task generate_count_config {
 			agg_dict[2] = lambda col: ','.join(col)
 			agg_dict[3] = 'sum'
 			df = df.groupby(0).agg(agg_dict)
-			df[3] = np.ceil(1 + 4 * (df[3] / 1e9)).astype(int)
+			df[3] = np.ceil(1 + 4 * (df[3].astype(float) / 1e9)).astype(int)
 			df.to_csv('grouped_sample_sheet.txt', index=True, header=False, sep='\t')
 
 		reference = '${reference}'.strip()
@@ -385,7 +388,7 @@ task generate_count_config {
 		bootDiskSizeGb: 12
 		disks: "local-disk 1 HDD"
 		memory:"1GB"
-		docker: "regevlab/dropseq-${drop_seq_tools_version}"
+		docker: "sccloud/dropseq:${drop_seq_tools_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}
