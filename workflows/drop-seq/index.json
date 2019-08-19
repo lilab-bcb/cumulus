@@ -30,7 +30,7 @@
     "genome_dict": "gs://regev-lab/resources/DropSeq/MMUL_8_0_1/MMUL_8_0_1.dict",
     "star_memory": "120G"
   },
-  "GRCh38": {
+  "grch38": {
     "refflat": "gs://regev-lab/resources/DropSeq/human/GRCh38.refFlat",
     "genome_fasta": "gs://regev-lab/resources/DropSeq/human/GRCh38.fasta",
     "star_genome": "gs://regev-lab/resources/DropSeq/human/GRCh38.tgz",
