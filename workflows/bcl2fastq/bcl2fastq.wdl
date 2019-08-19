@@ -121,7 +121,7 @@ task run_bcl2fastq {
 	}
 
 	runtime {
-		docker: "regevlab/bcl2fastq-${bcl2fastq_version}"
+		docker: "sccloud/bcl2fastq:${bcl2fastq_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
