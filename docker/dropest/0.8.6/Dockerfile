@@ -56,6 +56,6 @@ RUN apt-get -qq -y remove curl cmake build-essential wget \
 && apt-get autoclean \
 && rm -rf /var/lib/apt/lists/*
 
-ENV PATH=/software:/software/dropEst/build:$PATH \
+ENV PATH=/software:/software/dropEst-0.8.6/build:$PATH \
   LD_LIBRARY_PATH=/usr/local/lib/R/lib/:$LD_LIBRARY_PATH \
   R_PROFILE=~/.Rprofile
