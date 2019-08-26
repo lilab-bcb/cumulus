@@ -1,16 +1,10 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_mkfastq/versions/5/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_count/versions/4/plain-WDL/descriptor" as crc
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_vdj/versions/5/plain-WDL/descriptor" as crv
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/13/plain-WDL/descriptor" as sa
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_mkfastq/versions/3/plain-WDL/descriptor" as cram
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_count/versions/4/plain-WDL/descriptor" as crac
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_count/versions/6/plain-WDL/descriptor" as crac
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_mkfastq/versions/4/plain-WDL/descriptor" as cram
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_count/versions/5/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_mkfastq/versions/6/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_vdj/versions/6/plain-WDL/descriptor" as crv
 
-# import "../cellranger/cellranger_mkfastq.wdl" as crm
-# import "../cellranger/cellranger_count.wdl" as crc
-# import "../cellranger/cellranger_vdj.wdl" as crv
-# import "../cellranger/scCloud_adt.wdl" as sa
-# import "../cellranger/cellranger_atac_mkfastq.wdl" as cram
-# import "../cellranger/cellranger_atac_count.wdl" as crac
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/13/plain-WDL/descriptor" as sa
 
 workflow cellranger_workflow {
 	# 5 - 8 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry, DataType, FeatureBarcodeFile]). gs URL
@@ -333,7 +327,7 @@ task generate_bcl_csv {
 	}
 
 	runtime {
-		docker: "regevlab/cellranger-${cellranger_version}"
+		docker: "sccloud/cellranger:${cellranger_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}
@@ -465,7 +459,7 @@ task generate_count_config {
 	}
 
 	runtime {
-		docker: "regevlab/cellranger-${cellranger_version}"
+		docker: "sccloud/cellranger:${cellranger_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}
@@ -505,7 +499,7 @@ task collect_summaries {
 	}
 
 	runtime {
-		docker: "regevlab/cellranger-${cellranger_version}"
+		docker: "sccloud/cellranger:${cellranger_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}

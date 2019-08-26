@@ -118,7 +118,7 @@ task run_cellranger_atac_count {
 	}
 
 	runtime {
-		docker: "regevlab/cellranger-atac-${cellranger_atac_version}"
+		docker: "sccloud/cellranger-atac:${cellranger_atac_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
