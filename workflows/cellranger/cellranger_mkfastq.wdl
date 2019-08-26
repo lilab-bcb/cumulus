@@ -135,7 +135,7 @@ task run_cellranger_mkfastq {
 	}
 
 	runtime {
-		docker: "regevlab/cellranger-${cellranger_version}"
+		docker: "sccloud/cellranger:${cellranger_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12

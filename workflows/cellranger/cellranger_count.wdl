@@ -131,7 +131,7 @@ task run_cellranger_count {
 	}
 
 	runtime {
-		docker: "regevlab/cellranger-${cellranger_version}"
+		docker: "sccloud/cellranger:${cellranger_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
