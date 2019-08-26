@@ -17,8 +17,7 @@ workflow smartseq2_per_plate {
 
 	File reference_file = (if is_url then reference else acronym2gsurl[reference])
 
-	# smartseq2 version, default to "0.2.0"
-	String? smartseq2_version = "0.2.0"
+	String? smartseq2_version = "1.0.0"
 	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 	String? zones = "us-central1-b"
 	# Number of cpus per job
@@ -111,7 +110,7 @@ task parse_sample_sheet {
 	}
 
 	runtime {
-		docker: "regevlab/smartseq2-${smartseq2_version}"
+		docker: "sccloud/smartseq2:${smartseq2_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}
@@ -149,7 +148,7 @@ task run_rsem {
 	}
 
 	runtime {
-		docker: "regevlab/smartseq2-${smartseq2_version}"
+		docker: "sccloud/smartseq2:${smartseq2_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -221,7 +220,7 @@ task generate_count_matrix {
 	}
 
 	runtime {
-		docker: "regevlab/smartseq2-${smartseq2_version}"
+		docker: "sccloud/smartseq2:${smartseq2_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
