@@ -207,11 +207,11 @@ cellranger_workflow inputs:
 	  - 0.1
 	  - 0.1
 	* - cellranger_version
-	  - cellranger version, could be 2.0.2 (count only), 2.11, 2.2.0, 3.0.0, 3.0.2
+	  - cellranger version, could be 2.0.2 (count only), 3.0.2, 3.1.0
 	  - "3.0.2"
 	  - "3.0.2"
 	* - cellranger_atac_version
-	  - cellranger-atac version, could be 1.0.0 or 1.0.1
+	  - cellranger-atac version, currently only 1.0.1
 	  - "1.0.1"
 	  - "1.0.1"
 	* - sccloud_version

@@ -1,9 +1,9 @@
 Run Terra pipelines via command line
 ----------------------------------------------
 
-You can run Terra pipelines via the command line by installing the **kco** tools.
+You can run Terra pipelines via the command line by installing the **sccutil** package.
 
-Install ``kco`` tools for Broad users
+Install ``sccutil`` for Broad users
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Request an UGER node::
 
@@ -16,11 +16,11 @@ Add conda to your path::
 
 	reuse Anaconda3
 
-Activate the kco virtual environment::
+Activate the sccutil virtual environment::
 
-	source activate /seq/regev_genome_portal/conda_env/kco_tools
+	source activate /seq/regev_genome_portal/conda_env/sccutil
 
-Install ``kco`` tools for non-Broad users
+Install ``sccutil`` for non-Broad users
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Make sure you have ``conda`` installed. If you haven't installed conda_, use the following commands to install::
@@ -29,22 +29,22 @@ Make sure you have ``conda`` installed. If you haven't installed conda_, use the
 	bash Miniconda3-latest-Linux-x86_64.sh -p /users/foo/miniconda3
 	mv Miniconda3-latest-Linux-x86_64.sh /users/foo/miniconda3
 
-Next, create an virtual environment ``kco`` and install ``kco`` tools::
+Next, create an virtual environment ``sccutil`` and install ``sccutil`` tools::
 
-	conda create -n kco -y pip
-	source activate kco
-	git clone https://github.com/klarman-cell-observatory/KCO.git kco_tools
-	cd kco_tools
+	conda create -n sccutil -y pip
+	source activate sccutil
+	git clone https://github.com/klarman-cell-observatory/scc-util.git
+	cd scc-util
 	pip install -e .
 
 ---------------------------------
 
-Run Terra pipelines via ``kco fc_run``
+Run Terra pipelines via ``sccutil fc_run``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**kco fc_run** runs a Terra method. Features:
+**sccutil fc_run** runs a Terra method. Features:
 
-#. Uploads local files/directories in your inputs to a Google Cloud bucket updates the file paths to point to the Google Cloud bucket. Your sample sheet can point to local file paths and kco run will take care of uploading directories (e.g. fastq directories) and modifying the sample sheet to point to a Google Cloud bucket.
+#. Uploads local files/directories in your inputs to a Google Cloud bucket updates the file paths to point to the Google Cloud bucket. Your sample sheet can point to local file paths and sccutil run will take care of uploading directories (e.g. fastq directories) and modifying the sample sheet to point to a Google Cloud bucket.
 
 #. Creates or uses an existing workspace.
 
@@ -106,13 +106,13 @@ inputs.json:
 
 Run the following command to kick off your Terra pipeline::
 
-	kco fc_run -m scCloud/cellranger_workflow -i inputs.json -w myworkspace_namespace/myworkspace_name --bucket-folder inputs -o inputs_updated.json
+	sccutil fc_run -m scCloud/cellranger_workflow -i inputs.json -w myworkspace_namespace/myworkspace_name --bucket-folder inputs -o inputs_updated.json
 
-Upon success, **kco fc_run** returns a url pointing the the submitted Terra job.
+Upon success, **sccutil fc_run** returns a url pointing the the submitted Terra job.
 
 If for any reason, your job failed. You could rerun it without uploading files again via the following command::
 
-	kco fc_run -m scCloud/cellranger_workflow -i inputs_updated.json -w myworkspace_namespace/myworkspace_name
+	sccutil fc_run -m scCloud/cellranger_workflow -i inputs_updated.json -w myworkspace_namespace/myworkspace_name
 
 
 .. _conda: https://docs.conda.io/en/latest/miniconda.html
