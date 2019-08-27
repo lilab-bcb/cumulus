@@ -1,16 +1,16 @@
 :orphan:
 
-kco sample-sheet
+sccutil sample-sheet
 ----------------
 
-*kco sample-sheet* creates a sample sheet.
+*sccutil sample-sheet* creates a sample sheet.
 
 Synopsis
 ^^^^^^^^
 
 .. code-block:: shell
 
-	kco sample-sheet [OPTION]... dir
+	sccutil sample-sheet [OPTION]... dir
 
 where *dir* can be one or more directories to look for fastq files. Directories are searched recursively for fastq files.
 
@@ -30,19 +30,19 @@ Options
 	    | **--output**
 	  - Output sample sheet
 
-kco fc-upload
+sccutil fc-upload
 -------------
 
-*kco fc-upload* uploads local files/directories to your Terra workspace Google Cloud bucket.
+*sccutil fc-upload* uploads local files/directories to your Terra workspace Google Cloud bucket.
  
-Your sample sheet can point to local file paths and kco upload will take care of uploading directories (e.g. fastq directories) and modifying the sample sheet to point to a Google Cloud bucket.
+Your sample sheet can point to local file paths and sccutil upload will take care of uploading directories (e.g. fastq directories) and modifying the sample sheet to point to a Google Cloud bucket.
 
 Synopsis
 ^^^^^^^^
 
 .. code-block:: shell
 
-	kco fc-upload [OPTION]... file
+	sccutil fc-upload [OPTION]... file
 
 where file can be one or more files, such as a sample sheet or an input JSON.
 
@@ -79,13 +79,13 @@ example_sample_sheet.txt:
 
 command::
 
-	kco upload -w myworkspace_namespace/myworkspace_name example_sample_sheet.txt 
+	sccutil upload -w myworkspace_namespace/myworkspace_name example_sample_sheet.txt 
 
 
-kco fc-inputs
+sccutil fc-inputs
 -------------
 
-*kco fc-inputs* generates a stub JSON input file that can be used as input to *kco run*. The JSON file can optionally be based on a published method config.
+*sccutil fc-inputs* generates a stub JSON input file that can be used as input to *sccutil run*. The JSON file can optionally be based on a published method config.
 
 Options
 ^^^^^^^
@@ -109,4 +109,4 @@ Options
 
 Example: Generate a stub JSON file based on the published config for running Drop-Seq using the MMUL_8_0_1 genome::
 
-	kco fc-inputs -m regev/drop-seq -c regev/drop-seq-MMUL_8_0_1
+	sccutil fc-inputs -m regev/drop-seq -c regev/drop-seq-MMUL_8_0_1
