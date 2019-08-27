@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3:latest
+FROM continuumio/miniconda3:4.6.14
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
@@ -15,9 +15,9 @@ pip install xlsxwriter
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/cellranger/bcl2fastq2_0v2.20.0.422-2_amd64.deb /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/monitor_script.sh /software
-ADD cellranger-3.0.0.tar /software
+ADD cellranger-3.1.0.tar.gz /software
 
 RUN dpkg -i /software/bcl2fastq2_0v2.20.0.422-2_amd64.deb && chmod a+rx /software/monitor_script.sh
 
-ENV PATH=/software:/software/cellranger-3.0.0:$PATH
+ENV PATH=/software:/software/cellranger-3.1.0:$PATH
 ENV TMPDIR=/tmp
