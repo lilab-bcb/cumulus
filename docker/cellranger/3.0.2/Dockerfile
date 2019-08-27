@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3:latest
+FROM continuumio/miniconda3:4.6.14
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
