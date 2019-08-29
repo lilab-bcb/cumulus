@@ -1,7 +1,6 @@
 ====================================
-KCO tools and workflows
+scCloud workflows
 ====================================
 
-KCO tools for cloud computing!
 
-`Read documentation <http://kco-cloud.readthedocs.io>`__
+`Read documentation <http://sccloud.readthedocs.io>`__
