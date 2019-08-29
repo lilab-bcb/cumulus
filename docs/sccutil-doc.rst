@@ -1,7 +1,7 @@
 :orphan:
 
 sccutil sample-sheet
-----------------
+--------------------
 
 *sccutil sample-sheet* creates a sample sheet.
 
@@ -31,7 +31,7 @@ Options
 	  - Output sample sheet
 
 sccutil fc-upload
--------------
+------------------
 
 *sccutil fc-upload* uploads local files/directories to your Terra workspace Google Cloud bucket.
  
@@ -83,7 +83,7 @@ command::
 
 
 sccutil fc-inputs
--------------
+-----------------
 
 *sccutil fc-inputs* generates a stub JSON input file that can be used as input to *sccutil run*. The JSON file can optionally be based on a published method config.
 
