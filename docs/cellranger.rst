@@ -52,21 +52,24 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on Terra_.
 		  - 
 			| Provides the reference genome used by *cellranger count* for each 10x channel. 
 			| The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as
-			| **GRCh38** for human GRCh38, cellranger reference 1.2.0, Ensembl v84 gene annotation,
-			| **hg19** for human hg19, cellranger reference 1.2.0, Ensembl v82 gene annotation,
-			| **mm10** for mouse mm10, cellranger reference 1.2.0, Ensembl v84 gene annotation,
-			| **GRCh38_and_mm10** for human and mouse, built from GRCh38 and mm10 cellranger references (1.2.0), Ensembl v84 gene annotations for both human and mouse,
-			| **GRCh38_premrna** for human, introns included, built from GRCh38 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcripts as exons,
-			| **mm10_premrna** for mouse, introns included, built from mm10 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcripts as exons,
-			| **GRCh38_premrna_and_mm10_premrna** for human and mouse, introns included, built from GRCh38_premrna and mm10_premrna,
-			| **GRCh38_vdj** for human V(D)J sequences, cellranger reference 2.0.0, annotation built from *Homo_sapiens.GRCh38.87.chr_patch_hapl_scaff.gtf* and *vdj_GRCh38_alts_ensembl_10x_genes-2.0.0.gtf*,
-			| **GRCm38_vdj** for mouse V(D)J sequences, cellranger reference 2.0.0, annotation built from *Mus_musculus.GRCm38.90.chr_patch_hapl_scaff.gtf*,
 			| **GRCh38_v3.0.0** for human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation,
 			| **hg19_v3.0.0** for human hg19, cellranger reference 3.0.0, Ensembl v87 gene annotation,
 			| **mm10_v3.0.0** for mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation,
+			| **GRCh38_and_mm10_v3.1.0** for human and mouse, built from GRCh38 and mm10 cellranger references (3.1.0), Ensembl v93 gene annotations for both human and mouse,
+			| **GRCh38_premrna_v1.2.0** (GRCh38_premrna, obsoleted) for human, introns included, built from GRCh38 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcripts as exons,
+			| **mm10_premrna_v1.2.0** (mm10_premrna, obsoleted) for mouse, introns included, built from mm10 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcripts as exons,
+			| **GRCh38_premrna_and_mm10_premrna_v1.2.0** (GRCh38_premrna_and_mm10_premrna, obsoleted) for human and mouse, introns included, built from GRCh38_premrna and mm10_premrna,
+			| **GRCh38_vdj_v3.1.0** for human V(D)J sequences, cellranger reference 3.1.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*,
+			| **GRCm38_vdj_v3.1.0** for mouse V(D)J sequences, cellranger reference 3.1.0, annotation built from Ensembl *Mus_musculus.GRCm38.94.gtf*,
 			| **GRCh38_atac_v1.0.1** for scATAC-Seq, human GRCh38, cellranger-atac reference 1.0.1, Gencode v28 basic annotation,
-			| **mm10_atac_v1.0.1** for scATAC-Seq, mouse mm10, cellranger-atac reference 1.0.1, Gencode v28 basic annotation.
-			| **hg19_atac_v1.0.1** for scATAC-Seq, mouse hg19, cellranger-atac reference 1.0.1, Gencode v28 basic annotation.
+			| **mm10_atac_v1.0.1** for scATAC-Seq, mouse mm10, cellranger-atac reference 1.0.1, Gencode v28 basic annotation,
+			| **hg19_atac_v1.0.1** for scATAC-Seq, mouse hg19, cellranger-atac reference 1.0.1, Gencode v28 basic annotation,
+			| **GRCh38_v1.2.0** (GRCh38, obsoleted) for human GRCh38, cellranger reference 1.2.0, Ensembl v84 gene annotation,
+			| **hg19_v1.2.0** (hg19, obsoleted) for human hg19, cellranger reference 1.2.0, Ensembl v82 gene annotation,
+			| **mm10_v1.2.0** (mm10, obsoleted) for mouse mm10, cellranger reference 1.2.0, Ensembl v84 gene annotation,
+			| **GRCh38_and_mm10_v1.2.0** (GRCh38_and_mm10, obsoleted) for human and mouse, built from GRCh38 and mm10 cellranger references (1.2.0), Ensembl v84 gene annotations for both human and mouse,
+			| **GRCh38_vdj_v2.0.0** (GRCh38_vdj, obsoleted) for human V(D)J sequences, cellranger reference 2.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.87.chr_patch_hapl_scaff.gtf* and *vdj_GRCh38_alts_ensembl_10x_genes-2.0.0.gtf*,
+			| **GRCm38_vdj_v2.0.0** (GRCm38_vdj, obsoleted) for mouse V(D)J sequences, cellranger reference 2.0.0, annotation built from Ensembl *Mus_musculus.GRCm38.90.chr_patch_hapl_scaff.gtf*.
 		* - **Flowcell**
 		  - Indicates the Google bucket URL of uploaded BCL folders.
 		* - **Lane**
