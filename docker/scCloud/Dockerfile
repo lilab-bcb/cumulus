@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3:latest	
+FROM continuumio/miniconda3:4.7.10	
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && apt-get install --no-install-recommends -y \
@@ -20,38 +20,33 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 
 RUN pip install --upgrade pip && \
 	pip install numpy==1.16.4 && \
-	pip install Cython==0.29.9 && \
-	pip install pybind11==2.2.4 && \
+	pip install Cython==0.29.13 && \
+	pip install pybind11==2.3.0 && \
 	pip install h5py==2.9.0 && \
 	pip install joblib==0.13.2 && \
 	pip install leidenalg==0.7.0 && \
-	pip install lightgbm==2.2.3 && \
+	pip install lightgbm==2.2.1 && \
 	pip install loompy==2.0.17 && \
 	pip install natsort==6.0.0 && \
-	pip install numba==0.43.1 && \
+	pip install numba==0.45.1 && \
 	pip install pandas==0.24.2 && \
-	pip install scikit-learn==0.21.2 && \
-	pip install scipy==1.2.1 && \
-	pip install statsmodels==0.9.0 && \
+	pip install scikit-learn==0.21.3 && \
+	pip install scipy==1.2.2 && \
+	pip install statsmodels==0.10.1 && \
 	pip install tables==3.5.2 && \
-	mkdir /software && \
-	git clone https://github.com/nmslib/hnsw.git /software/hnswlib && \
-	cd /software/hnswlib/python_bindings && python setup.py install && cd ../../.. && \
-	git clone https://github.com/bli25broad/fishers_exact_test.git /software/fisher_test && \
-	cd /software/fisher_test && pip install . && cd ../.. && \
-	git clone https://github.com/bli25broad/louvain-igraph.git /software/louvain && \
-	cd /software/louvain && pip install . && cd ../.. && \
-	git clone https://github.com/bli25broad/Multicore-TSNE.git /software/MulticoreTSNE && \
-	cd /software/MulticoreTSNE && pip install . && cd ../.. && \
-	git clone https://github.com/bli25broad/umap.git /software/umap && \
-	cd /software/umap && pip install . && cd ../..
+	pip install hnswlib==0.3.2.0 && \
+	pip install fisher-modified==0.1.5 && \
+	pip install python-igraph==0.7.1.post6 && \
+	pip install louvain-github==0.6.1.post1 && \
+	pip install MulticoreTSNE-modified==0.1 && \
+	pip install umap-learn==0.3.10 && \
 
-COPY scCloud-0.13.0.tar.gz /software
+COPY sccloud-0.14.0.tar.gz /software
 COPY extract_ADT_UMIs /software/extract_ADT_UMIs
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/scCloud/master/docker/monitor_script.sh /software
 
-RUN tar -xzf /software/scCloud-0.13.0.tar.gz -C /software && \
-	cd /software/scCloud-0.13.0 && pip install . && cd ../.. && \
+RUN tar -xzf /software/sccloud-0.14.0.tar.gz -C /software && \
+	cd /software/sccloud-0.14.0 && pip install . && cd ../.. && \
 	cd /software/extract_ADT_UMIs && make clean && make all && cd ../.. && \
 	chmod a+rx /software/monitor_script.sh
 
