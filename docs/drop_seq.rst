@@ -197,3 +197,72 @@ Please see the description of important inputs below.
 	* - genomeSAindexNbases
 	  - Length (bases) of the SA pre-indexing string. Typically between 10 and 15. Longer strings will use much more memory, but allow faster searches. For small genomes, must be scaled down to min(14, log2(GenomeLength)/2 - 1)
 
+
+sccloud/dropseq_workflow WDL Terra Release Notes
+==============================================
+
+Version 16
+^^^^^^^^^^^
+- Use sccloud dockerhub organization
+- Changed default dropest version to 0.8.6
+
+Version 15
+^^^^^^^^^^^
+- Added drop_deq_tools_prep_bam_memory and drop_deq_tools_dge_memory options
+
+Version 14
+^^^^^^^^^^^
+- Fix for downloading files from user pays buckets
+
+Version 13
+^^^^^^^^^^^
+- Set GCLOUD_PROJECT_ID for user pays buckets
+
+Version 12
+^^^^^^^^^^^
+- Changed default dropEst memory from 52G to 104G
+
+Version 11
+^^^^^^^^^^^
+- Updated formula for computing disk size for dropseq_count
+
+Version 10
+^^^^^^^^^^^
+- Added option to specify merge_bam_alignment_memory and sort_bam_max_records_in_ram
+
+Version 9
+^^^^^^^^^^^
+- Updated default drop_seq_tools_version from 2.2.0 to 2.3.0
+
+Version 8
+^^^^^^^^^^^
+- Made additional options available for running dropEst
+
+Version 7
+^^^^^^^^^^^
+- Changed default dropEst memory from 104G to 52G
+
+Version 6
+^^^^^^^^^^^
+- Added option to run dropEst
+
+Version 5
+^^^^^^^^^^^
+- Specify full version for bcl2fastq (2.20.0.422-2 instead of 2.20.0.422)
+
+Version 4
+^^^^^^^^^^^
+- Fixed issue that prevented bcl2fastq from running
+
+Version 3
+^^^^^^^^^^^
+- Set default run_bcl2fastq to false
+- Create shortcuts for commonly used genomes
+
+Version 2
+^^^^^^^^^^^
+- Updated QC report
+
+Version 1
+^^^^^^^^^^^
+- Initial release
