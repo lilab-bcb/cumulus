@@ -77,9 +77,9 @@ workflow scCloud {
 	Int? max_umis
 	# Prefix for mitochondrial genes. [default: MT-]
 	String? mito_prefix
-	# Only keep cells with mitochondrial ratio less than <ratio>. [default: 0.1]
+	# Only keep cells with mitochondrial percent less than <percent>. [default: 10]
 	Float? percent_mito
-	# Only use genes that are expressed in at <ratio> * 100 percent of cells to select variable genes. [default: 0.0005]
+	# Only use genes that are expressed in at <percent> of cells to select variable genes. [default: 0.05]
 	Float? gene_percent_cells
 	# If input are raw 10x matrix, which include all barcodes, perform a pre-filtration step to keep the data size small. In the pre-filtration step, only keep cells with at least <number> of genes. [default: 100]
 	Int? min_genes_on_raw
