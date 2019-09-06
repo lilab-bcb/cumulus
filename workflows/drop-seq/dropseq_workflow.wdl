@@ -323,6 +323,7 @@ task generate_count_config {
 				disk_size_call = disk_size_call + df.iloc[i][2].split(',')
 				output = open('tmp.txt', 'w')
 				check_call(disk_size_call, stdout=output)
+				output.close()
 				output_df = pd.read_csv('tmp.txt', sep=' ', engine='python')
 				if output_df.shape[0] == 0:
 					print(df.index[i] + ' fastqs not found')
