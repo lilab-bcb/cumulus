@@ -185,7 +185,7 @@ task generate_count_matrix {
 			if gene_names is None:
 				gene_names = np.array(['_'.join(x.split('_')[1:]) for x in df.index])
 			tot_counts = df['expected_count'].sum()
-			counts = df['TPM'].values.copy()
+			counts = df['TPM'].values / 10.0 # convert TPMs into TP100Ks
 			denom = counts.sum()
 			if denom > 0:
 				counts = (counts / denom * tot_counts + 0.5).astype(int)
