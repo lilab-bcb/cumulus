@@ -75,8 +75,8 @@ Convert.anndata.base.AnnData <- function(
 			for (dr.key in names(dr.dict)) {
 				dr.name <- dr.dict[[dr.key]]
 				dr.pkey <- paste0("X_", dr.name)
-				if (dr.pkey %in% drs) {
-					dr.embed <- py_to_r(from$obsm[[dr.pkey]])
+				dr.embed <- py_to_r(from$obsm$get(dr.pkey))
+				if (!is.null(dr.embed)) {
 					colnames(x = dr.embed) <- paste0(dr.key, 1:ncol(x = dr.embed))
 					rownames(x = dr.embed) <- seurat.object@cell.names
 					seurat.object <- SetDimReduction(
