@@ -891,13 +891,13 @@ Load ``scCloud`` results into ``Seurat``
 -----------------------------------------
 
 First, you need to set ``make_output_seurat_compatible`` to ``true`` in ``scCloud`` to make sure ``output_name.h5ad`` is Seurat-compatible.
-Please note that python, the `anndata`_ python library, and the reticulate R library are required to load the result into Seurat.
+Please note that python, the `anndata`_ python library with version at least ``0.6.22.post1``, and the reticulate R library are required to load the result into Seurat.
 
 Execute the R code below to load the results into ``Seurat`` version 2::
 
 	library(Seurat)
 	library(reticulate)
-	source("https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/workflows/scCloud/h5ad2seurat.R")
+	source("https://raw.githubusercontent.com/klarman-cell-observatory/scCloud/master/workflows/scCloud/h5ad2seurat.R")
 	ad <- import("anndata", convert = FALSE)
 	test_ad <- ad$read_h5ad("output_name.seurat.h5ad")
 	test <- Convert.anndata.base.AnnData(test_ad, to = "seurat")
