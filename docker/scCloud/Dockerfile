@@ -31,9 +31,11 @@ RUN pip install --upgrade pip && \
 	pip install numba==0.45.1 && \
 	pip install pandas==0.24.2 && \
 	pip install scikit-learn==0.21.3 && \
+	pip install scikit-misc==0.1.1 && \
 	pip install scipy==1.2.2 && \
 	pip install statsmodels==0.10.1 && \
 	pip install tables==3.5.2 && \
+	pip install anndata==0.6.22.post1 && \
 	pip install hnswlib==0.3.2.0 && \
 	pip install fisher-modified==0.1.5 && \
 	pip install python-igraph==0.7.1.post6 && \
