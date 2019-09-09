@@ -42,7 +42,7 @@ RUN pip install --upgrade pip && \
 	pip install louvain-github==0.6.1.post1 && \
 	pip install MulticoreTSNE-modified==0.1 && \
 	pip install umap-learn==0.3.10 && \
-	pip install sccloud==0.14.0rc2
+	pip install sccloud[fitsne]==0.14.0rc2
 
 COPY extract_ADT_UMIs /software/extract_ADT_UMIs
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/scCloud/master/docker/monitor_script.sh /software
