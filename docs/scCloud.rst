@@ -1,6 +1,12 @@
 Run single-cell cloud-based analysis module (scCloud) for scRNA-Seq data analysis
 ---------------------------------------------------------------------------------
 
+Prepare Input Data
+^^^^^^^^^^^^^^^^^^
+
+Case 1: Sample Sheet
+++++++++++++++++++++
+
 Follow the steps below to run **scCloud** on Terra_.
 
 #. Create a sample sheet, **count_matrix.csv**, which describes the metadata for each 10x channel. The sample sheet should at least contain 2 columns --- *Sample* and *Location*. *Sample* refers to sample names and *Location* refers to the location of the channel-specific count matrix in either 10x format (e.g. ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_gene_bc_matrices_h5.h5`` for v2 chemistry, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_feature_bc_matrices.h5``) for v3 chemistry or dropseq format (e.g. ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_2/sample_2.umi.dge.txt.gz``). You are free to add any other columns and these columns will be used in selecting channels for futher analysis. In the example below, we have *Source*, which refers to the tissue of origin, *Platform*, which refers to the sequencing platform, *Donor*, which refers to the donor ID, and *Reference*, which refers to the reference genome.
@@ -30,6 +36,23 @@ Follow the steps below to run **scCloud** on Terra_.
 
 	.. image:: images/single_workflow.png
 
+
+Case 2: Single File
++++++++++++++++++++
+
+Alternatively, if you only have one single count matrix for analysis, you can go without sample sheets. **scCloud** currently supports the following formats:
+
+* 10x genomics v2/v3 formats (hdf5 or mtx);
+* HCA DCP mtx and loom formats;
+* Drop-seq dge formats.
+
+Simply upload your data to the Google Bucket of your workspace, and specify its URL in ``input_file`` field in `global inputs`_ below. Notice that for dge and loom files, ``genome`` field in `global inputs`_ is required.
+
+In this case, **aggregate_matrix** step will be skipped.
+
+
+.. _global inputs: ./scCloud.html#global-inputs
+
 ---------------------------------
 
 scCloud steps:
@@ -37,11 +60,11 @@ scCloud steps:
 
 **scCloud** processes single cell data in the following steps:
 
-#. **aggregate_matrix**. This step aggregates channel-specific count matrices into one big count matrix. Users could specify which channels they want to analyze and which sample attributes they want to import to the count matrix in this step.
+#. **aggregate_matrix** (optional). When given a CSV format sample sheet, this step aggregates channel-specific count matrices into one big count matrix. Users could specify which channels they want to analyze and which sample attributes they want to import to the count matrix in this step. Otherwise, if a single count matrix file is given, skip this step.
 
 #. **cluster**. This step is the main analysis step. In this step, **scCloud** performs low quality cell filtration, variable gene selection, batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. t-SNE/FLE).
 
-#. **de_analysis**. This step is optional. In this step, **scCloud** could calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **scCloud** could also calculate the area under ROC curve values for putative markers. If *find_markers_lightgbm* is on, **scCloud** will try to identify cluster-specific markers by training a LightGBM classifier. If the samples are human or mouse immune cells, **scCloud** could also optionally annotate putative cell types for each cluster based on known markers.
+#. **de_analysis**. This step is optional. In this step, **scCloud** could calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **scCloud** could also calculate the area under ROC curve values for putative markers. If ``find_markers_lightgbm`` is on, **scCloud** will try to identify cluster-specific markers by training a LightGBM classifier. If the samples are human or mouse immune cells, **scCloud** could also optionally annotate putative cell types for each cluster based on known markers.
 
 #. **plot**. This step is optional. In this step, **scCloud** could generate 6 types of figures based on the **cluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne**, **umap**, **fle** plots show the same t-SNE/UMAP/FLE (force-directed layout embedding) colored by different attributes (e.g. cluster labels, conditions) side-by-side. Third, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components. Lastly, if input is CITE-Seq data, **citeseq_tsne** plots tSNEs based on epitope expression.
 
@@ -62,8 +85,8 @@ global inputs
 	  - Description
 	  - Example
 	  - Default
-	* - **input_count_matrix_csv**
-	  - Input CSV file describing metadata of each 10x channel
+	* - **input_file**
+	  - Input CSV sample sheet describing metadata of each 10x channel, or a single input count matrix file
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_count_matrix.csv"
 	  - 
 	* - **output_name**
@@ -76,8 +99,8 @@ global inputs
 	  - 
 	* - sccloud_version
 	  - scCloud version
-	  - "0.8.0"
-	  - "0.8.0"
+	  - "0.9.0"
+	  - "0.9.0"
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-b us-east1-c us-east1-d"
@@ -123,10 +146,6 @@ aggregate_matrix inputs
 	  - Specify a comma-separated list of outputted attributes. These attributes should be column names in the count_matrix.csv file
 	  - "Source,Platform,Donor"
 	  - 
-	* - select_only_singlets
-	  - If we have demultiplexed data, turning on this option will make scCloud only include barcodes that are predicted as singlets
-	  - true
-	  - false
 	* - minimum_number_of_genes
 	  - Only keep barcodes with at least this number of expressed genes
 	  - 100
@@ -146,9 +165,9 @@ aggregate_matrix output
 	* - Name
 	  - Type
 	  - Description
-	* - **output_10x_h5**
+	* - **output_h5sc**
 	  - File
-	  - Aggregated count matrix in 10x format
+	  - Aggregated count matrix in scCloud hdf5 format
 
 ---------------------------------
 
@@ -168,6 +187,18 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - Description
 	  - Example
 	  - Default
+	* - channel
+	  - Specify the cell barcode attribute to represent different samples.
+	  - "Donor" 
+	  - 
+	* - black_list
+	  - Cell barcode attributes in black list will be poped out. Format is "attr1,attr2,...,attrn".
+	  - "attr1,attr2,attr3""
+	  - 
+	* - min_genes_on_raw
+	  - If input are raw 10x matrix, which include all barcodes, perform a pre-filtration step to keep the data size small. In the pre-filtration step, only keep cells with at least <min_genes_on_raw> of genes
+	  - 100
+	  - 100
 	* - cite_seq
 	  - | Data are CITE-Seq data. scCloud will perform analyses on RNA count matrix first. 
 	    | Then it will attach the ADT matrix to the RNA matrix with all antibody names changing to 'AD-' + antibody_name. 
@@ -178,6 +209,10 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - For CITE-Seq surface protein expression, make all cells with expression > <percentile> to the value at <percentile> to smooth outlier. Set <percentile> to 100.0 to turn this option off.
 	  - 10.0
 	  - 99.99
+	* - select_only_singlets
+	  - If we have demultiplexed data, turning on this option will make scCloud only include barcodes that are predicted as singlets
+	  - true
+	  - false
 	* - output_filtration_results
 	  - If output cell and gene filtration results to a spreadsheet
 	  - true
@@ -202,23 +237,6 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - If output parquet-formatted file
 	  - false
 	  - false
-	* - correct_batch_effect
-	  - If correct batch effects
-	  - false
-	  - false
-	* - batch_group_by
-	  - | Batch correction assumes the differences in gene expression between channels are due to batch effects. 
-	    | However, in many cases, we know that channels can be partitioned into several groups and each group is biologically different from others. 
-	    | In this case, we will only perform batch correction for channels within each group. This option defines the groups. 
-	    | If <expression> is None, we assume all channels are from one group. Otherwise, groups are defined according to <expression>.
-	    | <expression> takes the form of either ‘attr’, or ‘attr1+attr2+…+attrn’, or ‘attr=value11,…,value1n_1;value21,…,value2n_2;…;valuem1,…,valuemn_m’.
-	    | In the first form, ‘attr’ should be an existing sample attribute, and groups are defined by ‘attr’.
-	    | In the second form, ‘attr1’,…,’attrn’ are n existing sample attributes and groups are defined by the Cartesian product of these n attributes.
-	    | In the last form, there will be m + 1 groups. 
-	    | A cell belongs to group i (i > 0) if and only if its sample attribute ‘attr’ has a value among valuei1,…,valuein_i. 
-	    | A cell belongs to group 0 if it does not belong to any other groups
-	  - "Donor"
-	  - None
 	* - min_genes
 	  - Only keep cells with at least <min_genes> of genes
 	  - 500
@@ -240,57 +258,74 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - "mt-"
 	  - "MT-"
 	* - percent_mito
-	  - Only keep cells with mitochondrial ratio less than <percent_mito> of total counts
-	  - 0.1
-	  - 0.1
+	  - Only keep cells with mitochondrial ratio less than <percent_mito>% of total counts
+	  - 30
+	  - 10
 	* - gene_percent_cells
-	  - Only use genes that are expressed in at <ratio> * 100 percent of cells to select variable genes
-	  - 0.0005
-	  - 0.0005
-	* - min_genes_on_raw
-	  - If input are raw 10x matrix, which include all barcodes, perform a pre-filtration step to keep the data size small. In the pre-filtration step, only keep cells with at least <min_genes_on_raw> of genes
-	  - 100
-	  - 100
+	  - Only use genes that are expressed in at <gene_percent_cells>% of cells to select variable genes
+	  - 50
+	  - 0.05
 	* - counts_per_cell_after
-	  - Total counts per cell after normalization
+	  - Total counts per cell after normalization, before the count matrix is transformed to Log space.
 	  - 1e5
 	  - 1e5
+	* - select_hvf_flavor
+	  - Highly variable feature selection method. <flavor> can be "sccloud" or "Seurat".
+	  - "sccloud"
+	  - "sccloud"
+	* - select_hvf_ngenes
+	  - Select top <select_hvf_ngenes> highly variable features. If <select_hvf_flavor> is "Seurat" and <select_hvf_ngenes> is "None", select HVGs with z-score cutoff at 0.5.
+	  - 2000
+	  - 2000
+	* - no_select_hvf
+	  - Do not select highly variable features.
+	  - false
+	  - false
+	* - correct_batch_effect
+	  - If correct batch effects
+	  - false
+	  - false
+	* - batch_group_by
+	  - | Batch correction assumes the differences in gene expression between channels are due to batch effects. 
+	    | However, in many cases, we know that channels can be partitioned into several groups and each group is biologically different from others. 
+	    | In this case, we will only perform batch correction for channels within each group. This option defines the groups. 
+	    | If <expression> is None, we assume all channels are from one group. Otherwise, groups are defined according to <expression>.
+	    | <expression> takes the form of either ‘attr’, or ‘attr1+attr2+…+attrn’, or ‘attr=value11,…,value1n_1;value21,…,value2n_2;…;valuem1,…,valuemn_m’.
+	    | In the first form, ‘attr’ should be an existing sample attribute, and groups are defined by ‘attr’.
+	    | In the second form, ‘attr1’,…,’attrn’ are n existing sample attributes and groups are defined by the Cartesian product of these n attributes.
+	    | In the last form, there will be m + 1 groups. 
+	    | A cell belongs to group i (i > 0) if and only if its sample attribute ‘attr’ has a value among valuei1,…,valuein_i. 
+	    | A cell belongs to group 0 if it does not belong to any other groups
+	  - "Donor"
+	  - None
 	* - random_state
 	  - Random number generator seed
 	  - 0
 	  - 0
-	* - run_uncentered_pca
-	  - Run uncentered PCA.
-	  - true
-	  - false
-	* - no_variable_gene_selection
-	  - Do not select variable genes.
-	  - true
-	  - false
-	* - no_submat_to_dense
-	  - Do not convert variable-gene-selected submatrix to a dense matrix.
-	  - true
-	  - false
 	* - nPC
 	  - Number of principal components
 	  - 50
 	  - 50
-	* - nDC
+	* - knn_K
+	  - Number of nearest neighbors used for constructing affinity matrix.
+	  - 50
+	  - 100
+	* - knn_full_speed
+	  - For the sake of reproducibility, we only run one thread for building kNN indices. Turn on this option will allow multiple threads to be used for index building. However, it will also reduce reproducibility due to the racing between multiple threads.
+	  - true
+	  - false
+	* - run_diffmap
+	  - Calculate diffusion map. It will be automatically set to ``true`` when ``run_spectral_louvain``, ``run_spectral_leiden``, ``run_fle``, ``run_net_tsne``, ``run_net_umap``, or ``run_net_fle`` is set.
+	  - true
+	  - false
+	* - diffmap_ndc
 	  - Number of diffusion components
 	  - 50
 	  - 50
-	* - diffmap_K
-	  - Number of neighbors used for constructing affinity matrix
-	  - 100
-	  - 100
-	* - diffmap_alpha
-	  - Power parameter for diffusion-based pseudotime
-	  - 0.5
-	  - 0.5
-	* - diffmap_full_speed
-	  - For the sake of reproducibility, we only run one thread for building kNN indices. Turn on this option will allow multiple threads to be used for index building. However, it will also reduce reproducibility due to the racing between multiple threads
-	  - true
-	  - false
+	* - diffmap_maxt
+	  - Maximum time stamp to search for the knee point.
+	  - 2000
+	  - 2000
 	* - run_louvain
 	  - Run louvain clustering algorithm
 	  - true
@@ -305,54 +340,58 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - "louvain_labels"
 	* - run_leiden
 	  - Run leiden clustering algorithm.
-	  - true
+	  - false
 	  - false
 	* - leiden_resolution
 	  - Resolution parameter for the leiden clustering algorithm.
 	  - 1.3
 	  - 1.3
+	* - leiden_niter
+	  - Number of iterations of running the Leiden algorithm. If negative, run Leiden iteratively until no improvement.
+	  - 2
+	  - -1
 	* - leiden_class_label
 	  - Leiden cluster label name in AnnData.
 	  - "leiden_labels"
 	  - "leiden_labels"
-	* - run_approximated_louvain
-	  - Run approximated louvain clustering algorithm
-	  - true
+	* - run_spectral_louvain
+	  - Run spectral louvain clustering algorithm
 	  - false
-	* - approx_louvain_basis
-	  - Basis used for KMeans clustering. Can be "pca", "rpca", or "diffmap".
+	  - false
+	* - spectral_louvain_basis
+	  - Basis used for KMeans clustering. Can be "pca" or "diffmap".
 	  - "diffmap"
 	  - "diffmap"
-	* - approx_louvain_resolution
+	* - spectral_louvain_resolution
 	  - Resolution parameter for louvain.
 	  - 1.3
 	  - 1.3
-	* - approx_louvain_class_label
-	  - Approximated louvain label name in AnnData.
-	  - "approx_louvain_labels"
-	  - "approx_louvain_labels"
-	* - run_approximated_leiden
-	  - Run approximated leiden clustering algorithm.
-	  - true
+	* - spectral_louvain_class_label
+	  - Spectral louvain label name in AnnData.
+	  - "spectral_louvain_labels"
+	  - "spectral_louvain_labels"
+	* - run_spectral_leiden
+	  - Run spectral leiden clustering algorithm.
 	  - false
-	* - approx_leiden_basis
-	  - Basis used for KMeans clustering. Can be "pca", "rpca", or "diffmap".
+	  - false
+	* - spectral_leiden_basis
+	  - Basis used for KMeans clustering. Can be "pca" or "diffmap".
 	  - "diffmap"
 	  - "diffmap"
-	* - approx_leiden_resolution
+	* - spectral_leiden_resolution
 	  - Resolution parameter for leiden.
 	  - 1.3
 	  - 1.3
-	* - approx_leiden_class_label
-	  - Approximated leiden label name in AnnData.
-	  - "approx_leiden_labels"
-	  - "approx_leiden_labels"
+	* - spectral_leiden_class_label
+	  - Spectral leiden label name in AnnData.
+	  - "spectral_leiden_labels"
+	  - "spectral_leiden_labels"
 	* - run_tsne
 	  - Run multi-core t-SNE for visualization
-	  - true
+	  - false
 	  - false
 	* - tsne_perplexity
-	  - t-SNE’s perplexity parameter
+	  - t-SNE’s perplexity parameter, also used by FIt-SNE.
 	  - 30
 	  - 30
 	* - run_fitsne
@@ -361,7 +400,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - true
 	* - run_umap
 	  - Run umap for visualization
-	  - true
+	  - false
 	  - false
 	* - umap_K
 	  - K neighbors for umap.
@@ -369,7 +408,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - 15
 	* - umap_min_dist
 	  - Umap parameter.
-	  - 0.1
+	  - 0.5
 	  - 0.5
 	* - umap_spread
 	  - Umap parameter.
@@ -377,7 +416,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - 1.0
 	* - run_fle
 	  - Run force-directed layout embedding
-	  - true
+	  - false
 	  - false
 	* - fle_K
 	  - K neighbors for building graph for FLE
@@ -391,37 +430,21 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - Maximum number of iterations before stopping the forceAtlas2 algoritm.
 	  - 5000
 	  - 5000
-	* - fle_3D
-	  - Calculate 3D force-directed layout.
-	  - true
-	  - false
 	* - net_down_sample_fraction
 	  - Down sampling fraction for net-related visualization.
 	  - 0.1
 	  - 0.1
-	* - net_ds_full_speed
-	  - For net-UMAP and net-FLE, use full speed for the down-sampled data.
-	  - true
-	  - false
 	* - run_net_tsne
 	  - Run net tSNE for visualization.
-	  - true
+	  - false
 	  - false
 	* - net_tsne_out_basis
 	  - Output basis for net-tSNE.
 	  - "net_tsne"
 	  - "net_tsne"
-	* - run_net_fitsne
-	  - Run net FIt-SNE for visualization.
-	  - true
-	  - false
-	* - net_fitsne_out_basis
-	  - Output basis for net-FItSNE.
-	  - "net_fitsne"
-	  - "net_fitsne"
 	* - run_net_umap
 	  - Run net umap for visualization.
-	  - true
+	  - false
 	  - false
 	* - net_umap_out_basis
 	  - Output basis for net-UMAP.
@@ -429,11 +452,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - "net_umap"
 	* - run_net_fle
 	  - Run net FLE.
-	  - true
 	  - false
-	* - net_fle_ds_full_speed
-	  - If run full-speed kNN on down-sampled data points.
-	  - true
 	  - false
 	* - net_fle_out_basis
 	  - Output basis for net-FLE.
@@ -529,34 +548,42 @@ de_analysis inputs
 	  - Control false discovery rate at <alpha>
 	  - 0.05
 	  - 0.05
+	* - auc
+	  - Calculate area under ROC (AUROC) and area under Precision-Recall (AUPR).
+	  - true
+	  - true
 	* - fisher
 	  - Calculate Fisher’s exact test
 	  - true
 	  - true
+	* - t_test
+	  - Calculate Welch's t-test.
+	  - true
+	  - true
 	* - mwu
 	  - Calculate Mann-Whitney U test
-	  - true
 	  - false
-	* - roc
-	  - Calculate area under curve in ROC curve
-	  - true
-	  - true
+	  - false
 	* - find_markers_lightgbm
 	  - If also detect markers using LightGBM
-	  - true
+	  - false
 	  - false
 	* - remove_ribo
 	  - Remove ribosomal genes with either RPL or RPS as prefixes. Currently only works for human
-	  - true
+	  - false
 	  - false
 	* - min_gain
 	  - Only report genes with a feature importance score (in gain) of at least <gain>
-	  - 10.0
+	  - 1.0
 	  - 1.0 
 	* - annotate_cluster
 	  - If also annotate cell types for clusters based on DE results
-	  - true
 	  - false
+	  - false
+	* - annotate_de_test
+	  - Differential Expression test to use to infer cell types, could be either "t", "fisher", or "mwu".
+	  - "t"
+	  - "t"
 	* - organism
 	  - Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain" or a Google bucket link to a JSON file describing the markers.
 	  - "mouse_brain"
@@ -584,7 +611,7 @@ de_analysis outputs
 	  - Spreadsheet reporting DE results (output_name.de.xlsx)
 	* - output_markers_xlsx
 	  - File
-	  - An excel spreadsheet containing detected markers. Each cluster has one tab in the spreadsheet and each tab has three columns, listing markers that are strongly up-regulated, weakly up-regulated and down-regulated
+	  - An excel spreadsheet containing detected markers. Each cluster has one tab in the spreadsheet and each tab has three columns, listing markers that are strongly up-regulated, weakly up-regulated and down-regulated (output_name.markers.xlsx)
 	* - output_anno_file
 	  - File
 	  - Annotation file (output_name.anno.txt)
@@ -703,11 +730,6 @@ plot inputs
 	    | If non-empty, plot attr colored FIt-SNEs side by side
 	  - "louvain_labels,Donor"
 	  - None
-	* - plot_net_fitsne
-	  - | Takes the format of "attr,attr,...,attr". 
-	    | If non-empty, plot attr colored FIt-SNEs side by side based on net FIt-SNE result.
-	  - "leiden_labels,Channel"
-	  - None
 	* - plot_net_tsne
 	  - | Takes the format of "attr,attr,...,attr". 
 	    | If non-empty, plot attr colored t-SNEs side by side based on net t-SNE result.
@@ -806,7 +828,7 @@ Note that we will make the required inputs/outputs bold and all other inputs/out
 	    | This field contains one or more <subset_selection> strings separated by ';'. 
 	    | Each <subset_selection> string takes the format of 'attr:value,…,value', which means select cells with attr in the values. 
 	    | If multiple <subset_selection> strings are specified, the subset of cells selected is the intersection of these strings
-	  - "louvain_labels:3,6"
+	  - "louvain_labels:3,6" or "louvain_labels:3,6;Donor:1,2"
 	  - 
 	* - calculate_pseudotime
 	  - Calculate diffusion-based pseudotimes based on <roots>. <roots> should be a comma-separated list of cell barcodes
@@ -913,24 +935,23 @@ Ensure you have **scCloud** installed.
 
 Load the output::
 
-	import scCloud
-	adata = scCloud.tools.read_input("output_name.h5ad")
+	import sccloud as scc
+	adata = scc.read_input("output_name.h5ad")
 
 Violin plot of the computed quality measures::
 
-	scCloud.plotting.plot_qc_violin(adata, 'gene', 'output_name.gene.qc.pdf')
-	scCloud.plotting.plot_qc_violin(adata, 'count', 'output_name.count.qc.pdf')
-	scCloud.plotting.plot_qc_violin(adata, 'mito', 'output_name.mito.qc.pdf')
+	fig = scc.violin(adata, keys = ['n_genes', 'n_counts', 'percent_mito'], by = 'passed_qc')
+	fig.savefig('output_file.qc.pdf', dpi = 500)
 
 tSNE colored by louvain cluster labels and channel::
 
-	fig = scCloud.plotting.plot_scatter(adata, 'tsne', ['louvain_labels', 'Channel'])
-	fig.savefig('output_file.pdf', dpi = 500)
+	fig = scc.embedding(adata, basis = 'tsne', keys = ['louvain_labels', 'Channel'])
+	fig.savefig('output_file.tsne.pdf', dpi = 500)
 
 UMAP colored by genes of interest::
 
-	fig = scCloud.plotting.plot_scatter_genes(adata, 'umap', ['CD4', 'CD8A'])
-	fig.savefig('output_file.pdf', dpi = 500)
+	fig = scc.embedding(adata, basis = 'umap', keys = ['CD4', 'CD8A'])
+	fig.savefig('output_file.genes.umap.pdf', dpi = 500)
 
 
 .. _anndata: https://anndata.readthedocs.io/en/latest/
