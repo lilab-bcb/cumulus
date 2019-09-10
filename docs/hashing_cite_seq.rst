@@ -71,14 +71,14 @@ scCloud_hashing_cite_seq inputs:
 	  - Reference genome name. If not provided, scCloud will infer the genome name from data
 	  - "GRCh38"
 	  - 
-	* - demuxEM_alpha_on_samples
-	  - demuxEM parameter. The Dirichlet prior concentration parameter (alpha) on samples. An alpha value < 1.0 will make the prior sparse.
-	  - 2.0
-	  - 0.0
 	* - demuxEM_min_num_genes
 	  - demuxEM parameter. Only demultiplex cells/nuclei with at least <demuxEM_min_num_genes> expressed genes
 	  - 200
 	  - 100
+	* - demuxEM_alpha_on_samples
+	  - demuxEM parameter. The Dirichlet prior concentration parameter (alpha) on samples. An alpha value < 1.0 will make the prior sparse.
+	  - 2.0
+	  - 0.0
 	* - demuxEM_min_num_umis
 	  - demuxEM parameter. Only demultiplex cells/nuclei with at least <demuxEM_min_num_umis> of UMIs.
 	  - 200
@@ -105,8 +105,8 @@ scCloud_hashing_cite_seq inputs:
 	  - 
 	* - sccloud_version
 	  - scCloud version
-	  - "0.8.0"
-	  - "0.8.0"
+	  - "0.9.0"
+	  - "0.9.0"
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-b us-east1-c us-east1-d"
@@ -156,8 +156,8 @@ In the output folder of each cell-hashing/nuclei-hashing RNA-ADT data pair, you 
 	  - Description
 	* - output_name_demux.h5ad
 	  - Demultiplexed RNA count matrix in h5ad format.
-	* - output_name_demux_10x.h5
-	  - RNA expression matrix with demultiplexed sample identities in 10x's hdf5 format.
+	* - output_name_demux.h5sc
+	  - RNA expression matrix with demultiplexed sample identities in scCloud hdf5 format.
 	* - output_name_ADTs.h5ad
 	  - Antibody tag matrix in h5ad format.
 	* - output_name.ambient_hashtag.hist.png
@@ -179,8 +179,8 @@ In the output folder of each cite-seq RNA-ADT data pair, you can find the follow
 
 	* - Name
 	  - Description
-	* - output_name_merged_10x.h5ad
-	  - An h5ad file containing both RNA and ADT count matrices.
+	* - output_name.h5sc
+	  - An scCloud hdf5 file containing both RNA and ADT count matrices.
 
 ---------------------------------
 
