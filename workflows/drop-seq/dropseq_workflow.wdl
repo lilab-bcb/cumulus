@@ -1,6 +1,6 @@
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:bcl2fastq/versions/2/plain-WDL/descriptor" as bcl2fastq_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropest/versions/4/plain-WDL/descriptor" as dropest_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_align/versions/6/plain-WDL/descriptor" as dropseq_align_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_align/versions/7/plain-WDL/descriptor" as dropseq_align_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_count/versions/6/plain-WDL/descriptor" as dropseq_count_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_prepare_fastq/versions/4/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_qc/versions/6/plain-WDL/descriptor" as dropseq_qc_wdl
@@ -19,7 +19,7 @@ workflow dropseq_workflow {
 	Boolean run_dropest = false
 	Boolean run_aligner = true
 
-	String star_flags = "--limitOutSJcollapsed 1000000 --twopassMode Basic"
+	String? star_flags
 
 	# hg19, mm10, hg19_mm10, mmul_8.0.1 or a path to a custom reference JSON file
 	String reference
