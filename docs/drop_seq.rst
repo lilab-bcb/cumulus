@@ -140,7 +140,7 @@ Please see the description of important inputs below.
 	* - cellular_barcode_base_range
 	  - The base location of the cell barcode (default 1-12)
 	* - star_flags
-	  - Options to pass to STAR aligner (default "--limitOutSJcollapsed 1000000 --twopassMode Basic")
+	  - Additional options to pass to STAR aligner
 
 
 Please note that run_bcl2fastq must be set to true if you're starting from BCL files instead of FASTQs.
@@ -199,7 +199,12 @@ Please see the description of important inputs below.
 
 
 sccloud/dropseq_workflow WDL Terra Release Notes
-==============================================
+===================================================
+
+**Version 17**
+
+- Fixed bug that ignored WDL input star_flags (thanks to Carly Ziegler for reporting)
+- Changed default value of star_flags to the empty string (Prior versions of the WDL incorrectly indicated that basic 2-pass mapping was done)
 
 **Version 16**
 
