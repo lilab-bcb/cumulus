@@ -115,7 +115,7 @@ workflow scCloud_subcluster {
 	Boolean? run_net_tsne
 	# Output basis for net-tSNE. [default: net_tsne]
 	String? net_tsne_out_basis
-	# Run net FIt-SNE for visualization.
+	# Run net UMAP.
 	Boolean? run_net_umap
 	# Output basis for net-UMAP. [default: net_umap]
 	String? net_umap_out_basis
@@ -175,8 +175,6 @@ workflow scCloud_subcluster {
 	String? plot_diffmap
 	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored tSNEs side by side based on net tSNE result.
 	String? plot_net_tsne
-	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FItSNEs side by side based on net FItSNE result.
-	String? plot_net_fitsne
 	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored UMAPs side by side based on net UMAP result.
 	String? plot_net_umap
 	# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FLEs side by side based on net FLE result.
