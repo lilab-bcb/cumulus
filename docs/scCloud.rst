@@ -764,6 +764,50 @@ plot outputs
 	  - Array[File]
 	  - Outputted html files
 
+
+---------------------------------
+
+Generate SCP Output
+^^^^^^^^^^^^^^^^^^^
+
+Generate analysis result in `Single Cell Portal`_ (SCP) compatible format.
+
+scp_output inputs
++++++++++++++++++
+
+
+.. list-table::
+	:widths: 5 20 10 5
+	:header-rows: 1
+
+	* - Name
+	  - Description
+	  - Example
+	  - Default
+	* - generate_scp_outputs
+	  - Whether to generate SCP format output or not.
+	  - false
+	  - false
+	* - output_dense
+	  - Output dense expression matrix instead.
+	  - false
+	  - false
+
+
+scp_output outputs
+++++++++++++++++++
+
+.. list-table::
+	:widths: 5 5 20
+	:header-rows: 1
+
+	* - Name
+	  - Type
+	  - Description
+	* - output_scp_files
+	  - Array[File]
+	  - Outputted SCP format files.
+
 ---------------------------------
 
 Run CITE-Seq analysis
@@ -958,3 +1002,4 @@ UMAP colored by genes of interest::
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
 .. _adding a tool: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
 .. _Terra: https://app.terra.bio/
+.. _Single Cell Portal: https://portals.broadinstitute.org/single_cell
