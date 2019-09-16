@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:bcl2fastq/versions/2/plain-WDL/descriptor" as bcl2fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:bcl2fastq/versions/3/plain-WDL/descriptor" as bcl2fastq_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropest/versions/4/plain-WDL/descriptor" as dropest_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_align/versions/7/plain-WDL/descriptor" as dropseq_align_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_count/versions/6/plain-WDL/descriptor" as dropseq_count_wdl
@@ -24,7 +24,7 @@ workflow dropseq_workflow {
 	# hg19, mm10, hg19_mm10, mmul_8.0.1 or a path to a custom reference JSON file
 	String reference
 	File? acronym_file = "gs://regev-lab/resources/DropSeq/index.json"
-
+    String bcl2fastq_docker_registry = "gcr.io/sccloud-prod"
 
 	# use ncells value directly instead of estimating from elbow plot
 	Int? drop_seq_tools_force_cells
@@ -98,6 +98,7 @@ workflow dropseq_workflow {
 					memory = bcl2fastq_memory,
 					disk_space = bcl2fastq_disk_space,
 					preemptible = preemptible,
+					docker_registry = bcl2fastq_docker_registry,
 					bcl2fastq_version=bcl2fastq_version
 			}
 		}

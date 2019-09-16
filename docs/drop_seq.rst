@@ -201,6 +201,10 @@ Please see the description of important inputs below.
 sccloud/dropseq_workflow WDL Terra Release Notes
 ===================================================
 
+**Version 18**
+
+- Created a separate docker image for running bcl2fastq
+
 **Version 17**
 
 - Fixed bug that ignored WDL input star_flags (thanks to Carly Ziegler for reporting)
