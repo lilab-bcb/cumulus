@@ -1,7 +1,7 @@
 FROM debian:stretch-slim
 SHELL ["/bin/bash", "-c"]
 
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/cellranger/bcl2fastq2_0v2.20.0.422-2_amd64.deb /software/
+#ADD bcl2fastq2_0v2.20.0.422-2_amd64.deb /software/
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/monitor_script.sh /software/
 ADD cellranger-atac-1.1.0.tar.gz /software/
 
@@ -15,8 +15,9 @@ RUN apt-get -qq update && apt-get -qq -y install --no-install-recommends ca-cert
     && apt-get -qq -y autoremove \
     && apt-get autoclean \
     && rm -rf /var/lib/apt/lists/* /var/log/dpkg.log \
-    && dpkg -i /software/bcl2fastq2_0v2.20.0.422-2_amd64.deb && rm /software/bcl2fastq2_0v2.20.0.422-2_amd64.deb \
-	&& chmod a+rx /software/* \
-    && ln -s /usr/bin/python3 /usr/bin/python
+    && ln -s /usr/bin/python3 /usr/bin/python \
+    #&& dpkg -i /software/bcl2fastq2_0v2.20.0.422-2_amd64.deb && rm /software/bcl2fastq2_0v2.20.0.422-2_amd64.deb \
+	&& chmod a+rx /software/*
+
 
 ENV PATH=/software:/software/cellranger-atac-1.1.0/:$PATH
