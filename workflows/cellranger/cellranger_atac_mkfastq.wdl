@@ -8,7 +8,7 @@ workflow cellranger_atac_mkfastq {
 
 	# Whether to delete input bcl directory. If false, you should delete this folder yourself so as to not incur storage charges.
 	Boolean? delete_input_bcl_directory = true
-	# 1.0.0 or 1.0.1
+    String? docker_registry
 	String? cellranger_atac_version = "1.0.1"
 	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 	String? zones = "us-central1-b"
@@ -34,6 +34,7 @@ workflow cellranger_atac_mkfastq {
 			zones = zones,
 			num_cpu = num_cpu,
 			memory = memory,
+			docker_registry = docker_registry,
 			disk_space = disk_space,
 			preemptible = preemptible
 	}
@@ -52,6 +53,7 @@ task run_cellranger_atac_mkfastq {
 	Boolean delete_input_bcl_directory
 	String cellranger_atac_version
 	String zones
+	String docker_registry
 	Int num_cpu
 	String memory
 	Int disk_space
@@ -103,7 +105,7 @@ task run_cellranger_atac_mkfastq {
 	}
 
 	runtime {
-		docker: "sccloud/cellranger-atac:${cellranger_atac_version}"
+		docker: "${docker_registry}/cellranger-atac:${cellranger_atac_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
