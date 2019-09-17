@@ -69,11 +69,16 @@ static const std::vector<std::vector<uint64_t> > aux_arr = init_aux_arr();
 uint64_t barcode_to_binary(const std::string& barcode) {
 	uint64_t binary_id = 0;
 	char c;
-	if (barcode.length() > UPPER) printf("%s\n", barcode.c_str());
-	assert(barcode.length() <= UPPER);
+	if (barcode.length() > UPPER) {
+		printf("Barcode %s exceeds the length limit %d!\n", barcode.c_str(), UPPER);
+		exit(-1);
+	}
 	for (auto&& it = barcode.rbegin(); it != barcode.rend(); ++it) {
 		c = *it;
-		assert(base2id[c] >= 0);
+		if (base2id[c] < 0) { 
+			printf("Barcode %s contains unknown bases %c!\n", barcode.c_str(), c);
+			exit(-1);
+		}
 		binary_id <<= STEP;
 		binary_id += base2id[c];
 	}
@@ -93,7 +98,14 @@ inline bool insert(HashType& index_dict, uint64_t key, ValueType&& value) {
 	std::pair<HashIterType, bool> ret;
 	ret = index_dict.insert(std::make_pair(key, value));
 	if (ret.second) return true;
-	assert(ret.first->second.n_mis > 0 && value.n_mis > 0);
+	if (ret.first->second.n_mis == 0 && value.n_mis == 0) {
+		printf("ScCloud identified two identical barcodes! Please check your barcode file.\n");
+		exit(-1);
+	}
+	if (ret.first->second.n_mis == 0 || value.n_mis == 0) {
+		printf("Mismatch value is too large. Please decrease the number of mismatches allowed.\n");
+		exit(-1);
+	}
 	ret.first->second.item_id = -1;
 	return false;
 }
