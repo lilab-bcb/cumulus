@@ -83,7 +83,7 @@ When the execution is done, all the output results will be in folder ``gs://fc-e
 
 You'll need 4 files for the next phases. 3 are from the output:
 
-	* RNA information on the sample group of interest: ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/sample_cc/raw_gene_bc_matrices_h5.h5``;
+	* RNA information on the sample group of interest: ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/sample_cc/raw_feature_bc_matrix.h5``;
 	* Antibody Cell-Hashing matrix: ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/sample_cell_hashing/sample_cell_hashing.csv``;
 	* Antibody CITE-Seq matrix: ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/sample_cite_seq/sample_cite_seq.csv``.
 
@@ -108,7 +108,7 @@ On your local machine:
 	#. Prepare a sample sheet, ``sample_sheet_01.csv``, with the following content::
 
 		OUTNAME,RNA,ADT,TYPE
-		exp,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/raw_gene_bc_matrices_h5.h5,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/sample_cell_hashing.csv,cell-hashing
+		exp,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/raw_feature_bc_matrix.h5,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/sample_cell_hashing.csv,cell-hashing
 
 	   where **OUTNAME** specifies the subfolder name and prefix of output files, which can be renamed, **RNA** and **ADT** columns specify the RNA and ADT meta-data of samples, and **TYPE** is ``cell-hashing`` for this phase.
 	

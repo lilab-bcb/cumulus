@@ -106,8 +106,8 @@ Please see the description of inputs below. Note that required inputs are shown 
 	  - 
 	* - smartseq2_version
 	  - SMART-Seq2 docker version
-	  - "0.2.0"
-	  - "0.2.0"
+	  - "1.0.0"
+	  - "1.0.0"
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-b us-east1-c us-east1-d"
@@ -118,8 +118,8 @@ Please see the description of inputs below. Note that required inputs are shown 
 	  - 4
 	* - memory
 	  - Memory size string
-	  - "10GB"
-	  - "10GB"
+	  - "3.60G"
+	  - "3.60G"
 	* - disk_space
 	  - Disk space in gigabytes
 	  - 10

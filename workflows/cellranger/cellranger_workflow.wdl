@@ -1,7 +1,7 @@
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_count/versions/6/plain-WDL/descriptor" as crac
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_mkfastq/versions/4/plain-WDL/descriptor" as cram
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_atac_mkfastq/versions/5/plain-WDL/descriptor" as cram
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_count/versions/5/plain-WDL/descriptor" as crc
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_mkfastq/versions/6/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_mkfastq/versions/7/plain-WDL/descriptor" as crm
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_vdj/versions/6/plain-WDL/descriptor" as crv
 
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/13/plain-WDL/descriptor" as sa
@@ -60,12 +60,14 @@ workflow cellranger_workflow {
 	String? atac_dim_reduce
 
 
-	# 2.1.1, 2.2.0, 3.0.0, or 3.0.2
+	# 2.2.0, 3.0.2, 3.1.0
 	String? cellranger_version = "3.0.2"
-	# 1.0.0, 1.0.1
+	# 1.0.1
 	String? cellranger_atac_version = "1.0.1"
 	# scCloud version, default to "0.8.0"
 	String? sccloud_version = "0.8.0"
+
+	String? cellranger_mkfastq_docker_registry = "gcr.io/sccloud-prod"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus per cellranger job
@@ -116,6 +118,7 @@ workflow cellranger_workflow {
 						zones = zones,
 						num_cpu = num_cpu,
 						memory = memory,
+						docker_registry = cellranger_mkfastq_docker_registry,
 						disk_space = mkfastq_disk_space,
 						preemptible = preemptible
 				}
@@ -135,6 +138,7 @@ workflow cellranger_workflow {
 						zones = zones,
 						num_cpu = num_cpu,
 						memory = memory,
+						docker_registry = cellranger_mkfastq_docker_registry,
 						disk_space = mkfastq_disk_space,
 						preemptible = preemptible
 				}
@@ -292,7 +296,7 @@ task generate_bcl_csv {
 		import pandas as pd 
 		from subprocess import check_call
 
-		df = pd.read_csv('${input_csv_file}', header = 0, dtype=str)
+		df = pd.read_csv('${input_csv_file}', header = 0, dtype=str, index_col=False)
 		for c in df.columns:
 			df[c] = df[c].str.strip()
 		df['Flowcell'] = df['Flowcell'].map(lambda x: re.sub('/+$', '', x)) # remove trailing slashes

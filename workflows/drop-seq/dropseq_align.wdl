@@ -4,8 +4,8 @@ workflow dropseq_align {
     Int star_cpus = 64
     File input_bam
 
-    # e.g. --limitOutSJcollapsed 1000000
-    String star_flags = "--limitOutSJcollapsed 1000000 --twopassMode Basic"
+    # e.g. --twopassMode Basic
+    String? star_flags
     File star_genome_file
 	File refflat
 	File gene_intervals
@@ -66,7 +66,7 @@ workflow dropseq_align {
 
 task STAR {
 	String memory
-	String flags
+	String? flags
 	File input_bam
 	Int cpu
 	String sample_id
@@ -94,7 +94,8 @@ task STAR {
 		--readFilesIn /dev/stdin \
 		--runThreadN ${cpu} \
 		--outSAMtype BAM Unsorted \
-		--outFileNamePrefix "${sample_id}_"
+		--outFileNamePrefix "${sample_id}_" \
+		${" " + flags}
 
      	gsutil -q -m cp ${sample_id}_* ${output_directory}/
 	}

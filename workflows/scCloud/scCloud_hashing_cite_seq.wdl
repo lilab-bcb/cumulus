@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/23/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/24/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud_hashing_cite_seq {
@@ -7,8 +7,8 @@ workflow scCloud_hashing_cite_seq {
 	# Output directory, gs url
 	String output_directory
 
-	# scCloud version, default to "0.8.0"
-	String? sccloud_version = "0.8.0"
+	# scCloud version, default to "0.9.0"
+	String? sccloud_version = "0.9.0"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus

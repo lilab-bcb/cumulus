@@ -3,7 +3,7 @@ workflow bcl2fastq {
 	String output_directory
 	# Whether to delete input bcl directory. If false, you should delete this folder yourself so as to not incur storage charges.
 	Boolean? delete_input_bcl_directory = false
-	String? zones = "us-central1-b"
+	String? zones
 	Int? num_cpu = 32
 	String? memory = "120G"
 	Int? disk_space = 1500
@@ -13,6 +13,7 @@ workflow bcl2fastq {
 	Int? barcode_mismatches
 	Boolean? create_fastq_for_index_reads = false
 	String? bcl2fastq_version = "2.20.0.422"
+	String? docker_registry = "gcr.io/sccloud-prod"
 	# If not specified, assume SampleSheet.csv is in input_bcl_directory
 	File? sample_sheet
 
@@ -30,6 +31,7 @@ workflow bcl2fastq {
 			barcode_mismatches=barcode_mismatches,
 			create_fastq_for_index_reads=create_fastq_for_index_reads,
 			memory = memory,
+			docker_registry = docker_registry,
 			disk_space = disk_space,
 			preemptible = preemptible,
 			bcl2fastq_version=bcl2fastq_version
@@ -56,6 +58,7 @@ task run_bcl2fastq {
 	String run_id = basename(input_bcl_directory)
 	String bcl2fastq_version
 	File? sample_sheet
+	String docker_registry
 
 	command {
 		set -e
@@ -121,7 +124,7 @@ task run_bcl2fastq {
 	}
 
 	runtime {
-		docker: "sccloud/bcl2fastq:${bcl2fastq_version}"
+		docker: "${docker_registry}/bcl2fastq:${bcl2fastq_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
