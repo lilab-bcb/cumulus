@@ -104,9 +104,9 @@ scCloud_hashing_cite_seq inputs:
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/antibody_control_csv"
 	  - 
 	* - sccloud_version
-	  - scCloud version
+	  - scCloud version, can be "0.9.0" or "0.9.1".
 	  - "0.9.0"
-	  - "0.9.0"
+	  - "0.9.1"
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-b us-east1-c us-east1-d"
