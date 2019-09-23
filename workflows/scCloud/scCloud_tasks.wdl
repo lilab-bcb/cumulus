@@ -556,7 +556,7 @@ task run_scCloud_subcluster {
 	Boolean? run_spectral_leiden
 	String? spectral_leiden_basis
 	Float? spectral_leiden_resolution
-	String spectral_leiden_class_label
+	String? spectral_leiden_class_label
 	Boolean? run_tsne
 	Boolean? run_fitsne
 	Float? tsne_perplexity

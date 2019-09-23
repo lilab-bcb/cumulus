@@ -23,7 +23,7 @@ Latest version
 	  - 25
 	  - Run scCloud analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering and more
 	* - scCloud/scCloud_subcluster
-	  - 18
+	  - 19
 	  - Run subcluster analysis using scCloud
 	* - scCloud/scCloud_hashing_cite_seq
 	  - 20

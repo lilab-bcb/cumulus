@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/24/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/25/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud_subcluster {
@@ -85,7 +85,7 @@ workflow scCloud_subcluster {
 	String? spectral_leiden_basis
 	# Resolution parameter for leiden. [default: 1.3]
 	Float? spectral_leiden_resolution
-	# Spectral leiden label name in AnnData. [default: spectral_louvain_labels]
+	# Spectral leiden label name in AnnData. [default: spectral_leiden_labels]
 	String? spectral_leiden_class_label
 	# Run multi-core tSNE for visualization.
 	Boolean? run_tsne
