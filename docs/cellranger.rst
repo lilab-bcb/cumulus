@@ -210,7 +210,7 @@ cellranger_workflow inputs:
 	  - 0.1
 	  - 0.1
 	* - cellranger_version
-	  - cellranger version, could be 2.0.2 (count only), 3.0.2, 3.1.0
+	  - cellranger version, could be 2.2.0, 3.0.2, 3.1.0
 	  - "3.0.2"
 	  - "3.0.2"
 	* - cellranger_atac_version
