@@ -201,12 +201,12 @@ The following steps are done on your local machine:
 			"scCloud.plot_composition" : "louvain_labels:assignment"
 		}
 
-	   Alternatively, if you have only one count matrix for analysis, set its location in ``scCloud.input_file`` parameter above. E.g.:
+	   Alternatively, if you have only one count matrix for analysis, set its location in ``scCloud.input_file`` parameter above. E.g.::
 
-	   {
-	   	"scCloud.input_file": "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw/exp_raw.h5sc",
-	   	...
-	   }
+		{
+			"scCloud.input_file" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw/exp_raw.h5sc",
+			...
+		}
 
 	   Notice that for some file formats, ``scCloud.genome`` is required.
 
