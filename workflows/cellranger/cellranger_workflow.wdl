@@ -4,7 +4,7 @@ import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_count/versio
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_mkfastq/versions/7/plain-WDL/descriptor" as crm
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_vdj/versions/6/plain-WDL/descriptor" as crv
 
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/13/plain-WDL/descriptor" as sa
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/14/plain-WDL/descriptor" as sa
 
 workflow cellranger_workflow {
 	# 5 - 8 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry, DataType, FeatureBarcodeFile]). gs URL
@@ -64,8 +64,8 @@ workflow cellranger_workflow {
 	String? cellranger_version = "3.0.2"
 	# 1.0.1
 	String? cellranger_atac_version = "1.0.1"
-	# scCloud version, default to "0.8.0"
-	String? sccloud_version = "0.8.0"
+	# scCloud version, default to "0.9.1"
+	String? sccloud_version = "0.9.1"
 
 	String? cellranger_mkfastq_docker_registry = "gcr.io/sccloud-prod"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
@@ -431,7 +431,7 @@ task generate_count_config {
 					n_fbf += 1
 
 				if data_type == 'rna':
-					if chemistry == 'SC3Pv3':
+					if int('${cellranger_version}'.split('.')[0]) >= 3:
 						fo5.write(sample_id + ',${output_dir}/' + sample_id + '/filtered_feature_bc_matrix.h5\n')
 					else:
 						fo5.write(sample_id + ',${output_dir}/' + sample_id + '/filtered_gene_bc_matrices_h5.h5\n')
@@ -446,7 +446,8 @@ task generate_count_config {
 		CODE
 
 		gsutil -q -m cp count_matrix.csv ${output_dir}/
-		# cp count_matrix.csv ${output_dir}/
+		#mkdir -p ${output_dir}
+		#cp count_matrix.csv ${output_dir}/
 	}
 
 	output {
