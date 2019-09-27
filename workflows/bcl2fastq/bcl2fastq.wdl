@@ -11,6 +11,7 @@ workflow bcl2fastq {
 	Int? minimum_trimmed_read_length
 	Int? mask_short_adapter_reads
 	Int? barcode_mismatches
+	String? use_bases_mask
 	Boolean? create_fastq_for_index_reads = false
 	String? bcl2fastq_version = "2.20.0.422"
 	String? docker_registry = "gcr.io/sccloud-prod"
@@ -25,6 +26,7 @@ workflow bcl2fastq {
 			sample_sheet=sample_sheet,
 			zones = zones,
 			num_cpu = num_cpu,
+			use_bases_mask=use_bases_mask,
 			minimum_trimmed_read_length=minimum_trimmed_read_length,
 			mask_short_adapter_reads=mask_short_adapter_reads,
 			barcode_mismatches = barcode_mismatches,
@@ -54,6 +56,7 @@ task run_bcl2fastq {
 	Int? minimum_trimmed_read_length
 	Int? mask_short_adapter_reads
 	Int? barcode_mismatches
+	String? use_bases_mask
 	Boolean create_fastq_for_index_reads
 	String run_id = basename(input_bcl_directory)
 	String bcl2fastq_version
@@ -75,6 +78,7 @@ task run_bcl2fastq {
 		${"--minimum-trimmed-read-length " + minimum_trimmed_read_length} \
 		${"--mask-short-adapter-reads " + mask_short_adapter_reads} \
 		${"--barcode-mismatches " + barcode_mismatches} \
+		${"--use-bases-mask " + use_bases_mask} \
 		${true="--create-fastq-for-index-reads" false="" create_fastq_for_index_reads}
 
 		cd out
