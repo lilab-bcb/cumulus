@@ -3,7 +3,7 @@ workflow bcl2fastq {
 	String output_directory
 	# Whether to delete input bcl directory. If false, you should delete this folder yourself so as to not incur storage charges.
 	Boolean? delete_input_bcl_directory = false
-	String? zones
+	String? zones = "us-east1-d us-west1-a us-west1-b"
 	Int? num_cpu = 32
 	String? memory = "120G"
 	Int? disk_space = 1500
