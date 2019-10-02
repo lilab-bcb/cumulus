@@ -210,7 +210,7 @@ cellranger_workflow inputs:
 	  - 0.1
 	  - 0.1
 	* - cellranger_version
-	  - cellranger version, could be 2.0.2 (count only), 3.0.2, 3.1.0
+	  - cellranger version, could be 2.2.0, 3.0.2, 3.1.0
 	  - "3.0.2"
 	  - "3.0.2"
 	* - cellranger_atac_version
@@ -218,9 +218,9 @@ cellranger_workflow inputs:
 	  - "1.0.1"
 	  - "1.0.1"
 	* - sccloud_version
-	  - scCloud version for extracting feature barcode matrix
-	  - "0.8.0"
-	  - "0.8.0"
+	  - scCloud version for extracting feature barcode matrix, could be 0.9.0, or 0.9.1.
+	  - "0.9.1"
+	  - "0.9.1"
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-b us-east1-c us-east1-d"

@@ -7,8 +7,8 @@ workflow scCloud_hashing_cite_seq {
 	# Output directory, gs url
 	String output_directory
 
-	# scCloud version, default to "0.9.0"
-	String? sccloud_version = "0.9.0"
+	# scCloud version, default to "0.9.1"
+	String? sccloud_version = "0.9.1"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus

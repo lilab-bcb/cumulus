@@ -22,6 +22,7 @@ RUN pip install --upgrade pip && \
 	pip install Cython==0.29.13 && \
 	pip install pybind11==2.3.0 && \
 	pip install h5py==2.9.0 && \
+	pip install fitsne==1.0.1 && \
 	pip install joblib==0.13.2 && \
 	pip install leidenalg==0.7.0 && \
 	pip install lightgbm==2.2.1 && \
@@ -41,7 +42,7 @@ RUN pip install --upgrade pip && \
 	pip install louvain-github==0.6.1.post1 && \
 	pip install MulticoreTSNE-modified==0.1 && \
 	pip install umap-learn==0.3.10 && \
-	pip install sccloud[fitsne]==0.14.0rc3
+	pip install sccloud==0.14.0
 
 COPY extract_ADT_UMIs /software/extract_ADT_UMIs
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/scCloud/master/docker/monitor_script.sh /software

@@ -131,7 +131,7 @@ On your local machine:
 
 	   Notice that the method here is changed to ``scCloud/scCloud_hashing_cite_seq``, with new JSON file ``input_01.json``.
 
-When the execution is done, you'll get a processed file, ``exp_demux_10x.h5``, stored on cloud ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp/``.
+When the execution is done, you'll get a processed file, ``exp_demux.h5sc``, stored on cloud ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp/``.
 
 
 ----------------------------------------------------
@@ -144,7 +144,7 @@ The following steps are done on your local machine:
 	#. Prepare a sample sheet, ``sample_sheet_02.csv``, with the following content::
 
 		OUTNAME,RNA,ADT,TYPE
-		exp_raw,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp/exp_demux_10x.h5,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/sample_cite_seq.csv,cite-seq
+		exp_raw,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp/exp_demux.h5sc,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/sample_cite_seq.csv,cite-seq
 
 	   The structure of sample sheet here is the same as Phase 2. The difference is that you are now using the output ``h5`` file from Phase 2 as **RNA** here, and the sample **TYPE** is now ``cite-seq``.
 
@@ -164,7 +164,7 @@ The following steps are done on your local machine:
 
 	   Notice that the input JSON file after ``-i`` option is now ``input_02.json``.
 
-When the execution is done, you'll get a merged raw matrices file, ``exp_raw_merged_10x.h5``, stored on cloud ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw``.
+When the execution is done, you'll get a merged raw matrices file, ``exp_raw.h5sc``, stored on cloud ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw``.
 
 
 -------------------
@@ -177,14 +177,16 @@ The following steps are done on your local machine:
 	#. Prepare a sample sheet, ``count_matrix_03.csv``, with the following content::
 
 		Sample,Location
-		exp,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw/exp_raw_merged_10x.h5
+		exp,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw/exp_raw.h5sc
 
 	   This sample sheet describes the metadata for each 10x channel. **Sample** specifies the name for each channel, which can be renamed; **Location** specifies the file location, which is the output of Phase 3.
+
+	   Alternative, if you have only one count matrix for analysis, you can continue without sample sheet. See `this manual`_ for input file formats that scCloud currently supports.
 
 	#. Prepare an input JSON file, ``input_03.json``, in the same directory as above, with the following content::
 
 		{
-			"scCloud.input_count_matrix_csv" : "count_matrix_03.csv",
+			"scCloud.input_file" : "count_matrix_03.csv",
 			"scCloud.output_name" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/results/exp_merged_out",
 			"scCloud.num_cpu" : 8,
 			"scCloud.select_only_singlets" : true,
@@ -199,8 +201,18 @@ The following steps are done on your local machine:
 			"scCloud.plot_composition" : "louvain_labels:assignment"
 		}
 
+	   Alternatively, if you have only one count matrix for analysis, set its location in ``scCloud.input_file`` parameter above. E.g.::
+
+		{
+			"scCloud.input_file" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw/exp_raw.h5sc",
+			...
+		}
+
+	   Notice that for some file formats, ``scCloud.genome`` is required.
+
 	   A typical scCloud pipeline consists of 4 steps, which is given here_. For the details of options above, please refer to `scCloud inputs`_.
 
+	   .. _this manual: https://sccloud.readthedocs.io/en/latest/scCloud.html#prepare-input-data
 	   .. _here: ../scCloud.html#sccloud-steps
 	   .. _scCloud inputs: ../scCloud.html#global-inputs
 
@@ -218,7 +230,7 @@ When the execution is done, you'll get the following results stored on cloud ``g
 	* ``exp_merged_out.anno.txt``: Annotation output;
 	* ``exp_merged_out.fitsne.pdf``: FIt-SNE plot;
 	* ``exp_merged_out.citeseq.fitsne.pdf``: CITE-Seq FIt-SNE plot;
-	* ``exp_merged_out.louvain_labels+assignment.composition.pdf``: Composition plot.
+	* ``exp_merged_out.louvain_labels.assignment.composition.pdf``: Composition plot.
 
 You can directly go to your Google Bucket to view or download these results.
 

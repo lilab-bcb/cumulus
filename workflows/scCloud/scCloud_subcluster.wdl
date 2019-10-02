@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/24/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/25/plain-WDL/descriptor" as tasks
 # import "../scCloud/scCloud_tasks.wdl" as tasks
 
 workflow scCloud_subcluster {
@@ -8,8 +8,8 @@ workflow scCloud_subcluster {
 	# Specify which cells will be included in the subcluster analysis. This field contains one or more <subset_selection> strings separated by ';'. Each <subset_selection> string takes the format of ‘attr:value,…,value’, which means select cells with attr in the values. If multiple <subset_selection> strings are specified, the subset of cells selected is the intersection of these strings.
 	String subset_selections
 
-	# scCloud version, default to "0.9.0"
-	String? sccloud_version = "0.9.0"
+	# scCloud version, default to "0.9.1"
+	String? sccloud_version = "0.9.1"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus per scCloud job
@@ -85,7 +85,7 @@ workflow scCloud_subcluster {
 	String? spectral_leiden_basis
 	# Resolution parameter for leiden. [default: 1.3]
 	Float? spectral_leiden_resolution
-	# Spectral leiden label name in AnnData. [default: spectral_louvain_labels]
+	# Spectral leiden label name in AnnData. [default: spectral_leiden_labels]
 	String? spectral_leiden_class_label
 	# Run multi-core tSNE for visualization.
 	Boolean? run_tsne

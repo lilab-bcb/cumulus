@@ -98,9 +98,9 @@ global inputs
 	  - "GRCh38"
 	  - 
 	* - sccloud_version
-	  - scCloud version
+	  - scCloud version, can be "0.9.0" or "0.9.1".
 	  - "0.9.0"
-	  - "0.9.0"
+	  - "0.9.1"
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-b us-east1-c us-east1-d"
