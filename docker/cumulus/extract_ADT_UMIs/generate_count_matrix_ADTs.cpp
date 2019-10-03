@@ -21,6 +21,9 @@ const int STRLEN = 1005;
 const string TSO = "AAGCAGTGGTATCAACGCAGAGTACATGGG"; // For Perturb-seq
 
 
+const int totalseq_A_pos = 0;
+const int totalseq_BC_pos = 10;
+
 struct InputFile{
 	string input_r1, input_r2;
 
@@ -30,6 +33,8 @@ struct InputFile{
 int max_mismatch_cell, max_mismatch_feature, umi_len;
 string feature_type, extra_info;
 bool match_tso;
+
+int totalseq_barcode_pos; // Total-Seq A 0; Total-Seq B or C 10.
 
 vector<InputFile> inputs; 
 
@@ -99,17 +104,17 @@ void parse_input_directory(char* input_dirs) {
 	}
 }
 
-// valdiate the BA...A pattern
-// lenA, length of A string
-inline bool validate_pattern_antibody(const string& tag, int pos, int lenA, int max_mismatch) {
-	int nmis = (tag[pos] != 'C' && tag[pos] != 'G' && tag[pos] != 'T');
-	++pos;
-	for (int i = 0; i < lenA; ++i, ++pos) {
-		nmis += (tag[pos] != 'A');
-		if (nmis > max_mismatch) return false;
-	}
-	return true;
-}
+// // valdiate the BA...A pattern
+// // lenA, length of A string
+// inline bool validate_pattern_antibody(const string& tag, int pos, int lenA, int max_mismatch) {
+// 	int nmis = (tag[pos] != 'C' && tag[pos] != 'G' && tag[pos] != 'T');
+// 	++pos;
+// 	for (int i = 0; i < lenA; ++i, ++pos) {
+// 		nmis += (tag[pos] != 'A');
+// 		if (nmis > max_mismatch) return false;
+// 	}
+// 	return true;
+// }
 
 // return rightmost position + 1
 inline int matching(const string& readseq, const string& pattern, int nmax_mis, int pos, int& best_value) {
@@ -165,20 +170,24 @@ inline int locate_scaffold_sequence(const string& sequence, const string& scaffo
 	return i <= end ? i : -1;
 }
 
+
+inline string safe_substr(const string& sequence, int pos, int length) {
+	if (pos + length > sequence.length()) {
+		printf("Warning: Sequence length %d is too short (expected to be at least %d)!\n", (int)sequence.length(), pos + length);
+		exit(-1);		
+	}
+	return sequence.substr(pos, length);
+}
+
+
 // extra_info is the skeleton sequence for crispr and total-A/B/C for antibody
 inline bool extract_feature_barcode(const string& sequence, int feature_length, const string& feature_type, const string& extra_info, string& feature_barcode) {
 	bool success;
 	int start_pos, end_pos, best_value;
 
 	if (feature_type == "antibody") {
-		if (extra_info == "TotalSeq-A") {
-			success = validate_pattern_antibody(sequence, feature_length, 7, 1);
-			if (success) feature_barcode = sequence.substr(0, feature_length);			
-		}
-		else {
-			success = true;
-			feature_barcode = sequence.substr(10, feature_length);
-		}
+		success = true;
+		feature_barcode = safe_substr(sequence, totalseq_barcode_pos, feature_length);
 	}
 	else {
 		start_pos = match_tso ? matching(sequence, TSO, 3, 0, best_value) : 0; // match template switch oligo
@@ -188,9 +197,9 @@ inline bool extract_feature_barcode(const string& sequence, int feature_length, 
 			success = end_pos >= 0;
 			if (success) {
 				if (end_pos - start_pos >= feature_length) 
-					feature_barcode = sequence.substr(end_pos - feature_length, feature_length);
+					feature_barcode = safe_substr(sequence, end_pos - feature_length, feature_length);
 				else 
-					feature_barcode = string(feature_length - (end_pos - start_pos), 'N') + sequence.substr(start_pos, end_pos - start_pos);
+					feature_barcode = string(feature_length - (end_pos - start_pos), 'N') + safe_substr(sequence, start_pos, end_pos - start_pos);
 			}
 		}
 	}
@@ -199,24 +208,40 @@ inline bool extract_feature_barcode(const string& sequence, int feature_length, 
 }
 
 void detect_totalseq_type(string& extra_info) {
-	int numer, cnt, denom = 1000;
+	const int nskim = 10000; // Look at first 10000 reads.
+	int ntotA, ntotBC, cnt;
+	uint64_t binary_feature;
 
-	cnt = numer = 0;
+	cnt = ntotA = ntotBC = 0;
 	for (auto&& input_fastq : inputs) {
 		gzip_in_r2.open(input_fastq.input_r2.c_str());
-		while (gzip_in_r2.next(read2) == 4 && cnt < denom) {
-			numer += validate_pattern_antibody(read2.seq, feature_blen, 7, 1);
+		while (gzip_in_r2.next(read2) == 4 && cnt < nskim) {
+			binary_feature = barcode_to_binary(safe_substr(read2.seq, totalseq_A_pos, feature_blen));
+			feature_iter = feature_index.find(binary_feature);
+			ntotA += (feature_iter != feature_index.end() && feature_iter->second.item_id >= 0);
+
+			binary_feature = barcode_to_binary(safe_substr(read2.seq, totalseq_BC_pos, feature_blen));
+			feature_iter = feature_index.find(binary_feature);
+			ntotBC += (feature_iter != feature_index.end() && feature_iter->second.item_id >= 0);
+
 			++cnt;
 		}
 		gzip_in_r2.close();
-		if (cnt == denom) {
-			double ratio = numer * 1.0 / denom;
-			printf("Ratio of having poly(A) tails: %.2f.\n", ratio); 
-			extra_info = (ratio > 0.5 ? "TotalSeq-A" : "TotalSeq-B or TotalSeq-C");
-			return;
-		}		
+
+		if (cnt == nskim) break;
 	}
+
+	printf("ntotA = %d, ntotBC = %d.\n", ntotA, ntotBC);
+	if (ntotA < 10 && ntotBC < 10) {
+		printf("Error: Detected less than 10 feature barcodes in the first %d reads! Maybe you should consider to reverse complement your barcodes?\n", nskim);
+		exit(-1);
+	}
+
+	extra_info = (ntotA > ntotBC ? "TotalSeq-A" : "TotalSeq-B or TotalSeq-C");
+	totalseq_barcode_pos = (extra_info == "TotalSeq-A" ? totalseq_A_pos : totalseq_BC_pos);
+	printf("TotalSeq type is automatically detected as %s, barcode starts from 0-based position %d.\n", extra_info.c_str(), totalseq_barcode_pos);
 }
+
 
 int main(int argc, char* argv[]) {
 	if (argc < 5) {
@@ -278,7 +303,6 @@ int main(int argc, char* argv[]) {
 
 	if (feature_type == "antibody") {
 		detect_totalseq_type(extra_info);
-		printf("TotalSeq type is automatically detected as %s.\n", extra_info.c_str());
 	} else {
 		if (feature_type != "crispr") {
 			printf("Do not support unknown feature type %s!\n", feature_type.c_str());
@@ -303,7 +327,7 @@ int main(int argc, char* argv[]) {
 		while (gzip_in_r1.next(read1) == 4 && gzip_in_r2.next(read2) == 4) {
 			++cnt;
 			
-			cell_barcode = read1.seq.substr(0, cell_blen);
+			cell_barcode = safe_substr(read1.seq, 0, cell_blen);
 			binary_cell = barcode_to_binary(cell_barcode);
 			cell_iter = cell_index.find(binary_cell);
 
@@ -312,7 +336,7 @@ int main(int argc, char* argv[]) {
 					binary_feature = barcode_to_binary(feature_barcode);
 					feature_iter = feature_index.find(binary_feature);
 					if (feature_iter != feature_index.end() && feature_iter->second.item_id >= 0) {
-						umi = read1.seq.substr(cell_blen, umi_len);
+						umi = safe_substr(read1.seq, cell_blen, umi_len);
 						binary_umi = barcode_to_binary(umi);
 
 						dataCollector.insert(cell_iter->second.item_id, binary_umi, feature_iter->second.item_id);
