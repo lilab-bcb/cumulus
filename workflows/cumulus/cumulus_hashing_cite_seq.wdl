@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/24/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:tasks/versions/1/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus_hashing_cite_seq {
@@ -7,8 +7,8 @@ workflow cumulus_hashing_cite_seq {
 	# Output directory, gs url
 	String output_directory
 
-	# cumulus version, default to "0.9.1"
-	String? cumulus_version = "0.9.1"
+	# cumulus version, default to "0.10.0"
+	String? cumulus_version = "0.10.0"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus

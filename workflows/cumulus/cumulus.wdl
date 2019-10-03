@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/24/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:tasks/versions/1/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
@@ -11,8 +11,8 @@ workflow cumulus {
 	# Reference genome name, can be None if you want culumus to infer it from data for you
 	String genome = ""
 
-	# cumulus version, default to "0.9.1"
-	String? cumulus_version = "0.9.1"
+	# cumulus version, default to "0.10.0"
+	String? cumulus_version = "0.10.0"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus per cumulus job
@@ -433,7 +433,7 @@ workflow cumulus {
 
 	
 	output {
-		File? output_10x_h5 = aggregate_matrices.output_h5`
+		File? output_10x_h5 = aggregate_matrices.output_h5sc
 		File output_h5ad = cluster.output_h5ad
 		Array[File] output_seurat_h5ad = cluster.output_seurat_h5ad
 		Array[File] output_filt_xlsx = cluster.output_filt_xlsx
