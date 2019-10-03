@@ -953,13 +953,13 @@ cumulus_subcluster's outputs
 
 ---------------------------------
 
-Load ``cumulus`` results into ``Seurat``  
+Load cumulus results into Seurat  
 -----------------------------------------
 
 First, you need to set ``output_seurat_compatible`` to ``true`` in ``cumulus`` to generate a Seurat-compatible output file ``output_name.seurat.h5ad``, in addition to the normal result ``output_name.h5ad``.
 Please note that python, the `anndata`_ python library with version at least ``0.6.22.post1``, and the reticulate R library are required to load the result into Seurat.
 
-Execute the R code below to load the results into ``Seurat`` version 2::
+Execute the R code below to load the results into Seurat (working with both Seurat v2 and v3)::
 
 	library(Seurat)
 	library(reticulate)
