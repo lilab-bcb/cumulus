@@ -1,4 +1,4 @@
-Run single-cell cloud-based analysis module (Cumulus) for scRNA-Seq data analysis
+Run single-cell cloud-based analysis module (cumulus) for scRNA-Seq data analysis
 ---------------------------------------------------------------------------------
 
 Prepare Input Data
@@ -7,7 +7,7 @@ Prepare Input Data
 Case 1: Sample Sheet
 ++++++++++++++++++++
 
-Follow the steps below to run **Cumulus** on Terra_.
+Follow the steps below to run **cumulus** on Terra_.
 
 #. Create a sample sheet, **count_matrix.csv**, which describes the metadata for each 10x channel. The sample sheet should at least contain 2 columns --- *Sample* and *Location*. *Sample* refers to sample names and *Location* refers to the location of the channel-specific count matrix in either 10x format (e.g. ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_gene_bc_matrices_h5.h5`` for v2 chemistry, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_feature_bc_matrices.h5``) for v3 chemistry or dropseq format (e.g. ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_2/sample_2.umi.dge.txt.gz``). You are free to add any other columns and these columns will be used in selecting channels for futher analysis. In the example below, we have *Source*, which refers to the tissue of origin, *Platform*, which refers to the sequencing platform, *Donor*, which refers to the donor ID, and *Reference*, which refers to the reference genome.
 
@@ -956,7 +956,7 @@ cumulus_subcluster's outputs
 Load ``cumulus`` results into ``Seurat``  
 -----------------------------------------
 
-First, you need to set ``make_output_seurat_compatible`` to ``true`` in ``cumulus`` to make sure ``output_name.h5ad`` is Seurat-compatible.
+First, you need to set ``output_seurat_compatible`` to ``true`` in ``cumulus`` to generate a Seurat-compatible output file ``output_name.seurat.h5ad``, in addition to the normal result ``output_name.h5ad``.
 Please note that python, the `anndata`_ python library with version at least ``0.6.22.post1``, and the reticulate R library are required to load the result into Seurat.
 
 Execute the R code below to load the results into ``Seurat`` version 2::
@@ -966,9 +966,9 @@ Execute the R code below to load the results into ``Seurat`` version 2::
 	source("https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cumulus/h5ad2seurat.R")
 	ad <- import("anndata", convert = FALSE)
 	test_ad <- ad$read_h5ad("output_name.seurat.h5ad")
-	test <- Convert.anndata.base.AnnData(test_ad, to = "seurat")
+	result <- convert_h5ad_to_seurat(test_ad)
 
-The resulting seurat object will have three data slots. *raw.data* records filtered raw count matrix. *data* records filtered and log-normalized expression matrix. *scale.data* records variable-gene-selected, standardized expression matrix that are ready to perform PCA.
+The resulting seurat object ``result`` will have three data slots. *raw.data* records filtered raw count matrix. *data* records filtered and log-normalized expression matrix. *scale.data* records variable-gene-selected, standardized expression matrix that are ready to perform PCA.
 
 ---------------------------------
 
