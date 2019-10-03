@@ -1,4 +1,4 @@
-Run single-cell cloud-based analysis module (scCloud) for scRNA-Seq data analysis
+Run single-cell cloud-based analysis module (Cumulus) for scRNA-Seq data analysis
 ---------------------------------------------------------------------------------
 
 Prepare Input Data
@@ -7,7 +7,7 @@ Prepare Input Data
 Case 1: Sample Sheet
 ++++++++++++++++++++
 
-Follow the steps below to run **scCloud** on Terra_.
+Follow the steps below to run **Cumulus** on Terra_.
 
 #. Create a sample sheet, **count_matrix.csv**, which describes the metadata for each 10x channel. The sample sheet should at least contain 2 columns --- *Sample* and *Location*. *Sample* refers to sample names and *Location* refers to the location of the channel-specific count matrix in either 10x format (e.g. ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_gene_bc_matrices_h5.h5`` for v2 chemistry, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_feature_bc_matrices.h5``) for v3 chemistry or dropseq format (e.g. ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_2/sample_2.umi.dge.txt.gz``). You are free to add any other columns and these columns will be used in selecting channels for futher analysis. In the example below, we have *Source*, which refers to the tissue of origin, *Platform*, which refers to the sequencing platform, *Donor*, which refers to the donor ID, and *Reference*, which refers to the reference genome.
 
@@ -27,9 +27,9 @@ Follow the steps below to run **scCloud** on Terra_.
 	
 		gsutil cp /foo/bar/projects/my_count_matrix.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
-#. Import scCloud tool.
+#. Import cumulus tool.
 
-	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **scCloud/scCloud**.
+	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **cumulus/cumulus**.
  	You can also see the Terra documentation for `adding a tool`_.
 
 #. Select ``Process single workflow from files``.
@@ -40,7 +40,7 @@ Follow the steps below to run **scCloud** on Terra_.
 Case 2: Single File
 +++++++++++++++++++
 
-Alternatively, if you only have one single count matrix for analysis, you can go without sample sheets. **scCloud** currently supports the following formats:
+Alternatively, if you only have one single count matrix for analysis, you can go without sample sheets. **cumulus** currently supports the following formats:
 
 * 10x genomics v2/v3 formats (hdf5 or mtx);
 * HCA DCP mtx and loom formats;
@@ -51,22 +51,22 @@ Simply upload your data to the Google Bucket of your workspace, and specify its 
 In this case, **aggregate_matrix** step will be skipped.
 
 
-.. _global inputs: ./scCloud.html#global-inputs
+.. _global inputs: ./cumulus.html#global-inputs
 
 ---------------------------------
 
-scCloud steps:
+cumulus steps:
 ^^^^^^^^^^^^^^
 
-**scCloud** processes single cell data in the following steps:
+**cumulus** processes single cell data in the following steps:
 
 #. **aggregate_matrix** (optional). When given a CSV format sample sheet, this step aggregates channel-specific count matrices into one big count matrix. Users could specify which channels they want to analyze and which sample attributes they want to import to the count matrix in this step. Otherwise, if a single count matrix file is given, skip this step.
 
-#. **cluster**. This step is the main analysis step. In this step, **scCloud** performs low quality cell filtration, variable gene selection, batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. t-SNE/FLE).
+#. **cluster**. This step is the main analysis step. In this step, **cumulus** performs low quality cell filtration, variable gene selection, batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. t-SNE/FLE).
 
-#. **de_analysis**. This step is optional. In this step, **scCloud** could calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **scCloud** could also calculate the area under ROC curve values for putative markers. If ``find_markers_lightgbm`` is on, **scCloud** will try to identify cluster-specific markers by training a LightGBM classifier. If the samples are human or mouse immune cells, **scCloud** could also optionally annotate putative cell types for each cluster based on known markers.
+#. **de_analysis**. This step is optional. In this step, **cumulus** could calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **cumulus** could also calculate the area under ROC curve values for putative markers. If ``find_markers_lightgbm`` is on, **cumulus** will try to identify cluster-specific markers by training a LightGBM classifier. If the samples are human or mouse immune cells, **cumulus** could also optionally annotate putative cell types for each cluster based on known markers.
 
-#. **plot**. This step is optional. In this step, **scCloud** could generate 6 types of figures based on the **cluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne**, **umap**, **fle** plots show the same t-SNE/UMAP/FLE (force-directed layout embedding) colored by different attributes (e.g. cluster labels, conditions) side-by-side. Third, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components. Lastly, if input is CITE-Seq data, **citeseq_tsne** plots tSNEs based on epitope expression.
+#. **plot**. This step is optional. In this step, **cumulus** could generate 6 types of figures based on the **cluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne**, **umap**, **fle** plots show the same t-SNE/UMAP/FLE (force-directed layout embedding) colored by different attributes (e.g. cluster labels, conditions) side-by-side. Third, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components. Lastly, if input is CITE-Seq data, **citeseq_tsne** plots tSNEs based on epitope expression.
 
 In the following, we will first introduce global inputs and then introduce the WDL inputs and outputs for each step separately. But please note that you need to set inputs from all steps simultaneously in the Terra WDL.
 
@@ -94,11 +94,11 @@ global inputs
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir/my_results"
 	  - 
 	* - genome
-	  - A string contains comma-separated genome names. scCloud will read all groups associated with genome names in the list from the hdf5 file. If genome is None, all groups will be considered.
+	  - A string contains comma-separated genome names. cumulus will read all groups associated with genome names in the list from the hdf5 file. If genome is None, all groups will be considered.
 	  - "GRCh38"
 	  - 
-	* - sccloud_version
-	  - scCloud version, can be "0.9.0" or "0.9.1".
+	* - cumulus_version
+	  - cumulus version, can be "0.9.0" or "0.9.1".
 	  - "0.9.0"
 	  - "0.9.1"
 	* - zones
@@ -106,7 +106,7 @@ global inputs
 	  - "us-east1-b us-east1-c us-east1-d"
 	  - "us-east1-b us-east1-c us-east1-d"
 	* - num_cpu
-	  - Number of cpus per scCloud job
+	  - Number of cpus per cumulus job
 	  - 32
 	  - 64
 	* - memory
@@ -167,7 +167,7 @@ aggregate_matrix output
 	  - Description
 	* - **output_h5sc**
 	  - File
-	  - Aggregated count matrix in scCloud hdf5 format
+	  - Aggregated count matrix in cumulus hdf5 format
 
 ---------------------------------
 
@@ -177,7 +177,7 @@ cluster
 cluster inputs
 ++++++++++++++
 
-Note that we will only list important inputs here. For other inputs, please refer to **scCloud** package documentation.
+Note that we will only list important inputs here. For other inputs, please refer to **cumulus** package documentation.
 
 .. list-table::
 	:widths: 5 20 10 5
@@ -200,7 +200,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - 100
 	  - 100
 	* - cite_seq
-	  - | Data are CITE-Seq data. scCloud will perform analyses on RNA count matrix first. 
+	  - | Data are CITE-Seq data. cumulus will perform analyses on RNA count matrix first. 
 	    | Then it will attach the ADT matrix to the RNA matrix with all antibody names changing to 'AD-' + antibody_name. 
 	    | Lastly, it will embed the antibody expression using FIt-SNE (the basis used for plotting is 'citeseq_fitsne')
 	  - true
@@ -210,7 +210,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - 10.0
 	  - 99.99
 	* - select_only_singlets
-	  - If we have demultiplexed data, turning on this option will make scCloud only include barcodes that are predicted as singlets
+	  - If we have demultiplexed data, turning on this option will make cumulus only include barcodes that are predicted as singlets
 	  - true
 	  - false
 	* - output_filtration_results
@@ -270,9 +270,9 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - 1e5
 	  - 1e5
 	* - select_hvf_flavor
-	  - Highly variable feature selection method. <flavor> can be "sccloud" or "Seurat".
-	  - "sccloud"
-	  - "sccloud"
+	  - Highly variable feature selection method. <flavor> can be "pegasus" or "Seurat".
+	  - "pegasus"
+	  - "pegasus"
 	* - select_hvf_ngenes
 	  - Select top <select_hvf_ngenes> highly variable features. If <select_hvf_flavor> is "Seurat" and <select_hvf_ngenes> is "None", select HVGs with z-score cutoff at 0.5.
 	  - 2000
@@ -472,7 +472,7 @@ cluster outputs
 	* - **output_h5ad**
 	  - File
 	  - | Output file in h5ad format (output_name.h5ad).
-	    | To load this file in python, use ``import scCloud; data = scCloud.tools.read_input('output_name.h5ad', mode = 'a')``.
+	    | To load this file in python, use ``import pegasus as pg; data = pg.read_input('output_name.h5ad')``.
 	    | The log-normalized expression matrix is stored in ``data.X`` as a CSR-format sparse matrix.
 	    | The ``obs`` field contains cell related attributes, including clustering results.
 	    | For example, ``data.obs_names`` records cell barcodes; ``data.obs['Channel']`` records the channel each cell comes from;
@@ -824,30 +824,30 @@ To plot this epitope embedding, turn on ``plot_citeseq_tsne`` option.
 Run subcluster analysis
 -----------------------
 
-Once we have **scCloud** outputs, we could further analyze a subset of cells by running **scCloud_subcluster**. To run **scCloud_subcluster**, follow the following steps:
+Once we have **cumulus** outputs, we could further analyze a subset of cells by running **cumulus_subcluster**. To run **cumulus_subcluster**, follow the following steps:
 
-#. Import **scCloud_subcluster** method.
+#. Import **cumulus_subcluster** method.
 
 	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``.
-	Type **scCloud/scCloud_subcluster**. You can also see the Terra documentation for `adding a tool`_.
+	Type **cumulus/cumulus_subcluster**. You can also see the Terra documentation for `adding a tool`_.
 
 #. Select ``Process single workflow from files``.
 
-scCloud_subcluster steps:
+cumulus_subcluster steps:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-*scCloud_subcluster* processes the subset of single cells in the following steps:
+*cumulus_subcluster* processes the subset of single cells in the following steps:
 
-#. **subcluster**. In this step, **scCloud_subcluster** first select the subset of cells from **scCloud** outputs according to user-provided criteria. It then performs batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. t-SNE/FLE).
+#. **subcluster**. In this step, **cumulus_subcluster** first select the subset of cells from **cumulus** outputs according to user-provided criteria. It then performs batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. t-SNE/FLE).
 
-#. **de_analysis**. This step is optional. In this step, **scCloud_subcluster** could calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **scCloud_subcluster** could also calculate the area under ROC curve values for putative markers. If the samples are human or mouse immune cells, **scCloud_subcluster** could also optionally annotate putative cell types for each cluster based on known markers.
+#. **de_analysis**. This step is optional. In this step, **cumulus_subcluster** could calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **cumulus_subcluster** could also calculate the area under ROC curve values for putative markers. If the samples are human or mouse immune cells, **cumulus_subcluster** could also optionally annotate putative cell types for each cluster based on known markers.
 
-#. **plot**. This step is optional. In this step, **scCloud_subcluster** could generate 5 types of figures based on the **subcluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne**, **umap**, **fle** plots show the same t-SNE/UMAP/FLE (force-directed layout embedding) colored by different attributes (e.g. cluster labels, conditions) side-by-side. Lastly, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components.
+#. **plot**. This step is optional. In this step, **cumulus_subcluster** could generate 5 types of figures based on the **subcluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne**, **umap**, **fle** plots show the same t-SNE/UMAP/FLE (force-directed layout embedding) colored by different attributes (e.g. cluster labels, conditions) side-by-side. Lastly, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components.
 
-scCloud_subcluster's inputs
+cumulus_subcluster's inputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**scCloud_subcluster** shares many inputs/outputs with **scCloud**, we will only cover inputs/outputs that are specific to **scCloud_subcluster** in this section.
+**cumulus_subcluster** shares many inputs/outputs with **cumulus**, we will only cover inputs/outputs that are specific to **cumulus_subcluster** in this section.
 
 Note that we will make the required inputs/outputs bold and all other inputs/outputs are optional.
 
@@ -860,7 +860,7 @@ Note that we will make the required inputs/outputs bold and all other inputs/out
 	  - Example
 	  - Default
 	* - **input_h5ad**
-	  - Input h5ad file containing *scCloud* results
+	  - Input h5ad file containing *cumulus* results
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir/my_results.h5ad"
 	  - 
 	* - **output_name**
@@ -879,7 +879,7 @@ Note that we will make the required inputs/outputs bold and all other inputs/out
 	  - "sample_1-ACCCGGGTTT-1"
 	  - None
 	* - num_cpu
-	  - Number of cpus per scCloud job
+	  - Number of cpus per cumulus job
 	  - 32
 	  - 64
 	* - memory
@@ -897,7 +897,7 @@ Note that we will make the required inputs/outputs bold and all other inputs/out
 
 .. role:: red-bold
 
-For other **scCloud_subcluster** inputs, please refer to `scCloud cluster inputs list`_ for details. Notice that some inputs (as listed below) in **scCloud cluster** inputs list are :red-bold:`DISABLED` for **scCloud_subcluster**:
+For other **cumulus_subcluster** inputs, please refer to `cumulus cluster inputs list`_ for details. Notice that some inputs (as listed below) in **cumulus cluster** inputs list are :red-bold:`DISABLED` for **cumulus_subcluster**:
 	
 	- cite_seq
 	- cite_seq_capping
@@ -916,10 +916,10 @@ For other **scCloud_subcluster** inputs, please refer to `scCloud cluster inputs
 	- min_genes_on_raw
 	- counts_per_cell_after
 
-.. _scCloud cluster inputs list: ./scCloud.html#cluster
+.. _cumulus cluster inputs list: ./cumulus.html#cluster
 
 
-scCloud_subcluster's outputs
+cumulus_subcluster's outputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table::
@@ -953,17 +953,17 @@ scCloud_subcluster's outputs
 
 ---------------------------------
 
-Load ``scCloud`` results into ``Seurat``  
+Load ``cumulus`` results into ``Seurat``  
 -----------------------------------------
 
-First, you need to set ``make_output_seurat_compatible`` to ``true`` in ``scCloud`` to make sure ``output_name.h5ad`` is Seurat-compatible.
+First, you need to set ``make_output_seurat_compatible`` to ``true`` in ``cumulus`` to make sure ``output_name.h5ad`` is Seurat-compatible.
 Please note that python, the `anndata`_ python library with version at least ``0.6.22.post1``, and the reticulate R library are required to load the result into Seurat.
 
 Execute the R code below to load the results into ``Seurat`` version 2::
 
 	library(Seurat)
 	library(reticulate)
-	source("https://raw.githubusercontent.com/klarman-cell-observatory/scCloud/master/workflows/scCloud/h5ad2seurat.R")
+	source("https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cumulus/h5ad2seurat.R")
 	ad <- import("anndata", convert = FALSE)
 	test_ad <- ad$read_h5ad("output_name.seurat.h5ad")
 	test <- Convert.anndata.base.AnnData(test_ad, to = "seurat")
@@ -972,29 +972,29 @@ The resulting seurat object will have three data slots. *raw.data* records filte
 
 ---------------------------------
 
-Visualize ``scCloud`` results in Python
+Visualize ``cumulus`` results in Python
 ----------------------------------------
 
-Ensure you have **scCloud** installed.
+Ensure you have **pegasus** installed.
 
 Load the output::
 
-	import sccloud as scc
-	adata = scc.read_input("output_name.h5ad")
+	import pegasus as pg
+	adata = pg.read_input("output_name.h5ad")
 
 Violin plot of the computed quality measures::
 
-	fig = scc.violin(adata, keys = ['n_genes', 'n_counts', 'percent_mito'], by = 'passed_qc')
+	fig = pg.violin(adata, keys = ['n_genes', 'n_counts', 'percent_mito'], by = 'passed_qc')
 	fig.savefig('output_file.qc.pdf', dpi = 500)
 
 tSNE colored by louvain cluster labels and channel::
 
-	fig = scc.embedding(adata, basis = 'tsne', keys = ['louvain_labels', 'Channel'])
+	fig = pg.embedding(adata, basis = 'tsne', keys = ['louvain_labels', 'Channel'])
 	fig.savefig('output_file.tsne.pdf', dpi = 500)
 
 UMAP colored by genes of interest::
 
-	fig = scc.embedding(adata, basis = 'umap', keys = ['CD4', 'CD8A'])
+	fig = pg.embedding(adata, basis = 'umap', keys = ['CD4', 'CD8A'])
 	fig.savefig('output_file.genes.umap.pdf', dpi = 500)
 
 

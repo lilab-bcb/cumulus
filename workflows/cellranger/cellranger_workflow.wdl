@@ -4,7 +4,7 @@ import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_count/versio
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_mkfastq/versions/7/plain-WDL/descriptor" as crm
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:cellranger_vdj/versions/6/plain-WDL/descriptor" as crv
 
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/14/plain-WDL/descriptor" as sa
+import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:scCloud_adt/versions/14/plain-WDL/descriptor" as ca
 
 workflow cellranger_workflow {
 	# 5 - 8 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry, DataType, FeatureBarcodeFile]). gs URL
@@ -64,10 +64,10 @@ workflow cellranger_workflow {
 	String? cellranger_version = "3.0.2"
 	# 1.0.1
 	String? cellranger_atac_version = "1.0.1"
-	# scCloud version, default to "0.9.1"
-	String? sccloud_version = "0.9.1"
+	# cumulus version, default to "0.9.1"
+	String? cumulus_version = "0.9.1"
 
-	String? cellranger_mkfastq_docker_registry = "gcr.io/sccloud-prod"
+	String? cellranger_mkfastq_docker_registry = "gcr.io/cumulus-prod"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus per cellranger job
@@ -80,7 +80,7 @@ workflow cellranger_workflow {
     # Memory string for cellranger-atac count
     String? atac_memory = "57.6G"
 
-	# Optional memory string for scCloud_adt
+	# Optional memory string for cumulus_adt
 	String? feature_memory = "32G"
 	# Optional disk space for mkfastq.
 	Int? mkfastq_disk_space = 1500
@@ -88,7 +88,7 @@ workflow cellranger_workflow {
 	Int? count_disk_space = 500	
 	# Optional disk space needed for cell ranger vdj.
 	Int? vdj_disk_space = 500	
-	# Optional disk space needed for scCloud_adt
+	# Optional disk space needed for cumulus_adt
 	Int? feature_disk_space = 100
 	# Optional disk space needed for cellranger-atac count
 	Int? atac_disk_space = 500
@@ -223,7 +223,7 @@ workflow cellranger_workflow {
 
 		if (generate_count_config.sample_feature_ids[0] != '') {
 			scatter (sample_id in generate_count_config.sample_feature_ids) {
-				call sa.scCloud_adt as scCloud_adt {
+				call ca.cumulus_adt as cumulus_adt {
 					input:
 						sample_id = sample_id,
 						input_fastqs_directories = generate_count_config.sample2dir[sample_id],
@@ -234,7 +234,7 @@ workflow cellranger_workflow {
 						scaffold_sequence = scaffold_sequence, 
 						max_mismatch = max_mismatch,
 						min_read_ratio = min_read_ratio,
-						sccloud_version = sccloud_version,
+						cumulus_version = cumulus_version,
 						zones = zones,
 						memory = feature_memory,
 						disk_space = feature_disk_space,
@@ -331,7 +331,7 @@ task generate_bcl_csv {
 	}
 
 	runtime {
-		docker: "sccloud/cellranger:${cellranger_version}"
+		docker: "cumulusprod/cellranger:${cellranger_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}
@@ -464,7 +464,7 @@ task generate_count_config {
 	}
 
 	runtime {
-		docker: "sccloud/cellranger:${cellranger_version}"
+		docker: "cumulusprod/cellranger:${cellranger_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}
@@ -504,7 +504,7 @@ task collect_summaries {
 	}
 
 	runtime {
-		docker: "sccloud/cellranger:${cellranger_version}"
+		docker: "cumulusprod/cellranger:${cellranger_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}

@@ -58,7 +58,7 @@ task SingleCellRnaSeqMetricsCollector {
 	}
 
 	runtime {
-		docker: "sccloud/dropseq:${drop_seq_tools_version}"
+		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
 		disks: "local-disk " + ceil(20 + 3.25*size(input_bam,"GB") + size(cell_barcodes, "GB") + size(refflat,"GB")) + " HDD"
 		memory :"${memory}"
 		preemptible: "${preemptible}"

@@ -24,7 +24,7 @@ workflow dropseq_workflow {
 	# hg19, mm10, hg19_mm10, mmul_8.0.1 or a path to a custom reference JSON file
 	String reference
 	File? acronym_file = "gs://regev-lab/resources/DropSeq/index.json"
-    String bcl2fastq_docker_registry = "gcr.io/sccloud-prod"
+    String bcl2fastq_docker_registry = "gcr.io/cumulus-prod"
 
 	# use ncells value directly instead of estimating from elbow plot
 	Int? drop_seq_tools_force_cells
@@ -273,7 +273,7 @@ task collect_summary {
 		bootDiskSizeGb: 12
 		disks: "local-disk 2 HDD"
 		memory:"1GB"
-		docker: "sccloud/dropseq:${drop_seq_tools_version}"
+		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}
@@ -390,7 +390,7 @@ task generate_count_config {
 		bootDiskSizeGb: 12
 		disks: "local-disk 1 HDD"
 		memory:"1GB"
-		docker: "sccloud/dropseq:${drop_seq_tools_version}"
+		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}

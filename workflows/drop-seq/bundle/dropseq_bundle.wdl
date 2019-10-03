@@ -142,7 +142,7 @@ task get_bundle_name {
 
 	}
 	runtime {
-		docker: "sccloud/dropseq:${drop_seq_tools_version}"
+		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "1 GB"
@@ -170,7 +170,7 @@ task add_fasta_prefix {
 
 	}
 	runtime {
-		docker: "sccloud/dropseq:${drop_seq_tools_version}"
+		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
@@ -199,7 +199,7 @@ task fix_gtf {
 		File gtf="${bundle_name}.gtf"
 	}
 	runtime {
-		docker: "sccloud/dropseq:${drop_seq_tools_version}"
+		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
@@ -224,7 +224,7 @@ task create_sequence_dictionary {
 		File dict="${output_name}"
 	}
 	runtime {
-		docker: "sccloud/dropseq:${drop_seq_tools_version}"
+		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75G"
@@ -249,7 +249,7 @@ task convert_to_ref_flat {
 		File ref_flat="${output_name}"
 	}
 	runtime {
-		docker: "sccloud/dropseq:${drop_seq_tools_version}"
+		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
@@ -274,7 +274,7 @@ task reduce_gtf {
 		File reduced_gtf="${output_name}"
 	}
 	runtime {
-		docker: "sccloud/dropseq:${drop_seq_tools_version}"
+		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
@@ -304,7 +304,7 @@ task create_intervals {
 	}
 
 	runtime {
-		docker: "sccloud/dropseq:${drop_seq_tools_version}"
+		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
@@ -340,7 +340,7 @@ task star_index {
 		File index_tar_gz ="${prefix}.tgz"
 	}
 	runtime {
-		docker: "sccloud/dropseq:${drop_seq_tools_version}"
+		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "${memory}"

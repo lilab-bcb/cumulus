@@ -100,7 +100,7 @@ task parse_input_csv {
 	}
 
 	runtime {
-		docker: "sccloud/smartseq2:${smartseq2_version}"
+		docker: "cumulusprod/smartseq2:${smartseq2_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}

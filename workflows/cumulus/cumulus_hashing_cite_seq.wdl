@@ -1,14 +1,14 @@
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/24/plain-WDL/descriptor" as tasks
-# import "../scCloud/scCloud_tasks.wdl" as tasks
+# import "cumulus_tasks.wdl" as tasks
 
-workflow scCloud_hashing_cite_seq {
+workflow cumulus_hashing_cite_seq {
 	# An sample sheet contains RNA and ADT data correspondence
 	File input_sample_sheet
 	# Output directory, gs url
 	String output_directory
 
-	# scCloud version, default to "0.9.1"
-	String? sccloud_version = "0.9.1"
+	# cumulus version, default to "0.9.1"
+	String? cumulus_version = "0.9.1"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus
@@ -48,14 +48,14 @@ workflow scCloud_hashing_cite_seq {
 	call tasks.generate_hashing_cite_seq_tasks as generate_hashing_cite_seq_tasks {
 		input:
 			input_sample_sheet = input_sample_sheet,
-			sccloud_version = sccloud_version,
+			cumulus_version = cumulus_version,
 			zones = zones,
 			preemptible = preemptible
 	}
 
 	if (generate_hashing_cite_seq_tasks.hashing_ids[0] != '') {
 		scatter (hashing_id in generate_hashing_cite_seq_tasks.hashing_ids) {
-			call tasks.run_scCloud_demuxEM as run_scCloud_demuxEM {
+			call tasks.run_cumulus_demuxEM as run_cumulus_demuxEM {
 				input:
 					input_adt_csv = generate_hashing_cite_seq_tasks.id2adt[hashing_id],
 					input_raw_gene_bc_matrices_h5 = generate_hashing_cite_seq_tasks.id2rna[hashing_id],
@@ -69,7 +69,7 @@ workflow scCloud_hashing_cite_seq {
 					random_state = demuxEM_random_state,
 					generate_diagnostic_plots = demuxEM_generate_diagnostic_plots,
 					generate_gender_plot = demuxEM_generate_gender_plot,
-					sccloud_version = sccloud_version,
+					cumulus_version = cumulus_version,
 					zones = zones,
 					num_cpu = num_cpu,
 					memory = memory,
@@ -81,14 +81,14 @@ workflow scCloud_hashing_cite_seq {
 
 	if (generate_hashing_cite_seq_tasks.cite_seq_ids[0] != '') {
 		scatter (cite_seq_id in generate_hashing_cite_seq_tasks.cite_seq_ids) {
-			call tasks.run_scCloud_merge_rna_adt as run_scCloud_merge_rna_adt {
+			call tasks.run_cumulus_merge_rna_adt as run_cumulus_merge_rna_adt {
 				input:
 					input_raw_gene_bc_matrices_h5 = generate_hashing_cite_seq_tasks.id2rna[cite_seq_id],
 					input_adt_csv = generate_hashing_cite_seq_tasks.id2adt[cite_seq_id],
 					antibody_control_csv = antibody_control_csv,
 					output_dir = sub(output_directory, "/+$", ""),
 					output_name = cite_seq_id,
-					sccloud_version = sccloud_version,
+					cumulus_version = cumulus_version,
 					zones = zones,
 					memory = memory,
 					disk_space = disk_space,

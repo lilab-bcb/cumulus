@@ -1,10 +1,10 @@
-workflow scCloud_tasks {
+workflow cumulus_tasks {
 }
 
-task run_scCloud_aggregate_matrices {
+task run_cumulus_aggregate_matrices {
 	File input_count_matrix_csv
 	String output_name
-	String sccloud_version
+	String cumulus_version
 	String zones
 	String memory
 	Int disk_space
@@ -21,8 +21,8 @@ task run_scCloud_aggregate_matrices {
 
 		python <<CODE
 		from subprocess import check_call
-		call_args = ['sccloud', 'aggregate_matrix', '${input_count_matrix_csv}', '${output_name}', '--google-cloud']
-		# call_args = ['sccloud', 'aggregate_matrix', '${input_count_matrix_csv}', '${output_name}']
+		call_args = ['pegasus', 'aggregate_matrix', '${input_count_matrix_csv}', '${output_name}', '--google-cloud']
+		# call_args = ['pegasus', 'aggregate_matrix', '${input_count_matrix_csv}', '${output_name}']
 		if '${restrictions}' is not '':
 			ress = '${restrictions}'.split(';')
 			for res in ress:
@@ -46,7 +46,7 @@ task run_scCloud_aggregate_matrices {
 	}
 
 	runtime {
-		docker: "sccloud/sccloud:${sccloud_version}"
+		docker: "cumulusprod/cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -56,10 +56,10 @@ task run_scCloud_aggregate_matrices {
 	}
 }
 
-task run_scCloud_cluster {
+task run_cumulus_cluster {
 	File input_10x_file
 	String output_name
-	String sccloud_version
+	String cumulus_version
 	String zones
 	Int num_cpu
 	String memory
@@ -139,7 +139,7 @@ task run_scCloud_cluster {
 
 		python <<CODE
 		from subprocess import check_call
-		call_args = ['sccloud', 'cluster', '${input_10x_file}', '${output_name}', '-p', '${num_cpu}']
+		call_args = ['pegasus', 'cluster', '${input_10x_file}', '${output_name}', '-p', '${num_cpu}']
 		if '${genome}' is not '':
 			call_args.extend(['--genome', '${genome}'])
 		if '${channel}' is not '':
@@ -273,7 +273,7 @@ task run_scCloud_cluster {
 		print(' '.join(call_args))
 		check_call(call_args)
 		if '${output_parquet}' is 'true':
-			call_args = ['sccloud', 'parquet', '${output_name}.h5ad', '${output_name}', '-p', '${num_cpu}']
+			call_args = ['pegasus', 'parquet', '${output_name}.h5ad', '${output_name}', '-p', '${num_cpu}']
 			print(' '.join(call_args))
 			check_call(call_args)			
 		CODE
@@ -290,7 +290,7 @@ task run_scCloud_cluster {
 	}
 
 	runtime {
-		docker: "sccloud/sccloud:${sccloud_version}"
+		docker: "cumulusprod/cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -300,10 +300,10 @@ task run_scCloud_cluster {
 	}
 }
 
-task run_scCloud_de_analysis {
+task run_cumulus_de_analysis {
 	File input_h5ad
 	String output_name
-	String sccloud_version
+	String cumulus_version
 	String zones	
 	Int num_cpu
 	String memory
@@ -336,7 +336,7 @@ task run_scCloud_de_analysis {
 		call_args = ['mv', '-f', '${input_h5ad}', '${output_name}.h5ad']
 		print(' '.join(call_args))
 		check_call(call_args)			
-		call_args = ['sccloud', 'de_analysis', '${output_name}.h5ad', '${output_name}.de.xlsx', '-p', '${num_cpu}']
+		call_args = ['pegasus', 'de_analysis', '${output_name}.h5ad', '${output_name}.de.xlsx', '-p', '${num_cpu}']
 		if '${labels}' is not '':
 			call_args.extend(['--labels', '${labels}'])
 		if '${alpha}' is not '':
@@ -352,7 +352,7 @@ task run_scCloud_de_analysis {
 		print(' '.join(call_args))
 		check_call(call_args)
 		if '${find_markers_lightgbm}' is 'true':
-			call_args = ['sccloud', 'find_markers', '${output_name}.h5ad', '${output_name}.markers.xlsx', '-p', '${num_cpu}']
+			call_args = ['pegasus', 'find_markers', '${output_name}.h5ad', '${output_name}.markers.xlsx', '-p', '${num_cpu}']
 			if '${labels}' is not '':
 				call_args.extend(['--labels', '${labels}'])
 			if '${remove_ribo}' is 'true':
@@ -364,7 +364,7 @@ task run_scCloud_de_analysis {
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '${annotate_cluster}' is 'true':
-			call_args = ['sccloud', 'annotate_cluster', '${output_name}.h5ad', '${output_name}' + '.anno.txt']
+			call_args = ['pegasus', 'annotate_cluster', '${output_name}.h5ad', '${output_name}' + '.anno.txt']
 			if '${organism}' is not '':
 				call_args.extend(['--marker-file', '${organism}'])
 			if '${annotate_de_test}' is not '':
@@ -387,7 +387,7 @@ task run_scCloud_de_analysis {
 	}
 
 	runtime {
-		docker: "sccloud/sccloud:${sccloud_version}"
+		docker: "cumulusprod/cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -397,10 +397,10 @@ task run_scCloud_de_analysis {
 	}
 }
 
-task run_scCloud_plot {
+task run_cumulus_plot {
 	File input_h5ad
 	String output_name
-	String sccloud_version
+	String cumulus_version
 	String zones
 	String memory
 	Int disk_space
@@ -426,45 +426,45 @@ task run_scCloud_plot {
 			pairs = '${plot_composition}'.split(',')
 			for pair in pairs:
 				lab, attr = pair.split(':')
-				call_args = ['sccloud', 'plot', 'composition', '--cluster-labels', lab, '--attribute', attr, '--style', 'normalized', '--not-stacked', '${input_h5ad}', '${output_name}.' + lab + '.' + attr + '.composition.pdf']
+				call_args = ['pegasus', 'plot', 'composition', '--cluster-labels', lab, '--attribute', attr, '--style', 'normalized', '--not-stacked', '${input_h5ad}', '${output_name}.' + lab + '.' + attr + '.composition.pdf']
 				print(' '.join(call_args))
 				check_call(call_args)
 		if '${plot_tsne}' is not '':
-			call_args = ['sccloud', 'plot', 'scatter',  '--basis', 'tsne', '--attributes', '${plot_tsne}', '${input_h5ad}', '${output_name}.tsne.pdf']
+			call_args = ['pegasus', 'plot', 'scatter',  '--basis', 'tsne', '--attributes', '${plot_tsne}', '${input_h5ad}', '${output_name}.tsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '${plot_fitsne}' is not '':
-			call_args = ['sccloud', 'plot', 'scatter', '--basis', 'fitsne', '--attributes', '${plot_fitsne}', '${input_h5ad}', '${output_name}.fitsne.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'fitsne', '--attributes', '${plot_fitsne}', '${input_h5ad}', '${output_name}.fitsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '${plot_umap}' is not '':
-			call_args = ['sccloud', 'plot', 'scatter', '--basis', 'umap', '--attributes', '${plot_umap}', '${input_h5ad}', '${output_name}.umap.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'umap', '--attributes', '${plot_umap}', '${input_h5ad}', '${output_name}.umap.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '${plot_fle}' is not '':
-			call_args = ['sccloud', 'plot', 'scatter', '--basis', 'fle', '--attributes', '${plot_fle}', '${input_h5ad}', '${output_name}.fle.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'fle', '--attributes', '${plot_fle}', '${input_h5ad}', '${output_name}.fle.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '${plot_diffmap}' is not '':
 			attrs = '${plot_diffmap}'.split(',')
 			for attr in attrs:
-				call_args = ['sccloud', 'iplot', '--attribute', attr, 'diffmap_pca', '${input_h5ad}', '${output_name}.' + attr + '.diffmap_pca.html']
+				call_args = ['pegasus', 'iplot', '--attribute', attr, 'diffmap_pca', '${input_h5ad}', '${output_name}.' + attr + '.diffmap_pca.html']
 				print(' '.join(call_args))
 				check_call(call_args)
 		if '${plot_citeseq_fitsne}' is not '':
-			call_args = ['sccloud', 'plot', 'scatter', '--basis', 'citeseq_fitsne', '--attributes', '${plot_citeseq_fitsne}', '${input_h5ad}', '${output_name}.citeseq.fitsne.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'citeseq_fitsne', '--attributes', '${plot_citeseq_fitsne}', '${input_h5ad}', '${output_name}.citeseq.fitsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '${plot_net_tsne}' is not '':
-			call_args = ['sccloud', 'plot', 'scatter', '--basis', 'net_tsne', '--attributes', '${plot_net_tsne}', '${input_h5ad}', '${output_name}.net.tsne.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_tsne', '--attributes', '${plot_net_tsne}', '${input_h5ad}', '${output_name}.net.tsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '${plot_net_umap}' is not '':
-			call_args = ['sccloud', 'plot', 'scatter', '--basis', 'net_umap', '--attributes', '${plot_net_umap}', '${input_h5ad}', '${output_name}.net.umap.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_umap', '--attributes', '${plot_net_umap}', '${input_h5ad}', '${output_name}.net.umap.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '${plot_net_fle}' is not '':
-			call_args = ['sccloud', 'plot', 'scatter', '--basis', 'net_fle', '--attributes', '${plot_net_fle}', '${input_h5ad}', '${output_name}.net.fle.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_fle', '--attributes', '${plot_net_fle}', '${input_h5ad}', '${output_name}.net.fle.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		CODE
@@ -476,7 +476,7 @@ task run_scCloud_plot {
 	}
 
 	runtime {
-		docker: "sccloud/sccloud:${sccloud_version}"
+		docker: "cumulusprod/cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -486,11 +486,11 @@ task run_scCloud_plot {
 	}
 }
 
-task run_scCloud_scp_output {
+task run_cumulus_scp_output {
 	File input_h5ad
 	String output_name
 	Boolean output_dense
-	String sccloud_version
+	String cumulus_version
 	String zones
 	String memory
 	Int disk_space
@@ -499,7 +499,7 @@ task run_scCloud_scp_output {
 	command {
 		set -e
 		export TMPDIR=/tmp
-		sccloud scp_output ${true='--dense' false='' output_dense} ${input_h5ad} ${output_name}
+		pegasus scp_output ${true='--dense' false='' output_dense} ${input_h5ad} ${output_name}
 	}
 
 	output {
@@ -507,7 +507,7 @@ task run_scCloud_scp_output {
 	}
 
 	runtime {
-		docker: "sccloud/sccloud:${sccloud_version}"
+		docker: "cumulusprod/cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -517,10 +517,10 @@ task run_scCloud_scp_output {
 	}
 }
 
-task run_scCloud_subcluster {
+task run_cumulus_subcluster {
 	File input_h5ad
 	String output_name
-	String sccloud_version
+	String cumulus_version
 	String zones
 	Int num_cpu
 	String memory
@@ -583,7 +583,7 @@ task run_scCloud_subcluster {
 
 		python <<CODE
 		from subprocess import check_call
-		call_args = ['sccloud', 'subcluster', '${input_h5ad}', '${output_name}', '-p', '${num_cpu}']
+		call_args = ['pegasus', 'subcluster', '${input_h5ad}', '${output_name}', '-p', '${num_cpu}']
 		if '${subset_selections}' is not '':
 			sels = '${subset_selections}'.split(';')
 			for sel in sels:
@@ -685,7 +685,7 @@ task run_scCloud_subcluster {
 		print(' '.join(call_args))
 		check_call(call_args)
 		if '${output_parquet}' is 'true':
-			call_args = ['sccloud', 'parquet', '${output_name}.h5ad', '${output_name}', '-p', '${num_cpu}']
+			call_args = ['pegasus', 'parquet', '${output_name}.h5ad', '${output_name}', '-p', '${num_cpu}']
 			print(' '.join(call_args))
 			check_call(call_args)
 		CODE
@@ -699,7 +699,7 @@ task run_scCloud_subcluster {
 	}
 
 	runtime {
-		docker: "sccloud/sccloud:${sccloud_version}"
+		docker: "cumulusprod/cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -711,7 +711,7 @@ task run_scCloud_subcluster {
 
 task organize_results {
 	String output_name
-	String sccloud_version
+	String cumulus_version
 	String zones
 	Int disk_space
 	Int preemptible
@@ -757,7 +757,7 @@ task organize_results {
 	}
 
 	runtime {
-		docker: "sccloud/sccloud:${sccloud_version}"
+		docker: "cumulusprod/cumulus:${cumulus_version}"
 		zones: zones
 		memory: "30 GB"
 		bootDiskSizeGb: 12
@@ -769,7 +769,7 @@ task organize_results {
 
 task generate_hashing_cite_seq_tasks {
 	File input_sample_sheet
-	String sccloud_version
+	String cumulus_version
 	String zones
 	Int preemptible
 
@@ -802,18 +802,18 @@ task generate_hashing_cite_seq_tasks {
 	}
 
 	runtime {
-		docker: "sccloud/sccloud:${sccloud_version}"
+		docker: "cumulusprod/cumulus:${cumulus_version}"
 		zones: zones
 		preemptible: preemptible
 	}
 }
 
-task run_scCloud_demuxEM {
+task run_cumulus_demuxEM {
 	File input_adt_csv
 	File input_raw_gene_bc_matrices_h5
 	String output_dir
 	String output_name
-	String sccloud_version
+	String cumulus_version
 	String zones
 	Int num_cpu
 	String memory
@@ -835,7 +835,7 @@ task run_scCloud_demuxEM {
 
 		python <<CODE
 		from subprocess import check_call
-		call_args = ['sccloud', 'demuxEM', '${input_adt_csv}', '${input_raw_gene_bc_matrices_h5}', '${output_name}', '-p', '${num_cpu}']
+		call_args = ['pegasus', 'demuxEM', '${input_adt_csv}', '${input_raw_gene_bc_matrices_h5}', '${output_name}', '-p', '${num_cpu}']
 		if '${genome}' is not '':
 			call_args.extend(['--genome', '${genome}'])
 		if '${alpha_on_samples}' is not '':
@@ -873,7 +873,7 @@ task run_scCloud_demuxEM {
 	}
 
 	runtime {
-		docker: "sccloud/sccloud:${sccloud_version}"
+		docker: "cumulusprod/cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -883,13 +883,13 @@ task run_scCloud_demuxEM {
 	}
 }
 
-task run_scCloud_merge_rna_adt {
+task run_cumulus_merge_rna_adt {
 	File input_raw_gene_bc_matrices_h5
 	File input_adt_csv
 	File? antibody_control_csv
 	String output_dir
 	String output_name
-	String sccloud_version
+	String cumulus_version
 	String zones
 	String memory
 	Int disk_space
@@ -902,7 +902,7 @@ task run_scCloud_merge_rna_adt {
 
 		python <<CODE
 		from subprocess import check_call
-		call_args = ['sccloud', 'merge_rna_adt', '${input_raw_gene_bc_matrices_h5}', '${input_adt_csv}', '${output_name}']
+		call_args = ['pegasus', 'merge_rna_adt', '${input_raw_gene_bc_matrices_h5}', '${input_adt_csv}', '${output_name}']
 		if '${antibody_control_csv}' is not '':
 			call_args.extend(['--antibody-control-csv', '${antibody_control_csv}'])
 		print(' '.join(call_args))
@@ -920,7 +920,7 @@ task run_scCloud_merge_rna_adt {
 	}
 
 	runtime {
-		docker: "sccloud/sccloud:${sccloud_version}"
+		docker: "cumulusprod/cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12

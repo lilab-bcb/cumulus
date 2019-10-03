@@ -126,7 +126,7 @@ task run_cellranger_vdj {
 	}
 
 	runtime {
-		docker: "sccloud/cellranger:${cellranger_version}"
+		docker: "cumulusprod/cellranger:${cellranger_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12

@@ -47,7 +47,7 @@ task rsem_prepare_reference {
 
 	runtime {
 		disks: "local-disk " + ceil(disk_space + 8*size(fasta,"GB") + size(gtf,"GB")) + " HDD"
-		docker: "sccloud/smartseq2:${smartseq2_version}"
+		docker: "cumulusprod/smartseq2:${smartseq2_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 		cpu:"${cpu}"

@@ -1,18 +1,18 @@
 import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:tasks/versions/25/plain-WDL/descriptor" as tasks
-# import "../scCloud/scCloud_tasks.wdl" as tasks
+# import "cumulus_tasks.wdl" as tasks
 
-workflow scCloud_subcluster {
+workflow cumulus_subcluster {
 	File input_h5ad
 	# google bucket, subdirectory name and results name prefix
 	String output_name
 	# Specify which cells will be included in the subcluster analysis. This field contains one or more <subset_selection> strings separated by ';'. Each <subset_selection> string takes the format of ‘attr:value,…,value’, which means select cells with attr in the values. If multiple <subset_selection> strings are specified, the subset of cells selected is the intersection of these strings.
 	String subset_selections
 
-	# scCloud version, default to "0.9.1"
-	String? sccloud_version = "0.9.1"
+	# cumulus version, default to "0.9.1"
+	String? cumulus_version = "0.9.1"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
-	# Number of cpus per scCloud job
+	# Number of cpus per cumulus job
 	Int? num_cpu = 64
 	# Memory size string
 	String? memory = "200G"
@@ -29,13 +29,13 @@ workflow scCloud_subcluster {
 
 	# If correct batch effects [default: false]
 	Boolean? correct_batch_effect
-	# Batch correction assumes the differences in gene expression between channels are due to batch effects. However, in many cases, we know that channels can be partitioned into several groups and each group is biologically different from others. In this case, we will only perform batch correction for channels within each group. This option defines the groups. If <expression> is None, we assume all channels are from one group. Otherwise, groups are defined according to <expression>. <expression> takes the form of either 'attr', or 'attr1+attr2+sccloud..+attrn', or 'attr=value11,sccloud..,value1n_1;value21,sccloud..,value2n_2;sccloud..;valuem1,sccloud..,valuemn_m'. In the first form, 'attr' should be an existing sample attribute, and groups are defined by 'attr'. In the second form, 'attr1',sccloud..,'attrn' are n existing sample attributes and groups are defined by the Cartesian product of these n attributes. In the last form, there will be m + 1 groups. A cell belongs to group i (i > 0) if and only if its sample attribute 'attr' has a value among valuei1,sccloud..,valuein_i. A cell belongs to group 0 if it does not belong to any other groups.
+	# Batch correction assumes the differences in gene expression between channels are due to batch effects. However, in many cases, we know that channels can be partitioned into several groups and each group is biologically different from others. In this case, we will only perform batch correction for channels within each group. This option defines the groups. If <expression> is None, we assume all channels are from one group. Otherwise, groups are defined according to <expression>. <expression> takes the form of either 'attr', or 'attr1+attr2+...+attrn', or 'attr=value11,...,value1n_1;value21,...,value2n_2;...;valuem1,...,valuemn_m'. In the first form, 'attr' should be an existing sample attribute, and groups are defined by 'attr'. In the second form, 'attr1',...,'attrn' are n existing sample attributes and groups are defined by the Cartesian product of these n attributes. In the last form, there will be m + 1 groups. A cell belongs to group i (i > 0) if and only if its sample attribute 'attr' has a value among valuei1,...,valuein_i. A cell belongs to group 0 if it does not belong to any other groups.
 	String? batch_group_by
 	# If output loom-formatted file [default: false]
 	Boolean? output_loom
 	# If output parquet-formatted file [default: false]
 	Boolean? output_parquet
-	# Highly variable feature selection method. <flavor> can be 'sccloud' or 'Seurat'. [default: sccloud]
+	# Highly variable feature selection method. <flavor> can be 'pegasus' or 'Seurat'. [default: pegasus]
 	String? select_hvf_flavor
 	# Select top <nfeatures> highly variable features. If <flavor> is 'Seurat' and <nfeatures> is 'None', select HVGs with z-score cutoff at 0.5. [default: 2000]
 	Int? select_hvf_ngenes
@@ -190,7 +190,7 @@ workflow scCloud_subcluster {
 
 
 
-	call tasks.run_scCloud_subcluster as subcluster {
+	call tasks.run_cumulus_subcluster as subcluster {
 		input:
 			input_h5ad = input_h5ad,
 			output_name = out_name,
@@ -243,7 +243,7 @@ workflow scCloud_subcluster {
 			net_umap_out_basis = net_umap_out_basis,
 			run_net_fle = run_net_fle,
 			net_fle_out_basis = net_fle_out_basis,
-			sccloud_version = sccloud_version,
+			cumulus_version = cumulus_version,
 			zones = zones,
 			num_cpu = num_cpu,
 			memory = memory,
@@ -252,7 +252,7 @@ workflow scCloud_subcluster {
 	}
 
 	if (perform_de_analysis) {
-		call tasks.run_scCloud_de_analysis as de_analysis {
+		call tasks.run_cumulus_de_analysis as de_analysis {
 			input:
 				input_h5ad = subcluster.output_h5ad,
 				output_name = out_name,
@@ -270,7 +270,7 @@ workflow scCloud_subcluster {
 				annotate_de_test = annotate_de_test,
 				organism = organism,
 				minimum_report_score = minimum_report_score,
-				sccloud_version = sccloud_version,
+				cumulus_version = cumulus_version,
 				zones = zones,
 				num_cpu = num_cpu,
 				memory = memory,
@@ -280,7 +280,7 @@ workflow scCloud_subcluster {
 	}
 
 	if (defined(plot_composition) || defined(plot_tsne) || defined(plot_fitsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_diffmap) || defined(plot_net_tsne) || defined(plot_net_umap) || defined(plot_net_fle)) {
-		call tasks.run_scCloud_plot as plot {
+		call tasks.run_cumulus_plot as plot {
 			input:
 				input_h5ad = subcluster.output_h5ad,
 				output_name = out_name,
@@ -293,7 +293,7 @@ workflow scCloud_subcluster {
 				plot_net_tsne = plot_net_tsne,
 				plot_net_umap = plot_net_umap,
 				plot_net_fle = plot_net_fle,
-				sccloud_version = sccloud_version,
+				cumulus_version = cumulus_version,
 				zones = zones,
 				memory = memory,
 				disk_space = disk_space,
@@ -302,12 +302,12 @@ workflow scCloud_subcluster {
 	}
 
 	if (generate_scp_outputs) {
-		call tasks.run_scCloud_scp_output as scp_output {
+		call tasks.run_cumulus_scp_output as scp_output {
 			input:
 				input_h5ad = subcluster.output_h5ad,
 				output_name = out_name,
 				output_dense = output_dense,
-				sccloud_version = sccloud_version,
+				cumulus_version = cumulus_version,
 				zones = zones,
 				memory = memory,
 				disk_space = disk_space,
@@ -328,7 +328,7 @@ workflow scCloud_subcluster {
 			output_pdfs = plot.output_pdfs,
 			output_htmls = plot.output_htmls,
 			output_scp_files = scp_output.output_scp_files,
-			sccloud_version = sccloud_version,
+			cumulus_version = cumulus_version,
 			zones = zones,
 			disk_space = disk_space,
 			preemptible = preemptible

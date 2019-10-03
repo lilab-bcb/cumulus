@@ -1,4 +1,4 @@
-workflow scCloud_adt {
+workflow cumulus_adt {
 	# Sample ID
 	String sample_id
 	# A comma-separated list of input FASTQs directories (gs urls)
@@ -27,8 +27,8 @@ workflow scCloud_adt {
 	# minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for crispr
 	Float? min_read_ratio = 0.1
 
-	# scCloud version
-	String sccloud_version
+	# cumulus version
+	String cumulus_version
 	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 	String? zones = "us-central1-b"
 	# Memory string, e.g. 32G
@@ -50,7 +50,7 @@ workflow scCloud_adt {
 			scaffold_sequence = scaffold_sequence,
 			max_mismatch = max_mismatch,
 			min_read_ratio = min_read_ratio,
-			sccloud_version = sccloud_version,
+			cumulus_version = cumulus_version,
 			zones = zones,
 			memory = memory,
 			disk_space = disk_space,
@@ -74,7 +74,7 @@ task run_generate_count_matrix_ADTs {
 	String scaffold_sequence
 	Int max_mismatch
 	Float min_read_ratio
-	String sccloud_version
+	String cumulus_version
 	String zones
 	String memory
 	Int disk_space
@@ -135,7 +135,7 @@ task run_generate_count_matrix_ADTs {
 	}
 
 	runtime {
-		docker: "sccloud/sccloud:${sccloud_version}"
+		docker: "cumulusprod/cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
