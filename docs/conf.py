@@ -19,7 +19,7 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'scCloud'
+project = 'Cumulus'
 copyright = '2018, Bo Li, Joshua Gould, and et al.'
 author = 'Bo Li, Joshua Gould, and et al.'
 
@@ -110,7 +110,7 @@ html_static_path = ['_static']
 # -- Options for HTMLHelp output ---------------------------------------------
 
 # Output file base name for HTML help builder.
-htmlhelp_basename = 'scClouddoc'
+htmlhelp_basename = 'cumulusdoc'
 
 
 # -- Options for LaTeX output ------------------------------------------------
@@ -137,7 +137,7 @@ latex_elements = {
 # (source start file, target name, title,
 #  author, documentclass [howto, manual, or own class]).
 latex_documents = [
-    (master_doc, 'scCloud.tex', 'scCloud Documentation',
+    (master_doc, 'Cumulus.tex', 'Cumulus Documentation',
      'Bo Li, Joshua Gould, and et al.', 'manual'),
 ]
 
@@ -147,7 +147,7 @@ latex_documents = [
 # One entry per manual page. List of tuples
 # (source start file, name, description, authors, manual section).
 man_pages = [
-    (master_doc, 'scCloud', 'scCloud Documentation',
+    (master_doc, 'Cumulus', 'Cumulus Documentation',
      [author], 1)
 ]
 
@@ -158,8 +158,8 @@ man_pages = [
 # (source start file, target name, title, author,
 #  dir menu entry, description, category)
 texinfo_documents = [
-    (master_doc, 'scCloud', 'scCloud Documentation',
-     author, 'scCloud', 'One line description of project.',
+    (master_doc, 'Cumulus', 'Cumulus Documentation',
+     author, 'Cumulus', 'One line description of project.',
      'Miscellaneous'),
 ]
 

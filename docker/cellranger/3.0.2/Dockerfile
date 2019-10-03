@@ -11,7 +11,7 @@ RUN pip install --upgrade pip && \
 pip install pandas && \
 pip install xlsxwriter
 RUN mkdir /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
 ADD cellranger-3.0.2.tar /software
 
 # ADD bcl2fastq2_0v2.20.0.422-2_amd64.deb /software

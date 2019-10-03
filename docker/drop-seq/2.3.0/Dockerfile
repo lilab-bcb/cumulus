@@ -1,8 +1,8 @@
 FROM continuumio/miniconda3:4.6.14
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/drop-seq/summary.py /software/
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/monitor_script.sh /software/
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/drop-seq/summary.py /software/
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software/
 ADD https://github.com/broadinstitute/picard/releases/download/2.18.26/picard.jar /software/
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/drop-seq/filter_histogram.py /software/
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/drop-seq/filter_histogram.py /software/
 
 RUN apt-get update && \
 apt-get install --no-install-recommends -y curl dpkg-dev gnupg lsb-release procps && \

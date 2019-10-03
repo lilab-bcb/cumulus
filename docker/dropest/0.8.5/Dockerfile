@@ -44,9 +44,9 @@ RUN \
   make
 
 
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/dropest/dropest_umi_correct.R /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/dropest/create_dropest_config.py /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/dropest/dropest_umi_correct.R /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/dropest/create_dropest_config.py /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
 
 RUN rm ~/.Rprofile
 RUN chmod +x /software/*

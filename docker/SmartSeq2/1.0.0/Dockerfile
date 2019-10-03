@@ -15,7 +15,7 @@ pip install xlsxwriter
 RUN mkdir /software
 ADD https://github.com/deweylab/RSEM/archive/v1.3.2.tar.gz /software/RSEM_v1.3.2.tar.gz
 ADD https://github.com/BenLangmead/bowtie2/releases/download/v2.3.5/bowtie2-2.3.5-linux-x86_64.zip /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
 
 RUN chmod a+rx /software/monitor_script.sh && \
 	unzip /software/bowtie2-2.3.5-linux-x86_64.zip -d /software && \

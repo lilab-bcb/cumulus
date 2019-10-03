@@ -99,7 +99,7 @@ inline bool insert(HashType& index_dict, uint64_t key, ValueType&& value) {
 	ret = index_dict.insert(std::make_pair(key, value));
 	if (ret.second) return true;
 	if (ret.first->second.n_mis == 0 && value.n_mis == 0) {
-		printf("Cumulus identified two identical barcodes! Please check your barcode file.\n");
+		printf("ScCloud identified two identical barcodes! Please check your barcode file.\n");
 		exit(-1);
 	}
 	if (ret.first->second.n_mis == 0 || value.n_mis == 0) {

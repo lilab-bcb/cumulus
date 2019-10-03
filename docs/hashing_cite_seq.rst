@@ -1,7 +1,7 @@
 Demultiplex cell-hashing/nuclei-hashing data using demuxEM or prepare for CITE-Seq analysis
 -------------------------------------------------------------------------------------------
 
-Follow the steps below to run **scCloud** for cell-hashing/nuclei-hashing/CITE-Seq data on Terra_.
+Follow the steps below to run **cumulus** for cell-hashing/nuclei-hashing/CITE-Seq data on Terra_.
 
 #. Run Cell Ranger tool to generate raw gene count matrices and antibody hashtag data.
 
@@ -19,7 +19,7 @@ Follow the steps below to run **scCloud** for cell-hashing/nuclei-hashing/CITE-S
 		sample_1,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/raw_gene_bc_matrices_h5.h5,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1_ADT/sample_1_ADT.csv,cell-hashing
 		sample_2,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_2/raw_feature_bc_matrices.h5,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_2_ADT/sample_2_ADT.csv,nuclei-hashing
 
-	Note that in the above example, sample_2 is 10x genomics' v3 chemistry. scCloud can automatically detect v2/v3 chemistry when loading hdf5 files.
+	Note that in the above example, sample_2 is 10x genomics' v3 chemistry. cumulus can automatically detect v2/v3 chemistry when loading hdf5 files.
 
 #. Create an additional antibody-control sheet **antibody_control.csv** if you have CITE-Seq data. This sheet contains 2 columns --- *Antibody* and *Control*. 
 
@@ -38,9 +38,9 @@ Follow the steps below to run **scCloud** for cell-hashing/nuclei-hashing/CITE-S
 		gsutil cp /foo/bar/projects/antibody_control.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
 
-#. Import scCloud_hashing_cite_seq tool.
+#. Import cumulus_hashing_cite_seq tool.
 
-	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **scCloud/scCloud_hashing_cite_seq**.
+	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **cumulus/cumulus_hashing_cite_seq**.
  	You can also see the Terra documentation for `adding a tool`_.
 
 #. Select ``Process single workflow from files``.
@@ -48,7 +48,7 @@ Follow the steps below to run **scCloud** for cell-hashing/nuclei-hashing/CITE-S
 
 ---------------------------------
 
-scCloud_hashing_cite_seq inputs:
+cumulus_hashing_cite_seq inputs:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table::
@@ -68,7 +68,7 @@ scCloud_hashing_cite_seq inputs:
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_demux_dir"
 	  - 
 	* - genome
-	  - Reference genome name. If not provided, scCloud will infer the genome name from data
+	  - Reference genome name. If not provided, cumulus will infer the genome name from data
 	  - "GRCh38"
 	  - 
 	* - demuxEM_min_num_genes
@@ -103,8 +103,8 @@ scCloud_hashing_cite_seq inputs:
 	  - merge_rna_adt parameter. This is a CSV file containing the IgG control information for each antibody.
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/antibody_control_csv"
 	  - 
-	* - sccloud_version
-	  - scCloud version, can be "0.9.0" or "0.9.1".
+	* - cumulus_version
+	  - cumulus version, can be "0.9.0" or "0.9.1".
 	  - "0.9.0"
 	  - "0.9.1"
 	* - zones
@@ -112,7 +112,7 @@ scCloud_hashing_cite_seq inputs:
 	  - "us-east1-b us-east1-c us-east1-d"
 	  - "us-east1-b us-east1-c us-east1-d"
 	* - num_cpu
-	  - Number of cpus per scCloud_hashing_cite_seq job
+	  - Number of cpus per cumulus_hashing_cite_seq job
 	  - 8
 	  - 8
 	* - memory
@@ -130,10 +130,10 @@ scCloud_hashing_cite_seq inputs:
 
 ---------------------------------
 
-scCloud_hashing_cite_seq outputs
+cumulus_hashing_cite_seq outputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-See the table below for important *scCloud_hashing_cite_seq* outputs:
+See the table below for important *cumulus_hashing_cite_seq* outputs:
 
 .. list-table::
 	:widths: 5 5 10
@@ -157,7 +157,7 @@ In the output folder of each cell-hashing/nuclei-hashing RNA-ADT data pair, you 
 	* - output_name_demux.h5ad
 	  - Demultiplexed RNA count matrix in h5ad format.
 	* - output_name_demux.h5sc
-	  - RNA expression matrix with demultiplexed sample identities in scCloud hdf5 format.
+	  - RNA expression matrix with demultiplexed sample identities in cumulus hdf5 format.
 	* - output_name_ADTs.h5ad
 	  - Antibody tag matrix in h5ad format.
 	* - output_name.ambient_hashtag.hist.png
@@ -180,7 +180,7 @@ In the output folder of each cite-seq RNA-ADT data pair, you can find the follow
 	* - Name
 	  - Description
 	* - output_name.h5sc
-	  - An scCloud hdf5 file containing both RNA and ADT count matrices.
+	  - An cumulus hdf5 file containing both RNA and ADT count matrices.
 
 ---------------------------------
 

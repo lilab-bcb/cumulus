@@ -2,7 +2,7 @@ FROM debian:stretch-slim
 SHELL ["/bin/bash", "-c"]
 
 #ADD bcl2fastq2_0v2.20.0.422-2_amd64.deb /software/
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/KCO/master/docker/monitor_script.sh /software/
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software/
 ADD cellranger-atac-1.1.0.tar.gz /software/
 
 RUN apt-get -qq update && apt-get -qq -y install --no-install-recommends ca-certificates curl apt-transport-https gnupg lsb-release python3 python3-pip \

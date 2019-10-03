@@ -45,7 +45,7 @@ RUN pip install --upgrade pip && \
 	pip install sccloud==0.14.0
 
 COPY extract_ADT_UMIs /software/extract_ADT_UMIs
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/scCloud/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
 
 RUN cd /software/extract_ADT_UMIs && make clean && make all && cd ../.. && \
 	chmod a+rx /software/monitor_script.sh

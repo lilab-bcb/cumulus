@@ -1,6 +1,5 @@
 =====================================
-scCloud WDL workflows and Dockerfiles
+Cumulus WDL workflows and Dockerfiles
 =====================================
-
 
 `Read documentation <http://sccloud.readthedocs.io>`__
