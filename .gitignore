@@ -1,15 +1,12 @@
 .DS_Store
-docker/.DS_Store
+
 docker/cellranger/2.1.1/cellranger-2.1.1.tar.gz
 docker/cellranger/2.2.0/cellranger-2.2.0.tar.gz
 docker/cellranger/3.0.2/cellranger-3.0.2.tar.gz
 docker/cellranger-atac/1.0.1/cellranger-atac-1.0.1.tar.gz
-docker/scCloud/.DS_Store
-docker/scCloud/extract_ADT_UMIs/generate_count_matrix_ADTs
-docker/scCloud/scCloud-*.tar.gz
-docs/.DS_Store
-workflows/.DS_Store
-workflows/scCloud/.DS_Store
+
+docker/cumulus/extract_ADT_UMIs/generate_count_matrix_ADTs
+docker/cumulus/cumulus-*.tar.gz
 workflows/test/
 
 

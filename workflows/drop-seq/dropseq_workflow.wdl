@@ -1,9 +1,9 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:bcl2fastq/versions/3/plain-WDL/descriptor" as bcl2fastq_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropest/versions/4/plain-WDL/descriptor" as dropest_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_align/versions/7/plain-WDL/descriptor" as dropseq_align_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_count/versions/6/plain-WDL/descriptor" as dropseq_count_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_prepare_fastq/versions/4/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/scCloud:dropseq_qc/versions/6/plain-WDL/descriptor" as dropseq_qc_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:bcl2fastq/versions/1/plain-WDL/descriptor" as bcl2fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropest/versions/1/plain-WDL/descriptor" as dropest_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_align/versions/1/plain-WDL/descriptor" as dropseq_align_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_count/versions/1/plain-WDL/descriptor" as dropseq_count_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_prepare_fastq/versions/1/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_qc/versions/1/plain-WDL/descriptor" as dropseq_qc_wdl
 
 workflow dropseq_workflow {
 	# Either a list of flowcell URLS or sample_id tab r1 tab r2
@@ -17,14 +17,13 @@ workflow dropseq_workflow {
 	Boolean run_bcl2fastq = false
 	Boolean run_dropseq_tools = true
 	Boolean run_dropest = false
-	Boolean run_aligner = true
 
 	String? star_flags
 
 	# hg19, mm10, hg19_mm10, mmul_8.0.1 or a path to a custom reference JSON file
 	String reference
 	File? acronym_file = "gs://regev-lab/resources/DropSeq/index.json"
-    String bcl2fastq_docker_registry = "gcr.io/cumulus-prod"
+    String bcl2fastq_docker_registry = "gcr.io/broad-cumulus"
 
 	# use ncells value directly instead of estimating from elbow plot
 	Int? drop_seq_tools_force_cells
@@ -105,131 +104,162 @@ workflow dropseq_workflow {
 
 	}
 
-	if(run_aligner) {
 
-		call generate_count_config {
-			input:
-				input_csv_file = input_csv_file,
-				drop_seq_tools_version=drop_seq_tools_version,
-				bcl2fastq_sample_sheets = bcl2fastq.fastqs,
-				zones = zones,
-				preemptible = preemptible,
-				acronym_file=acronym_file,
-				star_cpus = star_cpus,
-				star_memory = star_memory,
-				reference=reference
-		}
+    call generate_count_config {
+        input:
+            input_csv_file = input_csv_file,
+            drop_seq_tools_version=drop_seq_tools_version,
+            bcl2fastq_sample_sheets = bcl2fastq.fastqs,
+            zones = zones,
+            preemptible = preemptible,
+            acronym_file=acronym_file,
+            star_cpus = star_cpus,
+            star_memory = star_memory,
+            reference=reference
+    }
 
-		scatter (row in generate_count_config.grouped_sample_sheet) {
-			call dropseq_prepare_fastq_wdl.dropseq_prepare_fastq as dropseq_prepare_fastq {
-				input:
-					r1 = row[1],
-					r2 = row[2],
-					disk_space = row[3],
-					sample_id = row[0],
-					umi_base_range=umi_base_range,
-					trim_sequence = trim_sequence,
-                    trim_num_bases = trim_num_bases,
-                    cellular_barcode_base_range=cellular_barcode_base_range,
-					quality_tags = drop_seq_tools_version != "2.1.0",
-					drop_seq_tools_version=drop_seq_tools_version,
-					output_directory = output_directory_stripped + '/' + row[0],
-					zones = zones,
-					preemptible = preemptible
-			}
-
-
-			call dropseq_align_wdl.dropseq_align as dropseq_align {
-				input:
-					sample_id = row[0],
-					drop_seq_tools_version=drop_seq_tools_version,
-					add_bam_tags_disk_space_multiplier=add_bam_tags_disk_space_multiplier,
-					output_directory = output_directory_stripped + '/' + row[0],
-					input_bam = dropseq_prepare_fastq.bam,
-					star_cpus = generate_count_config.star_cpus_output,
-					star_memory = generate_count_config.star_memory_output,
-					star_flags = star_flags,
-					star_genome_file= generate_count_config.star_genome,
-					refflat=generate_count_config.refflat,
-					gene_intervals=generate_count_config.gene_intervals,
-					genome_fasta=generate_count_config.genome_fasta,
-					genome_dict=generate_count_config.genome_dict,
-					merge_bam_alignment_memory=merge_bam_alignment_memory,
-                    sort_bam_max_records_in_ram =sort_bam_max_records_in_ram,
-					zones = zones,
-					preemptible = preemptible
-			}
-
-			if(run_dropest) {
-				call dropest_wdl.dropest as dropest {
-					input:
-						sample_id = row[0],
-						output_directory = output_directory_stripped + '/' + row[0],
-						input_bam = dropseq_align.aligned_tagged_bam,
-						velocyto=dropest_velocyto,
-						genes_min = dropest_genes_min,
-                        cells_max = dropest_cells_max,
-                        min_merge_fraction=dropest_min_merge_fraction,
-                        max_cb_merge_edit_distance=dropest_max_cb_merge_edit_distance,
-                        max_umi_merge_edit_distance=dropest_max_umi_merge_edit_distance,
-                        min_genes_before_merge=dropest_min_genes_before_merge,
-                       	dropest_memory = dropest_memory,
-                        merge_barcodes_precise = dropest_merge_barcodes_precise,
-						cellular_barcode_whitelist=cellular_barcode_whitelist,
-                        dropest_version=dropest_version,
-						zones = zones,
-						preemptible = preemptible
-				}
-			}
-
-			if(run_dropseq_tools) {
-				call dropseq_count_wdl.dropseq_count as dropseq_count {
-					input:
-						sample_id = row[0],
-						dge_prep_memory = drop_deq_tools_prep_bam_memory,
-                        dge_memory = drop_deq_tools_dge_memory,
-						drop_seq_tools_version=drop_seq_tools_version,
-						output_directory = output_directory_stripped + '/' + row[0],
-						input_bam = dropseq_align.aligned_tagged_bam,
-						force_cells = drop_seq_tools_force_cells,
-						cellular_barcode_whitelist=cellular_barcode_whitelist,
-						zones = zones,
-						preemptible = preemptible
-				}
-			}
+    scatter (row in generate_count_config.grouped_sample_sheet) {
+        call dropseq_prepare_fastq_wdl.dropseq_prepare_fastq as dropseq_prepare_fastq {
+            input:
+                r1 = row[1],
+                r2 = row[2],
+                disk_space = row[3],
+                sample_id = row[0],
+                umi_base_range=umi_base_range,
+                trim_sequence = trim_sequence,
+                trim_num_bases = trim_num_bases,
+                cellular_barcode_base_range=cellular_barcode_base_range,
+                quality_tags = drop_seq_tools_version != "2.1.0",
+                drop_seq_tools_version=drop_seq_tools_version,
+                output_directory = output_directory_stripped + '/' + row[0],
+                zones = zones,
+                preemptible = preemptible
+        }
 
 
-			call dropseq_qc_wdl.dropseq_qc as dropseq_qc {
-				input:
-					sample_id = row[0],
-					input_bam = dropseq_align.aligned_tagged_bam,
-					cell_barcodes=dropseq_count.cell_barcodes,
-					refflat=generate_count_config.refflat,
-					drop_seq_tools_version=drop_seq_tools_version,
-					output_directory = output_directory_stripped + '/' + row[0],
-					zones = zones,
-					preemptible = preemptible
-			}
+        call dropseq_align_wdl.dropseq_align as dropseq_align {
+            input:
+                sample_id = row[0],
+                drop_seq_tools_version=drop_seq_tools_version,
+                add_bam_tags_disk_space_multiplier=add_bam_tags_disk_space_multiplier,
+                output_directory = output_directory_stripped + '/' + row[0],
+                input_bam = dropseq_prepare_fastq.bam,
+                star_cpus = generate_count_config.star_cpus_output,
+                star_memory = generate_count_config.star_memory_output,
+                star_flags = star_flags,
+                star_genome_file= generate_count_config.star_genome,
+                refflat=generate_count_config.refflat,
+                gene_intervals=generate_count_config.gene_intervals,
+                genome_fasta=generate_count_config.genome_fasta,
+                genome_dict=generate_count_config.genome_dict,
+                merge_bam_alignment_memory=merge_bam_alignment_memory,
+                sort_bam_max_records_in_ram =sort_bam_max_records_in_ram,
+                zones = zones,
+                preemptible = preemptible
+        }
 
-		}
+        if(run_dropest) {
+            call dropest_wdl.dropest as dropest {
+                input:
+                    sample_id = row[0],
+                    output_directory = output_directory_stripped + '/' + row[0],
+                    input_bam = dropseq_align.aligned_tagged_bam,
+                    velocyto=dropest_velocyto,
+                    genes_min = dropest_genes_min,
+                    cells_max = dropest_cells_max,
+                    min_merge_fraction=dropest_min_merge_fraction,
+                    max_cb_merge_edit_distance=dropest_max_cb_merge_edit_distance,
+                    max_umi_merge_edit_distance=dropest_max_umi_merge_edit_distance,
+                    min_genes_before_merge=dropest_min_genes_before_merge,
+                    dropest_memory = dropest_memory,
+                    merge_barcodes_precise = dropest_merge_barcodes_precise,
+                    cellular_barcode_whitelist=cellular_barcode_whitelist,
+                    dropest_version=dropest_version,
+                    zones = zones,
+                    preemptible = preemptible
+            }
+        }
+
+        if(run_dropseq_tools) {
+            call dropseq_count_wdl.dropseq_count as dropseq_count {
+                input:
+                    sample_id = row[0],
+                    dge_prep_memory = drop_deq_tools_prep_bam_memory,
+                    dge_memory = drop_deq_tools_dge_memory,
+                    drop_seq_tools_version=drop_seq_tools_version,
+                    output_directory = output_directory_stripped + '/' + row[0],
+                    input_bam = dropseq_align.aligned_tagged_bam,
+                    force_cells = drop_seq_tools_force_cells,
+                    cellular_barcode_whitelist=cellular_barcode_whitelist,
+                    zones = zones,
+                    preemptible = preemptible
+            }
+        }
 
 
-		call collect_summary {
-			input:
-				dge_summary=dropseq_count.dge_summary,
-				bead_synthesis_summary=dropseq_count.bead_synthesis_summary,
-				star_log_final=dropseq_align.star_log_final,
-				adapter_trimming_report=dropseq_prepare_fastq.adapter_trimming_report,
-				polyA_trimming_report= dropseq_prepare_fastq.polyA_trimming_report,
-				sc_rnaseq_metrics_report=dropseq_qc.sc_rnaseq_metrics_report,
-				drop_seq_tools_version=drop_seq_tools_version,
-				zones = zones,
-				preemptible = preemptible,
-				sample_id=dropseq_align.output_sample_id,
-				output_directory=output_directory
-		}
+        call dropseq_qc_wdl.dropseq_qc as dropseq_qc {
+            input:
+                sample_id = row[0],
+                input_bam = dropseq_align.aligned_tagged_bam,
+                cell_barcodes=dropseq_count.cell_barcodes,
+                refflat=generate_count_config.refflat,
+                drop_seq_tools_version=drop_seq_tools_version,
+                output_directory = output_directory_stripped + '/' + row[0],
+                zones = zones,
+                preemptible = preemptible
+        }
 
-	}
+    }
+
+
+    call collect_summary {
+        input:
+            dge_summary=dropseq_count.dge_summary,
+            bead_synthesis_summary=dropseq_count.bead_synthesis_summary,
+            star_log_final=dropseq_align.star_log_final,
+            adapter_trimming_report=dropseq_prepare_fastq.adapter_trimming_report,
+            polyA_trimming_report= dropseq_prepare_fastq.polyA_trimming_report,
+            sc_rnaseq_metrics_report=dropseq_qc.sc_rnaseq_metrics_report,
+            drop_seq_tools_version=drop_seq_tools_version,
+            zones = zones,
+            preemptible = preemptible,
+            sample_id=dropseq_align.output_sample_id,
+            output_directory=output_directory
+    }
+
+    output {
+        Array[String] bam=dropseq_prepare_fastq.bam
+        Array[String] cellular_tag_summary=dropseq_prepare_fastq.cellular_tag_summary
+        Array[String] molecular_tag_summary=dropseq_prepare_fastq.molecular_tag_summary
+        Array[String] adapter_trimming_report = dropseq_prepare_fastq.adapter_trimming_report
+        Array[String] polyA_trimming_report= dropseq_prepare_fastq.polyA_trimming_report
+
+        Array[String] aligned_tagged_bam=dropseq_align.aligned_tagged_bam
+        Array[String] aligned_bam=dropseq_align.aligned_bam
+        Array[String] star_log_final = dropseq_align.star_log_final
+
+
+        Array[String?] bead_synthesis_stats = dropseq_count.bead_synthesis_stats
+        Array[String?] bead_synthesis_summary = dropseq_count.bead_synthesis_summary
+        Array[String?] bead_synthesis_report = dropseq_count.bead_synthesis_report
+        Array[String?] bead_substitution_report =dropseq_count.bead_substitution_report
+        Array[String?] histogram=dropseq_count.histogram
+        Array[String?] ncells=dropseq_count.ncells
+        Array[String?] cumplot=dropseq_count.cumplot
+        Array[String?] reads_plot=dropseq_count.reads_plot
+        Array[String?] cell_barcodes = dropseq_count.cell_barcodes
+        Array[String?] dge=dropseq_count.dge
+        Array[String?] dge_summary = dropseq_count.dge_summary
+        Array[String?] dge_reads=dropseq_count.dge_reads
+        Array[String?] dge_summary_reads = dropseq_count.dge_summary_reads
+
+        Array[String?] dropest_count_matrices = dropest.count_matrices
+        Array[String?] dropest_count_matrix = dropest.count_matrix
+        Array[String?] dropest_bam = dropest.bam
+        Array[String?] dropest_log= dropest.log
+
+        String sc_rnaseq_metrics_report=collect_summary.report
+    }
 }
 
 

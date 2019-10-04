@@ -79,7 +79,7 @@ Additionally the pipeline provides the option to generate count matrices using  
 
 #. Import dropseq_workflow tool.
 
-	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **scCloud/dropseq_workflow**.
+	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **dropseq_workflow**.
  	You can also see the Terra documentation for `adding a tool`_.
 
 #. Select ``Process single workflow from files``.
@@ -181,7 +181,7 @@ The pipeline outputs a list of google bucket urls containing one gene-count matr
 Building a Custom Genome
 ==========================
 
-The tool **scCloud/dropseq_bundle** can be used to build a custom genome.
+The tool **dropseq_bundle** can be used to build a custom genome.
 Please see the description of important inputs below.
 
 .. list-table::
@@ -191,15 +191,20 @@ Please see the description of important inputs below.
 	* - Name
 	  - Description
 	* - fasta_file
-	  - Array of fasta files. If more than one species, fasta and gtf files need to be in the same order.
+	  - Array of fasta files. If more than one species, fasta and gtf files must be in the same order.
 	* - gtf_file
-	  - Array of gtf files. If more than one species, fasta and gtf files need to be in the same order.
+	  - Array of gtf files. If more than one species, fasta and gtf files must be in the same order.
 	* - genomeSAindexNbases
 	  - Length (bases) of the SA pre-indexing string. Typically between 10 and 15. Longer strings will use much more memory, but allow faster searches. For small genomes, must be scaled down to min(14, log2(GenomeLength)/2 - 1)
 
 
-sccloud/dropseq_workflow WDL Terra Release Notes
+dropseq_workflow Terra Release Notes
 ===================================================
+
+**Version 1**
+
+- Renamed sccloud to cumulus
+- Added use_bases_mask option when running bcl2fastq
 
 **Version 18**
 

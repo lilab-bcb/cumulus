@@ -34,7 +34,7 @@ Next, create an virtual environment ``alto`` and install ``alto`` tools::
 	conda create -n alto -y pip
 	source activate alto
 	git clone https://github.com/klarman-cell-observatory/altocumulus.git
-	cd alto
+	cd altocumulus
 	pip install -e .
 
 ---------------------------------
