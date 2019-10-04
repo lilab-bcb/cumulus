@@ -1,16 +1,16 @@
 :orphan:
 
-sccutil sample-sheet
+alto sample-sheet
 --------------------
 
-*sccutil sample-sheet* creates a sample sheet.
+*alto sample-sheet* creates a sample sheet.
 
 Synopsis
 ^^^^^^^^
 
 .. code-block:: shell
 
-	sccutil sample-sheet [OPTION]... dir
+	alto sample-sheet [OPTION]... dir
 
 where *dir* can be one or more directories to look for fastq files. Directories are searched recursively for fastq files.
 
@@ -30,19 +30,19 @@ Options
 	    | **--output**
 	  - Output sample sheet
 
-sccutil fc-upload
+alto fc-upload
 ------------------
 
-*sccutil fc-upload* uploads local files/directories to your Terra workspace Google Cloud bucket.
+*alto fc-upload* uploads local files/directories to your Terra workspace Google Cloud bucket.
  
-Your sample sheet can point to local file paths and sccutil upload will take care of uploading directories (e.g. fastq directories) and modifying the sample sheet to point to a Google Cloud bucket.
+Your sample sheet can point to local file paths and alto upload will take care of uploading directories (e.g. fastq directories) and modifying the sample sheet to point to a Google Cloud bucket.
 
 Synopsis
 ^^^^^^^^
 
 .. code-block:: shell
 
-	sccutil fc-upload [OPTION]... file
+	alto fc-upload [OPTION]... file
 
 where file can be one or more files, such as a sample sheet or an input JSON.
 
@@ -79,13 +79,13 @@ example_sample_sheet.txt:
 
 command::
 
-	sccutil upload -w myworkspace_namespace/myworkspace_name example_sample_sheet.txt 
+	alto upload -w myworkspace_namespace/myworkspace_name example_sample_sheet.txt
 
 
-sccutil fc-inputs
+alto fc-inputs
 -----------------
 
-*sccutil fc-inputs* generates a stub JSON input file that can be used as input to *sccutil run*. The JSON file can optionally be based on a published method config.
+*alto fc-inputs* generates a stub JSON input file that can be used as input to *alto run*. The JSON file can optionally be based on a published method config.
 
 Options
 ^^^^^^^
@@ -109,4 +109,4 @@ Options
 
 Example: Generate a stub JSON file based on the published config for running Drop-Seq using the MMUL_8_0_1 genome::
 
-	sccutil fc-inputs -m regev/drop-seq -c regev/drop-seq-MMUL_8_0_1
+	alto fc-inputs -m regev/drop-seq -c regev/drop-seq-MMUL_8_0_1

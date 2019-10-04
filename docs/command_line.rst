@@ -1,9 +1,9 @@
 Run Terra pipelines via command line
 ----------------------------------------------
 
-You can run Terra pipelines via the command line by installing the **sccutil** package.
+You can run Terra pipelines via the command line by installing the **altocumulus** package.
 
-Install ``sccutil`` for Broad users
+Install ``altocumulus`` for Broad users
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 Request an UGER node::
 
@@ -16,11 +16,11 @@ Add conda to your path::
 
 	reuse Anaconda3
 
-Activate the sccutil virtual environment::
+Activate the alto virtual environment::
 
-	source activate /seq/regev_genome_portal/conda_env/sccutil
+	source activate /seq/regev_genome_portal/conda_env/cumulus
 
-Install ``sccutil`` for non-Broad users
+Install ``alto`` for non-Broad users
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Make sure you have ``conda`` installed. If you haven't installed conda_, use the following commands to install::
@@ -29,22 +29,22 @@ Make sure you have ``conda`` installed. If you haven't installed conda_, use the
 	bash Miniconda3-latest-Linux-x86_64.sh -p /users/foo/miniconda3
 	mv Miniconda3-latest-Linux-x86_64.sh /users/foo/miniconda3
 
-Next, create an virtual environment ``sccutil`` and install ``sccutil`` tools::
+Next, create an virtual environment ``alto`` and install ``alto`` tools::
 
-	conda create -n sccutil -y pip
-	source activate sccutil
-	git clone https://github.com/klarman-cell-observatory/scc-util.git
-	cd scc-util
+	conda create -n alto -y pip
+	source activate alto
+	git clone https://github.com/klarman-cell-observatory/altocumulus.git
+	cd alto
 	pip install -e .
 
 ---------------------------------
 
-Run Terra pipelines via ``sccutil fc_run``
+Run Terra pipelines via ``alto fc_run``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**sccutil fc_run** runs a Terra method. Features:
+**alto fc_run** runs a Terra method. Features:
 
-#. Uploads local files/directories in your inputs to a Google Cloud bucket updates the file paths to point to the Google Cloud bucket. Your sample sheet can point to local file paths and sccutil run will take care of uploading directories (e.g. fastq directories) and modifying the sample sheet to point to a Google Cloud bucket.
+#. Uploads local files/directories in your inputs to a Google Cloud bucket updates the file paths to point to the Google Cloud bucket. Your sample sheet can point to local file paths and alto run will take care of uploading directories (e.g. fastq directories) and modifying the sample sheet to point to a Google Cloud bucket.
 
 #. Creates or uses an existing workspace.
 
@@ -106,13 +106,13 @@ inputs.json:
 
 Run the following command to kick off your Terra pipeline::
 
-	sccutil fc_run -m scCloud/cellranger_workflow -i inputs.json -w myworkspace_namespace/myworkspace_name --bucket-folder inputs -o inputs_updated.json
+	alto fc_run -m scCloud/cellranger_workflow -i inputs.json -w myworkspace_namespace/myworkspace_name --bucket-folder inputs -o inputs_updated.json
 
-Upon success, **sccutil fc_run** returns a url pointing the the submitted Terra job.
+Upon success, **alto fc_run** returns a url pointing the the submitted Terra job.
 
 If for any reason, your job failed. You could rerun it without uploading files again via the following command::
 
-	sccutil fc_run -m scCloud/cellranger_workflow -i inputs_updated.json -w myworkspace_namespace/myworkspace_name
+	alto fc_run -m scCloud/cellranger_workflow -i inputs_updated.json -w myworkspace_namespace/myworkspace_name
 
 
 .. _conda: https://docs.conda.io/en/latest/miniconda.html

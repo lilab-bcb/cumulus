@@ -67,9 +67,9 @@ where ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir`` is the remote dire
 
 	.. _Cell-Ranger workflow inputs: ../cellranger.html#cellranger-workflow-inputs
 
-Now run the following sccutil command in the same directory on your local machine::
+Now run the following alto command in the same directory on your local machine::
 
-	sccutil fc_run -m scCloud/cellranger_workflow -w ws-lab/ws-01 --bucket-folder my-dir -i ranger_input.json -o ranger_input_updated.json
+	alto fc_run -m scCloud/cellranger_workflow -w ws-lab/ws-01 --bucket-folder my-dir -i ranger_input.json -o ranger_input_updated.json
 
 where options
 
@@ -127,7 +127,7 @@ On your local machine:
 
 	#. In the same directory on your local machine, type the following command::
 
-		sccutil fc_run -m scCloud/scCloud_hashing_cite_seq -w ws-lab/ws-01 --bucket-folder my-dir -i input_01.json -o input_01_updated.json
+		alto fc_run -m scCloud/scCloud_hashing_cite_seq -w ws-lab/ws-01 --bucket-folder my-dir -i input_01.json -o input_01_updated.json
 
 	   Notice that the method here is changed to ``scCloud/scCloud_hashing_cite_seq``, with new JSON file ``input_01.json``.
 
@@ -160,7 +160,7 @@ The following steps are done on your local machine:
 
 	#. In the same directory on your local machine, type the following command::
 
-		sccutil fc_run -m scCloud/scCloud_hashing_cite_seq -w ws-lab/ws-01 --bucket-folder my-dir -i input_02.json -o input_02_updated.json
+		alto fc_run -m scCloud/scCloud_hashing_cite_seq -w ws-lab/ws-01 --bucket-folder my-dir -i input_02.json -o input_02_updated.json
 
 	   Notice that the input JSON file after ``-i`` option is now ``input_02.json``.
 
@@ -218,7 +218,7 @@ The following steps are done on your local machine:
 
 	#. In the same directory on your local machine, type the following command::
 
-		sccutil fc_run -m scCloud/scCloud -w ws-lab/ws-01 --bucket-folder my-dir/results -i input_03.json -o input_03_updated.json
+		alto fc_run -m scCloud/scCloud -w ws-lab/ws-01 --bucket-folder my-dir/results -i input_03.json -o input_03_updated.json
 
 	   Notice that the method is changed to ``scCloud/scCloud``, and the input file after ``-i`` is now ``input_03.json``.
 
