@@ -67,7 +67,7 @@ workflow cellranger_workflow {
 	# cumulus version, default to "0.9.1"
 	String? cumulus_version = "0.9.1"
 
-	String? cellranger_mkfastq_docker_registry = "gcr.io/cumulus-prod"
+	String? cellranger_mkfastq_docker_registry = "gcr.io/broad-cumulus"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus per cellranger job

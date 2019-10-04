@@ -14,7 +14,7 @@ workflow bcl2fastq {
 	String? use_bases_mask
 	Boolean? create_fastq_for_index_reads = false
 	String? bcl2fastq_version = "2.20.0.422"
-	String? docker_registry = "gcr.io/sccloud-prod"
+	String? docker_registry = "gcr.io/broad-cumulus"
 	# If not specified, assume SampleSheet.csv is in input_bcl_directory
 	File? sample_sheet
 
