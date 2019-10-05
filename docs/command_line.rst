@@ -20,7 +20,7 @@ Activate the alto virtual environment::
 
 	source activate /seq/regev_genome_portal/conda_env/cumulus
 
-Install ``alto`` for non-Broad users
+Install ``altocumulus`` for non-Broad users
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 Make sure you have ``conda`` installed. If you haven't installed conda_, use the following commands to install::
@@ -29,7 +29,7 @@ Make sure you have ``conda`` installed. If you haven't installed conda_, use the
 	bash Miniconda3-latest-Linux-x86_64.sh -p /users/foo/miniconda3
 	mv Miniconda3-latest-Linux-x86_64.sh /users/foo/miniconda3
 
-Next, create an virtual environment ``alto`` and install ``alto`` tools::
+Next, create an virtual environment ``alto`` and install ``altocumulus``::
 
 	conda create -n alto -y pip
 	source activate alto
