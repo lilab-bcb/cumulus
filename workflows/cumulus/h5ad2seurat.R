@@ -109,7 +109,7 @@ convert_h5ad_to_seurat <- function(from) {
 		)
 	}
 
-	obsm_keys <- toString(test_ad$obsm$keys())
+	obsm_keys <- toString(from$obsm$keys())
 	obsm_keys <- gsub("KeysView(AxisArrays with keys: ", "", obsm_keys, fixed = TRUE)
 	obsm_keys <- substr(obsm_keys, 1, nchar(obsm_keys) - 1)
 	obsm_keys <- strsplit(obsm_keys, split = ", ", fixed = TRUE)[[1]]

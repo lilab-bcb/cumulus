@@ -961,8 +961,6 @@ Please note that python, the `anndata`_ python library with version at least ``0
 
 Execute the R code below to load the results into Seurat (working with both Seurat v2 and v3)::
 
-	library(Seurat)
-	library(reticulate)
 	source("https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cumulus/h5ad2seurat.R")
 	ad <- import("anndata", convert = FALSE)
 	test_ad <- ad$read_h5ad("output_name.seurat.h5ad")
