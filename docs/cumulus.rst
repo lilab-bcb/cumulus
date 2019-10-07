@@ -103,8 +103,8 @@ global inputs
 	  - "0.9.1"
 	* - zones
 	  - Google cloud zones
-	  - "us-east1-b us-east1-c us-east1-d"
-	  - "us-east1-b us-east1-c us-east1-d"
+	  - "us-east1-d us-west1-a us-west1-b"
+	  - "us-east1-d us-west1-a us-west1-b"
 	* - num_cpu
 	  - Number of cpus per cumulus job
 	  - 32
