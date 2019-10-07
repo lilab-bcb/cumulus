@@ -107,9 +107,9 @@ workflow cumulus {
 	Boolean? knn_full_speed
 	# Calculate diffusion map.
 	Boolean? run_diffmap
-	# Number of diffusion components. [default: 50]
+	# Number of diffusion components. [default: 100]
 	Int? diffmap_ndc
-	# Maximum time stamp to search for the knee point. [default: 2000]
+	# Maximum time stamp to search for the knee point. [default: 5000]
 	Int? diffmap_maxt
 	# Run louvain clustering algorithm.
 	Boolean? run_louvain = true

@@ -315,17 +315,17 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - true
 	  - false
 	* - run_diffmap
-	  - Calculate diffusion map. It will be automatically set to ``true`` when ``run_fle`` or ``run_net_fle`` is set.
+	  - Calculate diffusion map. It will be automatically set to ``true`` when input **run_fle** or **run_net_fle** is set.
 	  - true
 	  - false
 	* - diffmap_ndc
 	  - Number of diffusion components
-	  - 50
-	  - 50
+	  - 100
+	  - 100
 	* - diffmap_maxt
 	  - Maximum time stamp to search for the knee point.
-	  - 2000
-	  - 2000
+	  - 5000
+	  - 5000
 	* - run_louvain
 	  - Run louvain clustering algorithm
 	  - true
