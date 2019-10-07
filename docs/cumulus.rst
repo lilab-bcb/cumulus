@@ -315,7 +315,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - true
 	  - false
 	* - run_diffmap
-	  - Calculate diffusion map. It will be automatically set to ``true`` when ``run_spectral_louvain``, ``run_spectral_leiden``, ``run_fle``, ``run_net_tsne``, ``run_net_umap``, or ``run_net_fle`` is set.
+	  - Calculate diffusion map. It will be automatically set to ``true`` when ``run_fle`` or ``run_net_fle`` is set.
 	  - true
 	  - false
 	* - diffmap_ndc
