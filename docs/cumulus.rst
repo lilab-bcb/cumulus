@@ -98,9 +98,9 @@ global inputs
 	  - "GRCh38"
 	  - 
 	* - cumulus_version
-	  - cumulus version, can be "0.9.0" or "0.9.1".
-	  - "0.9.0"
-	  - "0.9.1"
+	  - cumulus version, currently only "0.10.0" is available.
+	  - "0.10.0"
+	  - "0.10.0"
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-d us-west1-a us-west1-b"

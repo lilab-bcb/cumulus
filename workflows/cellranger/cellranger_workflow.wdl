@@ -64,8 +64,8 @@ workflow cellranger_workflow {
 	String? cellranger_version = "3.0.2"
 	# 1.0.1
 	String? cellranger_atac_version = "1.0.1"
-	# cumulus version, default to "0.9.1"
-	String? cumulus_version = "0.9.1"
+	# cumulus version, default to "0.10.0"
+	String? cumulus_version = "0.10.0"
 
 	String? cellranger_mkfastq_docker_registry = "gcr.io/broad-cumulus"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"

@@ -104,13 +104,13 @@ cumulus_hashing_cite_seq inputs:
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/antibody_control_csv"
 	  - 
 	* - cumulus_version
-	  - cumulus version, can be "0.9.0" or "0.9.1".
-	  - "0.9.0"
-	  - "0.9.1"
+	  - cumulus version, currently only "0.10.0" is available..
+	  - "0.10.0"
+	  - "0.10.0"
 	* - zones
 	  - Google cloud zones
-	  - "us-east1-b us-east1-c us-east1-d"
-	  - "us-east1-b us-east1-c us-east1-d"
+	  - "us-east1-d us-west1-a us-west1-b"
+	  - "us-east1-d us-west1-a us-west1-b"
 	* - num_cpu
 	  - Number of cpus per cumulus_hashing_cite_seq job
 	  - 8

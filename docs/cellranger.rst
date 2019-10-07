@@ -217,14 +217,14 @@ cellranger_workflow inputs:
 	  - cellranger-atac version, currently only 1.0.1
 	  - "1.0.1"
 	  - "1.0.1"
-	* - sccloud_version
-	  - scCloud version for extracting feature barcode matrix, could be 0.9.0, or 0.9.1.
-	  - "0.9.1"
-	  - "0.9.1"
+	* - cumulus_version
+	  - Cumulus version for extracting feature barcode matrix, currently only "0.10.0" is available.
+	  - "0.10.0"
+	  - "0.10.0"
 	* - zones
 	  - Google cloud zones
-	  - "us-east1-b us-east1-c us-east1-d"
-	  - "us-east1-b us-east1-c us-east1-d"
+	  - "us-east1-d us-west1-a us-west1-b"
+	  - "us-east1-d us-west1-a us-west1-b"
 	* - num_cpu
 	  - Number of cpus to request for one node
 	  - 64
