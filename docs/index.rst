@@ -5,6 +5,7 @@
    :maxdepth: 1
    :hidden:
 
+
    first_time
    versions
    cellranger
@@ -14,3 +15,4 @@
    cumulus
    command_line
    examples/index
+   bcl2fastq

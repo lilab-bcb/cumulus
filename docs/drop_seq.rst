@@ -31,6 +31,9 @@ Additionally the pipeline provides the option to generate count matrices using  
 	``-m`` means copy in parallel, ``-r`` means copy the directory recursively.
 
 
+#. Non Broad Institute users that wish to run cellrankger mkfastq must create a custom docker image that contains bcl2fastq.
+
+    See :ref:`bcl2fastq-docker` instructions.
 
 #. Create a sample sheet.
 
