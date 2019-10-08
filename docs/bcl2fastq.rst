@@ -36,6 +36,7 @@ In this example we create a docker image for running cellranger mkfastq version 
 
 - Add the lines to cumulus/docker/cellranger/3.0.2/Dockerfile to include bcl2fastq (see Docker_).
 - Ensure you have `Docker installed`_
+- Download cellranger from https://support.10xgenomics.com/single-cell-gene-expression/software/downloads/3.0
 - Build, tag, and push the docker. Remember to replace PROJECT_ID with your GCP project id::
 
     cd cumulus/docker/cellranger/3.0.2/
