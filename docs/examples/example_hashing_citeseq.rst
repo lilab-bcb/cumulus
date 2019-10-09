@@ -1,7 +1,7 @@
 Example of Cell-Hashing and CITE-Seq Analysis on Cloud
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-In this example, you'll learn how to perform Cell-Hashing and CITE-Seq analysis using **scCloud** on Terra_.
+In this example, you'll learn how to perform Cell-Hashing and CITE-Seq analysis using **cumulus** on Terra_.
 
 -----------------------------
 
@@ -115,10 +115,10 @@ On your local machine:
 	#. Prepare an input JSON file, ``input_01.json``, in the same directory as above, with the following content::
 
 		{
-			"scCloud_hashing_cite_seq.input_sample_sheet" : "sample_sheet_01.csv",
-			"scCloud_hashing_cite_seq.output_directory" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/",
-			"scCloud_hashing_cite_seq.demuxEM_min_num_genes" : 500,
-			"scCloud_hashing_cite_seq.demuxEM_generate_diagnostic_plots" : true
+			"cumulus_hashing_cite_seq.input_sample_sheet" : "sample_sheet_01.csv",
+			"cumulus_hashing_cite_seq.output_directory" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/",
+			"cumulus_hashing_cite_seq.demuxEM_min_num_genes" : 500,
+			"cumulus_hashing_cite_seq.demuxEM_generate_diagnostic_plots" : true
 		}
 
 	   For the details on these options, please refer to `cell-hashing/nuclei-hashing inputs`_.
@@ -127,9 +127,9 @@ On your local machine:
 
 	#. In the same directory on your local machine, type the following command::
 
-		alto fc_run -m scCloud/scCloud_hashing_cite_seq -w ws-lab/ws-01 --bucket-folder my-dir -i input_01.json -o input_01_updated.json
+		alto fc_run -m cumulus/cumulus_hashing_cite_seq -w ws-lab/ws-01 --bucket-folder my-dir -i input_01.json -o input_01_updated.json
 
-	   Notice that the method here is changed to ``scCloud/scCloud_hashing_cite_seq``, with new JSON file ``input_01.json``.
+	   Notice that the method here is changed to ``cumulus/cumulus_hashing_cite_seq``, with new JSON file ``input_01.json``.
 
 When the execution is done, you'll get a processed file, ``exp_demux.h5sc``, stored on cloud ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp/``.
 
@@ -151,16 +151,16 @@ The following steps are done on your local machine:
 	#. Prepare an input JSON file, ``input_02.json``, in the same directory as above, with the following content::
 
 		{
-			"scCloud_hashing_cite_seq.input_sample_sheet" : "sample_sheet_02.csv",
-			"scCloud_hashing_cite_seq.output_directory" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/",
-			"scCloud_hashing_cite_seq.antibody_control_csv" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/citeseq_antibody_control.csv"
+			"cumulus_hashing_cite_seq.input_sample_sheet" : "sample_sheet_02.csv",
+			"cumulus_hashing_cite_seq.output_directory" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/",
+			"cumulus_hashing_cite_seq.antibody_control_csv" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/citeseq_antibody_control.csv"
 		}
 
 	   For the details on these options, please refer to `cell-hashing/nuclei-hashing inputs`_.
 
 	#. In the same directory on your local machine, type the following command::
 
-		alto fc_run -m scCloud/scCloud_hashing_cite_seq -w ws-lab/ws-01 --bucket-folder my-dir -i input_02.json -o input_02_updated.json
+		alto fc_run -m cumulus/cumulus_hashing_cite_seq -w ws-lab/ws-01 --bucket-folder my-dir -i input_02.json -o input_02_updated.json
 
 	   Notice that the input JSON file after ``-i`` option is now ``input_02.json``.
 
@@ -169,7 +169,7 @@ When the execution is done, you'll get a merged raw matrices file, ``exp_raw.h5s
 
 -------------------
 
-4. scCloud Pipeline
+4. Cumulus Pipeline
 ^^^^^^^^^^^^^^^^^^^
 
 The following steps are done on your local machine:
@@ -186,41 +186,41 @@ The following steps are done on your local machine:
 	#. Prepare an input JSON file, ``input_03.json``, in the same directory as above, with the following content::
 
 		{
-			"scCloud.input_file" : "count_matrix_03.csv",
-			"scCloud.output_name" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/results/exp_merged_out",
-			"scCloud.num_cpu" : 8,
-			"scCloud.select_only_singlets" : true,
-			"scCloud.cite_seq" : true,
-			"scCloud.run_louvain" : true,
-			"scCloud.find_markers_lightgbm" : true,
-			"scCloud.remove_ribo" : true,
-			"scCloud.mwu" : true,
-			"scCloud.annotate_cluster" : true,
-			"scCloud.plot_fitsne" : "louvain_labels,assignment",
-			"scCloud.plot_citeseq_fitsne" : "louvain_labels,assignment",
-			"scCloud.plot_composition" : "louvain_labels:assignment"
+			"cumulus.input_file" : "count_matrix_03.csv",
+			"cumulus.output_name" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/results/exp_merged_out",
+			"cumulus.num_cpu" : 8,
+			"cumulus.select_only_singlets" : true,
+			"cumulus.cite_seq" : true,
+			"cumulus.run_louvain" : true,
+			"cumulus.find_markers_lightgbm" : true,
+			"cumulus.remove_ribo" : true,
+			"cumulus.mwu" : true,
+			"cumulus.annotate_cluster" : true,
+			"cumulus.plot_fitsne" : "louvain_labels,assignment",
+			"cumulus.plot_citeseq_fitsne" : "louvain_labels,assignment",
+			"cumulus.plot_composition" : "louvain_labels:assignment"
 		}
 
-	   Alternatively, if you have only one count matrix for analysis, set its location in ``scCloud.input_file`` parameter above. E.g.::
+	   Alternatively, if you have only one count matrix for analysis, set its location in ``cumulus.input_file`` parameter above. E.g.::
 
 		{
-			"scCloud.input_file" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw/exp_raw.h5sc",
+			"cumulus.input_file" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw/exp_raw.h5sc",
 			...
 		}
 
-	   Notice that for some file formats, ``scCloud.genome`` is required.
+	   Notice that for some file formats, ``cumulus.genome`` is required.
 
-	   A typical scCloud pipeline consists of 4 steps, which is given here_. For the details of options above, please refer to `scCloud inputs`_.
+	   A typical scCloud pipeline consists of 4 steps, which is given here_. For the details of options above, please refer to `cumulus inputs`_.
 
-	   .. _this manual: https://sccloud.readthedocs.io/en/latest/scCloud.html#prepare-input-data
-	   .. _here: ../scCloud.html#sccloud-steps
-	   .. _scCloud inputs: ../scCloud.html#global-inputs
+	   .. _this manual: ../cumulus.html#prepare-input-data
+	   .. _here: ../cumulus.html#cumulus-steps
+	   .. _cumulus inputs: ../cumulus.html#global-inputs
 
 	#. In the same directory on your local machine, type the following command::
 
-		alto fc_run -m scCloud/scCloud -w ws-lab/ws-01 --bucket-folder my-dir/results -i input_03.json -o input_03_updated.json
+		alto fc_run -m cumulus/cumulus -w ws-lab/ws-01 --bucket-folder my-dir/results -i input_03.json -o input_03_updated.json
 
-	   Notice that the method is changed to ``scCloud/scCloud``, and the input file after ``-i`` is now ``input_03.json``.
+	   Notice that the method is changed to ``cumulus/cumulus``, and the input file after ``-i`` is now ``input_03.json``.
 
 When the execution is done, you'll get the following results stored on cloud ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/results/`` to check:
 	
