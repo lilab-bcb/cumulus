@@ -54,23 +54,22 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on Terra_.
 		  - 
 			| Provides the reference genome used by *cellranger count* for each 10x channel. 
 			| The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as
-			| **GRCh38_v3.0.0** for human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation,
-			| **hg19_v3.0.0** for human hg19, cellranger reference 3.0.0, Ensembl v87 gene annotation,
-			| **mm10_v3.0.0** for mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation,
-			| **GRCh38_and_mm10_v3.1.0** for human and mouse, built from GRCh38 and mm10 cellranger references (3.1.0), Ensembl v93 gene annotations for both human and mouse,
-			| **GRCh38_premrna_v1.2.0** (GRCh38_premrna, obsoleted) for human, introns included, built from GRCh38 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcripts as exons,
-			| **mm10_premrna_v1.2.0** (mm10_premrna, obsoleted) for mouse, introns included, built from mm10 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcripts as exons,
-			| **GRCh38_premrna_and_mm10_premrna_v1.2.0** (GRCh38_premrna_and_mm10_premrna, obsoleted) for human and mouse, introns included, built from GRCh38_premrna and mm10_premrna,
-			| **GRCh38_vdj_v3.1.0** for human V(D)J sequences, cellranger reference 3.1.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*,
-			| **GRCm38_vdj_v3.1.0** for mouse V(D)J sequences, cellranger reference 3.1.0, annotation built from Ensembl *Mus_musculus.GRCm38.94.gtf*,
-			| **GRCh38_atac_v1.0.1** for scATAC-Seq, human GRCh38, cellranger-atac reference 1.0.1, Gencode v28 basic annotation,
-			| **mm10_atac_v1.0.1** for scATAC-Seq, mouse mm10, cellranger-atac reference 1.0.1, Gencode v28 basic annotation,
-			| **hg19_atac_v1.0.1** for scATAC-Seq, mouse hg19, cellranger-atac reference 1.0.1, Gencode v28 basic annotation,
-			| **GRCh38_v1.2.0** (GRCh38, obsoleted) for human GRCh38, cellranger reference 1.2.0, Ensembl v84 gene annotation,
-			| **hg19_v1.2.0** (hg19, obsoleted) for human hg19, cellranger reference 1.2.0, Ensembl v82 gene annotation,
-			| **mm10_v1.2.0** (mm10, obsoleted) for mouse mm10, cellranger reference 1.2.0, Ensembl v84 gene annotation,
-			| **GRCh38_and_mm10_v1.2.0** (GRCh38_and_mm10, obsoleted) for human and mouse, built from GRCh38 and mm10 cellranger references (1.2.0), Ensembl v84 gene annotations for both human and mouse,
-			| **GRCh38_vdj_v2.0.0** (GRCh38_vdj, obsoleted) for human V(D)J sequences, cellranger reference 2.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.87.chr_patch_hapl_scaff.gtf* and *vdj_GRCh38_alts_ensembl_10x_genes-2.0.0.gtf*,
+			| **GRCh38_v3.0.0** for human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation
+			| **hg19_v3.0.0** for human hg19, cellranger reference 3.0.0, Ensembl v87 gene annotation
+			| **mm10_v3.0.0** for mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation
+			| **GRCh38_and_mm10_v3.1.0** for human and mouse, built from GRCh38 and mm10 cellranger references (3.1.0), Ensembl v93 gene annotations for both human and mouse
+			| **GRCh38_premrna_v1.2.0** (GRCh38_premrna, obsoleted) for human, introns included, built from GRCh38 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcripts as exons
+			| **mm10_premrna_v1.2.0** (mm10_premrna, obsoleted) for mouse, introns included, built from mm10 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcripts as exons
+			| **GRCh38_premrna_and_mm10_premrna_v1.2.0** (GRCh38_premrna_and_mm10_premrna, obsoleted) for human and mouse, introns included, built from GRCh38_premrna and mm10_premrna
+			| **GRCh38_vdj_v3.1.0** for human V(D)J sequences, cellranger reference 3.1.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
+			| **GRCm38_vdj_v3.1.0** for mouse V(D)J sequences, cellranger reference 3.1.0, annotation built from Ensembl *Mus_musculus.GRCm38.94.gtf*
+			| **GRCh38_atac_v1.1.0** for scATAC-Seq, human GRCh38, cellranger-atac reference 1.1.0
+			| **mm10_atac_v1.1.0** for scATAC-Seq, mouse mm10, cellranger-atac reference 1.0.1
+			| **GRCh38_v1.2.0** (GRCh38, obsoleted) for human GRCh38, cellranger reference 1.2.0, Ensembl v84 gene annotation
+			| **hg19_v1.2.0** (hg19, obsoleted) for human hg19, cellranger reference 1.2.0, Ensembl v82 gene annotation
+			| **mm10_v1.2.0** (mm10, obsoleted) for mouse mm10, cellranger reference 1.2.0, Ensembl v84 gene annotation
+			| **GRCh38_and_mm10_v1.2.0** (GRCh38_and_mm10, obsoleted) for human and mouse, built from GRCh38 and mm10 cellranger references (1.2.0), Ensembl v84 gene annotations for both human and mouse
+			| **GRCh38_vdj_v2.0.0** (GRCh38_vdj, obsoleted) for human V(D)J sequences, cellranger reference 2.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.87.chr_patch_hapl_scaff.gtf* and *vdj_GRCh38_alts_ensembl_10x_genes-2.0.0.gtf*
 			| **GRCm38_vdj_v2.0.0** (GRCm38_vdj, obsoleted) for mouse V(D)J sequences, cellranger reference 2.0.0, annotation built from Ensembl *Mus_musculus.GRCm38.90.chr_patch_hapl_scaff.gtf*.
 		* - **Flowcell**
 		  - Indicates the Google bucket URL of uploaded BCL folders.
@@ -319,6 +318,7 @@ Only run the count part
 
 Sometimes, users might want to perform demultiplexing locally and only run the count part on the cloud. This section describes how to only run the count part via ``cellranger_workflow``.
 
+
 #. Copy your FASTQ files to the workspace using gsutil in your unix terminal. 
 
 	You should upload folders of FASTQS. Each folder should contain all FASTQ files for one sample.
@@ -328,8 +328,12 @@ Sometimes, users might want to perform demultiplexing locally and only run the c
 		gsutil -m cp -r /foo/bar/fastq_path/K18WBC6Z4 gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq
 
 
+#. Create a scRNA-Seq formatted sample sheet.
 
-#. Create scRNA-Seq formatted sample sheet for cell ranger count only (required column headers are shown in bold):
+
+	This sample sheet is the same as the sample sheet described for running mkfastq and count except that the full path to the FASTQ files is ``FlowCell/Sample``.
+
+	scRNA-Seq formatted sample sheet description (required column headers are shown in bold):
 
 	.. list-table::
 		:widths: 5 30
@@ -340,31 +344,33 @@ Sometimes, users might want to perform demultiplexing locally and only run the c
 		* - **Sample**
 		  - Contains sample names. Each 10x channel should have a unique sample name.
 		* - **Reference**
-		  - 
-			| Provides the reference genome used by *cellranger count* for each 10x channel. 
+		  -
+			| Provides the reference genome used by *cellranger count* for each 10x channel.
 			| The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as
-			| **GRCh38** for human GRCh38, cellranger reference 1.2.0, Ensembl v84 gene annotation,
-			| **hg19** for human hg19, cellranger reference 1.2.0, Ensembl v82 gene annotation,
-			| **mm10** for mouse mm10, cellranger reference 1.2.0, Ensembl v84 gene annotation,
-			| **GRCh38_and_mm10** for human and mouse, built from GRCh38 and mm10 cellranger references (1.2.0), Ensembl v84 gene annotations for both human and mouse,
-			| **GRCh38_premrna** for human, introns included, built from GRCh38 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcripts as exons,
-			| **mm10_premrna** for mouse, introns included, built from mm10 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcripts as exons,
-			| **GRCh38_premrna_and_mm10_premrna** for human and mouse, introns included, built from GRCh38_premrna and mm10_premrna,
-			| **GRCh38_vdj** for human V(D)J sequences, cellranger reference 2.0.0, annotation built from *Homo_sapiens.GRCh38.87.chr_patch_hapl_scaff.gtf* and *vdj_GRCh38_alts_ensembl_10x_genes-2.0.0.gtf*,
-			| **GRCm38_vdj** for mouse V(D)J sequences, cellranger reference 2.0.0, annotation built from *Mus_musculus.GRCm38.90.chr_patch_hapl_scaff.gtf*,
-			| **GRCh38_v3.0.0** for human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation,
-			| **GRCh38_premrna_v3.0.0** for human GRCh38, introns included, cellranger reference 3.0.0, Ensembl v93 gene annotation, treating annotated transcripts as exons,
-			| **hg19_v3.0.0** for human hg19, cellranger reference 3.0.0, Ensembl v87 gene annotation,
-			| **mm10_v3.0.0** for mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation,
-			| **GRCh38_atac_v1.0.1** for scATAC-Seq, human GRCh38, cellranger-atac reference 1.0.1, Gencode v28 basic annotation,
-			| **mm10_atac_v1.0.1** for scATAC-Seq, mouse mm10, cellranger-atac reference 1.0.1, Gencode v28 basic annotation.
+			| **GRCh38_v3.0.0** for human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation
+			| **hg19_v3.0.0** for human hg19, cellranger reference 3.0.0, Ensembl v87 gene annotation
+			| **mm10_v3.0.0** for mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation
+			| **GRCh38_and_mm10_v3.1.0** for human and mouse, built from GRCh38 and mm10 cellranger references (3.1.0), Ensembl v93 gene annotations for both human and mouse
+			| **GRCh38_premrna_v1.2.0** (GRCh38_premrna, obsoleted) for human, introns included, built from GRCh38 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcripts as exons
+			| **mm10_premrna_v1.2.0** (mm10_premrna, obsoleted) for mouse, introns included, built from mm10 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcripts as exons
+			| **GRCh38_premrna_and_mm10_premrna_v1.2.0** (GRCh38_premrna_and_mm10_premrna, obsoleted) for human and mouse, introns included, built from GRCh38_premrna and mm10_premrna
+			| **GRCh38_vdj_v3.1.0** for human V(D)J sequences, cellranger reference 3.1.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
+			| **GRCm38_vdj_v3.1.0** for mouse V(D)J sequences, cellranger reference 3.1.0, annotation built from Ensembl *Mus_musculus.GRCm38.94.gtf*
+			| **GRCh38_atac_v1.1.0** for scATAC-Seq, human GRCh38, cellranger-atac reference 1.1.0
+			| **mm10_atac_v1.1.0** for scATAC-Seq, mouse mm10, cellranger-atac reference 1.0.1
+			| **GRCh38_v1.2.0** (GRCh38, obsoleted) for human GRCh38, cellranger reference 1.2.0, Ensembl v84 gene annotation
+			| **hg19_v1.2.0** (hg19, obsoleted) for human hg19, cellranger reference 1.2.0, Ensembl v82 gene annotation
+			| **mm10_v1.2.0** (mm10, obsoleted) for mouse mm10, cellranger reference 1.2.0, Ensembl v84 gene annotation
+			| **GRCh38_and_mm10_v1.2.0** (GRCh38_and_mm10, obsoleted) for human and mouse, built from GRCh38 and mm10 cellranger references (1.2.0), Ensembl v84 gene annotations for both human and mouse
+			| **GRCh38_vdj_v2.0.0** (GRCh38_vdj, obsoleted) for human V(D)J sequences, cellranger reference 2.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.87.chr_patch_hapl_scaff.gtf* and *vdj_GRCh38_alts_ensembl_10x_genes-2.0.0.gtf*
+			| **GRCm38_vdj_v2.0.0** (GRCm38_vdj, obsoleted) for mouse V(D)J sequences, cellranger reference 2.0.0, annotation built from Ensembl *Mus_musculus.GRCm38.90.chr_patch_hapl_scaff.gtf*.
 		* - **Flowcell**
-		  - Indicates the Google bucket URL of the uploaded FASTQ folders. The full path to the FASTQ files is FlowCell/Sample
+		  - Indicates the Google bucket URL of uploaded FASTQ folders.
 		* - Chemistry
 		  -
-			| Describes the 10x chemistry used for the sample. 
-			| This column is optional. The default chemistry for **rna** data (see DataType column below) is **auto**, which will try to detect the chemistry automatically. 
-			| The default chemistry for **adt** and **crispr** is **sC3Pv3**, which stands for single cell 3' v3. 
+			| Describes the 10x chemistry used for the sample.
+			| This column is optional. The default chemistry for **rna** data (see DataType column below) is **auto**, which will try to detect the chemistry automatically.
+			| The default chemistry for **adt** and **crispr** is **sC3Pv3**, which stands for single cell 3' v3.
 			| Note that if the index read has extra bases besides cell barcode and UMI, autodetection might fail. In this case, please specify the chemistry.
 			| According to *cellranger count*'s documentation, chemistry can be
 			| **auto** for autodetection,
@@ -372,20 +378,22 @@ Sometimes, users might want to perform demultiplexing locally and only run the c
 			| **fiveprime** for Single Cell 5′,
 			| **SC3Pv1** for Single Cell 3′ v1,
 			| **SC3Pv2** for Single Cell 3′ v2,
-			| **SC3Pv3** for Single Cell 3′ v3,
+			| **SC3Pv3** for Single Cell 3′ v3 (set cellranger version input parameter to >= 3.0.2),
 			| **SC5P-PE** for Single Cell 5′ paired-end (both R1 and R2 are used for alignment),
 			| **SC5P-R2** for Single Cell 5′ R2-only (where only R2 is used for alignment).
 		* - DataType
 		  -
-			| Describes the data type of the sample --- *count*, *vdj*, *adt*, *crispr*, or *atac*. 
-			| **count** refers to gene expression data (*cellranger count*), 
-			| **vdj** refers to V(D)J data (*cellranger vdj*), 
+			| Describes the data type of the sample --- *count*, *vdj*, *adt*, or *crispr*.
+			| **rna** refers to gene expression data (*cellranger count*),
+			| **vdj** refers to V(D)J data (*cellranger vdj*),
 			| **adt** refers to antibody tag data, which can be either CITE-Seq, cell-hashing, or nucleus-hashing,
-			| **crispr** refers to Perturb-seq data, and
+			| **crispr** refers to Perturb-seq guide tag data,
 			| **atac** refers to scATAC-Seq data (*cellranger-atac count*).
 			| This column is optional and the default data type is *rna*.
 		* - FeatureBarcodeFile
-		  - Google bucket urls pointing to feature barcode files for *adt* and *crispr* data. This column is optional provided no *adt* or *crispr* data are in the sample sheet.
+		  - Google bucket urls pointing to feature barcode files for *adt* and *crispr* data. Features can be either antibody for CITE-Seq, cell-hashing, nucleus-hashing or gRNA for Perburb-seq. This column is optional provided no *adt* or *crispr* data are in the sample sheet.
+
+
 
 	In the following example sample_1 is sequenced on 2 flowcells. The FASTQ files for flowcell_1 are located at gs://fc-e0000000-0000-0000-0000-000000000000/flowcell_1/sample_1 while the FASTQ files for flowcell_2 are located at gs://fc-e0000000-0000-0000-0000-000000000000/flowcell_2_sample1::
 

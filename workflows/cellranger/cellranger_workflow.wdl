@@ -62,8 +62,8 @@ workflow cellranger_workflow {
 
 	# 2.2.0, 3.0.2, 3.1.0
 	String? cellranger_version = "3.0.2"
-	# 1.0.1
-	String? cellranger_atac_version = "1.0.1"
+	# 1.1.0
+	String? cellranger_atac_version = "1.1.0"
 	# cumulus version, default to "0.10.0"
 	String? cumulus_version = "0.10.0"
 
