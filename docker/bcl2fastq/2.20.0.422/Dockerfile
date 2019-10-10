@@ -1,6 +1,8 @@
 FROM continuumio/miniconda3:4.6.14
 SHELL ["/bin/bash", "-c"]
 
+# See license at https://support.illumina.com/content/dam/illumina-support/documents/downloads/software/bcl2fastq/bcl2fastq2-v2-20-eula.pdf
+
 RUN apt-get update && \
 apt-get install --no-install-recommends -y build-essential dpkg-dev gnupg lsb-release procps && \
 export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
