@@ -69,7 +69,7 @@ Follow the steps below to extract gene-count matrices from SMART-Seq2 data on Te
 
 #. Import smartseq2 tool.
 
-	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **scCloud/smartseq2**.
+	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **cumulus/smartseq2**.
  	You can also see the Terra documentation for `adding a tool`_.
 
 #. Select ``Process single workflow from files``.
@@ -148,7 +148,7 @@ See the table below for important outputs.
 	  - Array[String]
 	  - A list of google bucket urls containing gene-count matrices, one per plate. Each gene-count matrix file has the suffix 'dge.txt.gz'.
 
-This WDL generates one gene-count matrix per SMART-Seq2 plate. The gene-count matrix uses Drop-Seq format: The first line starts with 'Gene' and then gives cell barcodes separated by tabs. Starting from the second line, each line describes one gene. The first item in the line is the gene name and the rest items are TPM-normalized count values of this gene for each cell. The gene-count matrices can be fed directly into ``scCloud`` for downstream analysis.
+This WDL generates one gene-count matrix per SMART-Seq2 plate. The gene-count matrix uses Drop-Seq format: The first line starts with 'Gene' and then gives cell barcodes separated by tabs. Starting from the second line, each line describes one gene. The first item in the line is the gene name and the rest items are TPM-normalized count values of this gene for each cell. The gene-count matrices can be fed directly into ``cumulus`` for downstream analysis.
 
 TPM-normalized counts are calculated as follows: We first estimate the gene expression levels in TPM using RSEM. Suppose we have ``c`` reads for one cell, we then calculate TPM-normalized count for gene i as ``TPM_i / 1e6 * c``. 
 

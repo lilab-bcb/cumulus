@@ -1,7 +1,7 @@
 Version 0.10.0 `October 2, 2019`
 --------------------------------
 
-scCloud is renamed to cumulus.
+cumulus is renamed to cumulus.
 
 cumulus can accept either a sample sheet or a single file.
 
@@ -10,7 +10,7 @@ Version 0.7.0 `Feburary 14, 2019`
 
 Added support for 10x genomics scATAC assays.
 
-scCloud runs FIt-SNE as default.
+cumulus runs FIt-SNE as default.
 
 Version 0.6.0 `January 31, 2019`
 --------------------------------

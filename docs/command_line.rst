@@ -61,8 +61,8 @@ Options
 	  - Description
 	* - | **-m**
 		| **--method**
-	  - | Method namespace/name (e.g. scCloud/cellranger_workflow).
-		| A version can optionally be specified (e.g. scCloud/cellranger_workflow/4), otherwise the latest version of the method is used
+	  - | Method namespace/name (e.g. cumulus/cellranger_workflow).
+		| A version can optionally be specified (e.g. cumulus/cellranger_workflow/4), otherwise the latest version of the method is used
 	* - | **-w**
 		| **--workspace**
 	  - Workspace name (e.g. foo/bar). The workspace will be created if it does not exist
@@ -106,13 +106,13 @@ inputs.json:
 
 Run the following command to kick off your Terra pipeline::
 
-	alto fc_run -m scCloud/cellranger_workflow -i inputs.json -w myworkspace_namespace/myworkspace_name --bucket-folder inputs -o inputs_updated.json
+	alto fc_run -m cumulus/cellranger_workflow -i inputs.json -w myworkspace_namespace/myworkspace_name --bucket-folder inputs -o inputs_updated.json
 
 Upon success, **alto fc_run** returns a url pointing the the submitted Terra job.
 
 If for any reason, your job failed. You could rerun it without uploading files again via the following command::
 
-	alto fc_run -m scCloud/cellranger_workflow -i inputs_updated.json -w myworkspace_namespace/myworkspace_name
+	alto fc_run -m cumulus/cellranger_workflow -i inputs_updated.json -w myworkspace_namespace/myworkspace_name
 
 
 .. _conda: https://docs.conda.io/en/latest/miniconda.html

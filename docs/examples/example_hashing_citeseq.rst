@@ -69,7 +69,7 @@ where ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir`` is the remote dire
 
 Now run the following alto command in the same directory on your local machine::
 
-	alto fc_run -m scCloud/cellranger_workflow -w ws-lab/ws-01 --bucket-folder my-dir -i ranger_input.json -o ranger_input_updated.json
+	alto fc_run -m cumulus/cellranger_workflow -w ws-lab/ws-01 --bucket-folder my-dir -i ranger_input.json -o ranger_input_updated.json
 
 where options
 
@@ -123,7 +123,7 @@ On your local machine:
 
 	   For the details on these options, please refer to `cell-hashing/nuclei-hashing inputs`_.
 
-	   .. _cell-hashing/nuclei-hashing inputs: ../hashing_cite_seq.html#sccloud-hashing-cite-seq-inputs
+	   .. _cell-hashing/nuclei-hashing inputs: ../hashing_cite_seq.html#cumulus-hashing-cite-seq-inputs
 
 	#. In the same directory on your local machine, type the following command::
 
@@ -181,7 +181,7 @@ The following steps are done on your local machine:
 
 	   This sample sheet describes the metadata for each 10x channel. **Sample** specifies the name for each channel, which can be renamed; **Location** specifies the file location, which is the output of Phase 3.
 
-	   Alternative, if you have only one count matrix for analysis, you can continue without sample sheet. See `this manual`_ for input file formats that scCloud currently supports.
+	   Alternative, if you have only one count matrix for analysis, you can continue without sample sheet. See `this manual`_ for input file formats that cumulus currently supports.
 
 	#. Prepare an input JSON file, ``input_03.json``, in the same directory as above, with the following content::
 
@@ -210,7 +210,7 @@ The following steps are done on your local machine:
 
 	   Notice that for some file formats, ``cumulus.genome`` is required.
 
-	   A typical scCloud pipeline consists of 4 steps, which is given here_. For the details of options above, please refer to `cumulus inputs`_.
+	   A typical cumulus pipeline consists of 4 steps, which is given here_. For the details of options above, please refer to `cumulus inputs`_.
 
 	   .. _this manual: ../cumulus.html#prepare-input-data
 	   .. _here: ../cumulus.html#cumulus-steps

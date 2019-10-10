@@ -206,7 +206,7 @@ dropseq_workflow Terra Release Notes
 
 **Version 1**
 
-- Renamed sccloud to cumulus
+- Renamed cumulus to cumulus
 - Added use_bases_mask option when running bcl2fastq
 
 **Version 18**
@@ -220,7 +220,7 @@ dropseq_workflow Terra Release Notes
 
 **Version 16**
 
-- Use sccloud dockerhub organization
+- Use cumulus dockerhub organization
 - Changed default dropEst version to 0.8.6
 
 **Version 15**
