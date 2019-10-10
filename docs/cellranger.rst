@@ -64,7 +64,7 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on Terra_.
 			| **GRCh38_vdj_v3.1.0** for human V(D)J sequences, cellranger reference 3.1.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
 			| **GRCm38_vdj_v3.1.0** for mouse V(D)J sequences, cellranger reference 3.1.0, annotation built from Ensembl *Mus_musculus.GRCm38.94.gtf*
 			| **GRCh38_atac_v1.1.0** for scATAC-Seq, human GRCh38, cellranger-atac reference 1.1.0
-			| **mm10_atac_v1.1.0** for scATAC-Seq, mouse mm10, cellranger-atac reference 1.0.1
+			| **mm10_atac_v1.1.0** for scATAC-Seq, mouse mm10, cellranger-atac reference 1.1.0
 			| **GRCh38_v1.2.0** (GRCh38, obsoleted) for human GRCh38, cellranger reference 1.2.0, Ensembl v84 gene annotation
 			| **hg19_v1.2.0** (hg19, obsoleted) for human hg19, cellranger reference 1.2.0, Ensembl v82 gene annotation
 			| **mm10_v1.2.0** (mm10, obsoleted) for mouse mm10, cellranger reference 1.2.0, Ensembl v84 gene annotation
@@ -123,7 +123,7 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on Terra_.
 		sample_5,GRCh38_vdj,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZZ,1,SI-GA-A1,fiveprime,vdj
 		sample_6,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZZ,2,AGATCCTT,SC3Pv3,adt,gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index.csv
 		sample_7,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZZ,3,TCCGGAGA,threeprime,crispr,gs://fc-e0000000-0000-0000-0000-000000000000/crispr_index.csv
-		sample_8,GRCh38_atac_v1.0.1,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9YB,*,SI-NA-A1,auto,atac
+		sample_8,GRCh38_atac_v1.1.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9YB,*,SI-NA-A1,auto,atac
 
 
 
@@ -215,9 +215,9 @@ cellranger_workflow inputs:
 	  - "3.0.2"
 	  - "3.0.2"
 	* - cellranger_atac_version
-	  - cellranger-atac version, currently only 1.0.1
-	  - "1.0.1"
-	  - "1.0.1"
+	  - cellranger-atac version, currently only 1.1.0
+	  - "1.1.0"
+	  - "1.1.0"
 	* - cumulus_version
 	  - Cumulus version for extracting feature barcode matrix, currently only "0.10.0" is available.
 	  - "0.10.0"
@@ -357,7 +357,7 @@ Sometimes, users might want to perform demultiplexing locally and only run the c
 			| **GRCh38_vdj_v3.1.0** for human V(D)J sequences, cellranger reference 3.1.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
 			| **GRCm38_vdj_v3.1.0** for mouse V(D)J sequences, cellranger reference 3.1.0, annotation built from Ensembl *Mus_musculus.GRCm38.94.gtf*
 			| **GRCh38_atac_v1.1.0** for scATAC-Seq, human GRCh38, cellranger-atac reference 1.1.0
-			| **mm10_atac_v1.1.0** for scATAC-Seq, mouse mm10, cellranger-atac reference 1.0.1
+			| **mm10_atac_v1.1.0** for scATAC-Seq, mouse mm10, cellranger-atac reference 1.1.0
 			| **GRCh38_v1.2.0** (GRCh38, obsoleted) for human GRCh38, cellranger reference 1.2.0, Ensembl v84 gene annotation
 			| **hg19_v1.2.0** (hg19, obsoleted) for human hg19, cellranger reference 1.2.0, Ensembl v82 gene annotation
 			| **mm10_v1.2.0** (mm10, obsoleted) for mouse mm10, cellranger reference 1.2.0, Ensembl v84 gene annotation
