@@ -136,7 +136,7 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on Terra_.
 
 #. Import cellranger_workflow tool.
 
-	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **scCloud/cellranger_workflow**.
+	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **cumulus/cellranger_workflow**.
  	You can also see the Terra documentation for `adding a tool`_.
 
 #. Select ``Process single workflow from files``.
@@ -148,7 +148,7 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on Terra_.
 cellranger_workflow inputs:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-``cellranger_workflow`` takes Illumina outputs as input and runs ``cellranger mkfastq``/``cellranger-atac mkfastq`` and ``cellranger count``/``cellranger vdj``/``cellranger-atac count``/scCloud feature extraction. Please see the description of inputs below. Note that required inputs are shown in bold.
+``cellranger_workflow`` takes Illumina outputs as input and runs ``cellranger mkfastq``/``cellranger-atac mkfastq`` and ``cellranger count``/``cellranger vdj``/``cellranger-atac count``/cumulus feature extraction. Please see the description of inputs below. Note that required inputs are shown in bold.
 
 .. list-table::
 	:widths: 5 30 30 5
@@ -171,7 +171,7 @@ cellranger_workflow inputs:
 	  - true
 	  - true
 	* - run_count
-	  - If you want to run steps after ``mkfastq``, such as ``cellranger count``, ``cellranger vdj``, ``cellranger-atac count`` or ``scCloud feature_extraction``
+	  - If you want to run steps after ``mkfastq``, such as ``cellranger count``, ``cellranger vdj``, ``cellranger-atac count`` or ``cumulus feature_extraction``
 	  - true
 	  - true
 	* - delete_input_directory
@@ -309,7 +309,7 @@ See the table below for important *Cell Ranger mkfastq/count* outputs.
 	  - A list of htmls visualizing QCs for each sample (cellranger count output).
 	* - count_matrix
 	  - String
-	  - gs url for a template count_matrix.csv to run scCloud.
+	  - gs url for a template count_matrix.csv to run cumulus.
 
 ---------------------------------
 
