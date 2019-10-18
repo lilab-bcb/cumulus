@@ -15,19 +15,19 @@ Latest version
 	  - Snapshot
 	  - Function
 	* - cumulus/cellranger_workflow
-	  - 2
+	  - 3
 	  - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
 	* - cumulus/smartseq2
-	  - 2
+	  - 3
 	  - Run Bowtie2 and RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files
 	* - cumulus/cumulus
-	  - 3
+	  - 4
 	  - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering and more
 	* - cumulus/cumulus_subcluster
-	  - 3
+	  - 4
 	  - Run subcluster analysis using cumulus
 	* - cumulus/cumulus_hashing_cite_seq
-	  - 3
+	  - 4
 	  - Run cumulus for cell-hashing/nucleus-hashing/CITE-Seq analysis
 
 Stable version - HTAPP v2
