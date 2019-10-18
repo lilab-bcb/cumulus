@@ -204,6 +204,10 @@ Please see the description of important inputs below.
 dropseq_workflow Terra Release Notes
 ===================================================
 
+**Version 2**
+
+- Added docker_registry input.
+
 **Version 1**
 
 - Renamed cumulus to cumulus

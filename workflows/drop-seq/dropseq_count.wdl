@@ -10,6 +10,7 @@ workflow dropseq_count {
 	Float? disk_multiplier = 3.5
 	String? dge_prep_memory = "3750M"
 	String? dge_memory = "3750M"
+	String docker_registry
 
 	call DigitalExpressionPrep {
 		input:
@@ -21,7 +22,8 @@ workflow dropseq_count {
 			memory=dge_prep_memory,
 			disk_multiplier=disk_multiplier,
 			zones=zones,
-			drop_seq_tools_version=drop_seq_tools_version
+			drop_seq_tools_version=drop_seq_tools_version,
+			docker_registry=docker_registry
 	}
 
 	call CollectCellBarcodes {
@@ -32,7 +34,8 @@ workflow dropseq_count {
 			ncells=if defined(force_cells) then force_cells	 else read_int(DigitalExpressionPrep.ncells),
 			sample_id=sample_id,
 			zones=zones,
-			drop_seq_tools_version=drop_seq_tools_version
+			drop_seq_tools_version=drop_seq_tools_version,
+			docker_registry=docker_registry
 	}
 
 	call DigitalExpression {
@@ -44,7 +47,8 @@ workflow dropseq_count {
 			barcodes=CollectCellBarcodes.cell_barcodes,
 			memory=dge_memory,
 			zones=zones,
-			drop_seq_tools_version=drop_seq_tools_version
+			drop_seq_tools_version=drop_seq_tools_version,
+			docker_registry=docker_registry
 	}
 	output {
 		String bead_synthesis_stats = DigitalExpressionPrep.bead_synthesis_stats
@@ -74,6 +78,7 @@ task CollectCellBarcodes {
 	String zones
 	String output_directory
 	String drop_seq_tools_version
+    String docker_registry
 
 	command {
 		set -e
@@ -87,11 +92,11 @@ task CollectCellBarcodes {
 	}
 
 	output {
-
 		String cell_barcodes="${output_directory}/${sample_id}_barcodes_use.txt"
 	}
+
 	runtime {
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		zones: zones
 		disks: "local-disk " + sub(((size(histogram,"GB")+1)*2),"\\..*","") + " HDD"
 		preemptible: "${preemptible}"
@@ -109,7 +114,7 @@ task DigitalExpression {
 	String zones
 	String output_directory
 	String drop_seq_tools_version
-
+    String docker_registry
 
 	command {
 		set -e
@@ -132,7 +137,6 @@ task DigitalExpression {
 	}
 
 	output {
-
 		String dge="${output_directory}/${sample_id}_dge.txt.gz"
 		String dge_summary = "${output_directory}/${sample_id}_dge.summary.txt"
 		String dge_reads="${output_directory}/${sample_id}_dge_reads.txt.gz"
@@ -140,7 +144,7 @@ task DigitalExpression {
 	}
 
 	runtime {
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		disks: "local-disk " + sub(((size(input_bam,"GB")+1)*3.25),"\\..*","") + " HDD"
 		memory :"${memory}"
 		zones: zones
@@ -159,6 +163,8 @@ task DigitalExpressionPrep {
 	String drop_seq_tools_version
 	File? cellular_barcode_whitelist
 	Float disk_multiplier
+	String docker_registry
+
 	command {
 		set -e
 
@@ -199,7 +205,6 @@ task DigitalExpressionPrep {
 	}
 
 	output {
-
 		String bam="${output_directory}/${sample_id}_aligned_tagged_repaired.bam"
 		String bead_synthesis_stats = "${output_directory}/${sample_id}_synthesis_error_stats.txt"
 		String bead_synthesis_summary = "${output_directory}/${sample_id}_synthesis_error_summary.txt"
@@ -213,7 +218,7 @@ task DigitalExpressionPrep {
 	}
 
 	runtime {
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		disks: "local-disk " + ceil(disk_multiplier * size(input_bam, "GB") + 20)+ " HDD"
 		memory :"${memory}"
 		zones: zones

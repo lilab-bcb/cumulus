@@ -7,6 +7,7 @@ workflow dropseq_qc {
 	Int preemptible = 2
 	String output_directory
 	String drop_seq_tools_version
+	String docker_registry
 
 	call SingleCellRnaSeqMetricsCollector {
 		input:
@@ -18,7 +19,8 @@ workflow dropseq_qc {
 			refflat=refflat,
 			zones=zones,
 			output_directory=output_directory,
-			drop_seq_tools_version=drop_seq_tools_version
+			drop_seq_tools_version=drop_seq_tools_version,
+			docker_registry=docker_registry
 	}
 
 
@@ -30,15 +32,16 @@ workflow dropseq_qc {
 
 
 task SingleCellRnaSeqMetricsCollector {
-	 File input_bam
-     File refflat
-     File? cell_barcodes
-     String sample_id
-     String output_directory
-     String zones
-     Int preemptible
-     String drop_seq_tools_version
-     String memory
+    File input_bam
+    File refflat
+    File? cell_barcodes
+    String sample_id
+    String output_directory
+    String zones
+    Int preemptible
+    String drop_seq_tools_version
+    String memory
+    String docker_registry
 
 	command {
     	set -e
@@ -58,7 +61,7 @@ task SingleCellRnaSeqMetricsCollector {
 	}
 
 	runtime {
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		disks: "local-disk " + ceil(20 + 3.25*size(input_bam,"GB") + size(cell_barcodes, "GB") + size(refflat,"GB")) + " HDD"
 		memory :"${memory}"
 		preemptible: "${preemptible}"

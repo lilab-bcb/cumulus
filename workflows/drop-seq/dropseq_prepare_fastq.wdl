@@ -13,6 +13,7 @@ workflow dropseq_prepare_fastq {
 	String cellular_barcode_base_range
 	String trim_sequence
     Int trim_num_bases
+    String docker_registry
 
 	call PrepareFastq {
 		input:
@@ -30,7 +31,8 @@ workflow dropseq_prepare_fastq {
 			disk_space=disk_space,
 			output_directory=output_directory,
 			zones= zones,
-			drop_seq_tools_version=drop_seq_tools_version
+			drop_seq_tools_version=drop_seq_tools_version,
+			docker_registry=docker_registry
 	}
 
 	output {
@@ -59,6 +61,8 @@ task PrepareFastq {
     String cellular_barcode_base_range
 	String trim_sequence
     Int trim_num_bases
+    String docker_registry
+
 	command {
 		set -o pipefail
 		set -e
@@ -135,7 +139,6 @@ task PrepareFastq {
 	}
 
 	output {
-
 		String bam="${output_directory}/${sample_id}_aligner_input.bam"
 		String cellular_tag_summary="${output_directory}/${sample_id}_tagged_cellular_summary.txt"
 		String molecular_tag_summary="${output_directory}/${sample_id}_tagged_molecular_summary.txt"
@@ -144,7 +147,7 @@ task PrepareFastq {
 	}
 
 	runtime {
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		disks: "local-disk ${disk_space} HDD"
 		memory :"${memory}"
 		cpu:"${cpu}"

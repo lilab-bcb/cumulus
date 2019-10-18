@@ -15,13 +15,16 @@ workflow dropseq_bundle {
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	String? drop_seq_tools_version = "2.3.0"
 	Int? preemptible = 2
+	String? docker_registry = ""
+
 	if(length(fasta_file)>1) {
 		call get_bundle_name {
 			input:
 				input_fasta=fasta_file,
 				drop_seq_tools_version=drop_seq_tools_version,
 				zones=zones,
-				preemptible=preemptible
+				preemptible=preemptible,
+				docker_registry=docker_registry
 		}
 
 		call add_fasta_prefix {
@@ -31,7 +34,8 @@ workflow dropseq_bundle {
 				bundle_name=get_bundle_name.bundle_name,
 				drop_seq_tools_version=drop_seq_tools_version,
 				zones=zones,
-				preemptible=preemptible
+				preemptible=preemptible,
+				docker_registry=docker_registry
 		}
 	}
 	String? bundle_name = if(length(fasta_file)>1) then get_bundle_name.bundle_name else sub(basename(fasta_file[0]), "\\.fasta$|\\.fa$", "")
@@ -44,7 +48,8 @@ workflow dropseq_bundle {
 			bundle_name=bundle_name,
 			drop_seq_tools_version=drop_seq_tools_version,
 			zones=zones,
-			preemptible=preemptible
+			preemptible=preemptible,
+			docker_registry=docker_registry
 	}
 
 	File gtf = fix_gtf.gtf
@@ -55,7 +60,8 @@ workflow dropseq_bundle {
 			output_name = bundle_name + ".dict",
 			drop_seq_tools_version=drop_seq_tools_version,
 			zones=zones,
-			preemptible=preemptible
+			preemptible=preemptible,
+			docker_registry=docker_registry
 	}
 	call convert_to_ref_flat {
 		input:
@@ -64,7 +70,8 @@ workflow dropseq_bundle {
 			output_name=bundle_name +  ".refFlat",
 			drop_seq_tools_version=drop_seq_tools_version,
 			zones=zones,
-			preemptible=preemptible
+			preemptible=preemptible,
+			docker_registry=docker_registry
 	}
 	call reduce_gtf {
 		input:
@@ -73,7 +80,8 @@ workflow dropseq_bundle {
 			output_name=bundle_name +  "_reduced.gtf",
 			drop_seq_tools_version=drop_seq_tools_version,
 			zones=zones,
-			preemptible=preemptible
+			preemptible=preemptible,
+			docker_registry=docker_registry
 	}
 	call create_intervals {
 		input:
@@ -82,7 +90,8 @@ workflow dropseq_bundle {
 			prefix=bundle_name,
 			drop_seq_tools_version=drop_seq_tools_version,
 			zones=zones,
-			preemptible=preemptible
+			preemptible=preemptible,
+			docker_registry=docker_registry
 	}
 	call star_index {
 		input:
@@ -94,7 +103,8 @@ workflow dropseq_bundle {
 			prefix=bundle_name,
 			drop_seq_tools_version=drop_seq_tools_version,
 			zones=zones,
-			preemptible=preemptible
+			preemptible=preemptible,
+			docker_registry=docker_registry
 	}
 
 	output {
@@ -116,6 +126,7 @@ task get_bundle_name {
 	String zones
 	String drop_seq_tools_version
 	Int preemptible
+	String docker_registry
 
 	command {
 		set -e
@@ -142,7 +153,7 @@ task get_bundle_name {
 
 	}
 	runtime {
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "1 GB"
@@ -158,7 +169,8 @@ task add_fasta_prefix {
 	String zones
 	String drop_seq_tools_version
 	Int preemptible
-	
+	String docker_registry
+
 	command {
 		set -e
 		add_fasta_prefix.py', '--prefix', ','.join(prefix_list), '--output', '_'.join(prefix_list), ${sep=' ' input_fasta}])
@@ -170,7 +182,7 @@ task add_fasta_prefix {
 
 	}
 	runtime {
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
@@ -187,6 +199,7 @@ task fix_gtf {
 	Int preemptible
 	String zones
 	String drop_seq_tools_version
+    String docker_registry
 
 	command {
 		set -e
@@ -199,7 +212,7 @@ task fix_gtf {
 		File gtf="${bundle_name}.gtf"
 	}
 	runtime {
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
@@ -214,7 +227,8 @@ task create_sequence_dictionary {
 	String zones
 	String drop_seq_tools_version
 	Int preemptible
-	
+	String docker_registry
+
 	command {
 		set -e
 		java -Xmx3500m -jar /software/picard.jar CreateSequenceDictionary R=${fasta} O=${output_name}
@@ -224,7 +238,7 @@ task create_sequence_dictionary {
 		File dict="${output_name}"
 	}
 	runtime {
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75G"
@@ -240,6 +254,7 @@ task convert_to_ref_flat {
 	String zones
 	String drop_seq_tools_version
 	Int preemptible
+	String docker_registry
 	
 	command {
 		set -e
@@ -249,7 +264,7 @@ task convert_to_ref_flat {
 		File ref_flat="${output_name}"
 	}
 	runtime {
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
@@ -265,6 +280,7 @@ task reduce_gtf {
 	String zones
 	String drop_seq_tools_version
 	Int preemptible
+	String docker_registry
 	
 	command {
 		set -e
@@ -274,7 +290,7 @@ task reduce_gtf {
 		File reduced_gtf="${output_name}"
 	}
 	runtime {
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
@@ -290,6 +306,7 @@ task create_intervals {
 	String zones
 	String drop_seq_tools_version
 	Int preemptible
+	String docker_registry
 	
 	command {
 		set -e
@@ -304,7 +321,7 @@ task create_intervals {
 	}
 
 	runtime {
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
@@ -323,6 +340,7 @@ task star_index {
 	String zones
 	String drop_seq_tools_version
 	Int preemptible
+	String docker_registry
 
 	command {
 		set -e
@@ -340,7 +358,7 @@ task star_index {
 		File index_tar_gz ="${prefix}.tgz"
 	}
 	runtime {
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "${memory}"

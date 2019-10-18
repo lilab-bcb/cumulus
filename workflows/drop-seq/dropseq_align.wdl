@@ -18,7 +18,7 @@ workflow dropseq_align {
 	Int add_bam_tags_disk_space_multiplier = 25
 	String? merge_bam_alignment_memory="13G"
 	Int? sort_bam_max_records_in_ram = 2000000
-
+    String docker_registry
 	call STAR {
 		input:
 			preemptible=preemptible,
@@ -30,7 +30,8 @@ workflow dropseq_align {
 			cpu=star_cpus,
 			zones=zones,
 			output_directory=output_directory,
-			drop_seq_tools_version=drop_seq_tools_version
+			drop_seq_tools_version=drop_seq_tools_version,
+			docker_registry=docker_registry
 	}
 
 	call AddTags {
@@ -49,7 +50,8 @@ workflow dropseq_align {
 			zones=zones,
 			output_directory=output_directory,
 			drop_seq_tools_version=drop_seq_tools_version,
-			disk_space_multiplier=add_bam_tags_disk_space_multiplier
+			disk_space_multiplier=add_bam_tags_disk_space_multiplier,
+			docker_registry=docker_registry
 	}
 
 
@@ -75,6 +77,7 @@ task STAR {
 	String zones
 	String output_directory
 	String drop_seq_tools_version
+	String docker_registry
 
 
 	command {
@@ -107,7 +110,7 @@ task STAR {
 	}
 
 	runtime {
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
         zones: zones
 		disks: "local-disk " + ceil(size(genome_tar, "GB")*5 + (3.25 * size(input_bam, "GB")) + 1)+ " HDD"
@@ -133,6 +136,7 @@ task AddTags {
 	Int disk_space_multiplier
 	Int cpu
 	Int sort_bam_max_records_in_ram
+    String docker_registry
 
 	command {
 		set -o pipefail
@@ -173,7 +177,7 @@ task AddTags {
 	}
 
 	runtime {
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		disks: "local-disk " + ceil(20 + size(genome_fasta,"GB") + size(gene_intervals,"GB") + size(genome_dict,"GB") + size(refflat,"GB") +  size(unaligned_bam,"GB")*2 + size(aligned_bam,"GB")*disk_space_multiplier) + " HDD"
 		memory :"${memory}"
 		preemptible: "${preemptible}"

@@ -1,9 +1,9 @@
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:bcl2fastq/versions/1/plain-WDL/descriptor" as bcl2fastq_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropest/versions/1/plain-WDL/descriptor" as dropest_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_align/versions/1/plain-WDL/descriptor" as dropseq_align_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_count/versions/1/plain-WDL/descriptor" as dropseq_count_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_prepare_fastq/versions/1/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_qc/versions/1/plain-WDL/descriptor" as dropseq_qc_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropest/versions/2/plain-WDL/descriptor" as dropest_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_align/versions/2/plain-WDL/descriptor" as dropseq_align_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_count/versions/2/plain-WDL/descriptor" as dropseq_count_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_prepare_fastq/versions/2/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_qc/versions/2/plain-WDL/descriptor" as dropseq_qc_wdl
 
 workflow dropseq_workflow {
 	# Either a list of flowcell URLS or sample_id tab r1 tab r2
@@ -23,7 +23,8 @@ workflow dropseq_workflow {
 	# hg19, mm10, hg19_mm10, mmul_8.0.1 or a path to a custom reference JSON file
 	String reference
 	File? acronym_file = "gs://regev-lab/resources/DropSeq/index.json"
-    String bcl2fastq_docker_registry = "gcr.io/broad-cumulus"
+    String? bcl2fastq_docker_registry = "gcr.io/broad-cumulus"
+    String? docker_registry =  ""
 
 	# use ncells value directly instead of estimating from elbow plot
 	Int? drop_seq_tools_force_cells
@@ -97,8 +98,8 @@ workflow dropseq_workflow {
 					memory = bcl2fastq_memory,
 					disk_space = bcl2fastq_disk_space,
 					preemptible = preemptible,
-					docker_registry = bcl2fastq_docker_registry,
-					bcl2fastq_version=bcl2fastq_version
+					bcl2fastq_version=bcl2fastq_version,
+					docker_registry=docker_registry
 			}
 		}
 
@@ -115,7 +116,8 @@ workflow dropseq_workflow {
             acronym_file=acronym_file,
             star_cpus = star_cpus,
             star_memory = star_memory,
-            reference=reference
+            reference=reference,
+            docker_registry=docker_registry,
     }
 
     scatter (row in generate_count_config.grouped_sample_sheet) {
@@ -133,7 +135,8 @@ workflow dropseq_workflow {
                 drop_seq_tools_version=drop_seq_tools_version,
                 output_directory = output_directory_stripped + '/' + row[0],
                 zones = zones,
-                preemptible = preemptible
+                preemptible = preemptible,
+                docker_registry = docker_registry
         }
 
 
@@ -155,7 +158,8 @@ workflow dropseq_workflow {
                 merge_bam_alignment_memory=merge_bam_alignment_memory,
                 sort_bam_max_records_in_ram =sort_bam_max_records_in_ram,
                 zones = zones,
-                preemptible = preemptible
+                preemptible = preemptible,
+                docker_registry = docker_registry
         }
 
         if(run_dropest) {
@@ -176,7 +180,9 @@ workflow dropseq_workflow {
                     cellular_barcode_whitelist=cellular_barcode_whitelist,
                     dropest_version=dropest_version,
                     zones = zones,
-                    preemptible = preemptible
+                    preemptible = preemptible,
+                    docker_registry=docker_registry
+
             }
         }
 
@@ -192,7 +198,8 @@ workflow dropseq_workflow {
                     force_cells = drop_seq_tools_force_cells,
                     cellular_barcode_whitelist=cellular_barcode_whitelist,
                     zones = zones,
-                    preemptible = preemptible
+                    preemptible = preemptible,
+                    docker_registry=docker_registry
             }
         }
 
@@ -206,7 +213,8 @@ workflow dropseq_workflow {
                 drop_seq_tools_version=drop_seq_tools_version,
                 output_directory = output_directory_stripped + '/' + row[0],
                 zones = zones,
-                preemptible = preemptible
+                preemptible = preemptible,
+                docker_registry=docker_registry
         }
 
     }
@@ -224,7 +232,8 @@ workflow dropseq_workflow {
             zones = zones,
             preemptible = preemptible,
             sample_id=dropseq_align.output_sample_id,
-            output_directory=output_directory
+            output_directory=output_directory,
+            docker_registry=docker_registry
     }
 
     output {
@@ -278,6 +287,7 @@ task collect_summary {
 	String zones
 	Int preemptible
 	String drop_seq_tools_version
+	String docker_registry
 
 	command {
 		set -e
@@ -303,7 +313,7 @@ task collect_summary {
 		bootDiskSizeGb: 12
 		disks: "local-disk 2 HDD"
 		memory:"1GB"
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}
@@ -324,6 +334,7 @@ task generate_count_config {
 	String? star_memory
 	Boolean is_reference_url = sub(reference, "^gs://.+", "URL") == "URL"
 	File config_file = (if is_reference_url then reference else acronym_file)
+	String docker_registry
 
 	command {
 		set -e
@@ -420,7 +431,7 @@ task generate_count_config {
 		bootDiskSizeGb: 12
 		disks: "local-disk 1 HDD"
 		memory:"1GB"
-		docker: "cumulusprod/dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}

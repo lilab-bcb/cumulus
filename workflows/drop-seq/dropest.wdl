@@ -38,7 +38,7 @@ workflow dropest {
     String? gene_id_tag = "XG"
     String? cellular_barcode_quality_tag = "CY"
     String? umi_quality_tag = "UY"
-
+    String docker_registry
 
 	call run_dropest {
 		input:
@@ -64,7 +64,8 @@ workflow dropest {
 			preemptible=preemptible,
 			zones=zones,
 			output_directory=output_directory,
-			dropest_version=dropest_version
+			dropest_version=dropest_version,
+			docker_registry=docker_registry
 	}
 #
 #	if(!apply_directional_umi_correction){
@@ -121,7 +122,7 @@ task run_dropest {
 	String zones
 	String output_directory
 	String dropest_version
-
+    String docker_registry
 	command {
 		set -e
 
@@ -166,7 +167,7 @@ task run_dropest {
 	}
 
 	runtime {
-		docker: "cumulusprod/dropest:${dropest_version}"
+		docker: "${docker_registry}dropest:${dropest_version}"
 		preemptible: "${preemptible}"
         zones: zones
 		disks: "local-disk " + ceil((3 * size(input_bam, "GB")) + 20)+ " HDD"
@@ -184,6 +185,7 @@ task run_dropest_umi_correct {
 	String zones
 	String output_directory
 	String dropest_version
+    String docker_registry
 
 	command {
 		set -e
@@ -201,7 +203,7 @@ task run_dropest_umi_correct {
 	}
 
 	runtime {
-		docker: "cumulusprod/dropest:${dropest_version}"
+		docker: "${docker_registry}dropest:${dropest_version}"
 		preemptible: "${preemptible}"
         zones: zones
 		disks: "local-disk " + ceil((1.5 * size(count_matrix, "GB")) + 20)+ " HDD"
