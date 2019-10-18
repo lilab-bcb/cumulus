@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:tasks/versions/1/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/1/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus_subcluster {
@@ -187,7 +187,7 @@ workflow cumulus_subcluster {
 	Boolean generate_scp_outputs = false
 	# Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain" or a JSON file describing the markers. [default: human_immune]
 	Boolean output_dense = false
-
+    String? docker_registry = ""
 
 
 	call tasks.run_cumulus_subcluster as subcluster {
@@ -248,7 +248,8 @@ workflow cumulus_subcluster {
 			num_cpu = num_cpu,
 			memory = memory,
 			disk_space = disk_space,
-			preemptible = preemptible
+			preemptible = preemptible,
+			docker_registry = docker_registry
 	}
 
 	if (perform_de_analysis) {
@@ -275,7 +276,8 @@ workflow cumulus_subcluster {
 				num_cpu = num_cpu,
 				memory = memory,
 				disk_space = disk_space,
-				preemptible = preemptible
+				preemptible = preemptible,
+				docker_registry = docker_registry
 		}
 	}
 
@@ -297,7 +299,8 @@ workflow cumulus_subcluster {
 				zones = zones,
 				memory = memory,
 				disk_space = disk_space,
-				preemptible = preemptible
+				preemptible = preemptible,
+				docker_registry = docker_registry
 		}
 	}
 
@@ -311,7 +314,8 @@ workflow cumulus_subcluster {
 				zones = zones,
 				memory = memory,
 				disk_space = disk_space,
-				preemptible = preemptible				
+				preemptible = preemptible,
+				docker_registry = docker_registry
 		}
 	}
 
@@ -331,6 +335,7 @@ workflow cumulus_subcluster {
 			cumulus_version = cumulus_version,
 			zones = zones,
 			disk_space = disk_space,
-			preemptible = preemptible
+			preemptible = preemptible,
+			docker_registry = docker_registry
 	}
 }

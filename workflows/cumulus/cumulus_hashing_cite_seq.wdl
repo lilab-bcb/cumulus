@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:tasks/versions/1/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/1/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus_hashing_cite_seq {
@@ -42,6 +42,7 @@ workflow cumulus_hashing_cite_seq {
 	# merge_rna_adt parameters
 	# A CSV file containing the IgG control information for each antibody.
 	File? antibody_control_csv
+	String? docker_registry = ""
 
 
 
@@ -50,7 +51,8 @@ workflow cumulus_hashing_cite_seq {
 			input_sample_sheet = input_sample_sheet,
 			cumulus_version = cumulus_version,
 			zones = zones,
-			preemptible = preemptible
+			preemptible = preemptible,
+			docker_registry = docker_registry
 	}
 
 	if (generate_hashing_cite_seq_tasks.hashing_ids[0] != '') {
@@ -74,7 +76,8 @@ workflow cumulus_hashing_cite_seq {
 					num_cpu = num_cpu,
 					memory = memory,
 					disk_space = disk_space,
-					preemptible = preemptible
+					preemptible = preemptible,
+					docker_registry = docker_registry
 			}
 		}
 	}
@@ -92,7 +95,8 @@ workflow cumulus_hashing_cite_seq {
 					zones = zones,
 					memory = memory,
 					disk_space = disk_space,
-					preemptible = preemptible
+					preemptible = preemptible,
+					docker_registry = docker_registry
 			}
 		}
 	}

@@ -14,6 +14,7 @@ task run_cumulus_aggregate_matrices {
 	Boolean? select_only_singlets
 	Int? minimum_number_of_genes
 	String? dropseq_genome
+	String docker_registry
 
 	command {
 		set -e
@@ -46,7 +47,7 @@ task run_cumulus_aggregate_matrices {
 	}
 
 	runtime {
-		docker: "cumulusprod/cumulus:${cumulus_version}"
+		docker: "${docker_registry}cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -131,6 +132,7 @@ task run_cumulus_cluster {
 	String? net_umap_out_basis
 	Boolean? run_net_fle
 	String? net_fle_out_basis
+    String docker_registry
 
 	command {
 		set -e
@@ -290,7 +292,7 @@ task run_cumulus_cluster {
 	}
 
 	runtime {
-		docker: "cumulusprod/cumulus:${cumulus_version}"
+		docker: "${docker_registry}cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -325,6 +327,7 @@ task run_cumulus_de_analysis {
 	Boolean? remove_ribo
 	Float? min_gain
 	Int? random_state
+    String docker_registry
 
 	command {
 		set -e
@@ -387,7 +390,7 @@ task run_cumulus_de_analysis {
 	}
 
 	runtime {
-		docker: "cumulusprod/cumulus:${cumulus_version}"
+		docker: "${docker_registry}cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -415,6 +418,7 @@ task run_cumulus_plot {
 	String? plot_net_tsne
 	String? plot_net_umap
 	String? plot_net_fle
+    String docker_registry
 
 	command {
 		set -e
@@ -476,7 +480,7 @@ task run_cumulus_plot {
 	}
 
 	runtime {
-		docker: "cumulusprod/cumulus:${cumulus_version}"
+		docker: "${docker_registry}cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -495,6 +499,7 @@ task run_cumulus_scp_output {
 	String memory
 	Int disk_space
 	Int preemptible
+	String docker_registry
 
 	command {
 		set -e
@@ -507,7 +512,7 @@ task run_cumulus_scp_output {
 	}
 
 	runtime {
-		docker: "cumulusprod/cumulus:${cumulus_version}"
+		docker: "${docker_registry}cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -575,6 +580,7 @@ task run_cumulus_subcluster {
 	String? net_umap_out_basis
 	Boolean? run_net_fle
 	String? net_fle_out_basis
+	String docker_registry
 
 	command {
 		set -e
@@ -699,7 +705,7 @@ task run_cumulus_subcluster {
 	}
 
 	runtime {
-		docker: "cumulusprod/cumulus:${cumulus_version}"
+		docker: "${docker_registry}cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -729,6 +735,7 @@ task organize_results {
 	Array[File]? output_pdfs
 	Array[File]? output_htmls
 	Array[File]? output_scp_files
+	String docker_registry
 
 	command {
 		set -e
@@ -757,7 +764,7 @@ task organize_results {
 	}
 
 	runtime {
-		docker: "cumulusprod/cumulus:${cumulus_version}"
+		docker: "${docker_registry}cumulus:${cumulus_version}"
 		zones: zones
 		memory: "30 GB"
 		bootDiskSizeGb: 12
@@ -772,6 +779,7 @@ task generate_hashing_cite_seq_tasks {
 	String cumulus_version
 	String zones
 	Int preemptible
+	String docker_registry
 
 	command {
 		set -e
@@ -802,7 +810,7 @@ task generate_hashing_cite_seq_tasks {
 	}
 
 	runtime {
-		docker: "cumulusprod/cumulus:${cumulus_version}"
+		docker: "${docker_registry}cumulus:${cumulus_version}"
 		zones: zones
 		preemptible: preemptible
 	}
@@ -827,6 +835,7 @@ task run_cumulus_demuxEM {
 	Int? random_state
 	Boolean? generate_diagnostic_plots
 	String? generate_gender_plot
+    String docker_registry
 
 	command {
 		set -e
@@ -873,7 +882,7 @@ task run_cumulus_demuxEM {
 	}
 
 	runtime {
-		docker: "cumulusprod/cumulus:${cumulus_version}"
+		docker: "${docker_registry}cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -894,6 +903,7 @@ task run_cumulus_merge_rna_adt {
 	String memory
 	Int disk_space
 	Int preemptible
+	String docker_registry
 
 	command {
 		set -e
@@ -920,7 +930,7 @@ task run_cumulus_merge_rna_adt {
 	}
 
 	runtime {
-		docker: "cumulusprod/cumulus:${cumulus_version}"
+		docker: "${docker_registry}cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12

@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:tasks/versions/1/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/1/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
@@ -243,7 +243,7 @@ workflow cumulus {
 	Boolean generate_scp_outputs = false
 	# Output dense expression matrix instead.
 	Boolean output_dense = false
-
+    String? docker_registry = ""
 
 	if (is_sample_sheet) {
 		call tasks.run_cumulus_aggregate_matrices as aggregate_matrices {
@@ -259,7 +259,8 @@ workflow cumulus {
 				zones = zones,
 				memory = memory,
 				disk_space = disk_space,
-				preemptible = preemptible
+				preemptible = preemptible,
+				docker_registry = docker_registry
 		}
 	}
 
@@ -340,7 +341,8 @@ workflow cumulus {
 			num_cpu = num_cpu,
 			memory = memory,
 			disk_space = disk_space,
-			preemptible = preemptible
+			preemptible = preemptible,
+			docker_registry = docker_registry
 	}
 
 	if (perform_de_analysis) {
@@ -367,7 +369,8 @@ workflow cumulus {
 				num_cpu = num_cpu,
 				memory = memory,
 				disk_space = disk_space,
-				preemptible = preemptible
+				preemptible = preemptible,
+				docker_registry = docker_registry
 		}
 	}
 
@@ -390,7 +393,8 @@ workflow cumulus {
 				zones = zones,
 				memory = memory,
 				disk_space = disk_space,
-				preemptible = preemptible
+				preemptible = preemptible,
+				docker_registry = docker_registry
 		}
 	}
 
@@ -404,7 +408,8 @@ workflow cumulus {
 				zones = zones,
 				memory = memory,
 				disk_space = disk_space,
-				preemptible = preemptible				
+				preemptible = preemptible,
+				docker_registry = docker_registry				
 		}
 	}
 
@@ -428,7 +433,8 @@ workflow cumulus {
 			cumulus_version = cumulus_version,
 			zones = zones,
 			disk_space = disk_space,
-			preemptible = preemptible
+			preemptible = preemptible,
+			docker_registry = docker_registry
 	}
 
 	
