@@ -1,4 +1,4 @@
-.. include:: ../README.rst
+.. include:: header.rst
 .. include:: release_notes.rst
 
 .. toctree::

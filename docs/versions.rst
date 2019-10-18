@@ -1,7 +1,8 @@
-Latest and stable versions on Terra
+Latest and stable versions on Terra_
 ---------------------------------------
 
-Cumulus is a fast growing project. As a result, we frequently update WDL snapshot versions on Terra. See below for latest and stable WDL versions you can use.
+Cumulus is a fast growing project. As a result, we frequently update WDL snapshot versions on Terra_.
+See below for latest and stable WDL versions you can use.
 
 Latest version
 ^^^^^^^^^^^^^^
@@ -14,7 +15,7 @@ Latest version
 	  - Snapshot
 	  - Function
 	* - cumulus/cellranger_workflow
-	  - 1
+	  - 2
 	  - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
 	* - cumulus/smartseq2
 	  - 1
@@ -71,3 +72,5 @@ Stable version - HTAPP v1
 	* - scCloud/scCloud
 	  - 3
 	  - Run scCloud analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering and more
+
+.. _Terra: https://app.terra.bio

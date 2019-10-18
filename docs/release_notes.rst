@@ -1,7 +1,7 @@
 Version 0.10.0 `October 2, 2019`
 --------------------------------
 
-cumulus is renamed to cumulus.
+scCloud renamed to cumulus.
 
 cumulus can accept either a sample sheet or a single file.
 

@@ -39,6 +39,7 @@ workflow cellranger_count {
 	Int? disk_space = 500
 	# Number of preemptible tries 
 	Int? preemptible = 2
+	String docker_registry
 
 	call run_cellranger_count {
 		input:
@@ -55,7 +56,8 @@ workflow cellranger_count {
 			num_cpu = num_cpu,
 			memory = memory,
 			disk_space = disk_space,
-			preemptible = preemptible
+			preemptible = preemptible,
+			docker_registry = docker_registry
 	}
 
 	output {
@@ -81,6 +83,7 @@ task run_cellranger_count {
 	String memory
 	Int disk_space
 	Int preemptible
+    String docker_registry
 
 	command {
 		set -e
@@ -131,7 +134,7 @@ task run_cellranger_count {
 	}
 
 	runtime {
-		docker: "cumulusprod/cellranger:${cellranger_version}"
+		docker: "${docker_registry}cellranger:${cellranger_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12

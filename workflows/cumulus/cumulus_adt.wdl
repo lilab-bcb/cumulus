@@ -37,6 +37,7 @@ workflow cumulus_adt {
 	Int? disk_space = 100
 	# Number of preemptible tries 
 	Int? preemptible = 2
+	String? docker_registry = ""
 
 	call run_generate_count_matrix_ADTs {
 		input:
@@ -54,7 +55,8 @@ workflow cumulus_adt {
 			zones = zones,
 			memory = memory,
 			disk_space = disk_space,
-			preemptible = preemptible
+			preemptible = preemptible,
+			docker_registry = docker_registry
 	}
 
 	output {
@@ -79,6 +81,7 @@ task run_generate_count_matrix_ADTs {
 	String memory
 	Int disk_space
 	Int preemptible
+	String docker_registry
 
 	command {
 		set -e
@@ -135,7 +138,7 @@ task run_generate_count_matrix_ADTs {
 	}
 
 	runtime {
-		docker: "cumulusprod/cumulus:${cumulus_version}"
+		docker: "${docker_registry}cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12

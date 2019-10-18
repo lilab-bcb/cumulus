@@ -1,10 +1,10 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/versions/1/plain-WDL/descriptor" as crac
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/versions/2/plain-WDL/descriptor" as crac
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq/versions/1/plain-WDL/descriptor" as cram
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/1/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/2/plain-WDL/descriptor" as crc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/1/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/1/plain-WDL/descriptor" as crv
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/2/plain-WDL/descriptor" as crv
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/1/plain-WDL/descriptor" as ca
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/2/plain-WDL/descriptor" as ca
 
 workflow cellranger_workflow {
 	# 5 - 8 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry, DataType, FeatureBarcodeFile]). gs URL
@@ -66,7 +66,7 @@ workflow cellranger_workflow {
 	String? cellranger_atac_version = "1.1.0"
 	# cumulus version, default to "0.10.0"
 	String? cumulus_version = "0.10.0"
-
+    String? docker_registry = ""
 	String? cellranger_mkfastq_docker_registry = "gcr.io/broad-cumulus"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
@@ -102,7 +102,8 @@ workflow cellranger_workflow {
 				output_dir = output_directory_stripped,
 				cellranger_version = cellranger_version,
 				zones = zones,
-				preemptible = preemptible
+				preemptible = preemptible,
+				docker_registry = docker_registry
 		}
 
 		if (generate_bcl_csv.run_ids[0] != '') {
@@ -157,7 +158,8 @@ workflow cellranger_workflow {
 				fastq_dirs_atac = cellranger_atac_mkfastq.output_fastqs_flowcell_directory,
 				cellranger_version = cellranger_version,
 				zones = zones,
-				preemptible = preemptible			
+				preemptible = preemptible,
+				docker_registry = docker_registry
 		}
 
 		if (generate_count_config.sample_ids[0] != '') {
@@ -177,7 +179,8 @@ workflow cellranger_workflow {
 						num_cpu = num_cpu,
 						memory = memory,
 						disk_space = count_disk_space,
-						preemptible = preemptible
+						preemptible = preemptible,
+						docker_registry = docker_registry
 				}
 			}
 
@@ -187,7 +190,8 @@ workflow cellranger_workflow {
 					sample_ids = cellranger_count.output_count_directory,
 					cellranger_version = cellranger_version,
 					zones = zones,
-					preemptible = preemptible
+					preemptible = preemptible,
+					docker_registry = docker_registry
 			}		
 		}
 
@@ -207,7 +211,8 @@ workflow cellranger_workflow {
 						num_cpu = num_cpu,
 						memory = memory,
 						disk_space = vdj_disk_space,
-						preemptible = preemptible
+						preemptible = preemptible,
+						docker_registry = docker_registry
 				}
 			}
 
@@ -217,7 +222,8 @@ workflow cellranger_workflow {
 					sample_ids = cellranger_vdj.output_vdj_directory,
 					cellranger_version = cellranger_version,
 					zones = zones,
-					preemptible = preemptible
+					preemptible = preemptible,
+					docker_registry = docker_registry
 			}		
 		}
 
@@ -238,7 +244,8 @@ workflow cellranger_workflow {
 						zones = zones,
 						memory = feature_memory,
 						disk_space = feature_disk_space,
-						preemptible = preemptible
+						preemptible = preemptible,
+						docker_registry = docker_registry
 				}
 			}		
 		}
@@ -258,7 +265,8 @@ workflow cellranger_workflow {
 						num_cpu = atac_num_cpu,
 						memory = atac_memory,
 						disk_space = atac_disk_space,
-						preemptible = preemptible
+						preemptible = preemptible,
+						docker_registry = docker_registry
 				}
 			}
 
@@ -268,7 +276,8 @@ workflow cellranger_workflow {
 					sample_ids = cellranger_atac_count.output_count_directory,
 					cellranger_version = cellranger_version,
 					zones = zones,
-					preemptible = preemptible
+					preemptible = preemptible,
+					docker_registry = docker_registry
 			}		
 		}
 	}
@@ -284,6 +293,7 @@ task generate_bcl_csv {
 	String cellranger_version
 	String zones
 	Int preemptible
+	String docker_registry
 
 	command {
 		set -e
@@ -331,7 +341,7 @@ task generate_bcl_csv {
 	}
 
 	runtime {
-		docker: "cumulusprod/cellranger:${cellranger_version}"
+		docker: "${docker_registry}cellranger:${cellranger_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}
@@ -347,6 +357,7 @@ task generate_count_config {
 	String cellranger_version
 	String zones
 	Int preemptible
+	String docker_registry
 
 	command {
 		set -e
@@ -464,7 +475,7 @@ task generate_count_config {
 	}
 
 	runtime {
-		docker: "cumulusprod/cellranger:${cellranger_version}"
+		docker: "${docker_registry}cellranger:${cellranger_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}
@@ -476,6 +487,7 @@ task collect_summaries {
 	String cellranger_version
 	String zones
 	Int preemptible
+    String docker_registry
 
 	command {
 		python <<CODE
@@ -504,7 +516,7 @@ task collect_summaries {
 	}
 
 	runtime {
-		docker: "cumulusprod/cellranger:${cellranger_version}"
+		docker: "${docker_registry}cellranger:${cellranger_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}

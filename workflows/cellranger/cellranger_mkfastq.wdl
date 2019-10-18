@@ -137,7 +137,7 @@ task run_cellranger_mkfastq {
 	}
 
 	runtime {
-		docker: "${docker_registry}/cellranger:${cellranger_version}"
+		docker: "${docker_registry}cellranger:${cellranger_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
