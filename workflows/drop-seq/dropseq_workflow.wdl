@@ -24,7 +24,7 @@ workflow dropseq_workflow {
 	String reference
 	File? acronym_file = "gs://regev-lab/resources/DropSeq/index.json"
     String? bcl2fastq_docker_registry = "gcr.io/broad-cumulus"
-    String? docker_registry =  ""
+    String? docker_registry = "cumulusprod/"
 
 	# use ncells value directly instead of estimating from elbow plot
 	Int? drop_seq_tools_force_cells

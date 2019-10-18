@@ -243,7 +243,7 @@ workflow cumulus {
 	Boolean generate_scp_outputs = false
 	# Output dense expression matrix instead.
 	Boolean output_dense = false
-    String? docker_registry = ""
+    String? docker_registry = "cumulusprod/"
 
 	if (is_sample_sheet) {
 		call tasks.run_cumulus_aggregate_matrices as aggregate_matrices {

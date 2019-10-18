@@ -187,7 +187,7 @@ workflow cumulus_subcluster {
 	Boolean generate_scp_outputs = false
 	# Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain" or a JSON file describing the markers. [default: human_immune]
 	Boolean output_dense = false
-    String? docker_registry = ""
+    String? docker_registry = "cumulusprod/"
 
 
 	call tasks.run_cumulus_subcluster as subcluster {

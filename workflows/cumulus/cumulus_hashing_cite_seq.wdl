@@ -42,7 +42,7 @@ workflow cumulus_hashing_cite_seq {
 	# merge_rna_adt parameters
 	# A CSV file containing the IgG control information for each antibody.
 	File? antibody_control_csv
-	String? docker_registry = ""
+	String? docker_registry = "cumulusprod/"
 
 
 

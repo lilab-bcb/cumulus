@@ -37,7 +37,7 @@ workflow cumulus_adt {
 	Int? disk_space = 100
 	# Number of preemptible tries 
 	Int? preemptible = 2
-	String? docker_registry = ""
+	String? docker_registry = "cumulusprod/"
 
 	call run_generate_count_matrix_ADTs {
 		input:
