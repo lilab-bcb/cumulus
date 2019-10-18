@@ -204,6 +204,10 @@ Please see the description of important inputs below.
 dropseq_workflow Terra Release Notes
 ===================================================
 
+**Version 3**
+
+- Set default value for docker_registry input.
+
 **Version 2**
 
 - Added docker_registry input.
