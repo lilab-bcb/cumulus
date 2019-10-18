@@ -15,7 +15,7 @@ workflow dropseq_bundle {
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	String? drop_seq_tools_version = "2.3.0"
 	Int? preemptible = 2
-	String? docker_registry = ""
+	String? docker_registry = "cumulusprod/"
 
 	if(length(fasta_file)>1) {
 		call get_bundle_name {

@@ -9,7 +9,7 @@ workflow smartseq2_create_reference {
 	Int? extra_disk_space = 15
 	# Number of preemptible tries 
 	Int? preemptible = 2
-    String? docker_registry = ""
+    String? docker_registry = "cumulusprod/"
 	call rsem_prepare_reference {
 		input:
 			fasta=fasta,
