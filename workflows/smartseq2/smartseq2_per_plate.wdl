@@ -29,14 +29,15 @@ workflow smartseq2_per_plate {
     Int? generate_count_matrix_disk_space = 10
 	# Number of preemptible tries 
 	Int? preemptible = 2
-
+    String docker_registry
 
 	call parse_sample_sheet {
 		input:
 			sample_sheet = sample_sheet,
 			smartseq2_version = smartseq2_version,
 			zones = zones,
-			preemptible = preemptible
+			preemptible = preemptible,
+			docker_registry = docker_registry
 	}
 
 	scatter (i in range(length(parse_sample_sheet.cell_ids))) {
@@ -51,7 +52,8 @@ workflow smartseq2_per_plate {
 				num_cpu = num_cpu,
 				memory = memory,
 				disk_space_multiplier = disk_space_multiplier,
-				preemptible = preemptible
+				preemptible = preemptible,
+				docker_registry = docker_registry
 		}
 	}
 
@@ -64,7 +66,8 @@ workflow smartseq2_per_plate {
 			zones = zones,
 			memory = memory,
 			disk_space = generate_count_matrix_disk_space,
-			preemptible = preemptible
+			preemptible = preemptible,
+			docker_registry = docker_registry
 	}
 
 	output {
@@ -86,6 +89,7 @@ task parse_sample_sheet {
 	String smartseq2_version
 	String zones
 	Int preemptible
+	String docker_registry
 
 	command {
 		set -e
@@ -110,7 +114,7 @@ task parse_sample_sheet {
 	}
 
 	runtime {
-		docker: "cumulusprod/smartseq2:${smartseq2_version}"
+		docker: "${docker_registry}smartseq2:${smartseq2_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}
@@ -127,6 +131,7 @@ task run_rsem {
 	String memory
 	Float? disk_space_multiplier
 	Int preemptible
+	String docker_registry
 
 	command {
 		set -e
@@ -148,7 +153,7 @@ task run_rsem {
 	}
 
 	runtime {
-		docker: "cumulusprod/smartseq2:${smartseq2_version}"
+		docker: "${docker_registry}smartseq2:${smartseq2_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -167,6 +172,7 @@ task generate_count_matrix {
 	String memory
 	Int disk_space
 	Int preemptible
+	String docker_registry
 
 	command {
 		set -e
@@ -220,7 +226,7 @@ task generate_count_matrix {
 	}
 
 	runtime {
-		docker: "cumulusprod/smartseq2:${smartseq2_version}"
+		docker: "${docker_registry}smartseq2:${smartseq2_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12

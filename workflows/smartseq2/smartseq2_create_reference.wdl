@@ -9,7 +9,7 @@ workflow smartseq2_create_reference {
 	Int? extra_disk_space = 15
 	# Number of preemptible tries 
 	Int? preemptible = 2
-
+    String? docker_registry = ""
 	call rsem_prepare_reference {
 		input:
 			fasta=fasta,
@@ -19,7 +19,8 @@ workflow smartseq2_create_reference {
 			preemptible=preemptible,
 			cpu=cpu,
 			memory=memory,
-			disk_space=extra_disk_space
+			disk_space=extra_disk_space,
+			docker_registry=docker_registry
 	}
 }
 
@@ -32,6 +33,7 @@ task rsem_prepare_reference {
 	Int cpu
 	String memory
 	Int disk_space
+    String docker_registry
 
 	command {
 		set -e
@@ -47,7 +49,7 @@ task rsem_prepare_reference {
 
 	runtime {
 		disks: "local-disk " + ceil(disk_space + 8*size(fasta,"GB") + size(gtf,"GB")) + " HDD"
-		docker: "cumulusprod/smartseq2:${smartseq2_version}"
+		docker: "${docker_registry}smartseq2:${smartseq2_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 		cpu:"${cpu}"

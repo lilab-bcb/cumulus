@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:smartseq2_per_plate/versions/1/plain-WDL/descriptor" as ss2pp
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:smartseq2_per_plate/versions/2/plain-WDL/descriptor" as ss2pp
 # import "smartseq2_per_plate.wdl" as ss2pp
 
 workflow smartseq2 {
@@ -23,8 +23,8 @@ workflow smartseq2 {
 	Float? disk_space_multiplier = 10
 	# Number of preemptible tries 
 	Int? preemptible = 2
-
     Int? generate_count_matrix_disk_space = 10
+    String? docker_registry = ""
 
 	call parse_input_csv {
 		input:
@@ -32,7 +32,8 @@ workflow smartseq2 {
 			output_directory = output_directory_stripped,
 			smartseq2_version = smartseq2_version,
 			zones = zones,
-			preemptible = preemptible
+			preemptible = preemptible,
+			docker_registry = docker_registry
 	}
 
 	scatter (plate_name in parse_input_csv.plate_names) {
@@ -48,7 +49,8 @@ workflow smartseq2 {
 				memory = memory,
 				disk_space_multiplier = disk_space_multiplier,
 				generate_count_matrix_disk_space=generate_count_matrix_disk_space,
-				preemptible = preemptible
+				preemptible = preemptible,
+				docker_registry = docker_registry
 		}
 	}
 
@@ -71,6 +73,7 @@ task parse_input_csv {
 	String smartseq2_version
 	String zones
 	Int preemptible
+	String docker_registry
 
 	command {
 		set -e
@@ -100,7 +103,7 @@ task parse_input_csv {
 	}
 
 	runtime {
-		docker: "cumulusprod/smartseq2:${smartseq2_version}"
+		docker: "${docker_registry}smartseq2:${smartseq2_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}

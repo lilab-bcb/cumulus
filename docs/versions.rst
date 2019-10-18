@@ -18,7 +18,7 @@ Latest version
 	  - 2
 	  - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
 	* - cumulus/smartseq2
-	  - 1
+	  - 2
 	  - Run Bowtie2 and RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files
 	* - cumulus/cumulus
 	  - 3
