@@ -15,7 +15,9 @@ workflow dropseq_bundle {
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	String? drop_seq_tools_version = "2.3.0"
 	Int? preemptible = 2
-	String? docker_registry = "cumulusprod/"
+	String docker_registry = "cumulusprod"
+    # docker_registry with trailing slashes stripped
+    String docker_registry_stripped = sub(docker_registry, "/+$", "")
 
 	if(length(fasta_file)>1) {
 		call get_bundle_name {
@@ -24,7 +26,7 @@ workflow dropseq_bundle {
 				drop_seq_tools_version=drop_seq_tools_version,
 				zones=zones,
 				preemptible=preemptible,
-				docker_registry=docker_registry
+				docker_registry=docker_registry_stripped
 		}
 
 		call add_fasta_prefix {
@@ -35,7 +37,7 @@ workflow dropseq_bundle {
 				drop_seq_tools_version=drop_seq_tools_version,
 				zones=zones,
 				preemptible=preemptible,
-				docker_registry=docker_registry
+				docker_registry=docker_registry_stripped
 		}
 	}
 	String? bundle_name = if(length(fasta_file)>1) then get_bundle_name.bundle_name else sub(basename(fasta_file[0]), "\\.fasta$|\\.fa$", "")
@@ -49,7 +51,7 @@ workflow dropseq_bundle {
 			drop_seq_tools_version=drop_seq_tools_version,
 			zones=zones,
 			preemptible=preemptible,
-			docker_registry=docker_registry
+			docker_registry=docker_registry_stripped
 	}
 
 	File gtf = fix_gtf.gtf
@@ -61,7 +63,7 @@ workflow dropseq_bundle {
 			drop_seq_tools_version=drop_seq_tools_version,
 			zones=zones,
 			preemptible=preemptible,
-			docker_registry=docker_registry
+			docker_registry=docker_registry_stripped
 	}
 	call convert_to_ref_flat {
 		input:
@@ -71,7 +73,7 @@ workflow dropseq_bundle {
 			drop_seq_tools_version=drop_seq_tools_version,
 			zones=zones,
 			preemptible=preemptible,
-			docker_registry=docker_registry
+			docker_registry=docker_registry_stripped
 	}
 	call reduce_gtf {
 		input:
@@ -81,7 +83,7 @@ workflow dropseq_bundle {
 			drop_seq_tools_version=drop_seq_tools_version,
 			zones=zones,
 			preemptible=preemptible,
-			docker_registry=docker_registry
+			docker_registry=docker_registry_stripped
 	}
 	call create_intervals {
 		input:
@@ -91,7 +93,7 @@ workflow dropseq_bundle {
 			drop_seq_tools_version=drop_seq_tools_version,
 			zones=zones,
 			preemptible=preemptible,
-			docker_registry=docker_registry
+			docker_registry=docker_registry_stripped
 	}
 	call star_index {
 		input:
@@ -104,7 +106,7 @@ workflow dropseq_bundle {
 			drop_seq_tools_version=drop_seq_tools_version,
 			zones=zones,
 			preemptible=preemptible,
-			docker_registry=docker_registry
+			docker_registry=docker_registry_stripped
 	}
 
 	output {
@@ -153,7 +155,7 @@ task get_bundle_name {
 
 	}
 	runtime {
-		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "1 GB"
@@ -182,7 +184,7 @@ task add_fasta_prefix {
 
 	}
 	runtime {
-		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
@@ -212,7 +214,7 @@ task fix_gtf {
 		File gtf="${bundle_name}.gtf"
 	}
 	runtime {
-		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
@@ -238,7 +240,7 @@ task create_sequence_dictionary {
 		File dict="${output_name}"
 	}
 	runtime {
-		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75G"
@@ -264,7 +266,7 @@ task convert_to_ref_flat {
 		File ref_flat="${output_name}"
 	}
 	runtime {
-		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
@@ -290,7 +292,7 @@ task reduce_gtf {
 		File reduced_gtf="${output_name}"
 	}
 	runtime {
-		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
@@ -321,7 +323,7 @@ task create_intervals {
 	}
 
 	runtime {
-		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
@@ -358,7 +360,7 @@ task star_index {
 		File index_tar_gz ="${prefix}.tgz"
 	}
 	runtime {
-		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "${memory}"
