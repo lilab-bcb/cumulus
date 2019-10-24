@@ -14,7 +14,8 @@ workflow bcl2fastq {
 	String? use_bases_mask
 	Boolean? create_fastq_for_index_reads = false
 	String? bcl2fastq_version = "2.20.0.422"
-	String? docker_registry = "gcr.io/broad-cumulus"
+	String docker_registry = "gcr.io/broad-cumulus"
+	String docker_registry_stripped = sub(docker_registry, "/+$", "")
 	# If not specified, assume SampleSheet.csv is in input_bcl_directory
 	File? sample_sheet
 
@@ -33,7 +34,7 @@ workflow bcl2fastq {
 			barcode_mismatches=barcode_mismatches,
 			create_fastq_for_index_reads=create_fastq_for_index_reads,
 			memory = memory,
-			docker_registry = docker_registry,
+			docker_registry = docker_registry_stripped,
 			disk_space = disk_space,
 			preemptible = preemptible,
 			bcl2fastq_version=bcl2fastq_version

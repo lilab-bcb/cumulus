@@ -8,7 +8,8 @@ workflow cumulus {
 	Boolean is_sample_sheet = sub(input_file, "^.+\\.csv$", "CSV") == "CSV"
 	# Google bucket, subdirectory name and results name prefix
 	String output_name
-	# Reference genome name, can be None if you want culumus to infer it from data for you
+	# Reference genome name, can be None if you want cumulus to infer it from data for you,
+	# if inputs are dropseq data, this option needs to turn on and provides the reference genome name
 	String genome = ""
 
 	# cumulus version, default to "0.10.0"
@@ -41,11 +42,6 @@ workflow cumulus {
 	Int? minimum_number_of_genes = 100
 	# If inputs are dropseq data
 	Boolean is_dropseq = false
-
-	# If inputs are dropseq data, this option needs to turn on and provides the reference genome name
-	String dropseq_genome = if is_dropseq then genome else ""
-
-
 
 	# for cluster
 
@@ -254,7 +250,7 @@ workflow cumulus {
 				attributes = attributes,
 				select_only_singlets = select_only_singlets,
 				minimum_number_of_genes = minimum_number_of_genes,
-				dropseq_genome = dropseq_genome,
+				genome = genome,
 				cumulus_version = cumulus_version,
 				zones = zones,
 				memory = memory,

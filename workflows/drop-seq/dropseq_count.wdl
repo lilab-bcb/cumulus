@@ -96,7 +96,7 @@ task CollectCellBarcodes {
 	}
 
 	runtime {
-		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
 		zones: zones
 		disks: "local-disk " + sub(((size(histogram,"GB")+1)*2),"\\..*","") + " HDD"
 		preemptible: "${preemptible}"
@@ -144,7 +144,7 @@ task DigitalExpression {
 	}
 
 	runtime {
-		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
 		disks: "local-disk " + sub(((size(input_bam,"GB")+1)*3.25),"\\..*","") + " HDD"
 		memory :"${memory}"
 		zones: zones
@@ -218,7 +218,7 @@ task DigitalExpressionPrep {
 	}
 
 	runtime {
-		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
 		disks: "local-disk " + ceil(disk_multiplier * size(input_bam, "GB") + 20)+ " HDD"
 		memory :"${memory}"
 		zones: zones

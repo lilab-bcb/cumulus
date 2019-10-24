@@ -31,7 +31,7 @@ Additionally the pipeline provides the option to generate count matrices using  
 	``-m`` means copy in parallel, ``-r`` means copy the directory recursively.
 
 
-#. Non Broad Institute users that wish to run cellrankger mkfastq must create a custom docker image that contains bcl2fastq.
+#. Non Broad Institute users that wish to run bcl2fastq must create a custom docker image.
 
     See :ref:`bcl2fastq-docker` instructions.
 
@@ -203,6 +203,11 @@ Please see the description of important inputs below.
 
 dropseq_workflow Terra Release Notes
 ===================================================
+
+**Version 4**
+
+- Handle uncompressed fastq files as workflow input.
+- Added optional prepare_fastq_disk_space_multiplier input.
 
 **Version 3**
 

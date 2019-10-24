@@ -167,7 +167,7 @@ task run_dropest {
 	}
 
 	runtime {
-		docker: "${docker_registry}dropest:${dropest_version}"
+		docker: "${docker_registry}/dropest:${dropest_version}"
 		preemptible: "${preemptible}"
         zones: zones
 		disks: "local-disk " + ceil((3 * size(input_bam, "GB")) + 20)+ " HDD"
@@ -203,7 +203,7 @@ task run_dropest_umi_correct {
 	}
 
 	runtime {
-		docker: "${docker_registry}dropest:${dropest_version}"
+		docker: "${docker_registry}/dropest:${dropest_version}"
 		preemptible: "${preemptible}"
         zones: zones
 		disks: "local-disk " + ceil((1.5 * size(count_matrix, "GB")) + 20)+ " HDD"

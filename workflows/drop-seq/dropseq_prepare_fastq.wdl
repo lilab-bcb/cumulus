@@ -50,6 +50,8 @@ task PrepareFastq {
 	Int cpu
 	String r1
 	String r2
+	Boolean is_gz = sub(r1, "^.+\\.gz$", "GZ") == "GZ"
+	String fastq_suffix = if is_gz then ".gz" else ""
 	Int disk_space
 	String sample_id
 	Int preemptible
@@ -70,17 +72,17 @@ task PrepareFastq {
 		python <<CODE
 		import os
 		from subprocess import check_call
+		fastq_suffix = '${fastq_suffix}'
 		r1_files = '${r1}'.split(',')
 		r2_files = '${r2}'.split(',')
 		for i in range(len(r1_files)):
 			call_args = ['gsutil', '-q', '-m', 'cp', r1_files[i], r2_files[i], '.']
 			check_call(call_args)
-			call_args = ['mv', os.path.basename(r1_files[i]), 'S_R1_' + str(i+1).zfill(3) + '.fastq.gz']
+			call_args = ['mv', os.path.basename(r1_files[i]), 'S_R1_' + str(i+1).zfill(3) + '.fastq' + fastq_suffix]
 			check_call(call_args)
-			call_args = ['mv', os.path.basename(r2_files[i]), 'S_R2_' + str(i+1).zfill(3) + '.fastq.gz']
+			call_args = ['mv', os.path.basename(r2_files[i]), 'S_R2_' + str(i+1).zfill(3) + '.fastq' + fastq_suffix]
 			check_call(call_args)
-
-			# rename to fastq files to  S_R1_###.fastq.gz
+			# rename to fastq files to  S_R1_###.fastq.gz or S_R1_###.fastq
 		CODE
 
 		mkfifo pipe1 pipe2 pipe3 pipe4 pipe5
@@ -88,8 +90,8 @@ task PrepareFastq {
 		java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/picard.jar FastqToSam \
 		OUTPUT=pipe1 \
 		USE_SEQUENTIAL_FASTQS=true \
-		FASTQ=S_R1_001.fastq.gz \
-		FASTQ2=S_R2_001.fastq.gz \
+		FASTQ=S_R1_001.fastq${fastq_suffix} \
+		FASTQ2=S_R2_001.fastq${fastq_suffix} \
 		QUALITY_FORMAT=Standard \
 		SAMPLE_NAME=${sample_id} \
 		SORT_ORDER=queryname | \
@@ -147,7 +149,7 @@ task PrepareFastq {
 	}
 
 	runtime {
-		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
 		disks: "local-disk ${disk_space} HDD"
 		memory :"${memory}"
 		cpu:"${cpu}"

@@ -13,7 +13,7 @@ task run_cumulus_aggregate_matrices {
 	String? attributes
 	Boolean? select_only_singlets
 	Int? minimum_number_of_genes
-	String? dropseq_genome
+	String? genome
 	String docker_registry
 
 	command {
@@ -34,8 +34,8 @@ task run_cumulus_aggregate_matrices {
 			call_args.append('--select-only-singlets')
 		if '${minimum_number_of_genes}' is not '':
 			call_args.extend(['--minimum-number-of-genes', '${minimum_number_of_genes}'])
-		if '${dropseq_genome}' is not '':
-			call_args.extend(['--dropseq-genome', '${dropseq_genome}'])
+		if '${genome}' is not '':
+			call_args.extend(['--genome', '${genome}'])
 
 		print(' '.join(call_args))
 		check_call(call_args)

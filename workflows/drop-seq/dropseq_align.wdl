@@ -110,7 +110,7 @@ task STAR {
 	}
 
 	runtime {
-		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
         zones: zones
 		disks: "local-disk " + ceil(size(genome_tar, "GB")*5 + (3.25 * size(input_bam, "GB")) + 1)+ " HDD"
@@ -177,7 +177,7 @@ task AddTags {
 	}
 
 	runtime {
-		docker: "${docker_registry}dropseq:${drop_seq_tools_version}"
+		docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
 		disks: "local-disk " + ceil(20 + size(genome_fasta,"GB") + size(gene_intervals,"GB") + size(genome_dict,"GB") + size(refflat,"GB") +  size(unaligned_bam,"GB")*2 + size(aligned_bam,"GB")*disk_space_multiplier) + " HDD"
 		memory :"${memory}"
 		preemptible: "${preemptible}"
