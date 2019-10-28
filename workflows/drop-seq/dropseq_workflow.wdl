@@ -6,14 +6,14 @@ import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_prepare_fastq/v
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_qc/versions/3/plain-WDL/descriptor" as dropseq_qc_wdl
 
 workflow dropseq_workflow {
-    # Either a list of flowcell URLS or sample_id tab r1 tab r2
-    File input_csv_file
+    # Either a list of flowcell URLS or a tab separated file with no header with sample_id tab r1 tab r2
+    File input_tsv_file
     # Output directory, gs URL
     String output_directory
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "/+$", "")
 
-    Array[Array[String]] input_tsv = read_tsv(input_csv_file)
+    Array[Array[String]] input_tsv = read_tsv(input_tsv_file)
     Boolean run_bcl2fastq = false
     Boolean run_dropseq_tools = true
     Boolean run_dropest = false
@@ -111,7 +111,7 @@ workflow dropseq_workflow {
 
     call generate_count_config {
         input:
-            input_csv_file = input_csv_file,
+            input_csv_file = input_tsv_file,
             drop_seq_tools_version=drop_seq_tools_version,
             bcl2fastq_sample_sheets = bcl2fastq.fastqs,
             disk_space_multiplier=prepare_fastq_disk_space_multiplier,
