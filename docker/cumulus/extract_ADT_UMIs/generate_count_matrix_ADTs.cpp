@@ -183,14 +183,15 @@ inline string safe_substr(const string& sequence, int pos, int length) {
 // extra_info is the skeleton sequence for crispr and total-A/B/C for antibody
 inline bool extract_feature_barcode(const string& sequence, int feature_length, const string& feature_type, const string& extra_info, string& feature_barcode) {
 	bool success;
-	int start_pos, end_pos, best_value;
+	int start_pos, end_pos, best_value; // here start_pos and end_pos are with respect to feature sequence.
 
 	if (feature_type == "antibody") {
 		success = true;
 		feature_barcode = safe_substr(sequence, totalseq_barcode_pos, feature_length);
 	}
 	else {
-		start_pos = match_tso ? matching(sequence, TSO, 3, 0, best_value) : 0; // match template switch oligo
+		// start_pos = match_tso ? matching(sequence, TSO, 3, 0, best_value) : 0; // match template switch oligo
+		start_pos = 0; // temporarily disable TSO matching
 		success = start_pos >= 0;
 		if (success) {
 			end_pos = locate_scaffold_sequence(sequence, extra_info, start_pos + feature_length - max_mismatch_feature, sequence.length() - (extra_info.length() - 2), 2);
