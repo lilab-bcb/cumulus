@@ -58,7 +58,7 @@ task run_cumulus_aggregate_matrices {
 }
 
 task run_cumulus_cluster {
-	File input_10x_file
+	File input_file
 	String output_name
 	String cumulus_version
 	String zones
@@ -141,7 +141,7 @@ task run_cumulus_cluster {
 
 		python <<CODE
 		from subprocess import check_call
-		call_args = ['pegasus', 'cluster', '${input_10x_file}', '${output_name}', '-p', '${num_cpu}']
+		call_args = ['pegasus', 'cluster', '${input_file}', '${output_name}', '-p', '${num_cpu}']
 		if '${genome}' is not '':
 			call_args.extend(['--genome', '${genome}'])
 		if '${channel}' is not '':
@@ -721,7 +721,7 @@ task organize_results {
 	String zones
 	Int disk_space
 	Int preemptible
-	File? output_10x_h5
+	File? output_h5sc
 	File? output_h5ad
 	Array[File]? output_seurat_h5ad
 	Array[File]? output_filt_xlsx
@@ -748,7 +748,7 @@ task organize_results {
 
 		# check_call(['mkdir', '-p', dest])
 		
-		files = ['${output_10x_h5}', '${sep=" " output_seurat_h5ad}', '${sep=" " output_filt_xlsx}', '${sep=" " output_loom_file}', '${sep=" " output_parquet_file}', '${output_de_xlsx}', '${sep=" " output_markers_xlsx}', '${sep=" " output_anno_file}']
+		files = ['${output_h5sc}', '${sep=" " output_seurat_h5ad}', '${sep=" " output_filt_xlsx}', '${sep=" " output_loom_file}', '${sep=" " output_parquet_file}', '${output_de_xlsx}', '${sep=" " output_markers_xlsx}', '${sep=" " output_anno_file}']
 		files.append('${output_h5ad}' if '${output_de_h5ad}' is '' else '${output_de_h5ad}')
 		files.extend('${sep="," output_filt_plot}'.split(','))
 		files.extend('${sep="," output_pdfs}'.split(','))
