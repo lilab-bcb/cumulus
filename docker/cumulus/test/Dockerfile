@@ -1,7 +1,8 @@
-FROM continuumio/miniconda3:4.6.14
+FROM continuumio/miniconda3:4.7.12
 SHELL ["/bin/bash", "-c"]
 
-RUN apt-get update && apt-get install --no-install-recommends -y \
+RUN mkdir -p /usr/share/man/man1 && \
+	apt-get update && apt-get install --no-install-recommends -y \
 		build-essential \
 		automake \
 		zlib1g-dev \
@@ -11,7 +12,8 @@ RUN apt-get update && apt-get install --no-install-recommends -y \
 		lsb-release \
 		libfftw3-dev \
 		libboost-iostreams-dev \
-		default-jdk && \
+		default-jdk \
+		curl && \
 	export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
 	echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
 	curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
