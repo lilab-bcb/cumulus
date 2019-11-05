@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/1/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/2/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
@@ -264,7 +264,7 @@ workflow cumulus {
 
 	call tasks.run_cumulus_cluster as cluster {
 		input:
-			input_10x_file = if is_sample_sheet then aggregate_matrices.output_h5sc else input_file,
+			input_file = if is_sample_sheet then aggregate_matrices.output_h5sc else input_file,
 			output_name = out_name,
 			genome = genome,
 			channel = channel,
@@ -412,7 +412,7 @@ workflow cumulus {
 	call tasks.organize_results {
 		input:
 			output_name = output_name,
-			output_10x_h5 = aggregate_matrices.output_h5sc,
+			output_h5sc = aggregate_matrices.output_h5sc,
 			output_h5ad = cluster.output_h5ad,
 			output_seurat_h5ad = cluster.output_seurat_h5ad,
 			output_filt_xlsx = cluster.output_filt_xlsx,
@@ -435,7 +435,7 @@ workflow cumulus {
 
 	
 	output {
-		File? output_10x_h5 = aggregate_matrices.output_h5sc
+		File? output_h5sc = aggregate_matrices.output_h5sc
 		File output_h5ad = cluster.output_h5ad
 		Array[File] output_seurat_h5ad = cluster.output_seurat_h5ad
 		Array[File] output_filt_xlsx = cluster.output_filt_xlsx
