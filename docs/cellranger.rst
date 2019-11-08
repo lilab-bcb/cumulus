@@ -264,23 +264,23 @@ cellranger_workflow inputs:
 	  - "57.6G"
 	  - "57.6G"
 	* - mkfastq_disk_space
-	  - Optional disk space in gigabytes for mkfastq
+	  - Optional disk space in GB for mkfastq
 	  - 1500
 	  - 1500
 	* - count_disk_space
-	  - Disk space in gigabytes needed for cellranger count
+	  - Disk space in GB needed for cellranger count
 	  - 500
 	  - 500
 	* - vdj_disk_space
-	  - Disk space in gigabytes needed for cellranger vdj
+	  - Disk space in GB needed for cellranger vdj
 	  - 500
 	  - 500
 	* - feature_disk_space
-	  - Disk space in gigabytes needed for extracting feature count matrix
+	  - Disk space in GB needed for extracting feature count matrix
 	  - 100
 	  - 100
 	* - atac_disk_space
-	  - Disk space in gigabytes needed for cellranger-atac count
+	  - Disk space in GB needed for cellranger-atac count
 	  - 500
 	  - 500
 	* - preemptible
@@ -490,7 +490,7 @@ Instructions to configure ``cellranger_workflow``
 		  - "32G"
 		  - "32G"
 		* - feature_disk_space
-		  - Optional disk space in gigabytes needed for extracting ADT count matrix
+		  - Optional disk space in GB needed for extracting ADT count matrix
 		  - 100
 		  - 100
 

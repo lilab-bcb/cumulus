@@ -142,7 +142,7 @@ global inputs
 	  - "200G"
 	  - "200G"
 	* - disk_space
-	  - Total disk space in gigabytes.
+	  - Total disk space in GB
 	  - 100
 	  - 100
 	* - preemptible
@@ -975,7 +975,7 @@ Note that we will make the required inputs/outputs bold and all other inputs/out
 	  - "200G"
 	  - "200G"
 	* - disk_space
-	  - Total disk space in gigabytes
+	  - Total disk space in GB
 	  - 100
 	  - 100
 	* - preemptible

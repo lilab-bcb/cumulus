@@ -9,6 +9,8 @@ workflow cumulus_hashing_cite_seq {
 
 	# cumulus version, default to "0.10.0"
 	String? cumulus_version = "0.10.0"
+	# Docker registry to use
+	String? docker_registry = "cumulusprod/"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus
@@ -42,7 +44,6 @@ workflow cumulus_hashing_cite_seq {
 	# merge_rna_adt parameters
 	# A CSV file containing the IgG control information for each antibody.
 	File? antibody_control_csv
-	String? docker_registry = "cumulusprod/"
 
 
 
