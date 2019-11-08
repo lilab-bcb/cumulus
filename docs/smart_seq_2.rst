@@ -1,7 +1,10 @@
 Extract gene-count matrices from plated-based SMART-Seq2 data
 -------------------------------------------------------------
 
-Follow the steps below to extract gene-count matrices from SMART-Seq2 data on Terra_. This WDL aligns reads using Bowtie 2 and estimates expression levels using RSEM.
+Run SMART-Seq2 Workflow
+~~~~~~~~~~~~~~~~~~~~~~~~
+
+Follow the steps below to extract gene-count matrices from SMART-Seq2 data on Terra_. This WDL aligns reads using *Bowtie 2* and estimates expression levels using *RSEM*.
 
 #. Copy your sequencing output to your workspace bucket using gsutil_ in your unix terminal.
 
@@ -67,17 +70,18 @@ Follow the steps below to extract gene-count matrices from SMART-Seq2 data on Te
 		gsutil cp /foo/bar/projects/sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
 
-#. Import smartseq2 tool.
+#. Import smartseq2 workflow to your workspace.
 
-	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **cumulus/smartseq2**.
- 	You can also see the Terra documentation for `adding a tool`_.
+	See the Terra documentation for `adding a workflow`_. The smartseq2 workflow is under ``Broad Methods Repository`` with name "**cumulus/smartseq2**".
 
-#. Select ``Process single workflow from files``.
+	Moreover, in the workflow page, click ``Export to Workspace...`` button, and select the workspace to which you want to export ``smartseq2`` in the drop-down menu.
+
+#. In your workspace, open ``smartseq2`` in ``WORKFLOWS`` tab. Select ``Process single workflow from files`` as below
 
 	.. image:: images/single_workflow.png
 
+   and click ``SAVE`` button.
 
----------------------------------
 
 Inputs:
 ^^^^^^^
@@ -101,17 +105,29 @@ Please see the description of inputs below. Note that required inputs are shown 
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2_output"
 	  -
 	* - **reference**
-	  - Reference transcriptome to align reads to. Currently we only have ``GRCh38`` for human and ``GRCm38`` for mouse
-	  - GRCh38
+	  - Reference transcriptome to align reads to. Acceptable values:
+
+	  	- Pre-created genome references: "GRCh38" for human; "GRCm38" and "mm10" for mouse.
+	  	- Create a custom genome reference using `smartseq2_create_reference workflow <./smart_seq_2.html#custom-genome>`_, and specify its Google bucket URL here. 
+	  - | "GRCh38", or
+	    | "gs://fc-e0000000-0000-0000-0000-000000000000/rsem_ref.tar.gz"
 	  - 
 	* - smartseq2_version
-	  - SMART-Seq2 docker version
+	  - SMART-Seq2 version to use. Versions available: 1.0.0.
 	  - "1.0.0"
 	  - "1.0.0"
+	* - docker_registry
+	  - Docker registry to use. Options:
+
+	  	- "cumulusprod/" for Docker Hub images; 
+
+	  	- "quay.io/cumulus/" for backup images on Red Hat registry.
+	  - "cumulusprod/"
+	  - "cumulusprod/"
 	* - zones
 	  - Google cloud zones
-	  - "us-east1-b us-east1-c us-east1-d"
-	  - "us-east1-b us-east1-c us-east1-d"
+	  - "us-east1-d us-west1-a us-west1-b"
+	  - "us-east1-d us-west1-a us-west1-b"
 	* - num_cpu
 	  - Number of cpus to request for one node
 	  - 4
@@ -121,7 +137,7 @@ Please see the description of inputs below. Note that required inputs are shown 
 	  - "3.60G"
 	  - "3.60G"
 	* - disk_space
-	  - Disk space in gigabytes
+	  - Disk space in GB
 	  - 10
 	  - 10
 	* - preemptible
@@ -146,11 +162,21 @@ See the table below for important outputs.
 	  - Description
 	* - output_count_matrix
 	  - Array[String]
-	  - A list of google bucket urls containing gene-count matrices, one per plate. Each gene-count matrix file has the suffix 'dge.txt.gz'.
+	  - A list of google bucket urls containing gene-count matrices, one per plate. Each gene-count matrix file has the suffix ``.dge.txt.gz``.
 
-This WDL generates one gene-count matrix per SMART-Seq2 plate. The gene-count matrix uses Drop-Seq format: The first line starts with 'Gene' and then gives cell barcodes separated by tabs. Starting from the second line, each line describes one gene. The first item in the line is the gene name and the rest items are TPM-normalized count values of this gene for each cell. The gene-count matrices can be fed directly into ``cumulus`` for downstream analysis.
+This WDL generates one gene-count matrix per SMART-Seq2 plate. The gene-count matrix uses Drop-Seq format: 
 
-TPM-normalized counts are calculated as follows: We first estimate the gene expression levels in TPM using RSEM. Suppose we have ``c`` reads for one cell, we then calculate TPM-normalized count for gene i as ``TPM_i / 1e6 * c``. 
+- The first line starts with ``"Gene"`` and then gives cell barcodes separated by tabs. 
+- Starting from the second line, each line describes one gene. 
+  The first item in the line is the gene name and the rest items are TPM-normalized count values of this gene for each cell. 
+
+The gene-count matrices can be fed directly into **cumulus** for downstream analysis.
+
+TPM-normalized counts are calculated as follows:
+
+#. Estimate the gene expression levels in TPM using *RSEM*. 
+
+#. Suppose ``c`` reads are achieved for one cell, then calculate TPM-normalized count for gene ``i`` as ``TPM_i / 1e6 * c``. 
 
 TPM-normalized counts reflect both the relative expression levels and the cell sequencing depth.
 
@@ -158,20 +184,23 @@ TPM-normalized counts reflect both the relative expression levels and the cell s
 
 ---------------------------------
 
-Custom Genome:
-^^^^^^^^^^^^^^
+Custom Genome
+~~~~~~~~~~~~~~~~
 
-#. Import smartseq2_create_reference tool.
+We also provide a way of generating user-customized Genome references for SMART-Seq2 workflow.
 
-	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **cumulus/smartseq2_create_reference**.
- 	You can also see the Terra documentation for `adding a tool`_.
+#. Import smartseq2_create_reference workflow to your workspace.
 
-#. Select ``Process single workflow from files``.
+	See the Terra documentation for `adding a workflow`_. The smartseq2_create_reference workflow is under ``Broad Methods Repository`` with name "**cumulus/smartseq2_create_reference**".
+
+	Moreover, in the workflow page, click ``Export to Workflow...`` button, and select the workspace to which you want to export ``smartseq2_create_reference`` in the drop-down menu.
+
+#. In your workspace, open ``smartseq2_create_reference`` in ``WORKFLOWS`` tab. Select ``Process single workflow from files`` as below
 
 	.. image:: images/single_workflow.png
 
+   and click ``SAVE`` button.
 
----------------------------------
 
 Inputs:
 ^^^^^^^
@@ -179,44 +208,77 @@ Inputs:
 Please see the description of inputs below. Note that required inputs are shown in bold.
 
 .. list-table::
-	:widths: 5 30 30
+	:widths: 5 30 30 5
 	:header-rows: 1
 
 	* - Name
 	  - Description
+	  - Type or Example
 	  - Default
 	* - **fasta**
-	  - Genome fasta file (e.g. Homo_sapiens.GRCh38.dna.primary_assembly.fa)
-	  -
+	  - Genome fasta file
+	  - | File. 
+	    | For example, "gs://fc-e0000000-0000-0000-0000-000000000000/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
+	  - 
 	* - **gtf**
 	  - GTF gene annotation file (e.g. Homo_sapiens.GRCh38.83.gtf)
-	  -
+	  - | File. 
+	    | For example, "gs://fc-e0000000-0000-0000-0000-000000000000/Homo_sapiens.GRCh38.83.gtf"
+	  - 
 	* - smartseq2_version
-	  - SMART-Seq2 docker version
+	  - | SMART-Seq2 version to use. 
+	    | Versions available: 1.0.0.
+	  - String
 	  - "1.0.0"
+	* - docker_registry
+	  - Docker registry to use. Options:
+
+	  	- "cumulusprod/" for Docker Hub images; 
+
+	  	- "quay.io/cumulus/" for backup images on Red Hat registry.
+	  - String
+	  - "cumulusprod/"
 	* - zones
 	  - Google cloud zones
+	  - String
 	  - "us-east1-b us-east1-c us-east1-d"
 	* - cpu
-	  - Number of cpus
-	  - 4
+	  - Number of CPUs
+	  - Integer
+	  - 8
 	* - memory
 	  - Memory size string
+	  - String
 	  - "7.2G"
 	* - extra_disk_space
-	  - Extra disk space in gigabytes
+	  - Extra disk space in GB
+	  - Integer
 	  - 15
 	* - preemptible
 	  - Number of preemptible tries
+	  - Integer
 	  - 2
-	* - docker_registry
-	  - The docker registry
-	  - "cumulusprod"
+
+Outputs
+^^^^^^^^
+
+.. list-table::
+	:widths: 5 5 10
+	:header-rows: 1
+
+	* - Name
+	  - Type
+	  - Description
+	* - reference
+	  - File
+	  - The custom Genome reference generated. Its default file name is ``rsem_ref.tar.gz``.
+
+
 
 ---------------------------------
 
 
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
-.. _adding a tool: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
+.. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
 .. _Terra: https://app.terra.bio/
 

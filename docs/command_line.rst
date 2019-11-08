@@ -96,7 +96,7 @@ Required options are in bold.
 Example
 ++++++++
 
-This example shows how to use ``alto fc_run`` to run cellranger_workflow to extract sequencer reads.
+This example shows how to use ``alto fc_run`` to run cellranger_workflow to extract gene-count matrices from sequencing output.
 
 #. Prepare your sample sheet ``example_sample_sheet.csv`` as the following::
 
@@ -112,7 +112,7 @@ This example shows how to use ``alto fc_run`` to run cellranger_workflow to extr
 
    where ``/my-local-path`` is the top-level directory of your BCL files on your local machine.
 
-   Note that ``sample_1``, ``sample_2``, ``sample_3``, and ``sample_4`` are sequenced on 2 flowcells. And for each sample, all of its FASTQ files will be passed to ``cellranger count`` in one command by the pipeline.
+   Note that ``sample_1``, ``sample_2``, ``sample_3``, and ``sample_4`` are sequenced on 2 flowcells.
 
 
 #. Prepare your JSON input file ``inputs.json`` for cellranger_workflow::
