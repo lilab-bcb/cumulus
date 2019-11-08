@@ -9,7 +9,10 @@ License
 
 Docker
 ^^^^^^^^^
-Add the lines below into your Dockerfile to install bcl2fastq into a debian based docker::
+
+Read `this tutorial <https://docs.docker.com/get-started/>`_ if you are new to Docker and don't know how to write your Dockerfile.
+
+For a Debian based docker, add the lines below into its Dockerfile to install ``bcl2fastq``::
 
     RUN apt-get install --no-install-recommends -y alien unzip
     ADD https://support.illumina.com/content/dam/illumina-support/documents/downloads/software/bcl2fastq/bcl2fastq2-v2-20-0-linux-x86-64.zip /software
@@ -19,32 +22,32 @@ You can host your private docker images in the `Google Container Registry`_.
 
 Workflows
 ^^^^^^^^^^^^
-Workflows such as cellranger_workflow and dropseq_workflow provide the option of running bcl2fastq. We provide dockers
-containing bcl2fastq that are accessible only by members of the Broad Institute. Non-Broad Institute members will have to provide
+Workflows such as **cellranger_workflow** and **dropseq_workflow** provide the option of running ``bcl2fastq``. We provide dockers
+containing ``bcl2fastq`` that are accessible only by members of the Broad Institute. Non-Broad Institute members will have to provide
 their own docker images.
 
 
 Example
 ^^^^^^^^^
-In this example we create a docker image for running cellranger mkfastq version 3.0.2.
+In this example we create a docker image for running ``cellranger mkfastq`` version 3.0.2.
 
-- Create a GCP project or reuse an existing project.
-- Enable the Google Container Registry
-- Clone the cumulus repository::
+#. Create a GCP project or reuse an existing project.
+#. Enable the Google Container Registry
+#. Clone the cumulus repository::
 
     git clone https://github.com/klarman-cell-observatory/cumulus.git
 
-- Add the lines to cumulus/docker/cellranger/3.0.2/Dockerfile to include bcl2fastq (see Docker_).
-- Ensure you have `Docker installed`_
-- Download cellranger from https://support.10xgenomics.com/single-cell-gene-expression/software/downloads/3.0
-- Build, tag, and push the docker. Remember to replace PROJECT_ID with your GCP project id::
+#. Add the lines to cumulus/docker/cellranger/3.0.2/Dockerfile to include bcl2fastq (see Docker_).
+#. Ensure you have `Docker installed`_
+#. Download cellranger from https://support.10xgenomics.com/single-cell-gene-expression/software/downloads/3.0
+#. Build, tag, and push the docker. Remember to replace PROJECT_ID with your GCP project id::
 
     cd cumulus/docker/cellranger/3.0.2/
     docker build -t cellranger-3.0.2 .
     docker tag cellranger-3.0.2 gcr.io/PROJECT_ID/cellranger:3.0.2
     gcr.io/PROJECT_ID/cellranger:3.0.2
 
-- Run cell_ranger_workflow, entering your docker registry URL for the input ``cellranger_mkfastq_docker_registry``
+#. Import **cellranger_workflow** workflow to your workspace (see `cellranger_workflow steps <./cellranger.html>`_), and enter your docker registry URL (in this example, ``"gcr.io/PROJECT_ID/"``) in ``cellranger_mkfastq_docker_registry`` field of `cellranger_workflow inputs <./cellranger.html#cellranger-workflow-inputs>`_.
 
 .. _`Google Container Registry`: https://cloud.google.com/container-registry/docs/
 .. _`bcl2fastq license`: https://support.illumina.com/content/dam/illumina-support/documents/downloads/software/bcl2fastq/bcl2fastq2-v2-20-eula.pdf

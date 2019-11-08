@@ -23,13 +23,23 @@ Activate the alto virtual environment::
 Install ``altocumulus`` for non-Broad users
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Make sure you have ``conda`` installed. If you haven't installed conda_, use the following commands to install::
+#. Make sure you have ``conda`` installed. If you haven't installed conda_, use the following commands to install it on Linux::
 
 	wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh .
-	bash Miniconda3-latest-Linux-x86_64.sh -p /users/foo/miniconda3
-	mv Miniconda3-latest-Linux-x86_64.sh /users/foo/miniconda3
+	bash Miniconda3-latest-Linux-x86_64.sh -p /home/foo/miniconda3
+	mv Miniconda3-latest-Linux-x86_64.sh /home/foo/miniconda3
 
-Next, create an virtual environment ``alto`` and install ``altocumulus``::
+   where ``/home/foo/miniconda3`` should be replaced by your own folder holding Miniconda3.
+
+Or use the following commdands for MacOS installation::
+
+	curl -O curl -O https://repo.anaconda.com/miniconda/Miniconda3-latest-MacOSX-x86_64.sh
+	bash Miniconda3-latest-MacOSX-x86_64.sh -p /Users/foo/miniconda3
+	mv Miniconda3-latest-MacOSX-x86_64.sh /Users/foo/miniconda3
+
+	where ``/Users/foo/miniconda3`` should be replaced by your own folder holding Miniconda3.
+
+#. Create a conda environment named "alto" and install ``altocumulus``::
 
 	conda create -n alto -y pip
 	source activate alto
@@ -37,21 +47,26 @@ Next, create an virtual environment ``alto`` and install ``altocumulus``::
 	cd altocumulus
 	pip install -e .
 
----------------------------------
+When the installation is done, type ``alto fc_run -h`` in terminal to see if you can see the help information.
 
-Run Terra pipelines via ``alto fc_run``
+
+Run Terra workflows via ``alto fc_run``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **alto fc_run** runs a Terra method. Features:
 
-#. Uploads local files/directories in your inputs to a Google Cloud bucket updates the file paths to point to the Google Cloud bucket. Your sample sheet can point to local file paths and alto run will take care of uploading directories (e.g. fastq directories) and modifying the sample sheet to point to a Google Cloud bucket.
+- Uploads local files/directories in your inputs to a Google Cloud bucket updates the file paths to point to the Google Cloud bucket. 
 
-#. Creates or uses an existing workspace.
+   Your sample sheet can point to local file paths. In this case, ``alto run`` will take care of uploading directories (e.g. fastq directories) and modifying the sample sheet to point to a Google Cloud bucket.
 
-#. Uses the latest version of a method unless the method version is specified.
+- Creates or uses an existing workspace.
+
+- Uses the latest version of a method unless the method version is specified.
 
 Options
 +++++++
+
+Required options are in bold.
 
 .. list-table::
 	:widths: 5 20
@@ -59,60 +74,71 @@ Options
 
 	* - Name
 	  - Description
-	* - | **-m**
-		| **--method**
-	  - | Method namespace/name (e.g. cumulus/cellranger_workflow).
-		| A version can optionally be specified (e.g. cumulus/cellranger_workflow/4), otherwise the latest version of the method is used
-	* - | **-w**
-		| **--workspace**
-	  - Workspace name (e.g. foo/bar). The workspace will be created if it does not exist
-	* - | **-i**
-		| **--inputs**
-	  - WDL input JSON. Can be specified as file or string
-	* - --bucket-folder
-	  - Store inputs to <folder> under workspace's google bucket
-	* - | -o
-		| --upload
-	  - Upload files/directories to the workspace Google Cloud bucket and output updated input json (with local path replaced by google bucket urls) to <updated_json>
+	* - | **-m <METHOD>**
+	    | **\\-\\-method <METHOD>**
+	  - | Specify a Terra workflow *<METHOD>* to use. 
+	    | *<METHOD>* is of format *Namespace/Name* (e.g. ``cumulus/cellranger_workflow``).
+	    | A snapshot version number can optionally be specified (e.g. ``cumulus/cellranger_workflow/4``); otherwise the latest snapshot of the method is used.
+	* - | **-w <WORKSPACE>**
+	    | **\\-\\-workspace <WORKSPACE>**
+	  - | Specify which Terra workspace *<WORKSPACE>* to use. 
+	    | *<WORKSPACE>* is also of format *Namespace/Name* (e.g. ``foo/bar``). The workspace will be created if it does not exist.
+	* - | **-i <WDL_INPUTS>**
+	    | **\\-\\-inputs <WDL_INPUTS>**
+	  - | Specify the WDL input JSON file to use. 
+	    | It can be a local file, a JSON string, or a Google bucket URL directing to a remote JSON file.
+	* - | \\-\\-bucket-folder <folder>
+	  - | Store inputs to <folder> under workspace's google bucket.
+	* - | -o <updated_json>
+	    | \\-\\-upload <updated_json>
+	  - | Upload files/directories to Google bucket of the workspace, and generate an updated input JSON file (with local paths replaced by Google bucket URLs) to <updated_json> on local machine.
 
-Examples
+Example
 ++++++++
 
-Upload BCL directories and sample sheet, convert sample sheet paths to gs:// URLs, and run cell ranger mkfastq and count.
+This example shows how to use ``alto fc_run`` to run cellranger_workflow to extract sequencer reads.
 
-example_sample_sheet.csv::
+#. Prepare your sample sheet ``example_sample_sheet.csv`` as the following::
 
 	Sample,Reference,Flowcell,Lane,Index,Chemistry
-	sample_1,GRCh38,/mylocalpath/flowcell1,1-2,SI-GA-A8,threeprime
-	sample_2,GRCh38,/mylocalpath/flowcell1,3-4,SI-GA-B8,threeprime
-	sample_3,mm10,/mylocalpath/flowcell1,5-6,SI-GA-C8,fiveprime
-	sample_4,mm10,/mylocalpath/flowcell1,7-8,SI-GA-D8,fiveprime
-	sample_1,GRCh38,/mylocalpath/flowcell2,1-2,SI-GA-A8,threeprime
-	sample_2,GRCh38,/mylocalpath/flowcell2,3-4,SI-GA-B8,threeprime
-	sample_3,mm10,/mylocalpath/flowcell2,5-6,SI-GA-C8,fiveprime
-	sample_4,mm10,/mylocalpath/flowcell2,7-8,SI-GA-D8,fiveprime
+	sample_1,GRCh38,/my-local-path/flowcell1,1-2,SI-GA-A8,threeprime
+	sample_2,GRCh38,/my-local-path/flowcell1,3-4,SI-GA-B8,threeprime
+	sample_3,mm10,/my-local-path/flowcell1,5-6,SI-GA-C8,fiveprime
+	sample_4,mm10,/my-local-path/flowcell1,7-8,SI-GA-D8,fiveprime
+	sample_1,GRCh38,/my-local-path/flowcell2,1-2,SI-GA-A8,threeprime
+	sample_2,GRCh38,/my-local-path/flowcell2,3-4,SI-GA-B8,threeprime
+	sample_3,mm10,/my-local-path/flowcell2,5-6,SI-GA-C8,fiveprime
+	sample_4,mm10,/my-local-path/flowcell2,7-8,SI-GA-D8,fiveprime
 
-Note that sample_1, sample_2, sample_3, and sample_4 are sequenced on 2 flowcells and for each sample, all of its FASTQ files will be passed to cell ranger count in one command by the pipeline.
+   where ``/my-local-path`` is the top-level directory of your BCL files on your local machine.
 
-inputs.json:
+   Note that ``sample_1``, ``sample_2``, ``sample_3``, and ``sample_4`` are sequenced on 2 flowcells. And for each sample, all of its FASTQ files will be passed to ``cellranger count`` in one command by the pipeline.
 
-.. code-block:: json
+
+#. Prepare your JSON input file ``inputs.json`` for cellranger_workflow::
 
 	{
-		"cellranger_workflow.input_csv_file" : "mylocalpath/sample_sheet.csv",
+		"cellranger_workflow.input_csv_file" : "/my-local-path/sample_sheet.csv",
 		"cellranger_workflow.output_directory" : "gs://url/outputs",
 		"cellranger_workflow.delete_input_bcl_directory": true
 	}
 
-Run the following command to kick off your Terra pipeline::
+   where ``gs://url/outputs`` is the folder on Google bucket of your workspace to hold output.
 
-	alto fc_run -m cumulus/cellranger_workflow -i inputs.json -w myworkspace_namespace/myworkspace_name --bucket-folder inputs -o inputs_updated.json
+#. Run the following command to kick off your Terra workflow::
 
-Upon success, **alto fc_run** returns a url pointing the the submitted Terra job.
+	alto fc_run -m cumulus/cellranger_workflow -i inputs.json -w myworkspace_namespace/myworkspace_name -o inputs_updated.json
+
+   where ``myworkspace_namespace/myworkspace_name`` should be replaced by your workspace namespace and name.
+
+
+Upon success, ``alto fc_run`` returns a URL pointing to the submitted Terra job for you to monitor.
 
 If for any reason, your job failed. You could rerun it without uploading files again via the following command::
 
 	alto fc_run -m cumulus/cellranger_workflow -i inputs_updated.json -w myworkspace_namespace/myworkspace_name
+
+because ``inputs_updated.json`` is the updated version of ``inputs.json`` with all local paths being replaced by their corresponding Google bucket URLs after uploading.
 
 
 .. _conda: https://docs.conda.io/en/latest/miniconda.html
