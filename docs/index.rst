@@ -9,10 +9,11 @@
    first_time
    versions
    cellranger
-   hashing_cite_seq
+   bcl2fastq
    smart_seq_2
    drop_seq
+   hashing_cite_seq
    cumulus
    command_line
    examples/index
-   bcl2fastq
+   contribution

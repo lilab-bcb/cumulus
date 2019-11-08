@@ -4,7 +4,7 @@ Run Cell Ranger tools using cellranger_workflow
 
 Follow the steps below to run CellRanger mkfastq/count/vdj on Terra_.
 
-#. Copy your sequencing output to your workspace bucket using gsutil_ in your unix terminal.
+#. Copy your sequencing output to your workspace bucket using gsutil_ (you already have it if you've installed Google cloud SDK) in your unix terminal.
 
 	You can obtain your bucket URL in the dashboard tab of your Terra workspace under the information panel.
 
@@ -28,9 +28,9 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on Terra_.
 
 		gsutil -m cp -r /foo/bar/nextseq/Data/VK18WBC6Z4 gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4
 	
-	``-m`` means copy in parallel, ``-r`` means copy the directory recursively.
+	``-m`` means copy in parallel, ``-r`` means copy the directory recursively, and ``gs://fc-e0000000-0000-0000-0000-000000000000`` should be replaced by your own workspace Google bucket URL.
 	
-#. Non Broad Institute users that wish to run cellrankger mkfastq must create a custom docker image that contains bcl2fastq.
+#. Non Broad Institute users that wish to run ``cellranger mkfastq`` must create a custom docker image that contains ``bcl2fastq``.
 
     See :ref:`bcl2fastq-docker` instructions.
 
@@ -40,7 +40,7 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on Terra_.
 
 	The sample sheet describes how to demultiplex flowcells and generate channel-specific count matrices. Note that *Sample*, *Lane*, and *Index* columns are defined exactly the same as in 10x's simple CSV layout file.
 
-	scRNA-Seq formatted sample sheet description (required column headers are shown in bold):
+	scRNA-Seq formatted sample sheet description **(required column headers are shown in bold)**:
 
 	.. list-table::
 		:widths: 5 30
@@ -134,14 +134,17 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on Terra_.
 		gsutil cp /foo/bar/projects/sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
 
-#. Import cellranger_workflow tool.
+#. Import "cellranger_workflow" workflow to your workspace.
 
-	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **cumulus/cellranger_workflow**.
- 	You can also see the Terra documentation for `adding a tool`_.
+	See the Terra documentation for `adding a workflow`_. The cellranger workflow is under ``Broad Methods Repository`` with name "**cumulus/cellranger_workflow**".
 
-#. Select ``Process single workflow from files``.
+	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export ``cellranger_workflow`` in the drop-down menu.
+
+#. In your workspace, open cellranger_workflow in ``WORKFLOWS`` tab. Select ``Process single workflow from files`` as below
 
 	.. image:: images/single_workflow.png
+
+   and click ``SAVE`` button.
 
 ---------------------------------
 
@@ -151,7 +154,7 @@ cellranger_workflow inputs:
 ``cellranger_workflow`` takes Illumina outputs as input and runs ``cellranger mkfastq``/``cellranger-atac mkfastq`` and ``cellranger count``/``cellranger vdj``/``cellranger-atac count``/cumulus feature extraction. Please see the description of inputs below. Note that required inputs are shown in bold.
 
 .. list-table::
-	:widths: 5 30 30 5
+	:widths: 5 30 30 10
 	:header-rows: 1
 
 	* - Name
@@ -192,7 +195,7 @@ cellranger_workflow inputs:
 	  - false
 	* - vdj_denovo
 	  - Do not align reads to reference V(D)J sequences before de novo assembly
-	  - true
+	  - false
 	  - false
 	* - vdj_chain
 	  - Force the web summary HTML and metrics summary CSV to only report on a particular chain type. The accepted values are: auto for autodetection based on TR vs IG representation, TR for T cell receptors, IG for B cell receptors, all for all chain types
@@ -219,25 +222,39 @@ cellranger_workflow inputs:
 	  - "1.1.0"
 	  - "1.1.0"
 	* - cumulus_version
-	  - Cumulus version for extracting feature barcode matrix, currently only "0.10.0" is available.
+	  - Cumulus version for extracting feature barcode matrix, currently only 0.10.0
 	  - "0.10.0"
 	  - "0.10.0"
+	* - docker_registry
+	  - Docker registry to use for cellranger_workflow. Options:
+
+	  	- "cumulusprod/" for Docker Hub images; 
+
+	  	- "quay.io/cumulus/" for backup images on Red Hat registry.
+	  - "cumulusprod/"
+	  - "cumulusprod/"
+	* - cellranger_mkfastq_docker_registry
+	  - Docker registry to use for ``cellranger mkfastq``. 
+	    Default is the registry to which only Broad users have access. 
+	    See :ref:`bcl2fastq-docker` for making your own registry.
+	  - "gcr.io/broad-cumulus"
+	  - "gcr.io/broad-cumulus"
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-d us-west1-a us-west1-b"
 	  - "us-east1-d us-west1-a us-west1-b"
 	* - num_cpu
 	  - Number of cpus to request for one node
-	  - 64
-	  - 64
+	  - 32
+	  - 32
 	* - atac_num_cpu
 	  - Number of cpus for cellranger-atac count
 	  - 64
 	  - 64
 	* - memory
 	  - Memory size string
-	  - "128G"
-	  - "128G"
+	  - "120G"
+	  - "120G"
 	* - feature_memory
 	  - Optional memory string for extracting feature count matrix
 	  - "32G"
@@ -319,7 +336,7 @@ Only run the count part
 Sometimes, users might want to perform demultiplexing locally and only run the count part on the cloud. This section describes how to only run the count part via ``cellranger_workflow``.
 
 
-#. Copy your FASTQ files to the workspace using gsutil in your unix terminal. 
+#. Copy your FASTQ files to the workspace using gsutil_ in your unix terminal. 
 
 	You should upload folders of FASTQS. Each folder should contain all FASTQ files for one sample.
 
@@ -401,7 +418,7 @@ Sometimes, users might want to perform demultiplexing locally and only run the c
 		sample_1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/flowcell_1
 		sample_1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/flowcell_2
 
-#. Set optional input ``run_mkfastq`` to ``false``.
+#. Set optional input ``run_mkfastq`` of cellranger_workflow workflow to ``false``.
 
 ---------------------------------
 
@@ -435,7 +452,15 @@ Instructions to configure ``cellranger_workflow``
 		sample_2_adt,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3-4,TCCGGAGA,SC3Pv3,adt,gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index.csv
 		sample_3_crispr,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,5-6,CGCTCATT,SC3Pv3,crispr,gs://fc-e0000000-0000-0000-0000-000000000000/crispr_index.csv
 
-	In the above sample sheet, the first line describes the normal 3' RNA assay. The second line describes its associated antibody tag data, which can from either a CITE-Seq, cell-hashing, or nucleus-hashing experiment. Note that for the tag data, the *Index* field is different. The index for tag and crispr data should be Illumina index primer sequence (e.g. D701 in line two). In addition, the *DataType* field is changed to *adt*. The third line describes another tag data, which is in 10x genomics' V3 chemistry. For tag and crispr data, it is important to explicitly state the chemistry (e.g. *SC3Pv3*). The last line describes one gRNA guide data for Perturb-seq (see the *crispr* in *DataType* field). Note that it is users' responsibility to avoid index collision between 10x genomics' RNA indexes (e.g. SI-GA-A8) and Illumina index sequences for tag and crispr data (e.g. ATTACTCG).
+	In the sample sheet above, despite the header row, 
+
+	- First row describes the normal 3' RNA assay; 
+	
+	- Second row describes its associated antibody tag data, which can from either a CITE-Seq, cell-hashing, or nucleus-hashing experiment. Note that for the tag data, the *Index* field is different. The index for tag and crispr data should be Illumina index primer sequence (e.g. ``ATTACTCG``, also known as ``D701``, in row two). In addition, the *DataType* field is changed to ``adt``. 
+	
+	- Third row describes another tag data, which is in 10x genomics' V3 chemistry. For tag and crispr data, it is important to explicitly state the chemistry (e.g. ``SC3Pv3``). 
+	
+	- Last row describes one gRNA guide data for Perturb-seq (see ``crispr`` in *DataType* field). Note that it is users' responsibility to avoid index collision between 10x genomics' RNA indexes (e.g. SI-GA-A8) and Illumina index sequences for tag and crispr data (e.g. ``ATTACTCG``).
 
 
 #. Fill in the ADT-specific parameters:
@@ -460,12 +485,12 @@ Instructions to configure ``cellranger_workflow``
 		  - Minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for the adt task and crispr data type
 		  - 0.1
 		  - 0.1
-		* - adt_memory
-		  - Optional memory in GB for extracting ADT count matrix
-		  - 32
-		  - 32
-		* - adt_disk_space
-		  - Optional disk space needed for extracting ADT count matrix
+		* - feature_memory
+		  - Optional memory string for extracting ADT count matrix
+		  - "32G"
+		  - "32G"
+		* - feature_disk_space
+		  - Optional disk space in gigabytes needed for extracting ADT count matrix
 		  - 100
 		  - 100
 
@@ -477,9 +502,9 @@ If the chemistry is V3, `10x genomics v3 cell barcode white list`_ will be used,
 
 For Perturb-seq data, a small number of sgRNA protospace sequences will be sequenced ultra-deeply and we may have PCR chimeric reads. Therefore, we generate filtered feature count matrices as well in a data driven manner: 
 
-We first plot the histogram of UMIs with certain number of read counts. The number of UMIs with x supporting reads decreases when x increases. We start from x = 1 and if we find that count[x] < count[x + 1] < count[x + 2], we detect a valley between two peaks. We filter out all UMIs with < x supporting reads since they are likely formed due to chimeric reads. 
+#. First, plot the histogram of UMIs with certain number of read counts. The number of UMIs with ``x`` supporting reads decreases when ``x`` increases. We start from ``x = 1``, and a valley between two peaks is detected if we find ``count[x] < count[x + 1] < count[x + 2]``. We filter out all UMIs with ``< x`` supporting reads since they are likely formed due to chimeric reads. 
 
-In addition, we also filter out barcode-feature-UMI combinations that have their read count ratio, which is defined as total reads supporting barcode-feature-UMI over total reads supporting barcode-UMI, no larger than *min_read_ratio*.
+#. In addition, we also filter out barcode-feature-UMI combinations that have their read count ratio, which is defined as total reads supporting barcode-feature-UMI over total reads supporting barcode-UMI, no larger than ``min_read_ratio`` parameter set above.
 
 Extracted feature count matrix output
 +++++++++++++++++++++++++++++++++++++
@@ -503,5 +528,5 @@ If data type is ``crispr``, three additional files, ``sample_id.umi_count.pdf``,
 .. _10x genomics v2 cell barcode white list: gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
 .. _10x genomics v3 cell barcode white list: gs://regev-lab/resources/cellranger/3M-february-2018.txt.gz
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
-.. _adding a tool: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
+.. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
 .. _Terra: https://app.terra.bio/

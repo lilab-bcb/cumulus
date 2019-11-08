@@ -14,6 +14,8 @@ workflow cumulus {
 
 	# cumulus version, default to "0.10.0"
 	String? cumulus_version = "0.10.0"
+	# Docker registry to use
+	String? docker_registry = "cumulusprod/"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus per cumulus job
@@ -55,7 +57,7 @@ workflow cumulus {
 	Boolean? cite_seq
 	# For CITE-Seq surface protein expression, make all cells with expression > <percentile> to the value at <percentile> to smooth outlier. Set <percentile> to 100.0 to turn this option off. [default: 99.99]
 	Float? cite_seq_capping
-	# If output cell and gene filtration results as a spreadsheet. [default: true]
+	# If write cell and gene filtration results as a spreadsheet. [default: true]
 	Boolean? output_filtration_results = true
 	# If plot filtration results as PDF files. [default: true]
 	Boolean? plot_filtration_results = true
@@ -239,7 +241,6 @@ workflow cumulus {
 	Boolean generate_scp_outputs = false
 	# Output dense expression matrix instead.
 	Boolean output_dense = false
-    String? docker_registry = "cumulusprod/"
 
 	if (is_sample_sheet) {
 		call tasks.run_cumulus_aggregate_matrices as aggregate_matrices {

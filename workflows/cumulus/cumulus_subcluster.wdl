@@ -10,6 +10,8 @@ workflow cumulus_subcluster {
 
 	# cumulus version, default to "0.10.0"
 	String? cumulus_version = "0.10.0"
+	# Docker registry to use
+	String? docker_registry = "cumulusprod/"
 	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
 	# Number of cpus per cumulus job
@@ -187,7 +189,6 @@ workflow cumulus_subcluster {
 	Boolean generate_scp_outputs = false
 	# Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain" or a JSON file describing the markers. [default: human_immune]
 	Boolean output_dense = false
-    String? docker_registry = "cumulusprod/"
 
 
 	call tasks.run_cumulus_subcluster as subcluster {

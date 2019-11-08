@@ -1,15 +1,25 @@
-Run single-cell cloud-based analysis module (cumulus) for scRNA-Seq data analysis
+Run Cumulus for sc/snRNA-Seq data analysis
 ---------------------------------------------------------------------------------
 
-Prepare Input Data
-^^^^^^^^^^^^^^^^^^
 
-Case 1: Sample Sheet
-++++++++++++++++++++
+Run Cumulus analysis
+~~~~~~~~~~~~~~~~~~~~~~~
+
+Prepare Input Data
+^^^^^^^^^^^^^^^^^^^^^^^
+
+Case One: Sample Sheet
++++++++++++++++++++++++++
 
 Follow the steps below to run **cumulus** on Terra_.
 
-#. Create a sample sheet, **count_matrix.csv**, which describes the metadata for each 10x channel. The sample sheet should at least contain 2 columns --- *Sample* and *Location*. *Sample* refers to sample names and *Location* refers to the location of the channel-specific count matrix in either 10x format (e.g. ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_gene_bc_matrices_h5.h5`` for v2 chemistry, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_feature_bc_matrices.h5``) for v3 chemistry or dropseq format (e.g. ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_2/sample_2.umi.dge.txt.gz``). You are free to add any other columns and these columns will be used in selecting channels for futher analysis. In the example below, we have *Source*, which refers to the tissue of origin, *Platform*, which refers to the sequencing platform, *Donor*, which refers to the donor ID, and *Reference*, which refers to the reference genome.
+#. Create a sample sheet, **count_matrix.csv**, which describes the metadata for each 10x channel. The sample sheet should at least contain 2 columns --- *Sample* and *Location*. *Sample* refers to sample names and *Location* refers to the location of the channel-specific count matrix in either of
+
+  - 10x format with v2 chemistry. For example, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_gene_bc_matrices_h5.h5``.
+  - 10x format with v3 chemistry. For example, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_feature_bc_matrices.h5``.
+  - Drop-seq format. For example, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_2/sample_2.umi.dge.txt.gz``. 
+
+You are free to add any other columns and these columns will be used in selecting channels for futher analysis. In the example below, we have *Source*, which refers to the tissue of origin, *Platform*, which refers to the sequencing platform, *Donor*, which refers to the donor ID, and *Reference*, which refers to the reference genome.
 
 	Example::
 
@@ -19,7 +29,7 @@ Follow the steps below to run **cumulus** on Terra_.
 		sample_3,pbmc,NextSeq,1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_3/filtered_feature_bc_matrices.h5
 		sample_4,pbmc,NextSeq,2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_4/filtered_feature_bc_matrices.h5
 
-	If you ran **cellranger_workflow**, you should obtain a template **count_matrix.csv** file that you can modify from **cellranger_mkfastq_count**'s outputs.
+	If you ran **cellranger_workflow** ahead, you should already obtain a template **count_matrix.csv** file that you can modify from **generate_count_config**'s outputs.
 
 #. Upload your sample sheet to the workspace.  
 
@@ -27,48 +37,58 @@ Follow the steps below to run **cumulus** on Terra_.
 	
 		gsutil cp /foo/bar/projects/my_count_matrix.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
-#. Import cumulus tool.
+	where ``/foo/bar/projects/my_count_matrix.csv`` is the path to your sample sheet in local machine, and ``gs://fc-e0000000-0000-0000-0000-000000000000/`` is the location on Google bucket to hold it.
 
-	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **cumulus/cumulus**.
- 	You can also see the Terra documentation for `adding a tool`_.
+#. Import cumulus workflow to your workspace.
 
-#. Select ``Process single workflow from files``.
+	See the Terra documentation for `adding a workflow`_. The cumulus workflow is under ``Broad Methods Repository`` with name "**cumulus/cumulus**".
+
+	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export cumulus workflow in the drop-down menu.
+
+#. In your workspace, open ``cumulus`` in ``WORKFLOWS`` tab. Select ``Process single workflow from files``.
 
 	.. image:: images/single_workflow.png
 
 
-Case 2: Single File
-+++++++++++++++++++
+Case Two: Single File
++++++++++++++++++++++++
 
-Alternatively, if you only have one single count matrix for analysis, you can go without sample sheets. **cumulus** currently supports the following formats:
+Alternatively, if you only have one single count matrix for analysis, you can go without sample sheets. **Cumulus** currently supports the following formats:
 
 * 10x genomics v2/v3 formats (hdf5 or mtx);
 * HCA DCP mtx and loom formats;
 * Drop-seq dge formats.
 
-Simply upload your data to the Google Bucket of your workspace, and specify its URL in ``input_file`` field in `global inputs`_ below. Notice that for dge and loom files, ``genome`` field in `global inputs`_ is required.
+Simply upload your data to the Google Bucket of your workspace, and specify its URL in ``input_file`` field of Cumulus' global inputs (see below). Notice that for dge and loom files, the ``genome`` field in global inputs is required.
 
-In this case, **aggregate_matrix** step will be skipped.
+In this case, the **aggregate_matrices** step will be skipped.
 
-
-.. _global inputs: ./cumulus.html#global-inputs
 
 ---------------------------------
 
-cumulus steps:
+Cumulus steps:
 ^^^^^^^^^^^^^^
 
-**cumulus** processes single cell data in the following steps:
+**Cumulus** processes single cell data in the following steps:
 
-#. **aggregate_matrix** (optional). When given a CSV format sample sheet, this step aggregates channel-specific count matrices into one big count matrix. Users could specify which channels they want to analyze and which sample attributes they want to import to the count matrix in this step. Otherwise, if a single count matrix file is given, skip this step.
+#. **aggregate_matrices** (optional). When given a CSV format sample sheet, this step aggregates channel-specific count matrices into one big count matrix. Users can specify which channels they want to analyze and which sample attributes they want to import to the count matrix in this step. Otherwise, if a single count matrix file is given, skip this step.
 
-#. **cluster**. This step is the main analysis step. In this step, **cumulus** performs low quality cell filtration, variable gene selection, batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. t-SNE/FLE).
+#. **cluster**. This is the main analysis step. In this step, **Cumulus** performs low quality cell filtration, highly variable gene selection, batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. t-SNE/UMAP/FLE).
 
-#. **de_analysis**. This step is optional. In this step, **cumulus** could calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **cumulus** could also calculate the area under ROC curve values for putative markers. If ``find_markers_lightgbm`` is on, **cumulus** will try to identify cluster-specific markers by training a LightGBM classifier. If the samples are human or mouse immune cells, **cumulus** could also optionally annotate putative cell types for each cluster based on known markers.
+#. **de_analysis**. This step is optional. In this step, **Cumulus** can calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **Cumulus** can also calculate the area under ROC (AUROC) curve values for putative markers. If ``find_markers_lightgbm`` is on, **Cumulus** will try to identify cluster-specific markers by training a LightGBM classifier. If the samples are human or mouse immune cells, **Cumulus** can also optionally annotate putative cell types for each cluster based on known markers.
 
-#. **plot**. This step is optional. In this step, **cumulus** could generate 6 types of figures based on the **cluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne**, **umap**, **fle** plots show the same t-SNE/UMAP/FLE (force-directed layout embedding) colored by different attributes (e.g. cluster labels, conditions) side-by-side. Third, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components. Lastly, if input is CITE-Seq data, **citeseq_tsne** plots tSNEs based on epitope expression.
+#. **plot**. This step is optional. In this step, **Cumulus** can generate 6 types of figures based on the **cluster** step results:
 
-In the following, we will first introduce global inputs and then introduce the WDL inputs and outputs for each step separately. But please note that you need to set inputs from all steps simultaneously in the Terra WDL.
+	- **composition** plots which are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. 
+	- **tsne**, **fitsne**, and **net_tsne**: t-SNE like plots based on different algorithms, respectively. Users can specify cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
+	- **umap** and **net_umap**: UMAP like plots based on different algorithms, respectively. Users can specify cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
+	- **fle** and **net_fle**: FLE (Force-directed Layout Embedding) like plots based on different algorithms, respectively. Users can specify cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
+	- **diffmap** plots which are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components. 
+	- If input is CITE-Seq data, there will be **citeseq_fitsne** plots which are FIt-SNE plots based on epitope expression.
+
+#. **organize_results**. Copy analysis results from execution environment to destination location on Google bucket.
+
+In the following sections, we will first introduce global inputs and then introduce the WDL inputs and outputs for each step separately. But please note that you need to set inputs from all steps simultaneously in the Terra WDL.
 
 Note that we will make the required inputs/outputs bold and all other inputs/outputs are optional.
 
@@ -94,19 +114,27 @@ global inputs
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir/my_results"
 	  - 
 	* - genome
-	  - A string contains comma-separated genome names. cumulus will read all groups associated with genome names in the list from the hdf5 file. If genome is None, all groups will be considered.
+	  - A string contains comma-separated genome names. Cumulus will read all groups associated with genome names in the list from the hdf5 file. If genome is None, all groups will be considered.
 	  - "GRCh38"
 	  - 
 	* - cumulus_version
-	  - cumulus version, currently only "0.10.0" is available.
+	  - cumulus version to use. Versions available: 0.10.0.
 	  - "0.10.0"
 	  - "0.10.0"
+	* - docker_registry
+	  - Docker registry to use. Options:
+
+	  	- "cumulusprod/" for Docker Hub images; 
+
+	  	- "quay.io/cumulus/" for backup images on Red Hat registry.
+	  - "cumulusprod/"
+	  - "cumulusprod/"
 	* - zones
-	  - Google cloud zones
+	  - Google cloud zones to consider for execution.
 	  - "us-east1-d us-west1-a us-west1-b"
 	  - "us-east1-d us-west1-a us-west1-b"
 	* - num_cpu
-	  - Number of cpus per cumulus job
+	  - Number of CPUs per Cumulus job
 	  - 32
 	  - 64
 	* - memory
@@ -114,7 +142,7 @@ global inputs
 	  - "200G"
 	  - "200G"
 	* - disk_space
-	  - Total disk space
+	  - Total disk space in gigabytes.
 	  - 100
 	  - 100
 	* - preemptible
@@ -124,11 +152,11 @@ global inputs
 
 ---------------------------------
 
-aggregate_matrix
-^^^^^^^^^^^^^^^^
+aggregate_matrices
+^^^^^^^^^^^^^^^^^^
 
-aggregate_matrix inputs
-+++++++++++++++++++++++
+aggregate_matrices inputs
++++++++++++++++++++++++++
 
 .. list-table::
 	:widths: 5 20 10 5
@@ -155,8 +183,8 @@ aggregate_matrix inputs
 	  - true
 	  - false
 
-aggregate_matrix output
-+++++++++++++++++++++++
+aggregate_matrices output
++++++++++++++++++++++++++
 
 .. list-table::
 	:widths: 5 5 20
@@ -165,9 +193,9 @@ aggregate_matrix output
 	* - Name
 	  - Type
 	  - Description
-	* - **output_h5sc**
+	* - output_h5sc
 	  - File
-	  - Aggregated count matrix in cumulus hdf5 format
+	  - Aggregated count matrix in Cumulus hdf5 (h5sc) format
 
 ---------------------------------
 
@@ -176,8 +204,6 @@ cluster
 
 cluster inputs
 ++++++++++++++
-
-Note that we will only list important inputs here. For other inputs, please refer to **cumulus** package documentation.
 
 .. list-table::
 	:widths: 5 20 10 5
@@ -203,7 +229,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - | Data are CITE-Seq data. cumulus will perform analyses on RNA count matrix first. 
 	    | Then it will attach the ADT matrix to the RNA matrix with all antibody names changing to 'AD-' + antibody_name. 
 	    | Lastly, it will embed the antibody expression using FIt-SNE (the basis used for plotting is 'citeseq_fitsne')
-	  - true
+	  - false
 	  - false
 	* - cite_seq_capping
 	  - For CITE-Seq surface protein expression, make all cells with expression > <percentile> to the value at <percentile> to smooth outlier. Set <percentile> to 100.0 to turn this option off.
@@ -211,10 +237,10 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - 99.99
 	* - select_only_singlets
 	  - If we have demultiplexed data, turning on this option will make cumulus only include barcodes that are predicted as singlets
-	  - true
+	  - false
 	  - false
 	* - output_filtration_results
-	  - If output cell and gene filtration results to a spreadsheet
+	  - If write cell and gene filtration results to a spreadsheet
 	  - true
 	  - true
 	* - plot_filtration_results
@@ -226,15 +252,15 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - 6,4
 	  -
 	* - output_seurat_compatible
-	  - Output seurat-compatible h5ad file. Caution: File size might be large, do not turn this option on for large data sets.
-	  - true
+	  - Generate Seurat-compatible h5ad file. Caution: File size might be large, do not turn this option on for large data sets.
+	  - false
 	  - false
 	* - output_loom
-	  - If output loom-formatted file
+	  - If generate loom-formatted file
 	  - false
 	  - false
 	* - output_parquet
-	  - If output parquet-formatted file
+	  - If generate parquet-formatted file
 	  - false
 	  - false
 	* - min_genes
@@ -247,30 +273,33 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - 6000
 	* - min_umis
 	  - Only keep cells with at least <min_umis> of UMIs
-	  - 600
+	  - 100
 	  - 100
 	* - max_umis
 	  - Only keep cells with less than <max_umis> of UMIs
-	  - 60000
+	  - 600000
 	  - 600000
 	* - mito_prefix
-	  - Prefix for mitochondrial genes
+	  - Prefix of mitochondrial gene names. This is to identify mitochondrial genes.
 	  - "mt-"
 	  - "MT-"
 	* - percent_mito
 	  - Only keep cells with mitochondrial ratio less than <percent_mito>% of total counts
-	  - 30
-	  - 10
+	  - 50
+	  - 10.0
 	* - gene_percent_cells
 	  - Only use genes that are expressed in at <gene_percent_cells>% of cells to select variable genes
 	  - 50
 	  - 0.05
 	* - counts_per_cell_after
-	  - Total counts per cell after normalization, before the count matrix is transformed to Log space.
+	  - Total counts per cell after normalization, before transforming the count matrix into Log space.
 	  - 1e5
 	  - 1e5
 	* - select_hvf_flavor
-	  - Highly variable feature selection method. <flavor> can be "pegasus" or "Seurat".
+	  - Highly variable feature selection method. Options: 
+
+	  	- "pegasus": New selection method proposed in Pegasus, the analysis module of Cumulus workflow.
+	  	- "Seurat": Conventional selection method used by Seurat and SCANPY.
 	  - "pegasus"
 	  - "pegasus"
 	* - select_hvf_ngenes
@@ -312,38 +341,38 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - 100
 	* - knn_full_speed
 	  - For the sake of reproducibility, we only run one thread for building kNN indices. Turn on this option will allow multiple threads to be used for index building. However, it will also reduce reproducibility due to the racing between multiple threads.
-	  - true
+	  - false
 	  - false
 	* - run_diffmap
-	  - Calculate diffusion map. It will be automatically set to ``true`` when input **run_fle** or **run_net_fle** is set.
-	  - true
+	  - Whether to calculate diffusion map or not. It will be automatically set to ``true`` when input **run_fle** or **run_net_fle** is set.
+	  - false
 	  - false
 	* - diffmap_ndc
 	  - Number of diffusion components
 	  - 100
 	  - 100
 	* - diffmap_maxt
-	  - Maximum time stamp to search for the knee point.
+	  - Maximum time stamp in diffusion map computation to search for the knee point.
 	  - 5000
 	  - 5000
 	* - run_louvain
-	  - Run louvain clustering algorithm
+	  - Run Louvain clustering algorithm
 	  - true
 	  - true
 	* - louvain_resolution
-	  - Resolution parameter for the louvain clustering algorithm
+	  - Resolution parameter for the Louvain clustering algorithm
 	  - 1.3
 	  - 1.3
 	* - louvain_class_label
-	  - Louvain cluster label name in AnnData.
+	  - Louvain cluster label name in analysis result.
 	  - "louvain_labels"
 	  - "louvain_labels"
 	* - run_leiden
-	  - Run leiden clustering algorithm.
+	  - Run Leiden clustering algorithm.
 	  - false
 	  - false
 	* - leiden_resolution
-	  - Resolution parameter for the leiden clustering algorithm.
+	  - Resolution parameter for the Leiden clustering algorithm.
 	  - 1.3
 	  - 1.3
 	* - leiden_niter
@@ -351,15 +380,15 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - 2
 	  - -1
 	* - leiden_class_label
-	  - Leiden cluster label name in AnnData.
+	  - Leiden cluster label name in analysis result.
 	  - "leiden_labels"
 	  - "leiden_labels"
 	* - run_spectral_louvain
-	  - Run spectral louvain clustering algorithm
+	  - Run Spectral Louvain clustering algorithm
 	  - false
 	  - false
 	* - spectral_louvain_basis
-	  - Basis used for KMeans clustering. Can be "pca" or "diffmap".
+	  - Basis used for KMeans clustering. Use diffusion map by default. If diffusion map is not calculated, use PCA coordinates. Users can also specify "pca" to directly use PCA coordinates.
 	  - "diffmap"
 	  - "diffmap"
 	* - spectral_louvain_resolution
@@ -367,15 +396,15 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - 1.3
 	  - 1.3
 	* - spectral_louvain_class_label
-	  - Spectral louvain label name in AnnData.
+	  - Spectral louvain label name in analysis result.
 	  - "spectral_louvain_labels"
 	  - "spectral_louvain_labels"
 	* - run_spectral_leiden
-	  - Run spectral leiden clustering algorithm.
+	  - Run Spectral Leiden clustering algorithm.
 	  - false
 	  - false
 	* - spectral_leiden_basis
-	  - Basis used for KMeans clustering. Can be "pca" or "diffmap".
+	  - Basis used for KMeans clustering. Use diffusion map by default. If diffusion map is not calculated, use PCA coordinates. Users can also specify "pca" to directly use PCA coordinates.
 	  - "diffmap"
 	  - "diffmap"
 	* - spectral_leiden_resolution
@@ -383,7 +412,7 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - 1.3
 	  - 1.3
 	* - spectral_leiden_class_label
-	  - Spectral leiden label name in AnnData.
+	  - Spectral leiden label name in analysis result.
 	  - "spectral_leiden_labels"
 	  - "spectral_leiden_labels"
 	* - run_tsne
@@ -399,63 +428,63 @@ Note that we will only list important inputs here. For other inputs, please refe
 	  - true
 	  - true
 	* - run_umap
-	  - Run umap for visualization
+	  - Run UMAP for visualization
 	  - false
 	  - false
 	* - umap_K
-	  - K neighbors for umap.
+	  - K neighbors for UMAP.
 	  - 15
 	  - 15
 	* - umap_min_dist
-	  - Umap parameter.
+	  - UMAP parameter.
 	  - 0.5
 	  - 0.5
 	* - umap_spread
-	  - Umap parameter.
+	  - UMAP parameter.
 	  - 1.0
 	  - 1.0
 	* - run_fle
-	  - Run force-directed layout embedding
+	  - Run force-directed layout embedding (FLE) for visualization
 	  - false
 	  - false
 	* - fle_K
-	  - K neighbors for building graph for FLE
+	  - Number of neighbors for building graph for FLE
 	  - 50
 	  - 50
 	* - fle_target_change_per_node
-	  - Target change per node to stop forceAtlas2.
+	  - Target change per node to stop FLE.
 	  - 2.0
 	  - 2.0
 	* - fle_target_steps
-	  - Maximum number of iterations before stopping the forceAtlas2 algoritm.
+	  - Maximum number of iterations before stopping the algoritm
 	  - 5000
 	  - 5000
 	* - net_down_sample_fraction
-	  - Down sampling fraction for net-related visualization.
+	  - Down sampling fraction for net-related visualization
 	  - 0.1
 	  - 0.1
 	* - run_net_tsne
-	  - Run net tSNE for visualization.
+	  - Run Net tSNE for visualization
 	  - false
 	  - false
 	* - net_tsne_out_basis
-	  - Output basis for net-tSNE.
+	  - Basis name for Net t-SNE coordinates in analysis result
 	  - "net_tsne"
 	  - "net_tsne"
 	* - run_net_umap
-	  - Run net umap for visualization.
+	  - Run Net UMAP for visualization
 	  - false
 	  - false
 	* - net_umap_out_basis
-	  - Output basis for net-UMAP.
+	  - Basis name for Net UMAP coordinates in analysis result
 	  - "net_umap"
 	  - "net_umap"
 	* - run_net_fle
-	  - Run net FLE.
+	  - Run Net FLE for visualization
 	  - false
 	  - false
 	* - net_fle_out_basis
-	  - Output basis for net-FLE.
+	  - Basis name for Net FLE coordinates in analysis result.
 	  - "net_fle"
 	  - "net_fle"
 
@@ -472,25 +501,24 @@ cluster outputs
 	* - **output_h5ad**
 	  - File
 	  - | Output file in h5ad format (output_name.h5ad).
-	    | To load this file in python, use ``import pegasus as pg; data = pg.read_input('output_name.h5ad')``.
+	    | To load this file in Python, you need to first install `Pegasus <https://pegasus.readthedocs.io/en/latest/installation.html>`_ on your local machine. Then use ``import pegasus as pg; data = pg.read_input('output_name.h5ad')`` in Python interpreter.
 	    | The log-normalized expression matrix is stored in ``data.X`` as a CSR-format sparse matrix.
 	    | The ``obs`` field contains cell related attributes, including clustering results.
 	    | For example, ``data.obs_names`` records cell barcodes; ``data.obs['Channel']`` records the channel each cell comes from;
 	    | ``data.obs['n_genes']``, ``data.obs['n_counts']``, and ``data.obs['percent_mito']`` record the number of expressed genes, total UMI count, and mitochondrial rate for each cell respectively;
-	    | ``data.obs['louvain_labels']`` and ``data.obs['approx_louvain_labels']`` record each cell's cluster labels using different clustring algorithms;
-	    | ``data.obs['pseudo_time']`` records the inferred pseudotime for each cell.
+	    | ``data.obs['louvain_labels']``, ``data.obs['leiden_labels']``, ``data.obs['spectral_louvain_labels']``, and ``data.obs['spectral_leiden_labels']`` record each cell's cluster labels using different clustring algorithms;
 	    | The ``var`` field contains gene related attributes.
-	    | For example, ``data.var_names`` records gene symbols, ``data.var['gene_ids']`` records Ensembl gene IDs, and ``data.var['selected']`` records selected variable genes.
-	    | The ``obsm`` field records embedding coordiates.
-	    | For example, ``data.obsm['X_pca']`` records PCA coordinates, ``data.obsm['X_tsne']`` records tSNE coordinates,
+	    | For example, ``data.var_names`` records gene symbols, ``data.var['gene_ids']`` records Ensembl gene IDs, and ``data.var['highly_variable_features']`` records selected variable genes.
+	    | The ``obsm`` field records embedding coordinates.
+	    | For example, ``data.obsm['X_pca']`` records PCA coordinates, ``data.obsm['X_tsne']`` records t-SNE coordinates,
 	    | ``data.obsm['X_umap']`` records UMAP coordinates, ``data.obsm['X_diffmap']`` records diffusion map coordinates,
 	    | ``data.obsm['X_diffmap_pca']`` records the first 3 PCs by projecting the diffusion components using PCA,
 	    | and ``data.obsm['X_fle']`` records the force-directed layout coordinates from the diffusion components.
-	    | The ``uns`` field stores other related information, such as reference genome (``data.uns['genome']``).
-	    | If '--make-output-seurat-compatible' is on, this file can be loaded into R and converted into a Seurat object
+	    | The ``varm`` field records DE analysis results if performed: ``data.varm['de_res']``.
+	    | The ``uns`` field stores other related information, such as reference genome (``data.uns['genome']``), kNN on PCA coordinates (``data.uns['pca_knn_indices']`` and ``data.uns['pca_knn_distances']``), etc.
 	* - output_seurat_h5ad
 	  - File
-	  - h5ad file in seurat-compatible manner. This file can be loaded into R and converted into a Seurat object
+	  - h5ad file in seurat-compatible manner. This file can be loaded into R and converted into a Seurat object (see `here <./cumulus.html#load-cumulus-results-into-seurat>`_ for instructions)
 	* - output_filt_xlsx
 	  - File
 	  - | Spreadsheet containing filtration results (output_name.filt.xlsx).
@@ -518,7 +546,7 @@ cluster outputs
 	  - Outputted loom file (output_name.loom)
 	* - output_parquet_file
 	  - File
-	  - Outputted PARQUET file that contains metadata and expression levels for every gene
+	  - Outputted PARQUET file that contains metadata and expression levels for every gene (output_name.parquet)
 
 ---------------------------------
 
@@ -537,11 +565,11 @@ de_analysis inputs
 	  - Example
 	  - Default
 	* - perform_de_analysis
-	  - If perform de analysis
+	  - If perform differential expression (DE) analysis
 	  - true
 	  - true
 	* - cluster_labels
-	  - Specify the cluster labels used for differential expression analysis
+	  - Specify the cluster label used for DE analysis
 	  - "louvain_labels"
 	  - "louvain_labels" 
 	* - alpha
@@ -549,7 +577,7 @@ de_analysis inputs
 	  - 0.05
 	  - 0.05
 	* - auc
-	  - Calculate area under ROC (AUROC) and area under Precision-Recall (AUPR).
+	  - Calculate area under ROC (AUROC)
 	  - true
 	  - true
 	* - fisher
@@ -569,7 +597,7 @@ de_analysis inputs
 	  - false
 	  - false
 	* - remove_ribo
-	  - Remove ribosomal genes with either RPL or RPS as prefixes. Currently only works for human
+	  - Remove ribosomal genes with either RPL or RPS as prefixes. Currently only works for human data
 	  - false
 	  - false
 	* - min_gain
@@ -581,11 +609,11 @@ de_analysis inputs
 	  - false
 	  - false
 	* - annotate_de_test
-	  - Differential Expression test to use to infer cell types, could be either "t", "fisher", or "mwu".
+	  - Differential Expression test to use for inference on cell types. Options: "t", "fisher", or "mwu"
 	  - "t"
 	  - "t"
 	* - organism
-	  - Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain" or a Google bucket link to a JSON file describing the markers.
+	  - Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain" or a Google bucket link to a JSON file describing the markers
 	  - "mouse_brain"
 	  - "human_immune"
 	* - minimum_report_score
@@ -624,7 +652,22 @@ In this subsection, we will describe the format of input JSON cell type marker f
 JSON file
 *********
 
-The top level of the JSON file is an object with two name/value pairs: *title* and *cell_types*. *title* is a string describing what this JSON file is for (e.g. "Mouse brain cell markers"). *cell_types* an array listing all cell types this JSON file defines. In the *cell_types* array, each cell type is described using a separate object with 2 to 3 name/value pairs: *name*, *markers*, and optional *subtypes*. *name* describes the cell type name (e.g. "GABAergic neuron"). *markers* is an array of gene-marker describing objects. Each gene-marker describing object has two name/value pairs: *genes* and *weight*. *genes* is an array of positive and negative gene markers(e.g. ["Rbfox3+", "Flt1-"]). *weight* is a real number between 0.0 and 1.0, which describes how much we trust the markers in *genes*. All markers in *genes* share the weight evenly. If we have 4 markers and the weight is 0.1, each marker has a weight of 0.025. The sum of weights from all gene-marker describing objects should be 1.0. *subtypes* describe cell subtypes for the cell type, which has the same format as the top level JSON object.
+The top level of the JSON file is an object with two name/value pairs:
+
+	- **title**: A string to describe what this JSON file is for (e.g. "Mouse brain cell markers").
+	- **cell_types**: List of all cell types this JSON file defines. In this list, each cell type is described using a separate object with 2 to 3 name/value pairs:
+
+		- **name**: Cell type name (e.g. "GABAergic neuron").
+		- **markers**: List of gene-marker describing objects, each of which has 2 name/value pairs:
+
+			- **genes**: List of positive and negative gene markers (e.g. ``["Rbfox3+", "Flt1-"]``).
+			- **weight**: A real number between ``0.0`` and ``1.0`` to describe how much we trust the markers in **genes**. 
+		
+		All markers in **genes** share the weight evenly. For instance, if we have 4 markers and the weight is 0.1, each marker has a weight of ``0.1 / 4 = 0.025``. 
+
+		The weights from all gene-marker describing objects of the same cell type should sum up to 1.0.
+
+		- **subtypes**: Description on cell subtypes for the cell type. It has the same structure as the top level JSON object.
 
 See below for an example JSON snippet::
 
@@ -657,28 +700,60 @@ See below for an example JSON snippet::
 	    ]
 	}
 
-Algorithm
-*********
+Inference Algorithm
+*********************
 
 We have already calculated the up-regulated and down-regulated genes for each cluster in the differential expression analysis step.
 
-We first load gene markers for each cell type from the JSON file. We exclude marker genes that are not expressed in our data, and their associated weights. 
+First, load gene markers for each cell type from the JSON file specified, and exclude marker genes, along with their associated weights, that are not expressed in the data. 
 
-We then scan each cluster to determine its putative cell types. For each cluster and putative cell type, we calculate a score between 0 and 1, which describes how likely cells from the cluster are of the specific cell type. The higher the score, the more likely cells are from the cell type. To calculate the score, we assign each marker a maximum impact value of 2. For a positive marker, if it is not up-regulated, its impact value is 0. Otherwise, if it additionally has a fold change in percentage of cells expressing this marker (within cluster vs. out of cluster) no less than 1.5, it has an impact value of 2 and is recorded as a strong supporting marker. If the fold change (fc) is less than 1.5, it has an impact value of 1 + (fc - 1) / 0.5 and is recorded as a weak supporting marker. For a negative marker, if it is up-regulated, its impact value is 0. If it is neither up-regulated nor down-regulated, its impact value is 1. Otherwise, if it additionally has 1 over fold change (fc) no less than 1.5, it has an impact value of 2 and is recorded as a strong supporting marker. If 1/fc is less than 1.5, it has an impact value of 1 + (1/fc - 1) / 0.5 and is recorded as a weak supporting marker. The score is calculated as the weighted sum of impact values weighted over the sum of weights multiplied by 2 from all expressed markers. If the score is larger than 0.5 and the cell type has cell subtypes, each cell subtype will also be evaluated. 
+Then scan each cluster to determine its putative cell types. For each cluster and putative cell type, we calculate a score between ``0`` and ``1``, which describes how likely cells from the cluster are of this cell type. The higher the score is, the more likely cells are from the cell type. 
+
+To calculate the score, each marker is initialized with a maximum impact value (which is ``2``). Then do case analysis as follows:
+
+	- For a positive marker:
+
+		- If it is not up-regulated, its impact value is set to ``0``. 
+
+		- Otherwise, if it is up-regulated:
+
+			- If it additionally has a fold change in percentage of cells expressing this marker (within cluster vs. out of cluster) no less than ``1.5``, it has an impact value of ``2`` and is recorded as a **strong supporting marker**. 
+
+			- If its fold change (``fc``) is less than ``1.5``, this marker has an impact value of ``1 + (fc - 1) / 0.5`` and is recorded as a **weak supporting marker**. 
+
+	- For a negative marker: 
+
+		- If it is up-regulated, its impact value is set to ``0``. 
+
+		- If it is neither up-regulated nor down-regulated, its impact value is set to ``1``. 
+
+		- Otherwise, if it is down-regulated: 
+
+			- If it additionally has ``1 / fc`` (where ``fc`` is its fold change) no less than ``1.5``, it has an impact value of ``2`` and is recorded as a **strong supporting marker**. 
+
+			- If ``1 / fc`` is less than ``1.5``, it has an impact value of ``1 + (1 / fc - 1) / 0.5`` and is recorded as a **weak supporting marker**. 
+
+The score is calculated as the weighted sum of impact values weighted over the sum of weights multiplied by 2 from all expressed markers. If the score is larger than 0.5 and the cell type has cell subtypes, each cell subtype will also be evaluated. 
 
 Output annotation file
 **********************
 
-For each cluster, putative cell types with scores larger than *minimum_report_score* will be reported in descending order with respect to their scores. The report of one putative cell type contains the *name* of the cell type, the *score*, the average percentage (*avgp*) of cells expressing marker within the cluster between all positive supporting markers, *strong support* markers and *weak support* markers. For each supporting marker, the marker name and percentag of cells expressing it within the cluster are reported.
+For each cluster, putative cell types with scores larger than ``minimum_report_score`` will be reported in descending order with respect to their scores. The report of each putative cell type contains the following fields:
+
+	- **name**: Cell type name.
+	- **score**: Score of cell type.
+	- **average marker percentage**: Average percentage of cells expressing marker within the cluster between all positive supporting markers.
+	- **strong support**: List of strong supporting markers. Each marker is represented by a tuple of its name and percentage of cells expressing it within the cluster.
+	- **weak support**: List of week supporting markers. It has the same structure as **strong support**.
 
 ---------------------------------
 
 plot
 ^^^^
 
-The h5ad file will contain a default attribute ``Channel``, which records which channel each single cell comes from. The ``Channel`` attribute matches the ``Sample`` column in the **count_matrix.csv** file. 
+The h5ad file contains a default cell attribute ``Channel``, which records which channel each that single cell comes from. If the input is a CSV format sample sheet, ``Channel`` attribute matches the ``Sample`` column in the sample sheet. Otherwise, it's specified in ``channel`` field of the cluster inputs. 
 
-Other attributes used in plot must be added using the ``attributes`` input in the ``aggregate_matrix`` section.
+Other cell attributes used in plot must be added via ``attributes`` field in the ``aggregate_matrices`` inputs.
 
 
 plot inputs
@@ -789,7 +864,7 @@ scp_output inputs
 	  - false
 	  - false
 	* - output_dense
-	  - Output dense expression matrix instead.
+	  - Output dense expression matrix, instead of the default sparse matrix format.
 	  - false
 	  - false
 
@@ -811,38 +886,51 @@ scp_output outputs
 ---------------------------------
 
 Run CITE-Seq analysis
----------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
-To run CITE-Seq analysis, turn on ``cite_seq`` option. 
+To run CITE-Seq analysis, turn on ``cite_seq`` option in cluster inputs of cumulus workflow. 
 
-An embedding of epitope expressions via t-SNE is available at basis ``X_citeseq_tsne``. 
+An embedding of epitope expressions via FIt-SNE is available at basis ``X_citeseq_fitsne``. 
 
-To plot this epitope embedding, turn on ``plot_citeseq_tsne`` option.
+To plot this epitope embedding, specify attributes to plot in ``plot_citeseq_fitsne`` field of cluster inputs.
 
 ---------------------------------
 
 Run subcluster analysis
------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Once we have **cumulus** outputs, we could further analyze a subset of cells by running **cumulus_subcluster**. To run **cumulus_subcluster**, follow the following steps:
 
 #. Import **cumulus_subcluster** method.
 
-	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``.
-	Type **cumulus/cumulus_subcluster**. You can also see the Terra documentation for `adding a tool`_.
+	See the Terra documentation for `adding a workflow`_. The cumulus workflow is under ``Broad Methods Repository`` with name "**cumulus/cumulus_subcluster**".
 
-#. Select ``Process single workflow from files``.
+	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export cumulus workflow in the drop-down menu.
+
+#. In your workspace, open ``cumulus_subcluster`` in ``WORKFLOWS`` tab. Select ``Process single workflow from files``.
+
+	.. image:: images/single_workflow.png
 
 cumulus_subcluster steps:
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 *cumulus_subcluster* processes the subset of single cells in the following steps:
 
-#. **subcluster**. In this step, **cumulus_subcluster** first select the subset of cells from **cumulus** outputs according to user-provided criteria. It then performs batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. t-SNE/FLE).
+#. **subcluster**. In this step, **cumulus_subcluster** first select the subset of cells from **cumulus** outputs according to user-provided criteria. It then performs batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. t-SNE/UMAP/FLE).
 
-#. **de_analysis**. This step is optional. In this step, **cumulus_subcluster** could calculate potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **cumulus_subcluster** could also calculate the area under ROC curve values for putative markers. If the samples are human or mouse immune cells, **cumulus_subcluster** could also optionally annotate putative cell types for each cluster based on known markers.
+#. **de_analysis** (optional). In this step, **cumulus_subcluster** calculates potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **cumulus_subcluster** can also calculate the area under ROC curve (AUROC) values for putative markers. If the samples are human or mouse immune cells, **cumulus_subcluster** can optionally annotate putative cell types for each cluster based on known markers.
 
-#. **plot**. This step is optional. In this step, **cumulus_subcluster** could generate 5 types of figures based on the **subcluster** step results. First, **composition** plots are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. Second, **tsne**, **umap**, **fle** plots show the same t-SNE/UMAP/FLE (force-directed layout embedding) colored by different attributes (e.g. cluster labels, conditions) side-by-side. Lastly, **diffmap** plots are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components.
+#. **plot** (optional). In this step, **cumulus_subcluster** can generate the following 5 types of figures based on the **subcluster** step results:
+
+	- **composition** plots which are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. 
+
+	- **tsne**, **fitsne**, and **net_tsne**: t-SNE like plots based on different algorithms, respectively. Users can specify different cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
+
+	- **umap** and **net_umap**: UMAP like plots based on different algorithms, respectively. Users can specify different cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
+
+	- **fle** and **net_fle**: FLE (Force-directed Layout Embedding) like plots based on different algorithms, respectively. Users can specify different cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
+
+	- **diffmap** plots which are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components.
 
 cumulus_subcluster's inputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -860,11 +948,11 @@ Note that we will make the required inputs/outputs bold and all other inputs/out
 	  - Example
 	  - Default
 	* - **input_h5ad**
-	  - Input h5ad file containing *cumulus* results
+	  - Google bucket URL of input h5ad file containing *cumulus* results
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir/my_results.h5ad"
 	  - 
 	* - **output_name**
-	  - This is the prefix for all output files. It should contain the google bucket url, subdirectory name and output name prefix
+	  - This is the prefix for all output files. It should contain the Google bucket URL, subdirectory name and output name prefix
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir/my_results_sub"
 	  - 
 	* - **subset_selections**
@@ -876,7 +964,7 @@ Note that we will make the required inputs/outputs bold and all other inputs/out
 	  - 
 	* - calculate_pseudotime
 	  - Calculate diffusion-based pseudotimes based on <roots>. <roots> should be a comma-separated list of cell barcodes
-	  - "sample_1-ACCCGGGTTT-1"
+	  - "sample_1-ACCCGGGTTT-1,sample_1-TCCCGGGAAA-2"
 	  - None
 	* - num_cpu
 	  - Number of cpus per cumulus job
@@ -887,7 +975,7 @@ Note that we will make the required inputs/outputs bold and all other inputs/out
 	  - "200G"
 	  - "200G"
 	* - disk_space
-	  - Total disk space
+	  - Total disk space in gigabytes
 	  - 100
 	  - 100
 	* - preemptible
@@ -931,33 +1019,37 @@ cumulus_subcluster's outputs
 	  - Description
 	* - **output_h5ad**
 	  - File
-	  - h5ad-formatted HDF5 file containing all results (output_name.h5ad). If de_analysis is on, this file should be the same as *output_de_h5ad*
+	  - | h5ad-formatted HDF5 file containing all results (output_name.h5ad). 
+	    | If ``perform_de_analysis`` is on, this file should be the same as *output_de_h5ad*.
+	    | To load this file in Python, it's similar as in `cumulus cluster outputs <./cumulus.html#cluster-outputs>`_ section.
+	    | Besides, for subcluster results, there is a new cell attributes in ``data.obs['pseudo_time']``, which records the inferred pseudotime for each cell.
 	* - output_loom_file
 	  - File
-	  - Outputted loom file (output_name.loom)
+	  - Generated loom file (output_name.loom)
 	* - output_parquet_file
 	  - File
-	  - Outputted PARQUET file that contains metadata and expression levels for every gene
+	  - Generated PARQUET file that contains metadata and expression levels for every gene (output_name.parquet)
 	* - output_de_h5ad
 	  - File
-	  - h5ad-formatted results with DE results updated (output_name.h5ad)
+	  - Generated h5ad-formatted results with DE results updated (output_name.h5ad)
 	* - output_de_xlsx
 	  - File
-	  - Spreadsheet reporting DE results (output_name.de.xlsx)
+	  - Generated Spreadsheet reporting DE results (output_name.de.xlsx)
 	* - output_pdfs
 	  - Array[File]
-	  - Outputted pdf files
+	  - Generated pdf files
 	* - output_htmls
 	  - Array[File]
-	  - Outputted html files
+	  - Generated html files
 
 ---------------------------------
 
-Load cumulus results into Seurat  
------------------------------------------
+Load Cumulus results into Seurat  
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-First, you need to set ``output_seurat_compatible`` to ``true`` in ``cumulus`` to generate a Seurat-compatible output file ``output_name.seurat.h5ad``, in addition to the normal result ``output_name.h5ad``.
-Please note that python, the `anndata`_ python library with version at least ``0.6.22.post1``, and the reticulate R library are required to load the result into Seurat.
+First, you need to set ``output_seurat_compatible`` field to ``true`` in cumulus cluster inputs to generate a Seurat-compatible output file ``output_name.seurat.h5ad``, in addition to the normal result ``output_name.h5ad``.
+
+Notice that python, the `anndata`_ python library with version at least ``0.6.22.post1``, and the ``reticulate`` R library are required to load the result into Seurat.
 
 Execute the R code below to load the results into Seurat (working with both Seurat v2 and v3)::
 
@@ -966,14 +1058,20 @@ Execute the R code below to load the results into Seurat (working with both Seur
 	test_ad <- ad$read_h5ad("output_name.seurat.h5ad")
 	result <- convert_h5ad_to_seurat(test_ad)
 
-The resulting seurat object ``result`` will have three data slots. *raw.data* records filtered raw count matrix. *data* records filtered and log-normalized expression matrix. *scale.data* records variable-gene-selected, standardized expression matrix that are ready to perform PCA.
+The resulting Seurat object ``result`` has three data slots: 
+
+	- **raw.data** records filtered raw count matrix. 
+	- **data** records filtered and log-normalized expression matrix. 
+	- **scale.data** records variable-gene-selected, standardized expression matrix that are ready to perform PCA.
 
 ---------------------------------
 
-Visualize ``cumulus`` results in Python
-----------------------------------------
+Visualize Cumulus results in Python
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Ensure you have **pegasus** installed.
+Ensure you have `Pegasus <https://pegasus.readthedocs.io/en/latest/installation.html>`_ installed.
+
+Download your analysis result data, say ``output_name.h5ad``, from Google bucket to your local machine.
 
 Load the output::
 
@@ -985,19 +1083,26 @@ Violin plot of the computed quality measures::
 	fig = pg.violin(adata, keys = ['n_genes', 'n_counts', 'percent_mito'], by = 'passed_qc')
 	fig.savefig('output_file.qc.pdf', dpi = 500)
 
-tSNE colored by louvain cluster labels and channel::
+t-SNE plot colored by louvain cluster labels and channel::
 
 	fig = pg.embedding(adata, basis = 'tsne', keys = ['louvain_labels', 'Channel'])
 	fig.savefig('output_file.tsne.pdf', dpi = 500)
 
-UMAP colored by genes of interest::
+t-SNE plot colored by genes of interest::
 
-	fig = pg.embedding(adata, basis = 'umap', keys = ['CD4', 'CD8A'])
-	fig.savefig('output_file.genes.umap.pdf', dpi = 500)
+	fig = pg.embedding(adata, basis = 'tsne', keys = ['CD4', 'CD8A'])
+	fig.savefig('output_file.genes.tsne.pdf', dpi = 500)
+
+For other embedding plots using FIt-SNE (``fitsne``), Net t-SNE (``net_tsne``), CITE-Seq FIt-SNE (``citeseq_fitsne``), UMAP (``umap``), Net UMAP (``net_umap``), FLE (``fle``), or Net FLE (``net_fle``) coordinates, simply substitute its basis name for ``tsne`` in the code above.
+
+Composition plot on louvain cluster labels colored by channel::
+
+	fig = pg.composition_plot(adata, by = 'louvain_labels', condition = 'Channel')
+	fig.savefig('output_file.composition.pdf', dpi = 500)
 
 
 .. _anndata: https://anndata.readthedocs.io/en/latest/
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
-.. _adding a tool: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
+.. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
 .. _Terra: https://app.terra.bio/
 .. _Single Cell Portal: https://portals.broadinstitute.org/single_cell
