@@ -134,13 +134,13 @@ Follow the steps below to run CellRanger mkfastq/count/vdj on Terra_.
 		gsutil cp /foo/bar/projects/sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
 
-#. Import "cellranger_workflow" workflow to your workspace.
+#. Import *cellranger_workflow* workflow to your workspace.
 
-	See the Terra documentation for `adding a workflow`_. The cellranger workflow is under ``Broad Methods Repository`` with name "**cumulus/cellranger_workflow**".
+	See the Terra documentation for `adding a workflow`_. The *cellranger_workflow* workflow is under ``Broad Methods Repository`` with name "**cumulus/cellranger_workflow**".
 
-	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export ``cellranger_workflow`` in the drop-down menu.
+	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cellranger_workflow* workflow in the drop-down menu.
 
-#. In your workspace, open cellranger_workflow in ``WORKFLOWS`` tab. Select ``Process single workflow from files`` as below
+#. In your workspace, open ``cellranger_workflow`` in ``WORKFLOWS`` tab. Select ``Process single workflow from files`` as below
 
 	.. image:: images/single_workflow.png
 
