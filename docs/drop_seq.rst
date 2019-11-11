@@ -80,14 +80,17 @@ Additionally the pipeline provides the option to generate count matrices using  
 		gsutil cp /foo/bar/projects/sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
 
-#. Import dropseq_workflow tool.
+#. Import *dropseq_workflow* workflow to your workspace.
 
-	In Terra, select the ``Tools`` tab, then click ``Find a Tool``. Click ``Broad Methods Repository``. Type **dropseq_workflow**.
- 	You can also see the Terra documentation for `adding a tool`_.
+	See the Terra documentation for `adding a workflow`_. The *dropseq_workflow* is under ``Broad Methods Repository`` with name "**cumulus/dropseq_workflow**".
 
-#. Select ``Process single workflow from files``.
+	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace you want to export *dropseq_workflow* workflow in the drop-down menu.
+
+#. In your workspace, open ``dropseq_workflow`` in ``WORKFLOWS`` tab. Select ``Process single workflow from files`` as below
 
 	.. image:: images/single_workflow.png
+
+   and click the ``SAVE`` button.
 
 ---------------------------------
 
@@ -176,7 +179,7 @@ The pipeline outputs a list of google bucket urls containing one gene-count matr
 .. _McCarroll lab: http://mccarrolllab.org/dropseq-1/
 .. _dropEst: https://github.com/hms-dbmi/dropEst
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
-.. _adding a tool: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
+.. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
 .. _Terra: https://app.terra.bio/
 
 

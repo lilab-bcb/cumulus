@@ -37,11 +37,11 @@ Follow the steps below to run **cumulus** for cell-hashing/nuclei-hashing/CITE-S
 		gsutil cp /foo/bar/projects/my_sample_sheet_hashing.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 		gsutil cp /foo/bar/projects/antibody_control.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
-#. Import cumulus_hashing_cite_seq to your workspace.
+#. Import *cumulus_hashing_cite_seq* to your workspace.
 
-	See the Terra documentation for `adding a workflow`_. The cumulus_hashing_cite_seq workflow is under ``Broad Methods Repository`` with name "**cumulus/cumulus_hashing_cite_seq**".
+	See the Terra documentation for `adding a workflow`_. The *cumulus_hashing_cite_seq* workflow is under ``Broad Methods Repository`` with name "**cumulus/cumulus_hashing_cite_seq**".
 
-	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export cumulus_hashing_cite_seq workflow in the drop-down menu.
+	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cumulus_hashing_cite_seq* workflow in the drop-down menu.
 
 #. In your workspace, open ``cumulus_hashing_cite_seq`` in ``WORKFLOWS`` tab. Select ``Process single workflow from files`` as below
 

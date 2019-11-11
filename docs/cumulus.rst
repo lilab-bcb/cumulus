@@ -39,11 +39,11 @@ You are free to add any other columns and these columns will be used in selectin
 
 	where ``/foo/bar/projects/my_count_matrix.csv`` is the path to your sample sheet in local machine, and ``gs://fc-e0000000-0000-0000-0000-000000000000/`` is the location on Google bucket to hold it.
 
-#. Import cumulus workflow to your workspace.
+#. Import *cumulus* workflow to your workspace.
 
-	See the Terra documentation for `adding a workflow`_. The cumulus workflow is under ``Broad Methods Repository`` with name "**cumulus/cumulus**".
+	See the Terra documentation for `adding a workflow`_. The *cumulus* workflow is under ``Broad Methods Repository`` with name "**cumulus/cumulus**".
 
-	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export cumulus workflow in the drop-down menu.
+	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cumulus* workflow in the drop-down menu.
 
 #. In your workspace, open ``cumulus`` in ``WORKFLOWS`` tab. Select ``Process single workflow from files`` as below
 

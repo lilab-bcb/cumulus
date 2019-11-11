@@ -70,11 +70,11 @@ Follow the steps below to extract gene-count matrices from SMART-Seq2 data on Te
 		gsutil cp /foo/bar/projects/sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
 
-#. Import smartseq2 workflow to your workspace.
+#. Import *smartseq2* workflow to your workspace.
 
-	See the Terra documentation for `adding a workflow`_. The smartseq2 workflow is under ``Broad Methods Repository`` with name "**cumulus/smartseq2**".
+	See the Terra documentation for `adding a workflow`_. The *smartseq2* workflow is under ``Broad Methods Repository`` with name "**cumulus/smartseq2**".
 
-	Moreover, in the workflow page, click ``Export to Workspace...`` button, and select the workspace to which you want to export ``smartseq2`` in the drop-down menu.
+	Moreover, in the workflow page, click ``Export to Workspace...`` button, and select the workspace to which you want to export *smartseq2* workflow in the drop-down menu.
 
 #. In your workspace, open ``smartseq2`` in ``WORKFLOWS`` tab. Select ``Process single workflow from files`` as below
 
