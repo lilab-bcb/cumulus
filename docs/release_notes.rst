@@ -1,3 +1,8 @@
+Version 0.11.0 `November 20, 2019`
+----------------------------------
+
+Reorganized Cumulus documentation.
+
 Version 0.10.0 `October 2, 2019`
 --------------------------------
 
@@ -10,7 +15,7 @@ Version 0.7.0 `Feburary 14, 2019`
 
 Added support for 10x genomics scATAC assays.
 
-cumulus runs FIt-SNE as default.
+scCloud runs FIt-SNE as default.
 
 Version 0.6.0 `January 31, 2019`
 --------------------------------

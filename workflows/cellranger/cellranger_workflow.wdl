@@ -60,16 +60,16 @@ workflow cellranger_workflow {
 	String? atac_dim_reduce
 
 
-	# 2.2.0, 3.0.2, 3.1.0
-	String? cellranger_version = "3.0.2"
+	# 3.1.0, 3.0.2, 2.2.0 
+	String? cellranger_version = "3.1.0"
 	# 1.1.0
 	String? cellranger_atac_version = "1.1.0"
-	# cumulus version, default to "0.10.0"
-	String? cumulus_version = "0.10.0"
+	# cumulus version, default to "0.11.0"
+	String? cumulus_version = "0.11.0"
     String? docker_registry = "cumulusprod/"
 	String? cellranger_mkfastq_docker_registry = "gcr.io/broad-cumulus"
-	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
-	String? zones = "us-east1-d us-west1-a us-west1-b"
+	# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+	String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 	# Number of cpus per cellranger job
 	Int? num_cpu = 32
 	# Memory string
