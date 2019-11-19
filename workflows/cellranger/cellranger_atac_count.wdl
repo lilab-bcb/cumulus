@@ -6,7 +6,7 @@ workflow cellranger_atac_count {
 	# cellRanger-atac output directory, gs url
 	String output_directory
 
-	# GRCh38_atac_v1.0.1, mm10_atac_v1.0.1 or a URL to a tar.gz file
+	# Keywords or a URL to a tar.gz file
 	String genome
 
 
