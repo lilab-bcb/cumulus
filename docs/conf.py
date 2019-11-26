@@ -20,8 +20,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Cumulus'
-copyright = '2018, Bo Li, Joshua Gould, and et al.'
-author = 'Bo Li, Joshua Gould, and et al.'
+copyright = '2019 The Broad Institute, Inc. and The General Hospital Corporation. All rights reserved.'
+author = 'Yiming Yang, Joshua Gould and Bo Li'
 
 # The short X.Y version
 version = ''
