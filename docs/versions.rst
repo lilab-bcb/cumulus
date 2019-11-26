@@ -21,7 +21,33 @@ Latest version
 	  - 3
 	  - Run Bowtie2 and RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files
 	* - cumulus/cumulus
-	  - 6
+	  - 7
+	  - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
+	* - cumulus/cumulus_subcluster
+	  - 4
+	  - Run subcluster analysis using cumulus
+	* - cumulus/cumulus_hashing_cite_seq
+	  - 4
+	  - Run cumulus for cell-hashing/nucleus-hashing/CITE-Seq analysis
+
+Stable version - v0.10.0
+^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+	:widths: 15 5 30
+	:header-rows: 1
+
+	* - WDL
+	  - Snapshot
+	  - Function
+	* - cumulus/cellranger_workflow
+	  - 3
+	  - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
+	* - cumulus/smartseq2
+	  - 3
+	  - Run Bowtie2 and RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files
+	* - cumulus/cumulus
+	  - 7
 	  - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
 	* - cumulus/cumulus_subcluster
 	  - 4

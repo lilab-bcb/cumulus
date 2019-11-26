@@ -251,7 +251,7 @@ workflow cumulus {
 				attributes = attributes,
 				select_only_singlets = select_only_singlets,
 				minimum_number_of_genes = minimum_number_of_genes,
-				genome = genome,
+# 				genome = genome,
 				cumulus_version = cumulus_version,
 				zones = zones,
 				memory = memory,
