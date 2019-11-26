@@ -17,3 +17,4 @@
    command_line
    examples/index
    contribution
+   contact
