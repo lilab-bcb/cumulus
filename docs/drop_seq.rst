@@ -207,6 +207,10 @@ Please see the description of important inputs below.
 dropseq_workflow Terra Release Notes
 ===================================================
 
+**Version 5**
+
+- Split preprocessing steps into separate tasks (FastqToSam, TagBam, FilterBam, and TrimBam).
+
 **Version 4**
 
 - Handle uncompressed fastq files as workflow input.

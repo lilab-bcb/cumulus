@@ -2,7 +2,7 @@ import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:bcl2fastq/versions/2/pl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropest/versions/3/plain-WDL/descriptor" as dropest_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_align/versions/3/plain-WDL/descriptor" as dropseq_align_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_count/versions/3/plain-WDL/descriptor" as dropseq_count_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_prepare_fastq/versions/3/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_prepare_fastq/versions/4/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_qc/versions/3/plain-WDL/descriptor" as dropseq_qc_wdl
 
 workflow dropseq_workflow {
@@ -150,7 +150,7 @@ workflow dropseq_workflow {
                 drop_seq_tools_version=drop_seq_tools_version,
                 add_bam_tags_disk_space_multiplier=add_bam_tags_disk_space_multiplier,
                 output_directory = output_directory_stripped + '/' + row[0],
-                input_bam = dropseq_prepare_fastq.bam,
+                input_bam = dropseq_prepare_fastq.trimmed_bam,
                 star_cpus = generate_count_config.star_cpus_output,
                 star_memory = generate_count_config.star_memory_output,
                 star_flags = star_flags,
@@ -241,7 +241,7 @@ workflow dropseq_workflow {
     }
 
     output {
-        Array[String] bam=dropseq_prepare_fastq.bam
+        Array[String] trimmed_bam=dropseq_prepare_fastq.trimmed_bam
         Array[String] cellular_tag_summary=dropseq_prepare_fastq.cellular_tag_summary
         Array[String] molecular_tag_summary=dropseq_prepare_fastq.molecular_tag_summary
         Array[String] adapter_trimming_report = dropseq_prepare_fastq.adapter_trimming_report
