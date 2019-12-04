@@ -5,7 +5,7 @@ workflow cellranger_create_reference {
 	Int? preemptible = 2
 	String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 	Int? num_cpu = 1
-	Int? memory = 16
+	Int? memory = 32
 
 	File input_gtf_file
 	String output_dir
@@ -75,7 +75,7 @@ task run_cellranger_filter {
 
 		call_args = ['cellranger', 'mkgtf', '${input_gtf_file}', '${genome}.filter.gtf']
 		for attr in attrs:
-			call_args.append('--attributes=' + attr)
+			call_args.append('--attribute=' + attr)
 
 		print(' '.join(call_args))
 		check_all(call_args)
