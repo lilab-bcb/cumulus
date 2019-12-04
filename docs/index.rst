@@ -14,6 +14,7 @@
    drop_seq
    hashing_cite_seq
    cumulus
+   demuxlet
    command_line
    examples/index
    contribution
