@@ -125,6 +125,8 @@ task run_cellranger_create_reference {
 		if '${ref_version}' is not '':
 			call_args.append('--ref-version=${ref_version}')
 
+		print(' '.join(call_args))
+		check_call(call_args)
 		CODE
 
 		# gsutil -q cp -r ${genome} ${output_dir}/${genome}
