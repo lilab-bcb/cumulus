@@ -1,72 +1,54 @@
 workflow cellranger_create_reference {
-	String docker_registry = "cumulusprod/"
-	String cellranger_version = '3.0.2'
-	Int disk_space = 500
-	Int preemptible = 2
+	String? docker_registry = "cumulusprod/"
+	String? cellranger_version = '3.1.0'
+	Int? disk_space = 500
+	Int? preemptible = 2
+	String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+	Int? num_cpu = 1
+	Int? memory = 16
 
-	String input_file
+	File input_gtf_file
 	String output_dir
-	String genome_list
-	String fasta_list
-	String genes_list
-	String attributes
+	String genome
+	File fasta
+	String? attributes
+	String? ref_version
 
-	Boolean is_sample_sheet = sub(input_file, "^.+\\.csv$", "CSV") == "CSV"
+	Boolean do_filter = if '${attributes}' != '' then true else false
 
 
-	if (is_sample_sheet)
-
-	if ('${attributes}' != '') {
+	if (do_filter) {
 		call run_cellranger_filter as filter {
 			input:
 				docker_registry = docker_registry,
 				cellranger_version = cellranger_version,
 				disk_space = disk_space,
+				zones = zones,
+				memory = memory,
 				preemptible = preemptible,
-				input_gtf_file = intput_gtf_file,
-				attributes = attributes
+				input_gtf_file = input_gtf_file,
+				attributes = attributes,
+				genome = genome
 		}
 	}
 
 
-
-
-}
-
-task generate_species {
-	String docker_registry
-	String cellranger_version
-	String disk_space
-	String preemptible
-	String zones
-	String memory
-
-	String input_csv_file
-
-	command {
-		set -e
-		export TMPDIR=/tmp
-
-		python <<CODE
-
-		import pandas as pd
-		from subprocess import check_call
-
-		df = pd.read_csv('${input_csv_file}', header = 0, dtype=str, index_col=False)
-		for col in df.columns:
-			df[col] = df[col].str.strip()
-
-
-
-		CODE
+	call run_cellranger_create_reference as create_ref {
+		input:
+			docker_registry = docker_registry,
+			cellranger_version = cellranger_version,
+			disk_space = disk_space,
+			preemptible = preemptible,
+			zones = zones,
+			output_dir = output_dir,
+			genome = genome,
+			fasta = fasta,
+			genes = if do_filter then filter.output_gtf_file else input_gtf_file,
+			memory = memory,
+			num_cpu = num_cpu,
+			ref_version = ref_version
 	}
 
-
-	runtime {
-		docker: "${docker_registry}cellranger:${cellranger_version}"
-		zones: zones
-		preemptible: "${preemptible}"
-	}
 }
 
 task run_cellranger_filter {
@@ -77,8 +59,8 @@ task run_cellranger_filter {
 	String memory
 	Int preemptible
 
-	String input_gtf_file
-	String output_name
+	File input_gtf_file
+	String genome
 	String attributes
 
 	command {
@@ -91,7 +73,7 @@ task run_cellranger_filter {
 
 		attrs = '${attributes}'.split(';')
 
-		call_args = ['cellranger', 'mkgtf', '${input_gtf_file}', '${output_name}.filter.gtf']
+		call_args = ['cellranger', 'mkgtf', '${input_gtf_file}', '${genome}.filter.gtf']
 		for attr in attrs:
 			call_args.append('--attributes=' + attr)
 
@@ -101,13 +83,13 @@ task run_cellranger_filter {
 	}
 
 	output {
-		File output_gtf_file = '${output_name}.filter.gtf'
+		File output_gtf_file = "${genome}.filter.gtf"
 	}
 
 	runtime {
 		docker: "${docker_registry}cellranger:${cellranger_version}"
 		zones: zones
-		memory: memory
+		memory: "${memory}G"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: 1
@@ -121,12 +103,13 @@ task run_cellranger_create_reference {
 	Int disk_space
 	Int num_cpu
 	String zones
-	String memory
+	Int memory
 	Int preemptible
 
-	String genome_list
-	String fasta_list
-	String genes_list
+	String output_dir
+	String genome
+	File fasta
+	File genes
 	String? ref_version
 
 	command {
@@ -137,22 +120,26 @@ task run_cellranger_create_reference {
 		python <<CODE
 		from subprocess import check_call
 
-		call_args = ['cellranger', 'mkref']
+		call_args = ['cellranger', 'mkref', '--genome=${genome}', '--fasta=${fasta}', '--genes=${genes}', '--nthreads=${num_cpu}', '--memgb=${memory}']
 
 		if '${ref_version}' is not '':
 			call_args.append('--ref-version=${ref_version}')
 
 		CODE
+
+		# gsutil -q cp -r ${genome} ${output_dir}/${genome}
+		mkdir -p ${output_dir}
+		cp -r ${genome} ${output_dir}/
 	}
 
 	output {
-
+		String output_folder = "${output_dir}/${genome}"
 	}
 
 	runtime {
 		docker: "${docker_registry}cellranger:${cellranger_version}"
 		zones: zones
-		memory: memory
+		memory: "${memory}G"
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: "${num_cpu}"
