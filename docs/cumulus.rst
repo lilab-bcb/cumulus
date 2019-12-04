@@ -13,11 +13,14 @@ Case One: Sample Sheet
 
 Follow the steps below to run **cumulus** on Terra_.
 
-#. Create a sample sheet, **count_matrix.csv**, which describes the metadata for each 10x channel. The sample sheet should at least contain 2 columns --- *Sample* and *Location*. *Sample* refers to sample names and *Location* refers to the location of the channel-specific count matrix in either of
+#. Create a sample sheet, **count_matrix.csv**, which describes the metadata for each sample count matrix. The sample sheet should at least contain 2 columns --- *Sample* and *Location*. *Sample* refers to sample names and *Location* refers to the location of the channel-specific count matrix in either of
 
   - 10x format with v2 chemistry. For example, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_gene_bc_matrices_h5.h5``.
   - 10x format with v3 chemistry. For example, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_feature_bc_matrices.h5``.
-  - Drop-seq format. For example, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_2/sample_2.umi.dge.txt.gz``. 
+  - Drop-seq format. For example, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_2/sample_2.umi.dge.txt.gz``.
+  - mtx, csv, tsv or loom format. 
+
+Additionally, an optional Reference column can be used to select samples generated from a same reference (e.g. mm10). If the count matrix is in either DGE, mtx, csv, tsv, or loom format, the value in this column will be used as the reference since the count matrix file does not contain reference name information. In addition, the Reference column can be used to aggregate count matrices generated from different genome versions or gene annotations together under a unified reference. For example, if we have one matrix generated from mm9 and the other one generated from mm10, we can write mm9_10 for these two matrices in their Reference column. Pegasus will change their references to 'mm9_10' and use the union of gene symbols from the two matrices as the gene symbols of the aggregated matrix. For HDF5 files (e.g. 10x v2/v3), the reference name contained in the file does not need to match the value in this column. In fact, we use this column to rename references in HDF5 files. For example, if we have two HDF files, one generated from mm9 and the other generated from mm10. We can set these two files' Reference column value to 'mm9_10', which will rename their reference names into mm9_10 and the aggregated matrix will contain all genes from either mm9 or mm10. This renaming feature does not work if one HDF5 file contain multiple references (e.g. mm10 and GRCh38).
 
 You are free to add any other columns and these columns will be used in selecting channels for futher analysis. In the example below, we have *Source*, which refers to the tissue of origin, *Platform*, which refers to the sequencing platform, *Donor*, which refers to the donor ID, and *Reference*, which refers to the reference genome.
 
@@ -115,14 +118,10 @@ global inputs
 	  - This is the prefix for all output files. It should contain the google bucket url, subdirectory name and output name prefix
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir/my_results"
 	  - 
-	* - genome
-	  - A string contains comma-separated genome names. Cumulus will read all groups associated with genome names in the list from the hdf5 file. If genome is None, all groups will be considered.
-	  - "GRCh38"
-	  - 
 	* - cumulus_version
-	  - cumulus version to use. Versions available: 0.10.0.
-	  - "0.10.0"
-	  - "0.10.0"
+	  - cumulus version to use. Versions available: 0.11.0, 0.10.0.
+	  - "0.11.0"
+	  - "0.11.0"
 	* - docker_registry
 	  - Docker registry to use. Options:
 
@@ -134,7 +133,7 @@ global inputs
 	* - zones
 	  - Google cloud zones to consider for execution.
 	  - "us-east1-d us-west1-a us-west1-b"
-	  - "us-east1-d us-west1-a us-west1-b"
+	  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 	* - num_cpu
 	  - Number of CPUs per Cumulus job
 	  - 32
@@ -176,14 +175,18 @@ aggregate_matrices inputs
 	  - Specify a comma-separated list of outputted attributes. These attributes should be column names in the count_matrix.csv file
 	  - "Source,Platform,Donor"
 	  - 
+	* - default_reference
+	  - If sample count matrix is in either DGE, mtx, csv, tsv or loom format and there is no Reference column in the csv_file, use default_reference as the reference.
+	  - "GRCh38"
+	  - 
+	* - select_only_singlets
+	  - If we have demultiplexed data, turning on this option will make cumulus only include barcodes that are predicted as singlets.
+	  - true
+	  - false
 	* - minimum_number_of_genes
 	  - Only keep barcodes with at least this number of expressed genes
 	  - 100
 	  - 100
-	* - is_dropseq
-	  - If inputs are dropseq data
-	  - true
-	  - false
 
 aggregate_matrices output
 +++++++++++++++++++++++++
@@ -215,6 +218,10 @@ cluster inputs
 	  - Description
 	  - Example
 	  - Default
+	* - considered_refs
+	  - A string contains comma-separated reference(e.g. genome) names. Cumulus will read all groups associated with reference names in the list from the input file. If considered_refs is None, all groups will be considered.
+	  - "mm10" 
+	  - 
 	* - channel
 	  - Specify the cell barcode attribute to represent different samples.
 	  - "Donor" 

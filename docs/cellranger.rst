@@ -83,7 +83,7 @@ A general step-by-step instruction
 		  - Describes the 10x chemistry used for the sample. This column is optional. 
 		* - DataType
 		  - 
-			| Describes the data type of the sample --- *count*, *vdj*, *adt*, or *crispr*. 
+			| Describes the data type of the sample --- *rna*, *vdj*, *adt*, or *crispr*. 
 			| **rna** refers to gene expression data (*cellranger count*), 
 			| **vdj** refers to V(D)J data (*cellranger vdj*), 
 			| **adt** refers to antibody tag data, which can be either CITE-Seq, cell-hashing, or nucleus-hashing, 

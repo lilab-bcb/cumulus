@@ -107,9 +107,9 @@ cumulus_hashing_cite_seq inputs:
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/antibody_control.csv"
 	  - 
 	* - cumulus_version
-	  - cumulus version to use. Versions available: 0.10.0.
-	  - "0.10.0"
-	  - "0.10.0"
+	  - cumulus version to use. Versions available: 0.11.0, 0.10.0.
+	  - "0.11.0"
+	  - "0.11.0"
 	* - docker_registry
 	  - Docker registry to use. Options:
 
@@ -121,7 +121,7 @@ cumulus_hashing_cite_seq inputs:
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-d us-west1-a us-west1-b"
-	  - "us-east1-d us-west1-a us-west1-b"
+	  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 	* - num_cpu
 	  - Number of CPUs per cumulus_hashing_cite_seq job
 	  - 8

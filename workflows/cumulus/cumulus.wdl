@@ -2,22 +2,19 @@ import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
-	# Input file: can be either 10x, hdf5, loom, SCP compatible format, or a csv-formatted file containing information of each scRNA-Seq run
+	# Input file: can be either a csv-formatted file containing information of each scRNA-Seq run or a single input file
 	File input_file
 	# If input file is a sample sheet in csv format.
 	Boolean is_sample_sheet = sub(input_file, "^.+\\.csv$", "CSV") == "CSV"
 	# Google bucket, subdirectory name and results name prefix
 	String output_name
-	# Reference genome name, can be None if you want cumulus to infer it from data for you,
-	# if inputs are dropseq data, this option needs to turn on and provides the reference genome name
-	String genome = ""
 
-	# cumulus version, default to "0.10.0"
-	String? cumulus_version = "0.10.0"
+	# cumulus version, default to "0.11.0"
+	String? cumulus_version = "0.11.0"
 	# Docker registry to use
 	String? docker_registry = "cumulusprod/"
-	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
-	String? zones = "us-east1-d us-west1-a us-west1-b"
+	# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+	String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 	# Number of cpus per cumulus job
 	Int? num_cpu = 64
 	# Memory size string
@@ -38,6 +35,8 @@ workflow cumulus {
 	String? restrictions
 	# Specify a comma-separated list of outputted attributes. These attributes should be column names in the csv file
 	String? attributes
+	# If sample count matrix is in either DGE, mtx, csv, tsv or loom format and there is no Reference column in the csv_file, use default_reference as the reference.
+	String? default_reference
 	# If we have demultiplexed data, turning on this option will make cumulus only include barcodes that are predicted as singlets
 	Boolean? select_only_singlets = false
 	# Only keep barcodes with at least this number of expressed genes
@@ -47,6 +46,8 @@ workflow cumulus {
 
 	# for cluster
 
+	# A string contains comma-separated reference(e.g. genome) names. pegasus will read all groups associated with reference names in the list from the input file. If considered_refs is None, all groups will be considered.
+	String? considered_refs
 	# Specify the cell barcode attribute to represent different samples.
 	String? channel
 	# Specify cell barcode attributes to be popped out.
@@ -249,9 +250,9 @@ workflow cumulus {
 				output_name = out_name,
 				restrictions = restrictions,
 				attributes = attributes,
+				default_reference = default_reference,
 				select_only_singlets = select_only_singlets,
 				minimum_number_of_genes = minimum_number_of_genes,
-# 				genome = genome,
 				cumulus_version = cumulus_version,
 				zones = zones,
 				memory = memory,
@@ -267,7 +268,7 @@ workflow cumulus {
 		input:
 			input_file = if is_sample_sheet then aggregate_matrices.output_h5sc else input_file,
 			output_name = out_name,
-			genome = genome,
+			considered_refs = considered_refs,
 			channel = channel,
 			black_list = black_list,
 			min_genes_on_raw = min_genes_on_raw,

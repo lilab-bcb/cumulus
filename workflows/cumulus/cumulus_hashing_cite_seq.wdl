@@ -7,12 +7,12 @@ workflow cumulus_hashing_cite_seq {
 	# Output directory, gs url
 	String output_directory
 
-	# cumulus version, default to "0.10.0"
-	String? cumulus_version = "0.10.0"
+	# cumulus version, default to "0.11.0"
+	String? cumulus_version = "0.11.0"
 	# Docker registry to use
 	String? docker_registry = "cumulusprod/"
-	# Google cloud zones, default to "us-east1-d us-west1-a us-west1-b"
-	String? zones = "us-east1-d us-west1-a us-west1-b"
+	# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+	String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 	# Number of cpus
 	Int? num_cpu = 8
 	# Memory string

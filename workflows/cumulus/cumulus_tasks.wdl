@@ -11,9 +11,9 @@ task run_cumulus_aggregate_matrices {
 	Int preemptible
 	String? restrictions
 	String? attributes
+	String? default_reference
 	Boolean? select_only_singlets
 	Int? minimum_number_of_genes
-	String? genome
 	String docker_registry
 
 	command {
@@ -22,7 +22,7 @@ task run_cumulus_aggregate_matrices {
 
 		python <<CODE
 		from subprocess import check_call
-		call_args = ['pegasus', 'aggregate_matrix', '${input_count_matrix_csv}', '${output_name}', '--google-cloud']
+		call_args = ['pegasus', 'aggregate_matrix', '${input_count_matrix_csv}', '${output_name}']
 		# call_args = ['pegasus', 'aggregate_matrix', '${input_count_matrix_csv}', '${output_name}']
 		if '${restrictions}' is not '':
 			ress = '${restrictions}'.split(';')
@@ -30,12 +30,12 @@ task run_cumulus_aggregate_matrices {
 				call_args.extend(['--restriction', res])
 		if '${attributes}' is not '':
 			call_args.extend(['--attributes', '${attributes}'])
+		if '${default_reference}' is not '':
+			call_args.extend(['--default-reference', '${default_reference}'])
 		if '${select_only_singlets}' is 'true':
 			call_args.append('--select-only-singlets')
 		if '${minimum_number_of_genes}' is not '':
 			call_args.extend(['--minimum-number-of-genes', '${minimum_number_of_genes}'])
-		if '${genome}' is not '':
-			call_args.extend(['--genome', '${genome}'])
 
 		print(' '.join(call_args))
 		check_call(call_args)
@@ -66,7 +66,7 @@ task run_cumulus_cluster {
 	String memory
 	Int disk_space
 	Int preemptible
-	String? genome
+	String? considered_refs
 	String? channel
 	String? black_list
 	Int? min_genes_on_raw
@@ -142,8 +142,8 @@ task run_cumulus_cluster {
 		python <<CODE
 		from subprocess import check_call
 		call_args = ['pegasus', 'cluster', '${input_file}', '${output_name}', '-p', '${num_cpu}']
-		if '${genome}' is not '':
-			call_args.extend(['--genome', '${genome}'])
+		if '${considered_refs}' is not '':
+			call_args.extend(['--considered-refs', '${considered_refs}'])
 		if '${channel}' is not '':
 			call_args.extend(['--channel', '${channel}'])
 		if '${black_list}' is not '':

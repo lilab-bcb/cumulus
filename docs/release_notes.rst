@@ -1,5 +1,5 @@
-Version 0.11.0 `November 20, 2019`
-----------------------------------
+Version 0.11.0 `December 4, 2019`
+---------------------------------
 
 Reorganized Cumulus documentation.
 
