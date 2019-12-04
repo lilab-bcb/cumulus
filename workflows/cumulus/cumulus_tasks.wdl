@@ -23,7 +23,6 @@ task run_cumulus_aggregate_matrices {
 		python <<CODE
 		from subprocess import check_call
 		call_args = ['pegasus', 'aggregate_matrix', '${input_count_matrix_csv}', '${output_name}']
-		# call_args = ['pegasus', 'aggregate_matrix', '${input_count_matrix_csv}', '${output_name}']
 		if '${restrictions}' is not '':
 			ress = '${restrictions}'.split(';')
 			for res in ress:

@@ -1,0 +1,3 @@
+Genome,Fasta,Genes,Attributes
+hg19,hg19.fa,hg19-ensembl.gtf,
+mm10,mm10.fa,mm10-ensembl.gtf,
