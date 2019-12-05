@@ -88,7 +88,6 @@ task run_cellranger_filter {
 		docker: "${docker_registry}cellranger:${cellranger_version}"
 		zones: zones
 		memory: "${memory}G"
-		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: 1
 		preemptible: "${preemptible}"
@@ -132,14 +131,13 @@ task run_cellranger_create_reference {
 	}
 
 	output {
-		String output_folder = "${output_dir}/${genome}.tar.gz"
+		File reference = "${output_dir}/${genome}.tar.gz"
 	}
 
 	runtime {
 		docker: "${docker_registry}cellranger:${cellranger_version}"
 		zones: zones
 		memory: "${memory}G"
-		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: "${num_cpu}"
 		preemptible: "${preemptible}"
