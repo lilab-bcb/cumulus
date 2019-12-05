@@ -10,7 +10,7 @@ workflow cellranger_atac_create_reference {
 	String output_dir
 	String genome
 
-	call run_cellranger_atac_create_reference as atac_mkref {
+	call run_cellranger_atac_create_reference {
 		input:
 			docker_registry = docker_registry,
 			cellranger_atac_version = cellranger_atac_version,
@@ -39,17 +39,16 @@ task run_cellranger_atac_create_reference {
 
 	command {
 		set -e
-		monitor_script.sh > monitoring.log
 
 		cellranger-atac mkref ${genome} --config ${config_json}
 		tar -czf ${genome}.tar.gz ${genome}
-		# gsutil -q cp ${genome}.tar.gz ${output_dir}
-		mkdir -p ${output_dir}
-		cp ${genome}.tar.gz ${output_dir}
+		gsutil -q cp ${genome}.tar.gz ${output_dir}
+		# mkdir -p ${output_dir}
+		# cp ${genome}.tar.gz ${output_dir}
 	}
 
 	output {
-		File reference = "${genome}.tar.gz"
+		File reference = "#{output_dir}/${genome}.tar.gz"
 	}
 
 	runtime {
