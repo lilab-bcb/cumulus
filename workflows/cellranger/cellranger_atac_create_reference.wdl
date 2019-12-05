@@ -42,15 +42,7 @@ task run_cellranger_atac_create_reference {
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log
 
-		python <<CODE
-		from subprocess import check_call
-
-		call_args = ['cellranger-atac', 'mkref', '${genome}', '--config', '${config_json}']
-
-		print(' '.join(call_args))
-		check_call(call_args)
-
-		CODE
+		cellranger-atac mkref ${genome} --config ${config_json}
 
 		# gsutil -q cp -r ${genome} ${output_dir}/${genome}
 		mkdir -p ${output_dir}
