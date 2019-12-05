@@ -1,6 +1,6 @@
 workflow cellranger_atac_create_reference {
 	String? docker_registry = "cumulusprod/"
-	String? cellranger_atac_version = '1.1.0'
+	String? cellranger_atac_version = '1.0.0'
 	Int? disk_space = 500
 	Int? preemptible = 2
 	String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
