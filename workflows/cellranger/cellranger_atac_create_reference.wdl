@@ -10,8 +10,6 @@ workflow cellranger_atac_create_reference {
 	String output_dir
 	String genome
 
-	Boolean do_filter = if '${attributes}' != '' then true else false
-
 	call run_cellranger_atac_create_reference as atac_mkref {
 		input:
 			docker_registry = docker_registry,
