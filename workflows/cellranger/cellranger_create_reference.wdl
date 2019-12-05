@@ -76,7 +76,7 @@ task run_cellranger_filter {
 			call_args.append('--attribute=' + attr)
 
 		print(' '.join(call_args))
-		check_all(call_args)
+		check_call(call_args)
 		CODE
 	}
 
