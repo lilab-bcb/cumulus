@@ -65,6 +65,8 @@ task run_cellranger_filter {
 
 	command {
 		set -e
+		export TMPDIR=/tmp
+		monitor_script.sh > monitoring.log &
 
 		python <<CODE
 		from subprocess import check_call
@@ -111,6 +113,8 @@ task run_cellranger_create_reference {
 
 	command {
 		set -e
+		export TMPDIR=/tmp
+		monitor_script.sh > monitoring.log &
 
 		python <<CODE
 		from subprocess import check_call

@@ -39,6 +39,8 @@ task run_cellranger_atac_create_reference {
 
 	command {
 		set -e
+		export TMPDIR=/tmp
+		monitor_script.sh > monitoring.log &
 
 		cellranger-atac mkref ${genome} --config ${config_json}
 		tar -czf ${genome}.tar.gz ${genome}
