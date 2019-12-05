@@ -39,14 +39,13 @@ task run_cellranger_atac_create_reference {
 
 	command {
 		set -e
-		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log
 
 		cellranger-atac mkref ${genome} --config ${config_json}
-
-		# gsutil -q cp -r ${genome} ${output_dir}/${genome}
+		tar -czf ${genome}.tar.gz ${genome}
+		# gsutil -q cp ${genome}.tar.gz ${output_dir}
 		mkdir -p ${output_dir}
-		cp -r ${genome} ${output_dir}/
+		cp ${genome}.tar.gz ${output_dir}
 	}
 
 	output {
@@ -57,7 +56,6 @@ task run_cellranger_atac_create_reference {
 		docker: "${docker_registry}cellranger-atac:${cellranger_atac_version}"
 		zones: zones
 		memory: memory
-		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: 1
 		preemptible: "${preemptible}"
