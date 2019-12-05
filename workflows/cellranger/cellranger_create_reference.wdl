@@ -65,8 +65,6 @@ task run_cellranger_filter {
 
 	command {
 		set -e
-		export TMPDIR=/tmp
-		monitor_script.sh > monitoring.log
 
 		python <<CODE
 		from subprocess import check_call
@@ -114,8 +112,6 @@ task run_cellranger_create_reference {
 
 	command {
 		set -e
-		export TMPDIR=/tmp
-		monitor_script.sh > monitoring.log
 
 		python <<CODE
 		from subprocess import check_call
@@ -129,13 +125,14 @@ task run_cellranger_create_reference {
 		check_call(call_args)
 		CODE
 
-		# gsutil -q cp -r ${genome} ${output_dir}/${genome}
-		mkdir -p ${output_dir}
-		cp -r ${genome} ${output_dir}/
+		tar -czf ${genome}.tar.gz ${genome}
+		gsutil -q cp ${genome}.tar.gz ${output_dir}
+		# mkdir -p ${output_dir}
+		# cp ${genome}.tar.gz ${output_dir}
 	}
 
 	output {
-		String output_folder = "${output_dir}/${genome}"
+		String output_folder = "${output_dir}/${genome}.tar.gz"
 	}
 
 	runtime {
