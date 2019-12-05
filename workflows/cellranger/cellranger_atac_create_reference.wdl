@@ -49,7 +49,7 @@ task run_cellranger_atac_create_reference {
 	}
 
 	output {
-		String output_folder = "${output_dir}/${genome}"
+		File reference = "${genome}.tar.gz"
 	}
 
 	runtime {
