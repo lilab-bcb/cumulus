@@ -50,7 +50,7 @@ task run_cellranger_atac_create_reference {
 	}
 
 	output {
-		File reference = "#{output_dir}/${genome}.tar.gz"
+		File reference = "${output_dir}/${genome}.tar.gz"
 	}
 
 	runtime {
