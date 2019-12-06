@@ -43,6 +43,8 @@ task rsem_prepare_reference {
 
 	command {
 		set -e
+		export TMPDIR=/tmp
+		monitor_script.sh > monitoring.log &
 
 		mkdir ${genome}
 		rsem-prepare-reference --gtf ${gtf} --bowtie2 -p ${cpu} ${fasta} ${genome}/${genome}
