@@ -1,7 +1,7 @@
 Run Cell Ranger tools using cellranger_workflow
 ------------------------------------------------
 
-``cellranger_workflow`` wraps Cell Ranger to process single-cell/nucleus RNA-seq, feature barcoding (cell/nucleus hashing, CITE-seq, Perturb-seq), single-cell ATAC-seq and single-cell immune profiling data.
+``cellranger_workflow`` wraps Cell Ranger to process single-cell/nucleus RNA-seq, feature barcoding (cell/nucleus hashing, CITE-seq, Perturb-seq), single-cell ATAC-seq and single-cell immune profiling data. It also provide routines to build cellranger references.
 
 A general step-by-step instruction
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -922,6 +922,27 @@ See the table below for important scIR-seq outputs.
 	* - count_matrix
 	  - String
 	  - gs url for a template count_matrix.csv to run cumulus.
+
+---------------------------------
+
+Build Cell Ranger References
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Build references for sc/snRNA-seq
++++++++++++++++++++++++++++++++++
+
+cellranger_create_reference.wdl
+
+Build references for scATAC-seq
++++++++++++++++++++++++++++++++
+
+cellranger_atac_create_reference.wdl
+
+Build references for single-cell immune profiling data
+++++++++++++++++++++++++++++++++++++++++++++++++++++++
+
+TODO cellranger_vdj_create_reference.wdl
+
 
 
 
