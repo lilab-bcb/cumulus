@@ -2,6 +2,8 @@ GRCh38_v3.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38-3.0.
 hg19_v3.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-hg19-3.0.0.tar.gz
 mm10_v3.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-mm10-3.0.0.tar.gz
 GRCh38_and_mm10_v3.1.0	gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38-and-mm10-3.1.0.tar.gz
+hg19_and_mm10_v3.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-hg19-and-mm10-3.0.0.tar.gz
+ERCC_v1.2.0	gs://regev-lab/resources/cellranger/refdata-cellranger-ercc92-1.2.0.tar.gz
 GRCh38_v1.2.0	gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38-1.2.0.tar.gz
 hg19_v1.2.0	gs://regev-lab/resources/cellranger/refdata-cellranger-hg19-1.2.0.tar.gz
 mm10_v1.2.0	gs://regev-lab/resources/cellranger/refdata-cellranger-mm10-1.2.0.tar.gz
