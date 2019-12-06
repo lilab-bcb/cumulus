@@ -525,6 +525,9 @@ cluster outputs
 	    | and ``data.obsm['X_fle']`` records the force-directed layout coordinates from the diffusion components.
 	    | The ``varm`` field records DE analysis results if performed: ``data.varm['de_res']``.
 	    | The ``uns`` field stores other related information, such as reference genome (``data.uns['genome']``), kNN on PCA coordinates (``data.uns['pca_knn_indices']`` and ``data.uns['pca_knn_distances']``), etc.
+	* - **output_log**
+	  - File
+	  - This is a copy of the logging module output, containing important intermediate messages
 	* - output_seurat_h5ad
 	  - File
 	  - h5ad file in seurat-compatible manner. This file can be loaded into R and converted into a Seurat object (see `here <./cumulus.html#load-cumulus-results-into-seurat>`_ for instructions)
@@ -1034,6 +1037,9 @@ cumulus_subcluster's outputs
 	    | If ``perform_de_analysis`` is on, this file should be the same as *output_de_h5ad*.
 	    | To load this file in Python, it's similar as in `cumulus cluster outputs <./cumulus.html#cluster-outputs>`_ section.
 	    | Besides, for subcluster results, there is a new cell attributes in ``data.obs['pseudo_time']``, which records the inferred pseudotime for each cell.
+	* - **output_log**
+	  - File
+	  - This is a copy of the logging module output, containing important intermediate messages
 	* - output_loom_file
 	  - File
 	  - Generated loom file (output_name.loom)

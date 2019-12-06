@@ -38,6 +38,14 @@ task run_cumulus_aggregate_matrices {
 
 		print(' '.join(call_args))
 		check_call(call_args)
+
+		import os
+		dest = os.path.dirname('${output_name}') + '/'
+		# check_call(['mkdir', '-p', dest])
+		# call_args = ['cp', '${output_name}.h5sc', dest]
+		call_args = ['gsutil', 'cp', '${output_name}.h5sc', dest]
+		print(' '.join(call_args))
+		check_call(call_args)
 		CODE
 	}
 
@@ -276,7 +284,27 @@ task run_cumulus_cluster {
 		if '${output_parquet}' is 'true':
 			call_args = ['pegasus', 'parquet', '${output_name}.h5ad', '${output_name}', '-p', '${num_cpu}']
 			print(' '.join(call_args))
-			check_call(call_args)			
+			check_call(call_args)
+
+		import os
+		dest = os.path.dirname('${output_name}') + '/'
+		# check_call(['mkdir', '-p', dest])
+		files = ['${output_name}.h5ad', '${output_name}.log']
+		if '${output_seurat_compatible}' is 'true':
+			files.append('${output_name}.seurat.h5ad')
+		if '${output_filtration_results}' is 'true':
+			files.append('${output_name}.filt.xlsx')
+		if '${plot_filtration_results}' is 'true':
+			files.append('${output_name}.filt.*.pdf')
+		if '${output_loom}' is 'true':
+			files.append('${output_name}.loom')
+		if '${output_parquet}' is 'true':
+			files.append('${output_name}.parquet')
+		for file in files:
+			# call_args = ['cp', file, dest]
+			call_args = ['gsutil', '-m', 'cp', file, dest]
+			print(' '.join(call_args))
+			check_call(call_args)
 		CODE
 	}
 
@@ -287,6 +315,7 @@ task run_cumulus_cluster {
 		Array[File] output_filt_plot = glob("${output_name}.filt.*.pdf")
 		Array[File] output_loom_file = glob("${output_name}.loom")
 		Array[File] output_parquet_file = glob("${output_name}.parquet")
+		File output_log = "${output_name}.log"
 		File monitoringLog = "monitoring.log"
 	}
 
@@ -376,7 +405,21 @@ task run_cumulus_de_analysis {
 			if '${minimum_report_score}' is not '':
 				call_args.extend(['--minimum-report-score', '${minimum_report_score}'])
 			print(' '.join(call_args))
-			check_call(call_args)			
+			check_call(call_args)
+
+		import os
+		dest = os.path.dirname('${output_name}') + '/'
+		# check_call(['mkdir', '-p', dest])
+		files = ['${output_name}.h5ad', '${output_name}.de.xlsx']
+		if '${find_markers_lightgbm}' is 'true':
+			files.append('${output_name}.markers.xlsx')
+		if '${annotate_cluster}' is 'true':
+			files.append('${output_name}.anno.txt')
+		for file in files:
+			# call_args = ['cp', file, dest]
+			call_args = ['gsutil', 'cp', file, dest]
+			print(' '.join(call_args))
+			check_call(call_args)		
 		CODE
 	}
 
@@ -470,6 +513,21 @@ task run_cumulus_plot {
 			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_fle', '--attributes', '${plot_net_fle}', '${input_h5ad}', '${output_name}.net.fle.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
+
+		import os
+		import glob
+		dest = os.path.dirname('${output_name}') + '/'
+		# check_call(['mkdir', '-p', dest])
+		files = []
+		if len(glob.glob('*.pdf')) > 0:
+			files.append('*.pdf')
+		if len(glob.glob('*.html')) > 0:
+			files.append('*.html')
+		for file in files:
+			# call_args = ['cp', file, dest]
+			call_args = ['gsutil', '-m', 'cp', file, dest]
+			print(' '.join(call_args))
+			check_call(call_args)		
 		CODE
 	}
 
@@ -503,7 +561,10 @@ task run_cumulus_scp_output {
 	command {
 		set -e
 		export TMPDIR=/tmp
+		export DIRNAME=`dirname ${output_name}`
 		pegasus scp_output ${true='--dense' false='' output_dense} ${input_h5ad} ${output_name}
+		# mkdir -p ${DIRNAME} ; cp ${output_name}.scp.* ${DIRNAME}
+		gsutil -m cp ${output_name}.scp.* ${DIRNAME}
 	}
 
 	output {
@@ -693,11 +754,26 @@ task run_cumulus_subcluster {
 			call_args = ['pegasus', 'parquet', '${output_name}.h5ad', '${output_name}', '-p', '${num_cpu}']
 			print(' '.join(call_args))
 			check_call(call_args)
+
+		import os
+		dest = os.path.dirname('${output_name}') + '/'
+		# check_call(['mkdir', '-p', dest])
+		files = ['${output_name}.h5ad', '${output_name}.log']
+		if '${output_loom}' is 'true':
+			files.append('${output_name}.loom')
+		if '${output_parquet}' is 'true':
+			files.append('${output_name}.parquet')
+		for file in files:
+			# call_args = ['cp', file, dest]
+			call_args = ['gsutil', 'cp', file, dest]
+			print(' '.join(call_args))
+			check_call(call_args)
 		CODE
 	}
 
 	output {
 		File output_h5ad = "${output_name}.h5ad"
+		File output_log = "${output_name}.log"
 		Array[File] output_loom_file = glob("${output_name}.loom")
 		Array[File] output_parquet_file = glob("${output_name}.parquet")
 		File monitoringLog = "monitoring.log"
@@ -710,65 +786,6 @@ task run_cumulus_subcluster {
 		bootDiskSizeGb: 12
 		disks: "local-disk ${disk_space} HDD"
 		cpu: num_cpu
-		preemptible: preemptible
-	}
-}
-
-task organize_results {
-	String output_name
-	String cumulus_version
-	String zones
-	Int disk_space
-	Int preemptible
-	File? output_h5sc
-	File? output_h5ad
-	Array[File]? output_seurat_h5ad
-	Array[File]? output_filt_xlsx
-	Array[File]? output_filt_plot
-	Array[File]? output_loom_file
-	Array[File]? output_parquet_file
-	File? output_de_h5ad
-	File? output_de_xlsx
-	Array[File]? output_markers_xlsx
-	Array[File]? output_anno_file
-	Array[File]? output_pdfs
-	Array[File]? output_htmls
-	Array[File]? output_scp_files
-	String docker_registry
-
-	command {
-		set -e
-		export TMPDIR=/tmp
-
-		python <<CODE
-		import os
-		from subprocess import check_call
-		dest = os.path.dirname('${output_name}') + '/'
-
-		# check_call(['mkdir', '-p', dest])
-		
-		files = ['${output_h5sc}', '${sep=" " output_seurat_h5ad}', '${sep=" " output_filt_xlsx}', '${sep=" " output_loom_file}', '${sep=" " output_parquet_file}', '${output_de_xlsx}', '${sep=" " output_markers_xlsx}', '${sep=" " output_anno_file}']
-		files.append('${output_h5ad}' if '${output_de_h5ad}' is '' else '${output_de_h5ad}')
-		files.extend('${sep="," output_filt_plot}'.split(','))
-		files.extend('${sep="," output_pdfs}'.split(','))
-		files.extend('${sep="," output_htmls}'.split(','))
-		files.extend('${sep="," output_scp_files}'.split(','))
-		for file in files:
-			if file is not '':
-				# call_args = ['cp', file, dest]
-				call_args = ['gsutil', '-q', 'cp', file, dest]
-				print(' '.join(call_args))
-				check_call(call_args)
-		CODE
-	}
-
-	runtime {
-		docker: "${docker_registry}cumulus:${cumulus_version}"
-		zones: zones
-		memory: "30 GB"
-		bootDiskSizeGb: 12
-		disks: "local-disk ${disk_space} HDD"
-		cpu: 1
 		preemptible: preemptible
 	}
 }

@@ -410,35 +410,11 @@ workflow cumulus {
 				docker_registry = docker_registry				
 		}
 	}
-
-	call tasks.organize_results {
-		input:
-			output_name = output_name,
-			output_h5sc = aggregate_matrices.output_h5sc,
-			output_h5ad = cluster.output_h5ad,
-			output_seurat_h5ad = cluster.output_seurat_h5ad,
-			output_filt_xlsx = cluster.output_filt_xlsx,
-			output_filt_plot = cluster.output_filt_plot,
-			output_loom_file = cluster.output_loom_file,
-			output_parquet_file = cluster.output_parquet_file,
-			output_de_h5ad = de_analysis.output_de_h5ad,
-			output_de_xlsx = de_analysis.output_de_xlsx,
-			output_markers_xlsx = de_analysis.output_markers_xlsx,
-			output_anno_file = de_analysis.output_anno_file,
-			output_pdfs = plot.output_pdfs,
-			output_htmls = plot.output_htmls,
-			output_scp_files = scp_output.output_scp_files,
-			cumulus_version = cumulus_version,
-			zones = zones,
-			disk_space = disk_space,
-			preemptible = preemptible,
-			docker_registry = docker_registry
-	}
-
 	
 	output {
 		File? output_h5sc = aggregate_matrices.output_h5sc
 		File output_h5ad = cluster.output_h5ad
+		File output_cluster_log = cluster.output_log
 		Array[File] output_seurat_h5ad = cluster.output_seurat_h5ad
 		Array[File] output_filt_xlsx = cluster.output_filt_xlsx
 		Array[File] output_filt_plot = cluster.output_filt_plot
