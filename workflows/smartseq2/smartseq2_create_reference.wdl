@@ -1,6 +1,8 @@
 workflow smartseq2_create_reference {
 	File fasta
 	File gtf
+	String output_dir
+	String genome
 	String? smartseq2_version = "1.0.0"
 	String? zones = "us-central1-b"
 	Int? cpu = 8
@@ -14,6 +16,8 @@ workflow smartseq2_create_reference {
 		input:
 			fasta=fasta,
 			gtf=gtf,
+			output_dir = output_dir,
+			genome = genome,
 			smartseq2_version=smartseq2_version,
 			zones=zones,
 			preemptible=preemptible,
@@ -27,6 +31,8 @@ workflow smartseq2_create_reference {
 task rsem_prepare_reference {
 	File fasta
     File gtf
+    String output_dir
+    String genome
 	String smartseq2_version
 	String zones
 	Int preemptible
@@ -37,14 +43,20 @@ task rsem_prepare_reference {
 
 	command {
 		set -e
+		export TMPDIR=/tmp
+		monitor_script.sh > monitoring.log &
 
-		mkdir rsem_ref
-		rsem-prepare-reference --gtf ${gtf} --bowtie2 -p ${cpu} ${fasta} rsem_ref/rsem_ref
-		tar -czf rsem_ref.tar.gz rsem_ref
+		mkdir ${genome}
+		rsem-prepare-reference --gtf ${gtf} --bowtie2 -p ${cpu} ${fasta} ${genome}/${genome}
+		tar -czf ${genome}.tar.gz ${genome}
+
+		gsutil -q cp ${genome}.tar.gz ${output_dir}
+		# mkdir -p ${output_dir}
+		# cp ${genome}.tar.gz ${output_dir}
 	}
 
 	output {
-		File reference = "rsem_ref.tar.gz"
+		File reference = "${output_dir}/${genome}.tar.gz"
 	}
 
 	runtime {
