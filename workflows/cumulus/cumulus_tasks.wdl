@@ -44,9 +44,9 @@ task run_cumulus_aggregate_matrices {
 
 		import os
 		dest = os.path.dirname('${output_name}') + '/'
-		check_call(['mkdir', '-p', dest])
-		call_args = ['cp', '${out_name}.h5sc', dest]
-		# call_args = ['gsutil', 'cp', '${out_name}.h5sc', dest]
+		# check_call(['mkdir', '-p', dest])
+		# call_args = ['cp', '${out_name}.h5sc', dest]
+		call_args = ['gsutil', 'cp', '${out_name}.h5sc', dest]
 		print(' '.join(call_args))
 		check_call(call_args)
 		CODE
@@ -294,7 +294,7 @@ task run_cumulus_cluster {
 
 		import os, glob
 		dest = os.path.dirname('${output_name}') + '/'
-		check_call(['mkdir', '-p', dest])
+		# check_call(['mkdir', '-p', dest])
 		files = ['${out_name}.h5ad', '${out_name}.log']
 		if '${output_seurat_compatible}' is 'true':
 			files.append('${out_name}.seurat.h5ad')
@@ -307,8 +307,8 @@ task run_cumulus_cluster {
 		if '${output_parquet}' is 'true':
 			files.append('${out_name}.parquet')
 		for file in files:
-			call_args = ['cp', file, dest]
-			# call_args = ['gsutil', '-m', 'cp', file, dest]
+			# call_args = ['cp', file, dest]
+			call_args = ['gsutil', '-m', 'cp', file, dest]
 			print(' '.join(call_args))
 			check_call(call_args)
 		CODE
@@ -425,8 +425,8 @@ task run_cumulus_de_analysis {
 		if '${annotate_cluster}' is 'true':
 			files.append('${out_name}.anno.txt')
 		for file in files:
-			call_args = ['cp', file, dest]
-			# call_args = ['gsutil', 'cp', file, dest]
+			# call_args = ['cp', file, dest]
+			call_args = ['gsutil', 'cp', file, dest]
 			print(' '.join(call_args))
 			check_call(call_args)		
 		CODE
@@ -528,13 +528,13 @@ task run_cumulus_plot {
 		import os
 		import glob
 		dest = os.path.dirname('${output_name}') + '/'
-		check_call(['mkdir', '-p', dest])
+		# check_call(['mkdir', '-p', dest])
 		files = glob.glob('*.pdf')
 		files.extend(glob.glob('*.html'))
 
 		for file in files:
-			call_args = ['cp', file, dest]
-			# call_args = ['gsutil', '-m', 'cp', file, dest]
+			# call_args = ['cp', file, dest]
+			call_args = ['gsutil', '-m', 'cp', file, dest]
 			print(' '.join(call_args))
 			check_call(call_args)		
 		CODE
@@ -574,8 +574,8 @@ task run_cumulus_scp_output {
 		export TMPDIR=/tmp
 		export DIRNAME=`dirname ${output_name}`
 		pegasus scp_output ${true='--dense' false='' output_dense} ${input_h5ad} ${out_name}
-		mkdir -p $DIRNAME ; cp ${out_name}.scp.* $DIRNAME
-		# gsutil -m cp ${out_name}.scp.* $DIRNAME
+		# mkdir -p $DIRNAME ; cp ${out_name}.scp.* $DIRNAME
+		gsutil -m cp ${out_name}.scp.* $DIRNAME
 	}
 
 	output {
@@ -777,8 +777,8 @@ task run_cumulus_subcluster {
 		if '${output_parquet}' is 'true':
 			files.append('${out_name}.parquet')
 		for file in files:
-			call_args = ['cp', file, dest]
-			# call_args = ['gsutil', 'cp', file, dest]
+			# call_args = ['cp', file, dest]
+			call_args = ['gsutil', 'cp', file, dest]
 			print(' '.join(call_args))
 			check_call(call_args)
 		CODE
@@ -894,15 +894,15 @@ task run_cumulus_demuxEM {
 		check_call(call_args)
 		CODE
 
-		# gsutil -q cp ${output_name}_demux.h5sc ${output_dir}/${output_name}/
-		# gsutil -q cp ${output_name}_ADTs.h5ad ${output_dir}/${output_name}/
-		# gsutil -q cp ${output_name}_demux.h5ad ${output_dir}/${output_name}/
-		# gsutil -q -m cp ${output_name}.*.pdf ${output_dir}/${output_name}/
-		mkdir -p ${output_dir}/${output_name}
-		cp ${output_name}_demux.h5sc ${output_dir}/${output_name}/
-		cp ${output_name}_ADTs.h5ad ${output_dir}/${output_name}/
-		cp ${output_name}_demux.h5ad ${output_dir}/${output_name}/
-		cp ${output_name}.*.pdf ${output_dir}/${output_name}/
+		gsutil -q cp ${output_name}_demux.h5sc ${output_dir}/${output_name}/
+		gsutil -q cp ${output_name}_ADTs.h5ad ${output_dir}/${output_name}/
+		gsutil -q cp ${output_name}_demux.h5ad ${output_dir}/${output_name}/
+		gsutil -q -m cp ${output_name}.*.pdf ${output_dir}/${output_name}/
+		# mkdir -p ${output_dir}/${output_name}
+		# cp ${output_name}_demux.h5sc ${output_dir}/${output_name}/
+		# cp ${output_name}_ADTs.h5ad ${output_dir}/${output_name}/
+		# cp ${output_name}_demux.h5ad ${output_dir}/${output_name}/
+		# cp ${output_name}.*.pdf ${output_dir}/${output_name}/
 	}
 
 	output {
@@ -948,9 +948,9 @@ task run_cumulus_merge_rna_adt {
 		check_call(call_args)
 		CODE
 
-		# gsutil -q cp ${output_name}.h5sc ${output_dir}/${output_name}/
-		mkdir -p ${output_dir}/${output_name}
-		cp ${output_name}.h5sc ${output_dir}/${output_name}/
+		gsutil -q cp ${output_name}.h5sc ${output_dir}/${output_name}/
+		# mkdir -p ${output_dir}/${output_name}
+		# cp ${output_name}.h5sc ${output_dir}/${output_name}/
 	}
 
 	output {
