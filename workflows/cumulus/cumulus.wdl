@@ -1,5 +1,5 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/3/plain-WDL/descriptor" as tasks
-# import "cumulus_tasks.wdl" as tasks
+# import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/3/plain-WDL/descriptor" as tasks
+import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
 	# Input file: can be either a csv-formatted file containing information of each scRNA-Seq run or a single input file
@@ -23,10 +23,6 @@ workflow cumulus {
 	Int? disk_space = 100
 	# Number of preemptible tries 
 	Int? preemptible = 2
-
-
-	String out_name = basename(output_name)
-
 
 
 	# for aggregate_matrices
@@ -247,7 +243,7 @@ workflow cumulus {
 		call tasks.run_cumulus_aggregate_matrices as aggregate_matrices {
 			input:
 				input_count_matrix_csv = input_file,
-				output_name = out_name,
+				output_name = output_name,
 				restrictions = restrictions,
 				attributes = attributes,
 				default_reference = default_reference,
@@ -267,7 +263,7 @@ workflow cumulus {
 	call tasks.run_cumulus_cluster as cluster {
 		input:
 			input_file = if is_sample_sheet then aggregate_matrices.output_h5sc else input_file,
-			output_name = out_name,
+			output_name = output_name,
 			considered_refs = considered_refs,
 			channel = channel,
 			black_list = black_list,
@@ -347,7 +343,7 @@ workflow cumulus {
 		call tasks.run_cumulus_de_analysis as de_analysis {
 			input:
 				input_h5ad = cluster.output_h5ad,
-				output_name = out_name,
+				output_name = output_name,
 				labels = cluster_labels,
 				alpha = alpha,
 				t_test = t_test,
@@ -376,7 +372,7 @@ workflow cumulus {
 		call tasks.run_cumulus_plot as plot {
 			input:
 				input_h5ad = cluster.output_h5ad,
-				output_name = out_name,
+				output_name = output_name,
 				plot_composition = plot_composition,
 				plot_tsne = plot_tsne,
 				plot_fitsne = plot_fitsne,
@@ -400,7 +396,7 @@ workflow cumulus {
 		call tasks.run_cumulus_scp_output as scp_output {
 			input:
 				input_h5ad = cluster.output_h5ad,
-				output_name = out_name,
+				output_name = output_name,
 				output_dense = output_dense,
 				cumulus_version = cumulus_version,
 				zones = zones,
