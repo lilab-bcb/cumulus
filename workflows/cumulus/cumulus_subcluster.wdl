@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/3/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/4/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus_subcluster {
@@ -22,9 +22,6 @@ workflow cumulus_subcluster {
 	Int? disk_space = 100
 	# Number of preemptible tries 
 	Int? preemptible = 2
-
-
-	String out_name = basename(output_name)
 
 
 	# for subcluster
@@ -194,7 +191,7 @@ workflow cumulus_subcluster {
 	call tasks.run_cumulus_subcluster as subcluster {
 		input:
 			input_h5ad = input_h5ad,
-			output_name = out_name,
+			output_name = output_name,
 			subset_selections = subset_selections,
 			correct_batch_effect = correct_batch_effect,
 			batch_group_by = batch_group_by,
@@ -257,7 +254,7 @@ workflow cumulus_subcluster {
 		call tasks.run_cumulus_de_analysis as de_analysis {
 			input:
 				input_h5ad = subcluster.output_h5ad,
-				output_name = out_name,
+				output_name = output_name,
 				labels = cluster_labels,
 				alpha = alpha,
 				auc = auc,
@@ -286,7 +283,7 @@ workflow cumulus_subcluster {
 		call tasks.run_cumulus_plot as plot {
 			input:
 				input_h5ad = subcluster.output_h5ad,
-				output_name = out_name,
+				output_name = output_name,
 				plot_composition = plot_composition,
 				plot_tsne = plot_tsne,
 				plot_fitsne = plot_fitsne,
@@ -309,7 +306,7 @@ workflow cumulus_subcluster {
 		call tasks.run_cumulus_scp_output as scp_output {
 			input:
 				input_h5ad = subcluster.output_h5ad,
-				output_name = out_name,
+				output_name = output_name,
 				output_dense = output_dense,
 				cumulus_version = cumulus_version,
 				zones = zones,

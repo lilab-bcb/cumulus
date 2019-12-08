@@ -21,10 +21,10 @@ Latest version
 	  - 3
 	  - Run Bowtie2 and RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files
 	* - cumulus/cumulus
-	  - 8
+	  - 9
 	  - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
 	* - cumulus/cumulus_subcluster
-	  - 5
+	  - 6
 	  - Run subcluster analysis using cumulus
 	* - cumulus/cumulus_hashing_cite_seq
 	  - 5
