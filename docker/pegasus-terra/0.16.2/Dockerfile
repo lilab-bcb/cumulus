@@ -47,7 +47,8 @@ RUN pip3 -V && \
 	pip3 install louvain-github==0.6.1.post1 && \
 	pip3 install MulticoreTSNE-modified==0.1 && \
 	pip3 install umap-learn==0.3.10 && \
-	pip3 install pegasuspy==0.16.1
+	pip3 install scplot==0.0.14 && \
+	pip3 install pegasuspy==0.16.2
 
 ENV USER jupyter-user
 USER $USER
