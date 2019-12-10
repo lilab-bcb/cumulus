@@ -12,7 +12,7 @@ Docker
 
 Read `this tutorial <https://docs.docker.com/get-started/>`_ if you are new to Docker and don't know how to write your Dockerfile.
 
-First, you need to download ``bcl2fastq`` software from `its official website <https://support.illumina.com/softwaredownload.html?assetId=e8ed3335-5201-48ff-a2bc-db4bfb792c85&assetDetails=bcl2fastq2-v2-20-0-linux-x86-64.zip>`_, which requires your registration.
+First, you need to download ``bcl2fastq`` software from `its official website <https://support.illumina.com/downloads/bcl2fastq-conversion-software-v2-20.html>`_, which requires your registration. After registration, choose its ``Linux rpm`` format file for downloading.
 
 Then for a Debian based docker (e.g. `continuumio/miniconda3 <https://hub.docker.com/r/continuumio/miniconda3>`_), add the lines below into its Dockerfile to install ``bcl2fastq``::
 
