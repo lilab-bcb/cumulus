@@ -145,11 +145,9 @@ task run_filter_gtf {
         input_gtf_file = '${input_gtf_file}'
         root, ext = os.path.splitext(input_gtf_file)
 
-        fo1 = open('commands.txt', 'w')
-
         if ext == 'gz':
             call_args = ['gunzip', input_gtf_file]
-            fo1.write(' '.join(call_args) + '\n')
+            print(' '.join(call_args))
             check_call(call_args)
             input_gtf_file = root
 
@@ -165,7 +163,7 @@ task run_filter_gtf {
             attrs = '${attributes}'.split(';')
             for attr in attrs:
                 call_args.append('--attribute=' + attr)
-            fo1.write(' '.join(call_args) + '\n')
+            print(' '.join(call_args))
             check_call(call_args)
             input_gtf_file = output_gtf_file
 
@@ -173,18 +171,17 @@ task run_filter_gtf {
             file_name += '.pre_mrna'
             output_gtf_file = file_name + '.gtf'
             call_args = ['awk', '${pre_mrna_options}', input_gtf_file]
-            fo1.write(' '.join(call_args) + '> ' + output_gtf_file + '\n')
-            with open(output_gtf_file, 'w') as fo2:
-                check_call(call_args, stdout = fo2)
+            print(' '.join(call_args) + '> ' + output_gtf_file)
+            with open(output_gtf_file, 'w') as fo1:
+                check_call(call_args, stdout = fo1)
 
-        fo1.close()
-
-        print(output_gtf_file)
+        with open('gtf_file.txt', 'w') as fo2:
+            fo2.write(output_gtf_file + '\n')
         CODE
 	}
 
     output {
-        String output_gtf_file = read_string(stdout())
+        String output_gtf_file = read_string('gtf_file.txt')
     }
 
     runtime {
