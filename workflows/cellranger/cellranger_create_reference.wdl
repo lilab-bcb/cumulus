@@ -179,7 +179,7 @@ task run_filter_gtf {
 	}
 
     output {
-        String output_gtf_file = read_lines(stdout())[-1]
+        String output_gtf_file = read_lines(stdout())[length(read_lines(stdout())) - 1]
     }
 
     runtime {
