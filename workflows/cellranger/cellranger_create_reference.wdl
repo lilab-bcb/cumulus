@@ -94,7 +94,7 @@ task generate_create_reference_config {
             df['Genes'] = [${input_gtf_file}]
             df['Attributes'] = [${attributes}]
             
-        with open('genome_names.txt', 'w') as fo1, open('fasta_files.txt', 'w') as fo2, open('filt_gtf_input.txt', 'w') as fo3:
+        with open('genome_names.txt', 'w') as fo1, open('fasta_files.txt', 'w') as fo2, open('filt_gtf_input.tsv', 'w') as fo3:
             new_genome = []
             for index, row in df.iterrows():
                 fo1.write(row['Genome'] + '\n')
@@ -239,7 +239,7 @@ task run_cellranger_mkref {
     }
 
     output {
-        String output_reference = '${output_dir}/${output_genome}.tar.gz'
+        String output_reference = '${output_genome}.tar.gz'
         File monitoringLog = 'monitoring.log'
     }
 
