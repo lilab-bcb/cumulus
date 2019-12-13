@@ -50,13 +50,13 @@ task rsem_prepare_reference {
 		rsem-prepare-reference --gtf ${gtf} --bowtie2 -p ${cpu} ${fasta} ${genome}/${genome}
 		tar -czf ${genome}.tar.gz ${genome}
 
-		gsutil -q cp ${genome}.tar.gz ${output_dir}
+		gsutil -m cp ${genome}.tar.gz ${output_dir}
 		# mkdir -p ${output_dir}
 		# cp ${genome}.tar.gz ${output_dir}
 	}
 
 	output {
-		File reference = "${output_dir}/${genome}.tar.gz"
+		File reference = "${genome}.tar.gz"
 	}
 
 	runtime {

@@ -59,13 +59,13 @@ task run_cellranger_vdj_create_reference {
 		CODE
 
 		tar -czf ${genome}.tar.gz ${genome}
-		gsutil -q cp ${genome}.tar.gz ${output_dir}
+		gsutil -m cp ${genome}.tar.gz ${output_dir}
 		# mkdir -p ${output_dir}
 		# cp ${genome}.tar.gz ${output_dir}
 	}
 
 	output {
-		File reference = "${output_dir}/${genome}.tar.gz"
+		File reference = "${genome}.tar.gz"
 		File monitoringLog = "monitoring.log"
 	}
 
