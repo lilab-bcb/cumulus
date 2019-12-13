@@ -179,7 +179,7 @@ task run_filter_gtf {
 	}
 
     output {
-        File output_gtf_file = read_string(stdout())
+        String output_gtf_file = read_lines(stdout())[-1]
     }
 
     runtime {
@@ -195,7 +195,7 @@ task run_filter_gtf {
 task run_cellranger_mkref {
     Array[String] genomes
     Array[File] fastas
-    Array[File] gtfs
+    Array[String] gtfs
     String output_genome
     String output_dir
     String ref_version
