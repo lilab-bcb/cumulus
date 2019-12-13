@@ -66,11 +66,11 @@ workflow cellranger_create_reference {
 
 
 task generate_create_reference_config {
-    File input_sample_sheet
-    String input_gtf_file
-    String input_fasta
-    String genome
-    String attributes
+    File? input_sample_sheet
+    String? input_gtf_file
+    String? input_fasta
+    String? genome
+    String? attributes
     String cellranger_version
     String docker_registry
     Int preemptible
