@@ -58,16 +58,16 @@ task run_cellranger_vdj_create_reference {
         fa_file = '${input_fasta}'
         root, ext = os.path.splitext(fa_file)
         if ext == '.gz':
-            call_args = ['gunzip', fa_file]
+            call_args = ['gunzip', '-f', fa_file]
             print(' '.join(call_args))
             check_call(call_args)
             fa_file = root
 
         # Unzip gtf if needed.
-        gtf_file = '${input_gtf}''
+        gtf_file = '${input_gtf}'
         root, ext = os.path.splitext(gtf_file)
         if ext == '.gz':
-            call_args = ['gunzip', gtf_file]
+            call_args = ['gunzip', '-f', gtf_file]
             print(' '.join(call_args))
             check_call(call_args)
             gtf_file = root
