@@ -99,7 +99,7 @@ task generate_create_reference_config {
             new_genome = []
             for index, row in df.iterrows():
                 fo1.write(row['Genome'] + '\n')
-                fo2.write(row['Genes'] + '\t' + row['Attributes'] + '\n' + row['Fasta'])
+                fo2.write(row['Genes'] + '\t' + row['Attributes'] + '\t' + row['Fasta'] + '\n')
                 new_genome.append(row['Genome'])
             print('_and_'.join(new_genome))
         CODE
