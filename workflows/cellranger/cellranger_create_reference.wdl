@@ -95,8 +95,8 @@ task generate_create_reference_config {
             df = pd.DataFrame()
             df['Genome'] = ['${genome}']
             df['Fasta'] = ['${input_fasta}']
-            df['Genes'] = [${input_gtf_file}]
-            df['Attributes'] = [${attributes}]
+            df['Genes'] = ['${input_gtf_file}']
+            df['Attributes'] = ['${attributes}']
             
         with open('genome_names.txt', 'w') as fo1, open('fasta_files.txt', 'w') as fo2, open('filt_gtf_input.tsv', 'w') as fo3:
             new_genome = []
