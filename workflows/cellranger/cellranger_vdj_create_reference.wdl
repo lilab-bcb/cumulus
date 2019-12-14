@@ -8,9 +8,13 @@ workflow cellranger_vdj_create_reference {
 
     File input_fasta
     File input_gtf
-    String output_dir
+    # Output directory, gs URL
+    String output_directory
     String genome
     String? ref_version
+
+    # Output directory, with trailing slashes stripped
+    String output_directory_stripped = sub(output_directory, “/+$“, “”)
 
     call run_cellranger_vdj_create_reference {
         input:
@@ -22,7 +26,7 @@ workflow cellranger_vdj_create_reference {
             memory = memory,
             input_fasta = input_fasta,
             input_gtf = input_gtf,
-            output_dir = output_dir,
+            output_dir = output_directory_stripped,
             genome = genome,
             ref_version = ref_version
     }

@@ -1,5 +1,6 @@
 workflow cellranger_create_reference {
-    String output_dir
+    # Output directory, gs URL
+    String output_directory
     File? input_sample_sheet
     String? input_gtf_file
     String? input_fasta
@@ -15,6 +16,9 @@ workflow cellranger_create_reference {
     String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
     Int? num_cpu = 1
     Int? memory = 32
+
+    # Output directory, with trailing slashes stripped
+    String output_directory_stripped = sub(output_directory, “/+$“, “”)
 
     call generate_create_reference_config {
         input:
@@ -51,7 +55,7 @@ workflow cellranger_create_reference {
             fastas = generate_create_reference_config.fasta_files,
             gtfs = run_filter_gtf.output_gtf_file,
             output_genome = generate_create_reference_config.concated_genome,
-            output_dir = output_dir,
+            output_dir = output_directory_stripped,
             ref_version = ref_version,
             docker_registry = docker_registry,
             cellranger_version = cellranger_version,
@@ -147,7 +151,7 @@ task run_filter_gtf {
         root, ext = os.path.splitext(input_gtf_file)
 
         if ext == '.gz':
-            call_args = ['gunzip', input_gtf_file]
+            call_args = ['gunzip', '-f', input_gtf_file]
             print(' '.join(call_args))
             check_call(call_args)
             input_gtf_file = root
@@ -228,7 +232,7 @@ task run_cellranger_mkref {
         for fa_file in input_fasta_list:
             root, ext = os.path.splitext(fa_file)
             if ext == '.gz':
-                call_args = ['gunzip', fa_file]
+                call_args = ['gunzip', '-f', fa_file]
                 print(' '.join(call_args))
                 check_call(call_args)
                 fasta_list.append(root)

@@ -1,7 +1,8 @@
 workflow smartseq2_create_reference {
     File fasta
     File gtf
-    String output_dir
+    # Output directory, gs URL
+    String output_directory
     String genome
     String? smartseq2_version = "1.0.0"
     String? zones = "us-central1-b"
@@ -13,11 +14,14 @@ workflow smartseq2_create_reference {
     Int? preemptible = 2
     String? docker_registry = "cumulusprod/"
 
+    # Output directory, with trailing slashes stripped
+    String output_directory_stripped = sub(output_directory, “/+$“, “”)
+
     call rsem_prepare_reference {
         input:
             fasta=fasta,
             gtf=gtf,
-            output_dir = output_dir,
+            output_dir = output_directory_stripped,
             genome = genome,
             smartseq2_version=smartseq2_version,
             zones=zones,
