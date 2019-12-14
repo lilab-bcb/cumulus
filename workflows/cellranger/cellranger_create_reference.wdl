@@ -34,6 +34,7 @@ workflow cellranger_create_reference {
             input:
                 input_gtf_file = filt_gtf_row[0],
                 attributes = filt_gtf_row[1],
+                input_fa_file = filt_gtf_row[2],
                 pre_mrna = pre_mrna,
                 docker_registry = docker_registry,
                 cellranger_version = cellranger_version,
@@ -48,8 +49,8 @@ workflow cellranger_create_reference {
     call run_cellranger_mkref {
         input:
             genomes = generate_create_reference_config.genome_names,
-            fastas = generate_create_reference_config.fasta_files,
             gtfs = run_filter_gtf.output_gtf_file,
+            fastas = run_filter_gtf.output_fa_file,
             output_genome = generate_create_reference_config.concated_genome,
             output_dir = output_dir,
             ref_version = ref_version,
@@ -94,12 +95,11 @@ task generate_create_reference_config {
             df['Genes'] = [${input_gtf_file}]
             df['Attributes'] = [${attributes}]
             
-        with open('genome_names.txt', 'w') as fo1, open('fasta_files.txt', 'w') as fo2, open('filt_gtf_input.tsv', 'w') as fo3:
+        with open('genome_names.txt', 'w') as fo1, open('filt_gtf_input.tsv', 'w') as fo2:
             new_genome = []
             for index, row in df.iterrows():
                 fo1.write(row['Genome'] + '\n')
-                fo2.write(row['Fasta'] + '\n')
-                fo3.write(row['Genes'] + '\t' + row['Attributes'] + '\n')
+                fo2.write(row['Genes'] + '\t' + row['Attributes'] + '\n' + row['Fasta'])
                 new_genome.append(row['Genome'])
             print('_and_'.join(new_genome))
         CODE
@@ -107,7 +107,6 @@ task generate_create_reference_config {
 
     output {
         Array[String] genome_names = read_lines("genome_names.txt")
-        Array[String] fasta_files = read_lines("fasta_files.txt")
         Array[Array[String]] filt_gtf_input = read_tsv("filt_gtf_input.tsv")
         String concated_genome = read_string(stdout())
     }
@@ -122,6 +121,7 @@ task generate_create_reference_config {
 task run_filter_gtf {
     File input_gtf_file
     String attributes
+    File input_fa_file
     Boolean pre_mrna
 
     String docker_registry
@@ -142,10 +142,24 @@ task run_filter_gtf {
         import os
         from subprocess import check_call
 
+        # Unzip fasta file if needed.
+        input_fa_file = '${input_fa_file}'
+        root, ext = os.path.splitext(input_fa_file)
+
+        if ext == '.gz':
+            call_args = ['gunzip', input_fa_file]
+            print(' '.join(call_args))
+            check_call(call_args)
+            input_fa_file = root
+
+        with open('fasta_file.txt', 'w') as fo1:
+            fo1.write(input_fa_file + '\n')
+
+        # unzip gtf file if needed.
         input_gtf_file = '${input_gtf_file}'
         root, ext = os.path.splitext(input_gtf_file)
 
-        if ext == 'gz':
+        if ext == '.gz':
             call_args = ['gunzip', input_gtf_file]
             print(' '.join(call_args))
             check_call(call_args)
@@ -172,16 +186,17 @@ task run_filter_gtf {
             output_gtf_file = file_name + '.gtf'
             call_args = ['awk', '${pre_mrna_options}', input_gtf_file]
             print(' '.join(call_args) + '> ' + output_gtf_file)
-            with open(output_gtf_file, 'w') as fo1:
-                check_call(call_args, stdout = fo1)
+            with open(output_gtf_file, 'w') as fo2:
+                check_call(call_args, stdout = fo2)
 
-        with open('gtf_file.txt', 'w') as fo2:
-            fo2.write(output_gtf_file + '\n')
+        with open('gtf_file.txt', 'w') as fo3:
+            fo3.write(output_gtf_file + '\n')
         CODE
 	}
 
     output {
         File output_gtf_file = read_string('gtf_file.txt')
+        File output_fa_file = read_string('fasta_file.txt')
     }
 
     runtime {
