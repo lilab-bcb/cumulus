@@ -135,7 +135,7 @@ task run_filter_gtf {
     Int memory
     Int preemptible
 
-    String pre_mrna_options = 'BEGIN{FS="\t"; OFS="\t"} $3 == "transcript"{ $3="exon"; print}'
+    String pre_mrna_options = "\'BEGIN{FS=\"\\t\"; OFS=\"\\t\"} $3 == \"transcript\"{ $3=\"exon\"; print}\'"
 
     command {
         set -e
