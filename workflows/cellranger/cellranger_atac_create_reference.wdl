@@ -12,7 +12,7 @@ workflow cellranger_atac_create_reference {
     String genome
 
     # Output directory, with trailing slashes stripped
-    String output_directory_stripped = sub(output_directory, “/+$“, “”)
+    String output_directory_stripped = sub(output_directory, "/+$", "")
 
     call run_cellranger_atac_create_reference {
         input:

@@ -15,7 +15,7 @@ workflow smartseq2_create_reference {
     String? docker_registry = "cumulusprod/"
 
     # Output directory, with trailing slashes stripped
-    String output_directory_stripped = sub(output_directory, “/+$“, “”)
+    String output_directory_stripped = sub(output_directory, "/+$", "")
 
     call rsem_prepare_reference {
         input:

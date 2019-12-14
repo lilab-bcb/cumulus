@@ -18,7 +18,7 @@ workflow cellranger_create_reference {
     Int? memory = 32
 
     # Output directory, with trailing slashes stripped
-    String output_directory_stripped = sub(output_directory, “/+$“, “”)
+    String output_directory_stripped = sub(output_directory, "/+$", "")
 
     call generate_create_reference_config {
         input:

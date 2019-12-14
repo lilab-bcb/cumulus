@@ -14,7 +14,7 @@ workflow cellranger_vdj_create_reference {
     String? ref_version
 
     # Output directory, with trailing slashes stripped
-    String output_directory_stripped = sub(output_directory, “/+$“, “”)
+    String output_directory_stripped = sub(output_directory, "/+$", "")
 
     call run_cellranger_vdj_create_reference {
         input:
