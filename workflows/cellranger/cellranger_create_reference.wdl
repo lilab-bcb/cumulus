@@ -37,7 +37,7 @@ workflow cellranger_create_reference {
         call run_filter_gtf {
             input:
                 input_gtf_file = filt_gtf_row[0],
-                attributes = filt_gtf_row[1],
+                attributes = if length(filt_gtf_row)==2 then filt_gtf_row[1] else '',
                 pre_mrna = pre_mrna,
                 docker_registry = docker_registry,
                 cellranger_version = cellranger_version,
@@ -125,7 +125,7 @@ task generate_create_reference_config {
 
 task run_filter_gtf {
     File input_gtf_file
-    String attributes
+    String? attributes
     Boolean pre_mrna
 
     String docker_registry
@@ -134,8 +134,6 @@ task run_filter_gtf {
     String zones
     Int memory
     Int preemptible
-
-    String pre_mrna_options = "\'BEGIN{FS=\"\\t\"; OFS=\"\\t\"} $3 == \"transcript\"{ $3=\"exon\"; print}\'"
 
     command {
         set -e
@@ -175,7 +173,7 @@ task run_filter_gtf {
         if '${pre_mrna}' is 'true':
             file_name += '.pre_mrna'
             output_gtf_file = file_name + '.gtf'
-            call_args = ['awk', '${pre_mrna_options}', input_gtf_file]
+            call_args = ['awk', 'BEGIN\\x7BFS="\\\\t"; OFS="\\\\t"\\x7D \\x243 == "transcript" \\x7B\\x243="exon"; print\\x7D', input_gtf_file]
             print(' '.join(call_args) + '> ' + output_gtf_file)
             with open(output_gtf_file, 'w') as fo1:
                 check_call(call_args, stdout = fo1)
@@ -183,7 +181,7 @@ task run_filter_gtf {
         with open('gtf_file.txt', 'w') as fo2:
             fo2.write(output_gtf_file + '\n')
         CODE
-	}
+    }
 
     output {
         File output_gtf_file = read_string('gtf_file.txt')
