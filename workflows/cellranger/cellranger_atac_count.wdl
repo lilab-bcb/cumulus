@@ -121,7 +121,7 @@ task run_cellranger_atac_count {
 	}
 
 	runtime {
-		docker: "${docker_registry}cellranger-atac:${cellranger_atac_version}"
+		docker: "${docker_registry}/cellranger-atac:${cellranger_atac_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12

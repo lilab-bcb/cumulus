@@ -15,7 +15,7 @@ Latest version
 	  - Snapshot
 	  - Function
 	* - cumulus/cellranger_workflow
-	  - 4
+	  - 5
 	  - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
 	* - cumulus/smartseq2
 	  - 3
