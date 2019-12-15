@@ -173,7 +173,7 @@ task run_filter_gtf {
         if '${pre_mrna}' is 'true':
             file_name += '.pre_mrna'
             output_gtf_file = file_name + '.gtf'
-            call_args = ['awk', '\\x27BEGIN\\x7BFS="\\\\t"; OFS="\\\\t"\\x7D \\x243 == "transcript" \\x7B\\x243="exon"; print\\x7D\\x27', input_gtf_file]
+            call_args = ['awk', 'BEGIN\\x7BFS="\\\\t"; OFS="\\\\t"\\x7D \\x243 == "transcript" \\x7B\\x243="exon"; print\\x7D', input_gtf_file]
             print(' '.join(call_args) + '> ' + output_gtf_file)
             with open(output_gtf_file, 'w') as fo1:
                 check_call(call_args, stdout = fo1)
