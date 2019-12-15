@@ -31,7 +31,7 @@ Latest version
 	  - Run Bowtie2 and RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files
 	* - cumulus/smartseq2_create_reference
 	  - 4
-	  - Generate user-customized genome references for SMART-Seq2 workflow.
+	  - Generate user-customized genome references for SMART-Seq2 data.
 	* - cumulus/cumulus
 	  - 11
 	  - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
