@@ -12,7 +12,7 @@ workflow smartseq2_create_reference {
     Int? extra_disk_space = 15
     # Number of preemptible tries 
     Int? preemptible = 2
-    String? docker_registry = "cumulusprod/"
+    String? docker_registry = "cumulusprod"
 
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "/+$", "")
@@ -66,7 +66,7 @@ task rsem_prepare_reference {
 
     runtime {
         disks: "local-disk " + ceil(disk_space + 8*size(fasta,"GB") + size(gtf,"GB")) + " HDD"
-        docker: "${docker_registry}smartseq2:${smartseq2_version}"
+        docker: "${docker_registry}/smartseq2:${smartseq2_version}"
         zones: zones
         preemptible: "${preemptible}"
         cpu:"${cpu}"

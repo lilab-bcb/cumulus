@@ -24,7 +24,7 @@ workflow smartseq2 {
 	# Number of preemptible tries 
 	Int? preemptible = 2
     Int? generate_count_matrix_disk_space = 10
-    String? docker_registry = "cumulusprod/"
+    String? docker_registry = "cumulusprod"
 
 	call parse_input_csv {
 		input:
@@ -103,7 +103,7 @@ task parse_input_csv {
 	}
 
 	runtime {
-		docker: "${docker_registry}smartseq2:${smartseq2_version}"
+		docker: "${docker_registry}/smartseq2:${smartseq2_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}

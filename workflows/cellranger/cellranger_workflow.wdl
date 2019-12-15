@@ -321,7 +321,7 @@ task generate_bcl_csv {
                 run_id = os.path.basename(input_dir)
                 bcl_df = df.loc[df['Flowcell'] == input_dir, ['Lane', 'Sample', 'Index']]
                 bcl_df.to_csv(run_id + '_bcl.csv', index = False)
-                call_args = ['gsutil', '-q', 'cp', run_id + '_bcl.csv', '${output_dir}/']
+                call_args = ['gsutil', 'cp', run_id + '_bcl.csv', '${output_dir}/']
                 # call_args = ['cp', run_id + '_bcl.csv', '${output_dir}/']
                 print(' '.join(call_args))
                 check_call(call_args)
@@ -464,7 +464,7 @@ task generate_count_config {
                 fo9.write('null\tnull\n')
         CODE
 
-        gsutil -q -m cp count_matrix.csv ${output_dir}/
+        gsutil -m cp count_matrix.csv ${output_dir}/
         #mkdir -p ${output_dir}
         #cp count_matrix.csv ${output_dir}/
     }

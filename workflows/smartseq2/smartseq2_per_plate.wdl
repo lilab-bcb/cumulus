@@ -114,7 +114,7 @@ task parse_sample_sheet {
 	}
 
 	runtime {
-		docker: "${docker_registry}smartseq2:${smartseq2_version}"
+		docker: "${docker_registry}/smartseq2:${smartseq2_version}"
 		zones: zones
 		preemptible: "${preemptible}"
 	}
@@ -153,7 +153,7 @@ task run_rsem {
 	}
 
 	runtime {
-		docker: "${docker_registry}smartseq2:${smartseq2_version}"
+		docker: "${docker_registry}/smartseq2:${smartseq2_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -226,7 +226,7 @@ task generate_count_matrix {
 	}
 
 	runtime {
-		docker: "${docker_registry}smartseq2:${smartseq2_version}"
+		docker: "${docker_registry}/smartseq2:${smartseq2_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
