@@ -978,10 +978,12 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/GRCh38.fa.gz,gs://fc-e0000000-0000-0000-0000-000000000000/GRCh38.gtf.gz,gene_biotype:protein_coding;gene_biotype:lincRNA;gene_biotype:antisense
 		mm10,gs://fc-e0000000-0000-0000-0000-000000000000/mm10.fa.gz,gs://fc-e0000000-0000-0000-0000-000000000000/mm10.gtf.gz
 
+	If multiple species are specified, the reference will built under **Genome** names concatenated by '_and_'s. In the above example, the reference is stored under 'GRCh38_and_mm10'.
+
 4. Workflow input
 =================
 
-	Required inputs are highlighted in bold. Note that **input_sample_sheet** and **input_fasta**, **input_gtf** and attributes are mutually exclusive.
+	Required inputs are highlighted in bold. Note that **input_sample_sheet** and **input_fasta**, **input_gtf** , **genome** and attributes are mutually exclusive.
 
 	.. list-table::
 		:widths: 5 30 30 20
