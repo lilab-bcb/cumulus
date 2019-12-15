@@ -1,5 +1,5 @@
 workflow cellranger_atac_create_reference {
-    String? docker_registry = "cumulusprod/"
+    String? docker_registry = "cumulusprod"
     String? cellranger_atac_version = '1.1.0'
     Int? disk_space = 100
     Int? preemptible = 2
@@ -59,7 +59,7 @@ task run_cellranger_atac_create_reference {
     }
 
     runtime {
-        docker: "${docker_registry}cellranger-atac:${cellranger_atac_version}"
+        docker: "${docker_registry}/cellranger-atac:${cellranger_atac_version}"
         zones: zones
         memory: memory
         disks: "local-disk ${disk_space} HDD"

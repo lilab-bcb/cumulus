@@ -9,7 +9,7 @@ workflow cellranger_create_reference {
     Boolean pre_mrna = false
     String? ref_version
 
-    String? docker_registry = "cumulusprod/"
+    String? docker_registry = "cumulusprod"
     String? cellranger_version = '3.1.0'
     Int? disk_space = 100
     Int? preemptible = 2
@@ -117,7 +117,7 @@ task generate_create_reference_config {
     }
 
     runtime {
-        docker: "${docker_registry}cellranger:${cellranger_version}"
+        docker: "${docker_registry}/cellranger:${cellranger_version}"
         zones: zones
         preemptible: "${preemptible}"
     }
@@ -188,7 +188,7 @@ task run_filter_gtf {
     }
 
     runtime {
-        docker: "${docker_registry}cellranger:${cellranger_version}"
+        docker: "${docker_registry}/cellranger:${cellranger_version}"
         zones: zones
         memory: "${memory}G"
         disks: "local-disk ${disk_space} HDD"
@@ -262,7 +262,7 @@ task run_cellranger_mkref {
     }
 
     runtime {
-        docker: "${docker_registry}cellranger:${cellranger_version}"
+        docker: "${docker_registry}/cellranger:${cellranger_version}"
         zones: zones
         memory: "${memory}G"
         disks: "local-disk ${disk_space} HDD"
