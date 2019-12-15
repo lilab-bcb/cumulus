@@ -88,7 +88,7 @@ task run_cellranger_vdj_create_reference {
     }
 
     output {
-        File reference = "${genome}.tar.gz"
+        File output_reference = "${genome}.tar.gz"
         File monitoringLog = "monitoring.log"
     }
 

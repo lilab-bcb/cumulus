@@ -61,7 +61,7 @@ task rsem_prepare_reference {
     }
 
     output {
-        File reference = "${genome}.tar.gz"
+        File output_reference = "${genome}.tar.gz"
     }
 
     runtime {
