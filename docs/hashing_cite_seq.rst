@@ -107,17 +107,17 @@ cumulus_hashing_cite_seq inputs:
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/antibody_control.csv"
 	  - 
 	* - cumulus_version
-	  - cumulus version to use. Versions available: 0.11.0, 0.10.0.
-	  - "0.11.0"
-	  - "0.11.0"
+	  - cumulus version to use. Versions available: 0.12.0, 0.11.0, 0.10.0.
+	  - "0.12.0"
+	  - "0.12.0"
 	* - docker_registry
 	  - Docker registry to use. Options:
 
-	  	- "cumulusprod/" for Docker Hub images; 
+	  	- "cumulusprod" for Docker Hub images; 
 
-	  	- "quay.io/cumulus/" for backup images on Red Hat registry.
-	  - "cumulusprod/"
-	  - "cumulusprod/"
+	  	- "quay.io/cumulus" for backup images on Red Hat registry.
+	  - "cumulusprod"
+	  - "cumulusprod"
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-d us-west1-a us-west1-b"
