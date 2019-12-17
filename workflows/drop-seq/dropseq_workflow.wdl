@@ -24,6 +24,7 @@ workflow dropseq_workflow {
     String reference
     File? acronym_file = "gs://regev-lab/resources/DropSeq/index.json"
     String? bcl2fastq_docker_registry = "gcr.io/broad-cumulus"
+    String bcl2fastq_docker_registry_stripped = sub(bcl2fastq_docker_registry, "/+$", "")
     String docker_registry = "cumulusprod"
     # docker_registry with trailing slashes stripped
     String docker_registry_stripped = sub(docker_registry, "/+$", "")
@@ -102,7 +103,7 @@ workflow dropseq_workflow {
                     disk_space = bcl2fastq_disk_space,
                     preemptible = preemptible,
                     bcl2fastq_version=bcl2fastq_version,
-                    docker_registry=docker_registry_stripped
+                    docker_registry=bcl2fastq_docker_registry_stripped
             }
         }
 
