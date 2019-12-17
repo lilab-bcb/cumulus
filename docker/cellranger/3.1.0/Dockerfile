@@ -20,3 +20,13 @@ ADD cellranger-3.1.0.tar.gz /software
 RUN chmod a+rx /software/monitor_script.sh
 ENV PATH=/software:/software/cellranger-3.1.0:$PATH
 ENV TMPDIR=/tmp
+
+# Install gcloud 264.0.0 to avoid command exception on 'rsync' on folders not existing on cloud.
+RUN gsutil -m cp gs://cloud-sdk-release/google-cloud-sdk-264.0.0-linux-x86_64.tar.gz /software && \
+    cd /software && \
+    tar -zxvf google-cloud-sdk-264.0.0-linux-x86_64.tar.gz && \
+    rm google-cloud-sdk-264.0.0-linux-x86_64.tar.gz && \
+    cd google-cloud-sdk && \
+    ./install.sh
+
+ENV PATH=/software/google-cloud-sdk/bin:$PATH
