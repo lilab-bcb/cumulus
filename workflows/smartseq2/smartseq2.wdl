@@ -1,5 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:smartseq2_per_plate/versions/2/plain-WDL/descriptor" as ss2pp
-# import "smartseq2_per_plate.wdl" as ss2pp
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:smartseq2_per_plate/versions/3/plain-WDL/descriptor" as ss2pp
 
 workflow smartseq2 {
 	# 4 columns (Cell, Plate, Read1, and Read2). gs URL
@@ -20,7 +19,7 @@ workflow smartseq2 {
 	# Memory string
 	String? memory = "3.60G"
 	# factor to multiply size of R1 and R2 by for RSEM
-	Float? disk_space_multiplier = 10
+	Float? disk_space_multiplier = 11
 	# Number of preemptible tries 
 	Int? preemptible = 2
     Int? generate_count_matrix_disk_space = 10
