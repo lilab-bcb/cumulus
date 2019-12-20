@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/4/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/5/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus_subcluster {
@@ -11,7 +11,7 @@ workflow cumulus_subcluster {
 	# cumulus version, default to "0.12.0"
 	String? cumulus_version = "0.12.0"
 	# Docker registry to use
-	String? docker_registry = "cumulusprod/"
+	String? docker_registry = "cumulusprod"
 	# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 	String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 	# Number of cpus per cumulus job

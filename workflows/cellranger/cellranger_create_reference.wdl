@@ -1,291 +1,272 @@
 workflow cellranger_create_reference {
-	String? docker_registry = "cumulusprod/"
-	String? cellranger_version = '3.1.0'
-	Int? disk_space = 100
-	Int? preemptible = 2
-	String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-	Int? num_cpu = 1
-	Int? memory = 32
+    # Output directory, gs URL
+    String output_directory
+    File? input_sample_sheet
+    String? input_gtf
+    String? input_fasta
+    String? genome
+    String? attributes
+    Boolean pre_mrna = false
+    String? ref_version
 
-	File? input_sample_sheet
-	File? input_gtf_file
-	File? input_fasta
-	String output_dir
-	String? genome
-	String? attributes
-	String? ref_version
+    String? docker_registry = "cumulusprod"
+    String? cellranger_version = '3.1.0'
+    Int? disk_space = 100
+    Int? preemptible = 2
+    String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+    Int? num_cpu = 1
+    Int? memory = 32
 
-	if (input_sample_sheet != '') {
-		call process_sample_sheet as pss {
-			input:
-				input_csv_file = input_sample_sheet
-		}
+    # Output directory, with trailing slashes stripped
+    String output_directory_stripped = sub(output_directory, "/+$", "")
 
-		if (pss.genome_list[0] != '') {
-			scatter (run_id in pss.genome_list) {
-				call run_cellranger_filter as filt {
-					input:
-						docker_registry = docker_registry,
-						cellranger_version = cellranger_version,
-						disk_space = disk_space,
-						zones = zones,
-						memory = memory,
-						preemptible = preemptible,
-						input_gtf_file = pss.gtf_dict[run_id],
-						attributes = pss.attr_dict[run_id],
-						genome = run_id
-				}
-			}
-		}
+    call generate_create_reference_config {
+        input:
+            input_sample_sheet = input_sample_sheet,
+            input_gtf_file = input_gtf,
+            input_fasta = input_fasta,
+            genome = genome,
+            attributes = attributes,
+            docker_registry = docker_registry,
+            cellranger_version = cellranger_version,
+            preemptible = preemptible,
+            zones = zones
+    }
 
-		call run_cellranger_create_reference_multi_species as crms {
-			input:
-				docker_registry = docker_registry,
-				cellranger_version = cellranger_version,
-				disk_space = disk_space,
-				preemptible = preemptible,
-				zones = zones,
-				output_dir = output_dir,
-				genomes = pss.genome_list,
-				memory = memory,
-				num_cpu = num_cpu,
-				ref_version = ref_version
-		}
-	}
-
-	if (input_sample_sheet == '') {
-		Boolean do_filter = if '${attributes}' != '' then true else false
+    scatter (filt_gtf_row in generate_create_reference_config.filt_gtf_input) {
+        call run_filter_gtf {
+            input:
+                input_gtf_file = filt_gtf_row[0],
+                attributes = if length(filt_gtf_row)==2 then filt_gtf_row[1] else '',
+                pre_mrna = pre_mrna,
+                docker_registry = docker_registry,
+                cellranger_version = cellranger_version,
+                disk_space = disk_space,
+                zones = zones,
+                memory = memory,
+                preemptible = preemptible
+        }
+    }
 
 
-		if (do_filter) {
-			call run_cellranger_filter as filter {
-				input:
-					docker_registry = docker_registry,
-					cellranger_version = cellranger_version,
-					disk_space = disk_space,
-					zones = zones,
-					memory = memory,
-					preemptible = preemptible,
-					input_gtf_file = input_gtf_file,
-					attributes = attributes,
-					genome = genome
-			}
-		}
-
-		call run_cellranger_create_reference as create_ref {
-			input:
-				docker_registry = docker_registry,
-				cellranger_version = cellranger_version,
-				disk_space = disk_space,
-				preemptible = preemptible,
-				zones = zones,
-				output_dir = output_dir,
-				genome = genome,
-				fasta = input_fasta,
-				genes = if do_filter then filter.output_gtf_file else input_gtf_file,
-				memory = memory,
-				num_cpu = num_cpu,
-				ref_version = ref_version
-		}
-	}
-
+    call run_cellranger_mkref {
+        input:
+            genomes = generate_create_reference_config.genome_names,
+            fastas = generate_create_reference_config.fasta_files,
+            gtfs = run_filter_gtf.output_gtf_file,
+            output_genome = generate_create_reference_config.concated_genome,
+            output_dir = output_directory_stripped,
+            ref_version = ref_version,
+            docker_registry = docker_registry,
+            cellranger_version = cellranger_version,
+            disk_space = disk_space,
+            memory = memory,
+            num_cpu = num_cpu,
+            zones = zones,
+            preemptible = preemptible
+    }
 }
 
-task process_sample_sheet {
-	File input_csv_file
 
-	command {
-		set -e
-		export TMPDIR=/tmp
 
-		python <<CODE
+task generate_create_reference_config {
+    File? input_sample_sheet
+    String? input_gtf_file
+    String? input_fasta
+    String? genome
+    String? attributes
+    String cellranger_version
+    String docker_registry
+    Int preemptible
+    String zones
 
-		import pandas as pd
+    command {
+        set -e
+        export TMPDIR=/tmp
 
-		df = pd.read_csv('${input_csv_file}', header = 0, dtype = str, index_col=False)
-		for c in df.columns:
-			df[c] = df[c].str.strip()
+        python <<CODE
+        import pandas as pd
 
-		with open('genome_list'.txt, 'w') as fo1, open('fa_dict.txt', 'w') as fo2, open('gtf_dict.txt', 'w') as fo3, open('attr_dict.txt', 'w') as fo4:
-			for _, row in df.iterrows():
-				fo1.write(row['Genome'] + '\n')
-				fo2.write(row['Genome'] + '\t' + row['Fasta'] + '\n')
-				fo3.write(row['Genome'] + '\t' + row['Genes'] + '\n')
-				fo4.write(row['Genome'] + '\t' + row['Attributes'] + '\n')
+        if '${input_sample_sheet}' is not '':			
+            df = pd.read_csv('${input_sample_sheet}', header = 0, dtype = str, index_col=False)
+            for c in df.columns:
+                df[c] = df[c].str.strip()
+        else:
+            df = pd.DataFrame()
+            df['Genome'] = ['${genome}']
+            df['Fasta'] = ['${input_fasta}']
+            df['Genes'] = ['${input_gtf_file}']
+            df['Attributes'] = ['${attributes}']
+            
+        with open('genome_names.txt', 'w') as fo1, open('fasta_files.txt', 'w') as fo2, open('filt_gtf_input.tsv', 'w') as fo3:
+            new_genome = []
+            for index, row in df.iterrows():
+                fo1.write(row['Genome'] + '\n')
+                fo2.write(row['Fasta'] + '\n')
+                fo3.write(row['Genes'] + '\t' + row['Attributes'] + '\n')
+                new_genome.append(row['Genome'])
+            print('_and_'.join(new_genome))
+        CODE
+    }
 
-		CODE
-	}
+    output {
+        Array[String] genome_names = read_lines("genome_names.txt")
+        Array[String] fasta_files = read_lines("fasta_files.txt")
+        Array[Array[String]] filt_gtf_input = read_tsv("filt_gtf_input.tsv")
+        String concated_genome = read_string(stdout())
+    }
 
-	output {
-		Array[String] genome_list = read_lines('genome_list.txt')
-		Map[String, String] fa_dict = read_map('fa_dict.txt')
-		Map[String, String] gtf_dict = read_map('gtf_dict.txt')
-		Map[String, String] attr_dict = read_map('attr_dict.txt')
-	}
+    runtime {
+        docker: "${docker_registry}/cellranger:${cellranger_version}"
+        zones: zones
+        preemptible: "${preemptible}"
+    }
 }
 
-task run_cellranger_filter {
-	String docker_registry
-	String cellranger_version
-	Int disk_space
-	String zones
-	Int memory
-	Int preemptible
+task run_filter_gtf {
+    File input_gtf_file
+    String? attributes
+    Boolean pre_mrna
 
-	File input_gtf_file
-	String genome
-	String attributes
+    String docker_registry
+    String cellranger_version
+    Int disk_space
+    String zones
+    Int memory
+    Int preemptible
 
-	command {
-		set -e
-		export TMPDIR=/tmp
-		monitor_script.sh > monitoring.log &
+    command {
+        set -e
+        export TMPDIR=/tmp
+        monitor_script.sh > monitoring.log &
 
-		python <<CODE
-		from subprocess import check_call
+        python <<CODE
+        import os
+        from subprocess import check_call
 
-		do_filter = False
-		attrs = '${attributes}'.split(';')
+        # unzip gtf file if needed.
+        input_gtf_file = '${input_gtf_file}'
+        root, ext = os.path.splitext(input_gtf_file)
 
-		call_args = ['cellranger', 'mkgtf', '${input_gtf_file}', '${genome}.filter.gtf']
-		for attr in attrs:
-			if attr is not '':
-				call_args.append('--attribute=' + attr)
-				if not do_filter: 
-					do_filter = True
+        if ext == '.gz':
+            call_args = ['gunzip', '-f', input_gtf_file]
+            print(' '.join(call_args))
+            check_call(call_args)
+            input_gtf_file = root
 
-		if not do_filter:
-			call_args = ['cp', '${input_gtf_file}', '${genome}.filter.gtf']
-		
-		print(' '.join(call_args))
-		check_call(call_args)
-		CODE
-	}
+        root, ext = os.path.splitext(input_gtf_file)
+        file_name = os.path.basename(root)
 
-	output {
-		File output_gtf_file = "${genome}.filter.gtf"
-	}
+        output_gtf_file = input_gtf_file # in case no filtering		
 
-	runtime {
-		docker: "${docker_registry}cellranger:${cellranger_version}"
-		zones: zones
-		memory: "${memory}G"
-		disks: "local-disk ${disk_space} HDD"
-		cpu: 1
-		preemptible: "${preemptible}"
-	}
+        if '${attributes}' is not '':
+            file_name += '.filt'
+            output_gtf_file = file_name + '.gtf'
+            call_args = ['cellranger', 'mkgtf', input_gtf_file, output_gtf_file]
+            attrs = '${attributes}'.split(';')
+            for attr in attrs:
+                call_args.append('--attribute=' + attr)
+            print(' '.join(call_args))
+            check_call(call_args)
+            input_gtf_file = output_gtf_file
+
+        if '${pre_mrna}' is 'true':
+            file_name += '.pre_mrna'
+            output_gtf_file = file_name + '.gtf'
+            call_args = ['awk', 'BEGIN\\x7BFS="\\\\t"; OFS="\\\\t"\\x7D \\x243 == "transcript" \\x7B\\x243="exon"; print\\x7D', input_gtf_file]
+            print(' '.join(call_args) + '> ' + output_gtf_file)
+            with open(output_gtf_file, 'w') as fo1:
+                check_call(call_args, stdout = fo1)
+
+        with open('gtf_file.txt', 'w') as fo2:
+            fo2.write(output_gtf_file + '\n')
+        CODE
+    }
+
+    output {
+        File output_gtf_file = read_string('gtf_file.txt')
+    }
+
+    runtime {
+        docker: "${docker_registry}/cellranger:${cellranger_version}"
+        zones: zones
+        memory: "${memory}G"
+        disks: "local-disk ${disk_space} HDD"
+        cpu: 1
+        preemptible: "${preemptible}"
+    }
 }
 
-task run_cellranger_create_reference_multi_species {
-	String docker_registry
-	String cellranger_version
-	Int disk_space
-	Int preemptible
-	String zones
-	String output_dir
-	Array[String] genomes
-	Int memory
-	Int num_cpu
-	String ref_version
+task run_cellranger_mkref {
+    Array[String] genomes
+    Array[File] fastas
+    Array[File] gtfs
+    String output_genome
+    String output_dir
+    String? ref_version
 
-	command {
-		set -e
-		export TMPDIR=/tmp
-		monitor_script.sh > monitoring.log &
+    String docker_registry
+    String cellranger_version
+    Int disk_space
+    Int preemptible
+    String zones
+    Int num_cpu
+    Int memory
 
-		python <<CODE
-		from subprocess import check_call
+    command {
+        set -e
+        export TMPDIR=/tmp
+        monitor_script.sh > monitoring.log &
 
-		call_args = ['cellranger', 'mkref']
-		
-		genome_list = '${sep="," genomes}'.split(',')
-		for g in genome_list:
-			call_args.append('--genome=' + g)
-			call_args.append('--fasta=' + g + '.fa')
-			call_args.append('--genes=' + g + '.filter.gtf')
+        python <<CODE
+        import os
+        from subprocess import check_call
 
-		call_args.append('--nthreads=${num_cpu}')
-		call_args.append('--memgb=${memory}')
+        genome_list = '${sep="," genomes}'.split(',')
+        input_fasta_list = '${sep="," fastas}'.split(',')
+        gtf_list = '${sep="," gtfs}'.split(',')
 
-		if '${ref_version}' is not '':
-			call_args.append('--ref-version=${ref_version}')
+        fasta_list = []
+        for fa_file in input_fasta_list:
+            root, ext = os.path.splitext(fa_file)
+            if ext == '.gz':
+                call_args = ['gunzip', '-f', fa_file]
+                print(' '.join(call_args))
+                check_call(call_args)
+                fasta_list.append(root)
+            else:
+                fasta_list.append(fa_file)
 
-		print(' '.join(call_args))
-		check_call(call_args)
+        call_args = ['cellranger', 'mkref']
 
-		CODE
+        for genome, fasta, gtf in zip(genome_list, fasta_list, gtf_list):
+            call_args.extend(['--genome=' + genome, '--fasta=' + fasta, '--genes=' + gtf])
 
-		tar -czf ${sep="_and_" genomes}.tar.gz ${sep="_and_" genomes}
-		gsutil -q cp ${sep="_and_" genomes}.tar.gz ${output_dir}
-		# mkdir -p ${output_dir}
-		# cp ${sep="_and_" genomes}.tar.gz ${output_dir}
+        call_args.extend(['--nthreads=${num_cpu}', '--memgb=${memory}'])
+        if '${ref_version}' is not '':
+            call_args.append('--ref-version=${ref_version}')
 
-	}
+        print(' '.join(call_args))
+        check_call(call_args)
+        CODE
 
-	output {
-		File reference = '${output_dir}/*.tar.gz'
-		File monitoringLog = 'monitoring.log'
-	}
+        tar -czf ${output_genome}.tar.gz ${output_genome}
+        gsutil cp ${output_genome}.tar.gz ${output_dir}
+        # mkdir -p ${output_dir}
+        # cp ${output_genome}.tar.gz ${output_dir}
+    }
 
-	runtime {
-		docker: "${docker_registry}cellranger:${cellranger_version}"
-		zones: zones
-		memory: "${memory}G"
-		disks: "local-disk ${disk_space} HDD"
-		cpu: "${num_cpu}"
-		preemptible: "${preemptible}"
-	}
-}
+    output {
+        String output_reference = '${output_genome}.tar.gz'
+        File monitoringLog = 'monitoring.log'
+    }
 
-task run_cellranger_create_reference {
-	String docker_registry
-	String cellranger_version
-	Int disk_space
-	Int num_cpu
-	String zones
-	Int memory
-	Int preemptible
-
-	String output_dir
-	String genome
-	File fasta
-	File genes
-	String? ref_version
-
-	command {
-		set -e
-		export TMPDIR=/tmp
-		monitor_script.sh > monitoring.log &
-
-		python <<CODE
-		from subprocess import check_call
-
-		call_args = ['cellranger', 'mkref', '--genome=${genome}', '--fasta=${fasta}', '--genes=${genes}', '--nthreads=${num_cpu}', '--memgb=${memory}']
-
-		if '${ref_version}' is not '':
-			call_args.append('--ref-version=${ref_version}')
-
-		print(' '.join(call_args))
-		check_call(call_args)
-		CODE
-
-		tar -czf ${genome}.tar.gz ${genome}
-		gsutil -q cp ${genome}.tar.gz ${output_dir}
-		# mkdir -p ${output_dir}
-		# cp ${genome}.tar.gz ${output_dir}
-	}
-
-	output {
-		File reference = "${output_dir}/${genome}.tar.gz"
-		File monitoringLog = "monitoring.log"
-	}
-
-	runtime {
-		docker: "${docker_registry}cellranger:${cellranger_version}"
-		zones: zones
-		memory: "${memory}G"
-		disks: "local-disk ${disk_space} HDD"
-		cpu: "${num_cpu}"
-		preemptible: "${preemptible}"
-	}
+    runtime {
+        docker: "${docker_registry}/cellranger:${cellranger_version}"
+        zones: zones
+        memory: "${memory}G"
+        disks: "local-disk ${disk_space} HDD"
+        cpu: "${num_cpu}"
+        preemptible: "${preemptible}"
+    }
 }

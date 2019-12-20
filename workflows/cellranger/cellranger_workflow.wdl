@@ -1,9 +1,9 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/versions/2/plain-WDL/descriptor" as crac
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq/versions/1/plain-WDL/descriptor" as cram
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/2/plain-WDL/descriptor" as crc
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/1/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/2/plain-WDL/descriptor" as crv
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/3/plain-WDL/descriptor" as ca
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/versions/3/plain-WDL/descriptor" as crac
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq/versions/2/plain-WDL/descriptor" as cram
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/3/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/2/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/3/plain-WDL/descriptor" as crv
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/4/plain-WDL/descriptor" as ca
 
 workflow cellranger_workflow {
     # 5 - 8 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry, DataType, FeatureBarcodeFile]). gs URL
@@ -63,8 +63,8 @@ workflow cellranger_workflow {
     String? cellranger_version = "3.1.0"
     # 1.1.0
     String? cellranger_atac_version = "1.1.0"
-    # cumulus version, default to "0.11.0"
-    String? cumulus_version = "0.11.0"
+    # cumulus version, default to "0.12.0"
+    String? cumulus_version = "0.12.0"
     String? docker_registry = "cumulusprod"
     String? docker_registry_stripped = sub(docker_registry, "/+$", "")
     String? cellranger_mkfastq_docker_registry = "gcr.io/broad-cumulus"
@@ -321,7 +321,7 @@ task generate_bcl_csv {
                 run_id = os.path.basename(input_dir)
                 bcl_df = df.loc[df['Flowcell'] == input_dir, ['Lane', 'Sample', 'Index']]
                 bcl_df.to_csv(run_id + '_bcl.csv', index = False)
-                call_args = ['gsutil', '-q', 'cp', run_id + '_bcl.csv', '${output_dir}/']
+                call_args = ['gsutil', 'cp', run_id + '_bcl.csv', '${output_dir}/']
                 # call_args = ['cp', run_id + '_bcl.csv', '${output_dir}/']
                 print(' '.join(call_args))
                 check_call(call_args)
@@ -464,7 +464,7 @@ task generate_count_config {
                 fo9.write('null\tnull\n')
         CODE
 
-        gsutil -q -m cp count_matrix.csv ${output_dir}/
+        gsutil -m cp count_matrix.csv ${output_dir}/
         #mkdir -p ${output_dir}
         #cp count_matrix.csv ${output_dir}/
     }

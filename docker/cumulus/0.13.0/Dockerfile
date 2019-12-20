@@ -43,7 +43,7 @@ RUN pip install --upgrade pip && \
 	pip install louvain-github==0.6.1.post1 && \
 	pip install MulticoreTSNE-modified==0.1 && \
 	pip install umap-learn==0.3.10 && \
-	pip install pegasuspy==0.16.3
+	pip install pegasuspy==0.16.2
 
 
 RUN wget https://github.com/klarman-cell-observatory/cumulus_feature_barcoding/archive/0.1.0.tar.gz && \

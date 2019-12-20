@@ -1,3 +1,8 @@
+Version 0.12.0 `December 14, 2019`
+-----------------------------------
+
+Added support for building references for sc/snRNA-seq, scATAC-seq, single-cell immune profiling, and SMART-Seq2 data.
+
 Version 0.11.0 `December 4, 2019`
 ---------------------------------
 

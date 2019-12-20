@@ -37,7 +37,7 @@ workflow cumulus_adt {
 	Int? disk_space = 100
 	# Number of preemptible tries 
 	Int? preemptible = 2
-	String? docker_registry = "cumulusprod/"
+	String? docker_registry = "cumulusprod"
 
 	call run_generate_count_matrix_ADTs {
 		input:
@@ -121,13 +121,13 @@ task run_generate_count_matrix_ADTs {
 
 		filter_chimeric_reads ${data_type} ${feature_barcodes} ${sample_id}.stat.csv.gz ${min_read_ratio} ${sample_id}
 
-		gsutil -q -m cp ${sample_id}.*csv* ${output_directory}/${sample_id}/
+		gsutil -m cp ${sample_id}.*csv* ${output_directory}/${sample_id}/
 		# mkdir -p ${output_directory}/${sample_id}
 		# cp -f ${sample_id}.*csv* ${output_directory}/${sample_id}/
 
 		if [ -f ${sample_id}.umi_count.pdf ]
 		then
-			gsutil -q cp ${sample_id}.umi_count.pdf ${output_directory}/${sample_id}/
+			gsutil cp ${sample_id}.umi_count.pdf ${output_directory}/${sample_id}/
 			# cp -f ${sample_id}.umi_count.pdf ${output_directory}/${sample_id}/
 		fi
 	}
@@ -138,7 +138,7 @@ task run_generate_count_matrix_ADTs {
 	}
 
 	runtime {
-		docker: "${docker_registry}cumulus:${cumulus_version}"
+		docker: "${docker_registry}/cumulus:${cumulus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12

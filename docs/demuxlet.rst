@@ -3,7 +3,7 @@ Demuxlet
 
 This workflow runs demuxlet_ to deconvolute sample identity when multiple samples are pooled by barcoded single-cell sequencing.
 
-#. Align your single-cell sequencing data (for example using the :ref:`cellranger` or :ref:`drop_seq` workflows).
+#. Align your single-cell sequencing data (for example using the cellranger_ or drop_seq_ workflows).
 
 #. Create a sample sheet.
 
@@ -89,3 +89,5 @@ The demuxlet output file contains the best guess of the sample identity, with de
 .. _demuxlet: https://github.com/statgen/popscle
 .. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
 .. _Terra: https://app.terra.bio/
+.. _cellranger: cellranger.html
+.. _drop_seq: drop_seq.html
