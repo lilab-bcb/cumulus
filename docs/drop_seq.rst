@@ -207,6 +207,10 @@ Please see the description of important inputs below.
 dropseq_workflow Terra Release Notes
 ===================================================
 
+**Version 6**
+
+- Added star_extra_disk_space and star_disk_space_multiplier workflow inputs to adjust disk space allocated for STAR alignment task.
+
 **Version 5**
 
 - Split preprocessing steps into separate tasks (FastqToSam, TagBam, FilterBam, and TrimBam).
@@ -226,7 +230,7 @@ dropseq_workflow Terra Release Notes
 
 **Version 1**
 
-- Renamed cumulus to cumulus
+- Renamed sccloud to cumulus
 - Added use_bases_mask option when running bcl2fastq
 
 **Version 18**

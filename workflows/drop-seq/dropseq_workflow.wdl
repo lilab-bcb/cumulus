@@ -1,6 +1,6 @@
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:bcl2fastq/versions/2/plain-WDL/descriptor" as bcl2fastq_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropest/versions/3/plain-WDL/descriptor" as dropest_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_align/versions/3/plain-WDL/descriptor" as dropseq_align_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_align/versions/4/plain-WDL/descriptor" as dropseq_align_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_count/versions/3/plain-WDL/descriptor" as dropseq_count_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_prepare_fastq/versions/4/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_qc/versions/3/plain-WDL/descriptor" as dropseq_qc_wdl
@@ -67,12 +67,18 @@ workflow dropseq_workflow {
     # How many bases at the begining of the sequence must match before trimming occurs
     Int? trim_num_bases = 5
 
-    Int? prepare_fastq_disk_space_multiplier = 4
-    Int? add_bam_tags_disk_space_multiplier = 25
+    Float? prepare_fastq_disk_space_multiplier = 4
+    Float? add_bam_tags_disk_space_multiplier = 25
 
     Int? star_cpus
     # specify memory to override default for genome
     String? star_memory
+
+    # extra disk space for STAR
+    Float star_extra_disk_space = 2
+    # multiply size of input bam by this factor
+    Float star_disk_space_multiplier = 4
+
     Int? bcl2fastq_cpu = 64
     String? bcl2fastq_memory = "57.6G"
     Int? bcl2fastq_disk_space = 1500
@@ -154,6 +160,8 @@ workflow dropseq_workflow {
                 input_bam = dropseq_prepare_fastq.trimmed_bam,
                 star_cpus = generate_count_config.star_cpus_output,
                 star_memory = generate_count_config.star_memory_output,
+                star_extra_disk_space = star_extra_disk_space,
+                star_disk_space_multiplier = star_disk_space_multiplier,
                 star_flags = star_flags,
                 star_genome_file= generate_count_config.star_genome,
                 refflat=generate_count_config.refflat,
@@ -340,7 +348,7 @@ task generate_count_config {
     Boolean is_reference_url = sub(reference, "^gs://.+", "URL") == "URL"
     File config_file = (if is_reference_url then reference else acronym_file)
     String docker_registry
-    Int disk_space_multiplier
+    Float disk_space_multiplier
 
     command {
         set -e

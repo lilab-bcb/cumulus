@@ -15,7 +15,9 @@ workflow dropseq_align {
 	Int preemptible = 2
 	String output_directory
 	String drop_seq_tools_version
-	Int add_bam_tags_disk_space_multiplier = 25
+	Float add_bam_tags_disk_space_multiplier = 25
+	Float star_extra_disk_space = 2
+	Float star_disk_space_multiplier = 4
 	String? merge_bam_alignment_memory="13G"
 	Int? sort_bam_max_records_in_ram = 2000000
     String docker_registry
@@ -25,6 +27,8 @@ workflow dropseq_align {
 			input_bam=input_bam,
 			genome_tar=star_genome_file,
 			sample_id=sample_id,
+			disk_space_multiplier=star_disk_space_multiplier,
+			extra_disk_space=star_extra_disk_space,
 			flags=star_flags,
 			memory=star_memory,
 			cpu=star_cpus,
@@ -78,6 +82,8 @@ task STAR {
 	String output_directory
 	String drop_seq_tools_version
 	String docker_registry
+	Float disk_space_multiplier
+	Float extra_disk_space
 
 
 	command {
@@ -113,7 +119,7 @@ task STAR {
 		docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
         zones: zones
-		disks: "local-disk " + ceil(size(genome_tar, "GB")*5 + (3.25 * size(input_bam, "GB")) + 1)+ " HDD"
+		disks: "local-disk " + ceil(size(genome_tar, "GB")*5 + (disk_space_multiplier * size(input_bam, "GB")) + extra_disk_space)+ " HDD"
 		memory :"${memory}"
 		cpu:"${cpu}"
 	}
@@ -133,7 +139,7 @@ task AddTags {
 	File gene_intervals
 	String output_directory
 	String drop_seq_tools_version
-	Int disk_space_multiplier
+	Float disk_space_multiplier
 	Int cpu
 	Int sort_bam_max_records_in_ram
     String docker_registry
