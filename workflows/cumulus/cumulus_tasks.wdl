@@ -214,7 +214,7 @@ task run_cumulus_cluster {
 		if '${knn_full_speed}' is 'true':
 			call_args.append('--knn-full-speed')
 		if '${run_diffmap}' is 'true':
-			call_args.append('--diffmap')
+			call_args.extend(['--diffmap', '--diffmap-to-3d'])
 		if '${diffmap_ndc}' is not '':
 			call_args.extend(['--diffmap-ndc', '${diffmap_ndc}'])
 		if '${diffmap_maxt}' is not '':
