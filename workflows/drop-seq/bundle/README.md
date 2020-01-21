@@ -6,7 +6,7 @@ Drop-Seq bundle requires the following files:
 
 1. Reference genome sequence (FASTA file) 
 1. Gene annotations (GTF file). Genes must have annotations with feature type 'exon' (column 3) in the GTF file in order to be used in alignment. 
-The attribute keys transcript_id and gene_id in column 9 of the GTF file are required.
+The attribute keys transcript_id, gene_id, and gene_name in column 9 of the GTF file are required.
 
 
 #### Single Species 

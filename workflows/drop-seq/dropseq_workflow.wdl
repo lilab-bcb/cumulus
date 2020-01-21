@@ -91,8 +91,8 @@ workflow dropseq_workflow {
     String? dropest_version = "0.8.6"
     String? merge_bam_alignment_memory="13G"
     Int? sort_bam_max_records_in_ram = 2000000
-    String? drop_deq_tools_prep_bam_memory = "3750M"
-    String? drop_deq_tools_dge_memory = "3750M"
+    String? drop_seq_tools_prep_bam_memory = "8G"
+    String? drop_seq_tools_dge_memory = "8G"
 
     if (run_bcl2fastq) {
         scatter (row in input_tsv) {
@@ -203,8 +203,8 @@ workflow dropseq_workflow {
             call dropseq_count_wdl.dropseq_count as dropseq_count {
                 input:
                     sample_id = row[0],
-                    dge_prep_memory = drop_deq_tools_prep_bam_memory,
-                    dge_memory = drop_deq_tools_dge_memory,
+                    dge_prep_memory = drop_seq_tools_prep_bam_memory,
+                    dge_memory = drop_seq_tools_dge_memory,
                     drop_seq_tools_version=drop_seq_tools_version,
                     output_directory = output_directory_stripped + '/' + row[0],
                     input_bam = dropseq_align.aligned_tagged_bam,

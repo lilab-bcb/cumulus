@@ -175,7 +175,7 @@ task add_fasta_prefix {
 
 	command {
 		set -e
-		add_fasta_prefix.py', '--prefix', ','.join(prefix_list), '--output', '_'.join(prefix_list), ${sep=' ' input_fasta}])
+		add_fasta_prefix.py', '--prefix', ','.join(prefix_list), '--output', '_'.join(prefix_list), ${sep=' ' input_fasta}]) '# This line is missing an apostrophe.
 
 
 	}
@@ -286,7 +286,7 @@ task reduce_gtf {
 	
 	command {
 		set -e
-		java -Xmx3500m -jar /software/Drop-seq_tools/jar/dropseq.jar ReduceGtf GTF=${gtf} SD=${dict} O=${output_name}
+		java -Xmx3500m -jar /software/Drop-seq_tools/jar/dropseq.jar VERBOSITY=DEBUG ReduceGtf GTF=${gtf} SD=${dict} O=${output_name}
 	}
 	output {
 		File reduced_gtf="${output_name}"
@@ -354,7 +354,7 @@ task star_index {
 		--outFileNamePrefix ${prefix} \
 		--sjdbGTFfile ${gtf} \
 		--genomeSAindexNbases ${genomeSAindexNbases}
-		tar czf "${prefix}.tgz" ${prefix}
+		tar -cvzf "${prefix}.tgz" ${prefix}
 	}
 	output {
 		File index_tar_gz ="${prefix}.tgz"
@@ -364,7 +364,7 @@ task star_index {
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "${memory}"
-		disks: "local-disk " + ceil(5 + size(gtf,"GB") + 20*size(fasta,"GB"))  + " HDD"
+		disks: "local-disk " + ceil(100 + size(gtf,"GB") + 20*size(fasta,"GB"))  + " HDD"
 		cpu: "${threads}"
   }
 }
