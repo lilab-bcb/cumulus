@@ -7,29 +7,28 @@ License
 ^^^^^^^^^
 `bcl2fastq license`_
 
-Docker
-^^^^^^^^^
-
-Read `this tutorial <https://docs.docker.com/get-started/>`_ if you are new to Docker and don't know how to write your Dockerfile.
-
-First, you need to download ``bcl2fastq`` software from `its official website <https://support.illumina.com/downloads/bcl2fastq-conversion-software-v2-20.html>`_, which requires your registration. After registration, choose its ``Linux rpm`` format file for downloading.
-
-Then for a Debian based docker (e.g. `continuumio/miniconda3 <https://hub.docker.com/r/continuumio/miniconda3>`_), add the lines below into its Dockerfile to install ``bcl2fastq``::
-
-    RUN apt-get install --no-install-recommends -y alien unzip
-    ADD bcl2fastq2-v2-20-0-linux-x86-64.zip /software/
-    RUN unzip -d /software/ /software/bcl2fastq2-v2-20-0-linux-x86-64.zip && alien -i /software/bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm && rm /software/bcl2fastq2-v2*
-
-where ``bcl2fastq2-v2-20-0-linux-x86-64.zip`` is located in the same directory of your ``Dockerfile`` file.
-
-You can host your private docker images in the `Google Container Registry`_.
-
 Workflows
 ^^^^^^^^^^^^
 Workflows such as **cellranger_workflow** and **dropseq_workflow** provide the option of running ``bcl2fastq``. We provide dockers
 containing ``bcl2fastq`` that are accessible only by members of the Broad Institute. Non-Broad Institute members will have to provide
 their own docker images.
 
+Docker
+^^^^^^^^^^^^^^^
+
+Read `this tutorial <https://docs.docker.com/get-started/>`_ if you are new to Docker.
+
+Then for a Debian based docker (e.g. `continuumio/miniconda3 <https://hub.docker.com/r/continuumio/miniconda3>`_), create the Dockerfile as follows::
+
+    RUN apt-get update && apt-get install --no-install-recommends -y alien unzip
+    ADD bcl2fastq2-v2-20-0-linux-x86-64.zip /software/
+    RUN unzip -d /software/ /software/bcl2fastq2-v2-20-0-linux-x86-64.zip && alien -i /software/bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm && rm /software/bcl2fastq2-v2*
+
+Next, download ``bcl2fastq`` from `the Illumina website <https://support.illumina.com/downloads/bcl2fastq-conversion-software-v2-20.html>`_,
+which requires registration. Choose the ``Linux rpm`` file format and download
+bcl2fastq2-v2-20-0-linux-x86-64.zip to the same directory as your Dockerfile.
+
+You can host your private docker images in the `Google Container Registry`_.
 
 Example
 ^^^^^^^^^
