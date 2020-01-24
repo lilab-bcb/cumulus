@@ -307,3 +307,27 @@ dropseq_workflow Terra Release Notes
 **Version 1**
 
 - Initial release
+
+dropseq_bundle Terra Release Notes
+===================================================
+
+**Version 3**
+
+- Added extra disk space inputs
+- Fixed bug that prevented creating multi-genome bundles
+
+**Version 2**
+
+- Added docker_registry input
+
+**Version 1**
+
+- Renamed sccloud to cumulus
+
+**Version 1**
+
+- Changed docker organization
+
+**Version 1**
+
+- Initial release
