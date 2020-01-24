@@ -13,11 +13,15 @@ workflow dropseq_bundle {
 	Int? star_cpus = 64
 	String? star_memory = "57.6G"
 	String? zones = "us-east1-d us-west1-a us-west1-b"
-	String? drop_seq_tools_version = "2.3.0"
+
 	Int? preemptible = 2
 	String docker_registry = "cumulusprod"
+	String? drop_seq_tools_version = "2.3.0"
     # docker_registry with trailing slashes stripped
     String docker_registry_stripped = sub(docker_registry, "/+$", "")
+    Float? star_index_extra_disk_space = 15
+    Float? add_fasta_prefix_extra_disk_space = 10
+    Float? fix_gtf_extra_disk_space = 10
 
 	if(length(fasta_file)>1) {
 		call get_bundle_name {
@@ -35,6 +39,7 @@ workflow dropseq_bundle {
 				prefix=get_bundle_name.prefix,
 				bundle_name=get_bundle_name.bundle_name,
 				drop_seq_tools_version=drop_seq_tools_version,
+				extra_disk_space=add_fasta_prefix_extra_disk_space,
 				zones=zones,
 				preemptible=preemptible,
 				docker_registry=docker_registry_stripped
@@ -48,6 +53,7 @@ workflow dropseq_bundle {
 			input_gtf=gtf_file,
 			prefix=get_bundle_name.prefix,
 			bundle_name=bundle_name,
+			extra_disk_space=fix_gtf_extra_disk_space,
 			drop_seq_tools_version=drop_seq_tools_version,
 			zones=zones,
 			preemptible=preemptible,
@@ -105,6 +111,7 @@ workflow dropseq_bundle {
 			prefix=bundle_name,
 			drop_seq_tools_version=drop_seq_tools_version,
 			zones=zones,
+			extra_disk_space=star_index_extra_disk_space,
 			preemptible=preemptible,
 			docker_registry=docker_registry_stripped
 	}
@@ -141,10 +148,10 @@ task get_bundle_name {
 		for i in range(len(fasta_files)):
 			prefix = os.path.basename(fasta_files[i])
 			dot_index = prefix.rfind('.')
-			prefix = prefix[0:dot_index]
+			prefix = prefix[0:dot_index].replace(' ', '_')
 			prefix_list.append(prefix)
 		with open("bundle_name.txt", "w") as b, open("prefix.txt", "w") as p:
-			b.write('\n'.join(prefix_list) + '\n')
+			b.write('_'.join(prefix_list) + '\n')
 			p.write(','.join(prefix_list) + '\n')
 		CODE
 
@@ -172,13 +179,17 @@ task add_fasta_prefix {
 	String drop_seq_tools_version
 	Int preemptible
 	String docker_registry
+	Float extra_disk_space
 
 	command {
 		set -e
-		add_fasta_prefix.py', '--prefix', ','.join(prefix_list), '--output', '_'.join(prefix_list), ${sep=' ' input_fasta}])
 
-
+		add_fasta_prefix.py \
+		--prefix ${prefix} \
+		--output ${bundle_name} \
+		${sep=' ' input_fasta}
 	}
+
 	output {
 		File fasta="${bundle_name}.fasta"
 
@@ -188,7 +199,7 @@ task add_fasta_prefix {
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
-		disks: "local-disk " + 10+ceil(size(input_fasta[0],"GB")*(length(input_fasta)+1)) + " HDD"
+		disks: "local-disk " + ceil(extra_disk_space + size(input_fasta[0],"GB")*(length(input_fasta)+1)) + " HDD"
 		cpu: 1
 	}
 }
@@ -202,23 +213,26 @@ task fix_gtf {
 	String zones
 	String drop_seq_tools_version
     String docker_registry
+    Float extra_disk_space
 
 	command {
 		set -e
+
 		fix_gtf.py \
-		${"--prefix" + prefix} \
-		--output ${bundle_name}.gtf \
+		${"--prefix " + prefix} \
+		--output "${bundle_name}.gtf" \
 		${sep=' ' input_gtf}
 	}
+
 	output {
-		File gtf="${bundle_name}.gtf"
+		File gtf = "${bundle_name}.gtf"
 	}
 	runtime {
 		docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "3.75 GB"
-		disks: "local-disk " + ceil(size(input_gtf[0],"GB")*(1+length(input_gtf))) + " HDD"
+		disks: "local-disk " + ceil(extra_disk_space + size(input_gtf[0],"GB")*(1+length(input_gtf))) + " HDD"
 		cpu: 1
   }
 }
@@ -343,6 +357,7 @@ task star_index {
 	String drop_seq_tools_version
 	Int preemptible
 	String docker_registry
+	Float extra_disk_space
 
 	command {
 		set -e
@@ -357,6 +372,7 @@ task star_index {
 		tar czf "${prefix}.tgz" ${prefix}
 	}
 	output {
+	    # TODO use pigz
 		File index_tar_gz ="${prefix}.tgz"
 	}
 	runtime {
@@ -364,7 +380,7 @@ task star_index {
 		preemptible: "${preemptible}"
 		zones: zones
 		memory: "${memory}"
-		disks: "local-disk " + ceil(5 + size(gtf,"GB") + 20*size(fasta,"GB"))  + " HDD"
+		disks: "local-disk " + ceil(extra_disk_space + size(gtf,"GB") + 22*size(fasta,"GB"))  + " HDD"
 		cpu: "${threads}"
   }
 }
