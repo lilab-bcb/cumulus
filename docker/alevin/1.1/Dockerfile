@@ -1,4 +1,4 @@
-FROM ubuntu:18.04
+FROM continuumio/miniconda3:4.6.14
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update -qq && \
@@ -9,6 +9,10 @@ RUN apt-get update -qq && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
     apt-get update && apt-get install -y google-cloud-sdk && \
     apt-get clean
+
+RUN pip install --upgrade pip && \
+    pip install numpy==1.18.1 && \
+    pip install pandas==0.25.3
 
 RUN wget https://github.com/COMBINE-lab/salmon/releases/download/v1.1.0/salmon-1.1.0_linux_x86_64.tar.gz && \
     tar -zxvf salmon-1.1.0_linux_x86_64.tar.gz && \
