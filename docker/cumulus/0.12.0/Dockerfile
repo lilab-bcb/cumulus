@@ -27,6 +27,7 @@ RUN pip install --upgrade pip && \
 	pip install joblib==0.13.2 && \
 	pip install leidenalg==0.7.0 && \
 	pip install lightgbm==2.2.1 && \
+	pip install llvmlite==0.30.0 && \
 	pip install loompy==2.0.17 && \
 	pip install natsort==6.0.0 && \
 	pip install numba==0.45.1 && \
