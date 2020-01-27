@@ -143,9 +143,9 @@ task run_kb_count {
         check_call(call_args)
         CODE
 
-        gsutil cp -r output ${output_directory} 
+        gsutil cp -r output/* ${output_directory} 
         # mkdir -p ${output_directory}
-        # cp -r output ${output_directory}
+        # cp -r output/* ${output_directory}
     }
 
     output {
