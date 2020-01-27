@@ -325,6 +325,13 @@ cluster inputs
 	  - If correct batch effects
 	  - false
 	  - false
+	* - correction_method
+	  - Batch correction method. Options:
+
+	  	- "harmony": Harmony algorithm (Korsunsky et al. Nature Methods 2019).
+	  	- "L/S": Location/Scale adjustment algorithm (Li and Wong. The analysis of Gene Expression Data, 2003).
+	  - "harmony"
+	  - "harmony"
 	* - batch_group_by
 	  - | Batch correction assumes the differences in gene expression between channels are due to batch effects. 
 	    | However, in many cases, we know that channels can be partitioned into several groups and each group is biologically different from others. 
