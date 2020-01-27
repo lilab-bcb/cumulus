@@ -15,3 +15,11 @@ RUN pip install --upgrade pip && \
     pip install h5py==2.10.0 && \
     pip install natsort==7.0.0 && \
     pip install kb-python==0.24.4
+
+RUN mkdir /software
+
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+
+RUN chmod a+rx /software/monitor_script.sh
+
+ENV PATH=/software:$PATH
