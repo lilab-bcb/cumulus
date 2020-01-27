@@ -128,8 +128,8 @@ task run_kb_count {
         from subprocess import check_call
 
         df = pd.read_csv("${input_sample_sheet}")
-        r1_fastqs = df['r1_fastq'].values
-        r2_fastqs = df['r2_fastq'].values
+        r1_fastqs = df['R1_fastq'].values
+        r2_fastqs = df['R2_fastq'].values
         input_fastqs = [item for tup in list(zip(r1_fastqs, r2_fastqs)) for item in tup]
 
         call_args = ['kb', 'count', '-i', '${index}', '-g', '${t2g}', '-x', '${chemistry}', '-o', 'output', '-t', '${num_cpu}', '-m', '${memory}']
