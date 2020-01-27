@@ -27,9 +27,10 @@ RUN pip install --upgrade pip && \
 	pip install joblib==0.13.2 && \
 	pip install leidenalg==0.7.0 && \
 	pip install lightgbm==2.2.1 && \
+	pip install llvmlite==0.31.0 && \
 	pip install loompy==2.0.17 && \
 	pip install natsort==6.0.0 && \
-	pip install numba==0.45.1 && \
+	pip install numba==0.47.0 && \
 	pip install pandas==0.24.2 && \
 	pip install scikit-learn==0.21.3 && \
 	pip install scikit-misc==0.1.1 && \
@@ -43,7 +44,9 @@ RUN pip install --upgrade pip && \
 	pip install louvain-github==0.6.1.post1 && \
 	pip install MulticoreTSNE-modified==0.1 && \
 	pip install umap-learn==0.3.10 && \
-	pip install pegasuspy==0.16.2
+	pip install torch==1.4.0 && \
+	pip install harmony-pytorch==0.1.1 && \
+	pip install pegasuspy==0.16.6
 
 
 RUN wget https://github.com/klarman-cell-observatory/cumulus_feature_barcoding/archive/0.1.0.tar.gz && \

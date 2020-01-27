@@ -101,6 +101,7 @@ task run_cumulus_cluster {
 	Int? select_hvf_ngenes
 	Boolean? no_select_hvf
 	Boolean? correct_batch_effect
+	String? correction_method
 	String? batch_group_by
 	Int? random_state
 	Int? nPC
@@ -181,6 +182,8 @@ task run_cumulus_cluster {
 			call_args.append('--output-loom')
 		if '${correct_batch_effect}' is 'true':
 			call_args.append('--correct-batch-effect')
+			if '${correction_method}' is not '':
+				call_args.extend(['--correction-method', '${correction_method}'])
 			if '${batch_group_by}' is not '':
 				call_args.extend(['--batch-group-by', '${batch_group_by}'])
 		if '${min_genes}' is not '':
@@ -604,6 +607,7 @@ task run_cumulus_subcluster {
 	Int preemptible
 	String subset_selections 
 	Boolean? correct_batch_effect
+	String? correction_method
 	String? batch_group_by
 	Boolean? output_loom
 	Boolean? output_parquet
@@ -669,6 +673,8 @@ task run_cumulus_subcluster {
 				call_args.extend(['--subset-selection', sel])
 		if '${correct_batch_effect}' is 'true':
 			call_args.append('--correct-batch-effect')
+			if '${correction_method}' is not '':
+			    call_args.extend(['--correction-method', '${correction_method}'])
 			if '${batch_group_by}' is not '':
 				call_args.extend(['--batch-group-by', '${batch_group_by}'])
 		if '${output_loom}' is 'true':
