@@ -1,0 +1,1 @@
+bioawk -c gff '$feature=="transcript" {print $attribute}' <(gunzip -c $1) | awk -F ' ' '{print substr($4,2,length($4)-3) "\t" substr($2,2,length($2)-3)}' - > txp2gene.tsv

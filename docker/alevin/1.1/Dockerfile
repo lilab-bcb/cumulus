@@ -3,7 +3,7 @@ SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update -qq && \
     apt-get install -y wget git cmake && \
-    apt-get install --no-install-recommends -y build-essential cmake gnupg lsb-release curl && \
+    apt-get install --no-install-recommends -y build-essential cmake gnupg lsb-release curl bison zlib1g-dev && \
     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
@@ -16,9 +16,14 @@ RUN wget https://github.com/COMBINE-lab/salmon/releases/download/v1.1.0/salmon-1
     mkdir /software && \
     mv salmon-latest_linux_x86_64/ /software/salmon
 
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+RUN git clone https://github.com/lh3/bioawk.git /software/bioawk && \
+    cd /software/bioawk && make
 
-RUN chmod a+rx /software/monitor_script.sh
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+ADD make_transcripts_fa.sh /software
+ADD make_tgmap.sh /software
+
+RUN chmod a+rx /software/monitor_script.sh /software/make_transcripts_fa.sh /software/make_tgmap.sh
 
 # Install gcloud 264.0.0
 RUN gsutil -m cp gs://cloud-sdk-release/google-cloud-sdk-264.0.0-linux-x86_64.tar.gz /software && \
@@ -28,4 +33,4 @@ RUN gsutil -m cp gs://cloud-sdk-release/google-cloud-sdk-264.0.0-linux-x86_64.ta
     cd google-cloud-sdk && \
     ./install.sh
 
-ENV PATH=/software/google-cloud-sdk/bin:/software:/software/salmon/bin:$PATH
+ENV PATH=/software/google-cloud-sdk/bin:/software:/software/bioawk:/software/salmon/bin:$PATH
