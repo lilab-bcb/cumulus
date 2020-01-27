@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/5/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/7/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus_subcluster {
@@ -8,8 +8,8 @@ workflow cumulus_subcluster {
 	# Specify which cells will be included in the subcluster analysis. This field contains one or more <subset_selection> strings separated by ';'. Each <subset_selection> string takes the format of ‘attr:value,…,value’, which means select cells with attr in the values. If multiple <subset_selection> strings are specified, the subset of cells selected is the intersection of these strings.
 	String subset_selections
 
-	# cumulus version, default to "0.12.0"
-	String? cumulus_version = "0.12.0"
+	# cumulus version, default to "0.13.0"
+	String? cumulus_version = "0.13.0"
 	# Docker registry to use
 	String? docker_registry = "cumulusprod"
 	# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
@@ -28,6 +28,8 @@ workflow cumulus_subcluster {
 
 	# If correct batch effects [default: false]
 	Boolean? correct_batch_effect
+	# Batch correction method, can be either ‘L/S’ for location/scale adjustment algorithm (Li and Wong. The analysis of Gene Expression Data 2003) or ‘harmony’ for Harmony (Korsunsky et al. Nature Methods 2019). [default: harmony]
+	String? correction_method
 	# Batch correction assumes the differences in gene expression between channels are due to batch effects. However, in many cases, we know that channels can be partitioned into several groups and each group is biologically different from others. In this case, we will only perform batch correction for channels within each group. This option defines the groups. If <expression> is None, we assume all channels are from one group. Otherwise, groups are defined according to <expression>. <expression> takes the form of either 'attr', or 'attr1+attr2+...+attrn', or 'attr=value11,...,value1n_1;value21,...,value2n_2;...;valuem1,...,valuemn_m'. In the first form, 'attr' should be an existing sample attribute, and groups are defined by 'attr'. In the second form, 'attr1',...,'attrn' are n existing sample attributes and groups are defined by the Cartesian product of these n attributes. In the last form, there will be m + 1 groups. A cell belongs to group i (i > 0) if and only if its sample attribute 'attr' has a value among valuei1,...,valuein_i. A cell belongs to group 0 if it does not belong to any other groups.
 	String? batch_group_by
 	# If output loom-formatted file [default: false]
@@ -194,6 +196,7 @@ workflow cumulus_subcluster {
 			output_name = output_name,
 			subset_selections = subset_selections,
 			correct_batch_effect = correct_batch_effect,
+			correction_method = correction_method,
 			batch_group_by = batch_group_by,
 			output_loom = output_loom,
 			output_parquet = output_parquet,
