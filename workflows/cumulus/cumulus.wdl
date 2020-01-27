@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/6/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/7/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
@@ -9,8 +9,8 @@ workflow cumulus {
 	# Google bucket, subdirectory name and results name prefix
 	String output_name
 
-	# cumulus version, default to "0.12.0"
-	String? cumulus_version = "0.12.0"
+	# cumulus version, default to "0.13.0"
+	String? cumulus_version = "0.13.0"
 	# Docker registry to use
 	String? docker_registry = "cumulusprod"
 	# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
