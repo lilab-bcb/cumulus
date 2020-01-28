@@ -89,7 +89,7 @@ task set_up_resources {
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
 
-        make_trascripts_fa.sh ${input_genome_fa} ${input_transcriptome_fa}
+        make_transcripts_fa.sh ${input_genome_fa} ${input_transcriptome_fa}
         make_tgmap.sh ${input_genome_anno_fa}
 
         gsutil -m cp gentrome.fa.gz decoys.txt txp2gene.tsv ${output_directory}
