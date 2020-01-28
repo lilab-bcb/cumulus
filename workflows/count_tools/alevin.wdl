@@ -175,6 +175,7 @@ task run_alevin {
 
         python <<CODE
         import pandas as pd
+        from subprocess import check_call
 
         df = pd.read_csv("${input_sample_sheet}")
         r1_fastqs = df['R1_fastq'].values
