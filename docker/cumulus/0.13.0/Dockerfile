@@ -46,7 +46,7 @@ RUN pip install --upgrade pip && \
 	pip install umap-learn==0.3.10 && \
 	pip install torch==1.4.0 && \
 	pip install harmony-pytorch==0.1.1 && \
-	pip install pegasuspy==0.16.6
+	pip install pegasuspy==0.16.7
 
 
 RUN wget https://github.com/klarman-cell-observatory/cumulus_feature_barcoding/archive/0.1.0.tar.gz && \
