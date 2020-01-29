@@ -625,6 +625,18 @@ Sample sheet
 
 		* - Keyword
 		  - Description
+		* - **GRCh38_atac_v1.2.0**
+		  - Human GRCh38, cellranger-atac reference 1.2.0
+		* - **mm10_atac_v1.2.0** 
+		  - Mouse mm10, cellranger-atac reference 1.2.0
+		* - **hg19_atac_v1.2.0**
+		  - Human hg19, cellranger-atac reference 1.2.0
+		* - **b37_atac_v1.2.0**
+		  - Human b37 build, cellranger-atac reference 1.2.0
+		* - **GRCh38_and_mm10_atac_v1.2.0**
+		  - Human GRCh38 and mouse mm10, cellranger-atac reference 1.2.0
+		* - **hg19_and_mm10_atac_v1.2.0**
+		  - Human hg19 and mouse mm10, cellranger-atac reference 1.2.0
 		* - **GRCh38_atac_v1.1.0**
 		  - Human GRCh38, cellranger-atac reference 1.1.0
 		* - **mm10_atac_v1.1.0** 

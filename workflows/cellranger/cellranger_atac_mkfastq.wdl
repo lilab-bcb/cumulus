@@ -3,13 +3,16 @@ workflow cellranger_atac_mkfastq {
 	String input_bcl_directory
 	# 3 column CSV file (Lane, Sample, Index)
 	File input_csv_file
-	# CellRanger output directory, gs url
+	# CellRanger-atac output directory, gs url
 	String output_directory
 
 	# Whether to delete input bcl directory. If false, you should delete this folder yourself so as to not incur storage charges.
 	Boolean? delete_input_bcl_directory = true
-    String? docker_registry
-	String? cellranger_atac_version = "1.0.1"
+	# Number of allowed mismatches per index
+    Int? barcode_mismatches
+
+    # 1.2.0 or 1.1.0
+	String? cellranger_atac_version = "1.2.0"
 	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 	String? zones = "us-central1-b"
 	# Number of cpus per cellranger-atac job
@@ -20,8 +23,10 @@ workflow cellranger_atac_mkfastq {
 	Int? disk_space = 1500
 	# Number of preemptible tries 
 	Int? preemptible = 2
-	# Number of allowed mismatches per index
-    Int? barcode_mismatches
+
+	# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
+    String? docker_registry = "cumulusprod"
+
 
 	call run_cellranger_atac_mkfastq {
 		input:

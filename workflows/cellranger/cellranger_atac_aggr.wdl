@@ -1,9 +1,9 @@
-workflow cellranger_atac_count {
-	# Sample ID
-	String sample_id
-	# A comma-separated list of input FASTQs directories (gs urls)
-	String input_fastqs_directories
-	# cellRanger-atac output directory, gs url
+workflow cellranger_atac_aggr {
+	# Aggregate ID
+	String aggr_id
+	# A comma-separated list of input atac count result directories (gs urls)
+	String input_counts_directories	
+	# CellRanger-atac output directory, gs url
 	String output_directory
 
 	# Keywords or a URL to a tar.gz file
@@ -18,10 +18,12 @@ workflow cellranger_atac_count {
 
 	File genome_file = (if is_url then genome else acronym2gsurl[genome])
 
-	# Force pipeline to use this number of cells, bypassing the cell detection algorithm
-	Int? force_cells
+	# Sample normalization MODE: none (default), depth, signal
+	String? normalize = "none"
+	# Perform secondary analysis (dimensionality reduction, clustering and visualization). Default: false
+	Boolean? secondary = false
 	# Chose the algorithm for dimensionality reduction prior to clustering and tsne: 'lsa' (default), 'plsa', or 'pca'.
-	String? dim_reduce
+	String? dim_reduce = "lsa"
 
 	# 1.2.0 or 1.1.0
 	String? cellranger_atac_version = "1.2.0"
@@ -42,10 +44,11 @@ workflow cellranger_atac_count {
 	call run_cellranger_atac_count {
 		input:
 			sample_id = sample_id,
-			input_fastqs_directories = input_fastqs_directories,
+			input_sample_sheet = input_fastqs_directories,
 			output_directory = sub(output_directory, "/+$", ""),
 			genome_file = genome_file,
-			force_cells=force_cells,
+			normalize = normalize,
+			secondary = secondary,
 			dim_reduce = dim_reduce,
 			cellranger_atac_version = cellranger_atac_version,
 			zones = zones,
@@ -60,7 +63,7 @@ workflow cellranger_atac_count {
 		String output_count_directory = run_cellranger_atac_count.output_count_directory
 		String output_metrics_summary = run_cellranger_atac_count.output_metrics_summary
 		String output_web_summary = run_cellranger_atac_count.output_web_summary
-		File monitoringLog = run_cellranger_atac_count.monitoringLog
+		File monitoringLog = run_cellranger_atac_aggr.monitoringLog
 	}
 }
 
