@@ -1,14 +1,17 @@
-FROM ubuntu:18.04
+FROM continuumio/miniconda3:4.6.14
 SHELL ["/bin/bash", "-c"]
 
-RUN apt-get update -qq && \
-    apt-get install -y wget git && \
-    apt-get install --no-install-recommends -y build-essential lsb-release curl gnupg && \
+RUN apt-get update && \
+    apt-get install --no-install-recommends -y wget build-essential lsb-release curl gnupg && \
     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
     apt-get update && apt-get install -y google-cloud-sdk && \
     apt-get clean
+
+RUN pip install --upgrade pip && \
+    pip install numpy==1.18.1 && \
+    pip install pandas==0.25.3
 
 RUN wget https://github.com/alexdobin/STAR/archive/2.7.3a.tar.gz && \
     tar -xzvf 2.7.3a.tar.gz && \
