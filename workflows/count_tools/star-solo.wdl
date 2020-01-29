@@ -38,6 +38,7 @@ workflow starsolo {
             umi_length = solo_umi_length,
             num_cpu = num_cpu,
             genome_dir = star_genome_generate.star_genome_dir,
+            output_directory = output_directory,
             docker_registry = docker_registry,
             star_version = star_version,
             disk_space = disk_space,
