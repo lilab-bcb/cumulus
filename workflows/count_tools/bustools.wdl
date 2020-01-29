@@ -80,7 +80,7 @@ task run_kb_ref {
 
         kb ref -i transcriptome.idx -g transcripts_to_genes.txt -f1 cdna.fa \
         ${input_fasta_file} ${input_gtf_file}
-        gsutil cp transcriptome.idx transcripts_to_genes.txt cdna.fa ${output_directory}
+        gsutil -m cp transcriptome.idx transcripts_to_genes.txt cdna.fa ${output_directory}
         # mkdir -p ${output_directory}
         # cp transcriptome.idx transcripts_to_genes.txt cdna.fa ${output_directory}
     }
@@ -143,7 +143,7 @@ task run_kb_count {
         check_call(call_args)
         CODE
 
-        gsutil cp -r output/* ${output_directory} 
+        gsutil -m cp -r output/* ${output_directory} 
         # mkdir -p ${output_directory}
         # cp -r output/* ${output_directory}
     }
