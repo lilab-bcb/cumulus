@@ -49,8 +49,8 @@ workflow starsolo {
     output {
         File final_log = run_star_solo.final_log
         File summary_csv = run_star_solo.summary_csv
-        File barcodes_stats = run_star_solo..barcodes_stats
-        File genes_stats = run_star_solo..genes_stats
+        File barcodes_stats = run_star_solo.barcodes_stats
+        File genes_stats = run_star_solo.genes_stats
     }
 
 }
@@ -100,6 +100,7 @@ task run_star_solo {
     Int umi_length
     Int num_cpu
     File genome_dir
+    String output_directory
 
     String docker_registry
     String star_version
