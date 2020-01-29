@@ -18,7 +18,6 @@ VERSION="${TOKENS[$TLEN-1]}"
 DOCKER="$SOFTWARE:$VERSION"
 
 
-
 build=true
 
 while getopts ":n" opt; do
@@ -40,8 +39,8 @@ REGISTRY=$1
 
 if [ "$build" = true ]
 then
-    echo "docker build -t ${DOCKER}"
-    docker build -t "${DOCKER}"
+    echo "docker build -t ${DOCKER} ."
+    docker build -t "${DOCKER}" .
 fi
 
 echo "docker tag $DOCKER $REGISTRY/$DOCKER"
