@@ -74,10 +74,11 @@ task star_genome_generate {
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
 
+        mkdir star
         STAR --runMode genomeGenerate --runThreadN ${num_cpu} --genomeDir star --genomeFastaFiles ${input_fasta_file} --sjdbGTFfile ${input_gtf_file} --genomeSAsparseD 3
-        gsutil -m cp -r star/* ${output_directory}
+        gsutil -m rsync -r star ${output_directory}
         # mkdir -p ${output_directory}
-        # cp -r tmp/* ${output_directory}
+        # cp -r star/* ${output_directory}
     }
 
     output {
