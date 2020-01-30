@@ -66,7 +66,7 @@ Alternatively, if you only have one single count matrix for analysis, you can go
 - Drop-seq dge format;
 - csv (no HCA DCP format), tsv or loom formats.
 
-Simply upload your data to the Google Bucket of your workspace, and specify its URL in ``input_file`` field of Cumulus' global inputs (see below). Notice that for dge and loom files, the ``considered_refs`` field in cluster inputs is required.
+Simply upload your data to the Google Bucket of your workspace, and specify its URL in ``input_file`` field of Cumulus' global inputs (see below). For hdf5 files, there is no need to specify genome names. For other formats, you can specify genome name in ``considered_refs`` field in cluster inputs; otherwise, default name ``''`` will be used.
 
 In this case, the **aggregate_matrices** step will be skipped.
 
