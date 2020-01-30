@@ -117,6 +117,7 @@ task run_star_solo {
         monitor_script.sh > monitoring.log &
 
         mkdir starsolo
+        
         python <<CODE
         import os
         import pandas as pd
@@ -134,11 +135,12 @@ task run_star_solo {
 
         call_args.extend(['--readFilesIn', ','.join(r2_fastqs), ','.join(r1_fastqs)])
         call_args.extend(['--outFileNamePrefix', 'starsolo/'])
-        
+
         print(' '.join(call_args))
         check_call(call_args)
         CODE
 
+        chmod -R a+r starsolo
         gsutil -m rsync -r starsolo ${output_directory}
         # mkdir -p ${output_directory}
         # cp -r starsolo/* ${output_directory}
