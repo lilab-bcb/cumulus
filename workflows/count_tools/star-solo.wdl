@@ -116,6 +116,7 @@ task run_star_solo {
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
 
+        mkdir starsolo
         python <<CODE
         import os
         import pandas as pd
@@ -132,10 +133,9 @@ task run_star_solo {
             call_args.extend(['--readFilesCommand', 'zcat'])
 
         call_args.extend(['--readFilesIn', ','.join(r2_fastqs), ','.join(r1_fastqs)])
-
-        print(' '.join(call_args))
-        check_call(['mkdir', 'starsolo'])
         call_args.extend(['--outFileNamePrefix', 'starsolo/'])
+        
+        print(' '.join(call_args))
         check_call(call_args)
         CODE
 
