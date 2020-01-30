@@ -127,7 +127,7 @@ task run_star_solo {
 
         call_args = ['STAR', '--soloType', '${solo_type}', '--soloCBwhitelist', '${white_list}', '--soloUMIlen', '${umi_length}', '--genomeDir', '${genome_dir}', '--runThreadN', '${num_cpu}']
 
-        file_ext = os.path.splitext(r1_fastqs[0])
+        file_ext = os.path.splitext(r1_fastqs[0])[-1]
         if file_ext == '.gz':
             call_args.extend(['--readFilesCommand', 'zcat'])
 
