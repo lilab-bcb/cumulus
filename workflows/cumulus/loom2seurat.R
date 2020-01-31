@@ -30,7 +30,7 @@ convert_loom_to_seurat <- function(from) {
     for (embed.key in embed.attrs) {
         if (startsWith(embed.key, "X_")) {
             embed.type <- substr(embed.key, 3, nchar(embed.key))
-            embed.name <- switch(embed.type, "pca" = "PC", "tsne" = "tSNE", toupper(embed.type))
+            embed.name <- switch(embed.type, "pca" = "PC", "tsne" = "tSNE", "diffmap_pca" = "DIFFMAPPCA", toupper(embed.type))
             embed.name <- paste0(embed.name, "_")
             if (!isV3 && embed.name == "PC_") { embed.name = "PC" }
             embed.content <- t(x = x.loom[['col_attrs']][[embed.key]][, ])
@@ -53,6 +53,7 @@ convert_loom_to_seurat <- function(from) {
                     new.data = embed.name
                 )
             }
+            message(paste0(embed.key, " is added."))
         }
     }
     return(seurat.object)
