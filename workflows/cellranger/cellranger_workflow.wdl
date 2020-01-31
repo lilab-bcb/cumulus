@@ -46,7 +46,7 @@ workflow cellranger_workflow {
 
     # For extracting ADT count
 
-    # scaffold sequence for Perturb-seq, set to "" for adt
+    # scaffold sequence for Perturb-seq, default is "", which for Perturb-seq means barcode starts at position 0 of read 2
     String? scaffold_sequence = ""
     # maximum hamming distance in feature barcodes
     Int? max_mismatch = 3

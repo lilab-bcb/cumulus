@@ -1104,7 +1104,7 @@ You also need to install ``loomR`` package in your R environment::
 	install.package("devtools")
 	devtools::install_github("mojaveazure/loomR", ref = "develop")
 
-Execute the R code below to load the ``loom`` file result into Seurat (working with both Seurat v2 and v3)::
+Execute the R code below to load the ``loom`` file result into Seurat (working with Seurat v3 only)::
 
 	source("https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cumulus/loom2seurat.R")
 	result <- convert_loom_to_seurat("output_name.loom")
