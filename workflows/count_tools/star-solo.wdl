@@ -48,10 +48,7 @@ workflow starsolo {
     }
 
     output {
-        File final_log = run_star_solo.final_log
-        File summary_csv = run_star_solo.summary_csv
-        File barcodes_stats = run_star_solo.barcodes_stats
-        File genes_stats = run_star_solo.genes_stats
+        File output = run_star_solo.output_directory
     }
 
 }
@@ -140,18 +137,14 @@ task run_star_solo {
         check_call(call_args)
         CODE
 
-        chmod -R a+rx starsolo
-        gsutil -m rsync -r starsolo ${output_directory}
+        gsutil -m cp -r starsolo/* ${output_directory}
         # mkdir -p ${output_directory}
         # cp -r starsolo/* ${output_directory}
 
     }
 
     output {
-        File final_log = 'starsolo/Log.final.out'
-        File summary_csv = 'starsolo/Solo.out/Gene/Summary.csv'
-        File barcodes_stats = 'starsolo/Solo.out/Barcodes.stats'
-        File genes_stats = 'starsolo/Solo.out/Features.stats'
+        File output_directory = 'starsolo'
     }
 
     runtime {
