@@ -13,22 +13,22 @@ workflow cumulus_adt {
 	String data_type
 
 	# cell barcodes white list, from 10x genomics, can be either v2 or v3 chemistry
-	File cell_barcode_file = (if chemistry == "SC3Pv3" then "gs://regev-lab/resources/cellranger/3M-february-2018.txt.gz" else "gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz")
-	# File cell_barcode_file = (if chemistry == "SC3Pv3" then "3M-february-2018.txt.gz" else "737K-august-2016.txt.gz")
+	# File cell_barcode_file = (if chemistry == "SC3Pv3" then "gs://regev-lab/resources/cellranger/3M-february-2018.txt.gz" else "gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz")
+	File cell_barcode_file = (if chemistry == "SC3Pv3" then "3M-february-2018.txt.gz" else "737K-august-2016.txt.gz")
 
 	# feature barcodes in csv format
 	File feature_barcode_file
 
-	# scaffold sequence for Perturb-seq, set it to "" for adt
-	String scaffold_sequence
+	# scaffold sequence for Perturb-seq, default is "", which for Perturb-seq means barcode starts at position 0 of read 2
+	String? scaffold_sequence = ""
 
 	# maximum hamming distance in feature barcodes
 	Int? max_mismatch = 3
 	# minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for crispr
 	Float? min_read_ratio = 0.1
 
-	# cumulus version
-	String cumulus_version
+	# cumulus_feature_barcoding version
+	String cumulus_feature_barcoding_version
 	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 	String? zones = "us-central1-b"
 	# Memory string, e.g. 32G
@@ -37,7 +37,10 @@ workflow cumulus_adt {
 	Int? disk_space = 100
 	# Number of preemptible tries 
 	Int? preemptible = 2
+
+	# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
 	String? docker_registry = "cumulusprod"
+
 
 	call run_generate_count_matrix_ADTs {
 		input:
@@ -51,7 +54,7 @@ workflow cumulus_adt {
 			scaffold_sequence = scaffold_sequence,
 			max_mismatch = max_mismatch,
 			min_read_ratio = min_read_ratio,
-			cumulus_version = cumulus_version,
+			cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
 			zones = zones,
 			memory = memory,
 			disk_space = disk_space,
@@ -76,7 +79,7 @@ task run_generate_count_matrix_ADTs {
 	String scaffold_sequence
 	Int max_mismatch
 	Float min_read_ratio
-	String cumulus_version
+	String cumulus_feature_barcoding_version
 	String zones
 	String memory
 	Int disk_space
@@ -95,8 +98,8 @@ task run_generate_count_matrix_ADTs {
 		fastqs = []
 		for i, directory in enumerate('${input_fastqs_directories}'.split(',')):
 			directory = re.sub('/+$', '', directory) # remove trailing slashes 
-			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/${sample_id}', '.']
-			# call_args = ['cp', '-r', directory + '/${sample_id}', '.']
+			# call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/${sample_id}', '.']
+			call_args = ['cp', '-r', directory + '/${sample_id}', '.']
 			print(' '.join(call_args))
 			check_call(call_args)
 			call_args = ['mv', '${sample_id}', '${sample_id}_' + str(i)]
@@ -121,14 +124,14 @@ task run_generate_count_matrix_ADTs {
 
 		filter_chimeric_reads ${data_type} ${feature_barcodes} ${sample_id}.stat.csv.gz ${min_read_ratio} ${sample_id}
 
-		gsutil -m cp ${sample_id}.*csv* ${output_directory}/${sample_id}/
-		# mkdir -p ${output_directory}/${sample_id}
-		# cp -f ${sample_id}.*csv* ${output_directory}/${sample_id}/
+		# gsutil -m cp ${sample_id}.*csv* ${output_directory}/${sample_id}/
+		mkdir -p ${output_directory}/${sample_id}
+		cp -f ${sample_id}.*csv* ${output_directory}/${sample_id}/
 
 		if [ -f ${sample_id}.umi_count.pdf ]
 		then
-			gsutil cp ${sample_id}.umi_count.pdf ${output_directory}/${sample_id}/
-			# cp -f ${sample_id}.umi_count.pdf ${output_directory}/${sample_id}/
+			# gsutil cp ${sample_id}.umi_count.pdf ${output_directory}/${sample_id}/
+			cp -f ${sample_id}.umi_count.pdf ${output_directory}/${sample_id}/
 		fi
 	}
 
@@ -138,7 +141,7 @@ task run_generate_count_matrix_ADTs {
 	}
 
 	runtime {
-		docker: "${docker_registry}/cumulus:${cumulus_version}"
+		docker: "${docker_registry}/cumulus_feature_barcoding:${cumulus_feature_barcoding_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
