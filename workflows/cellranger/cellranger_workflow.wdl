@@ -3,7 +3,7 @@ import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/3/plain-WDL/descriptor" as crc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/2/plain-WDL/descriptor" as crm
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/3/plain-WDL/descriptor" as crv
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/4/plain-WDL/descriptor" as ca
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/5/plain-WDL/descriptor" as ca
 
 workflow cellranger_workflow {
     # 5 - 8 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry, DataType, FeatureBarcodeFile]). gs URL
@@ -63,8 +63,8 @@ workflow cellranger_workflow {
     String? cellranger_version = "3.1.0"
     # 1.2.0, 1.1.0
     String? cellranger_atac_version = "1.2.0"
-    # cumulus version, default to "0.13.0"
-    String? cumulus_version = "0.13.0"
+    # cumulus_feature_barcoding version, default to "0.2.0"
+    String? cumulus_feature_barcoding_version = "0.2.0"
     # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
     String? docker_registry = "cumulusprod"
     String? docker_registry_stripped = sub(docker_registry, "/+$", "")
@@ -243,7 +243,7 @@ workflow cellranger_workflow {
                         scaffold_sequence = scaffold_sequence, 
                         max_mismatch = max_mismatch,
                         min_read_ratio = min_read_ratio,
-                        cumulus_version = cumulus_version,
+                        cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
                         zones = zones,
                         memory = feature_memory,
                         disk_space = feature_disk_space,
