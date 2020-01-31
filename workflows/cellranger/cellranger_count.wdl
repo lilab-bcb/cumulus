@@ -27,8 +27,8 @@ workflow cellranger_count {
 	# Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
 	Boolean? secondary = false
 
-	# 2.1.1, 2.2.0, 3.0.0, or 3.0.2
-	String? cellranger_version = "3.0.2"
+	# cellranger version
+	String cellranger_version
 	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 	String? zones = "us-central1-b"
 	# Number of cpus per cellranger job
@@ -39,6 +39,8 @@ workflow cellranger_count {
 	Int? disk_space = 500
 	# Number of preemptible tries 
 	Int? preemptible = 2
+
+	# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
 	String docker_registry
 
 	call run_cellranger_count {

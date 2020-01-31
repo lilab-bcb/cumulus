@@ -61,14 +61,16 @@ workflow cellranger_workflow {
 
     # 3.1.0, 3.0.2, 2.2.0 
     String? cellranger_version = "3.1.0"
-    # 1.1.0
-    String? cellranger_atac_version = "1.1.0"
-    # cumulus version, default to "0.12.0"
-    String? cumulus_version = "0.12.0"
+    # 1.2.0, 1.1.0
+    String? cellranger_atac_version = "1.2.0"
+    # cumulus version, default to "0.13.0"
+    String? cumulus_version = "0.13.0"
+    # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
     String? docker_registry = "cumulusprod"
     String? docker_registry_stripped = sub(docker_registry, "/+$", "")
-    String? cellranger_mkfastq_docker_registry = "gcr.io/broad-cumulus"
-    String? cellranger_mkfastq_docker_registry_stripped = sub(cellranger_mkfastq_docker_registry, "/+$", "")
+    # cellranger/cellranger-atac mkfastq registry, default to gcr.io/broad-cumulus
+    String? mkfastq_docker_registry = "gcr.io/broad-cumulus"
+    String? mkfastq_docker_registry_stripped = sub(mkfastq_docker_registry, "/+$", "")
     # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
     String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
     # Number of cpus per cellranger job
@@ -120,7 +122,7 @@ workflow cellranger_workflow {
                         zones = zones,
                         num_cpu = num_cpu,
                         memory = memory,
-                        docker_registry = cellranger_mkfastq_docker_registry_stripped,
+                        docker_registry = mkfastq_docker_registry_stripped,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible
                 }
@@ -140,7 +142,7 @@ workflow cellranger_workflow {
                         zones = zones,
                         num_cpu = num_cpu,
                         memory = memory,
-                        docker_registry = cellranger_mkfastq_docker_registry_stripped,
+                        docker_registry = mkfastq_docker_registry_stripped,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible
                 }

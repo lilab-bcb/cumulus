@@ -8,18 +8,21 @@ workflow cellranger_mkfastq {
 
 	# Whether to delete input bcl directory. If false, you should delete this folder yourself so as to not incur storage charges.
 	Boolean? delete_input_bcl_directory = false
-	String? cellranger_version = "3.0.2"
+	# cellranger version
+	String cellranger_version
 	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 	String? zones = "us-central1-b"
 	# Number of cpus per cellranger job
 	Int? num_cpu = 32
 	# Memory string, e.g. 120G
 	String? memory = "120G"
-	String? docker_registry
 	# Disk space in GB
 	Int? disk_space = 1500
 	# Number of preemptible tries 
 	Int? preemptible = 2
+
+	# Which docker registry to use
+	String docker_registry
 
 	# Number of allowed mismatches per index
 	Int? barcode_mismatches
