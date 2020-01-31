@@ -25,8 +25,8 @@ workflow cellranger_vdj {
 	# Force the web summary HTML and metrics summary CSV to only report on a particular chain type. The accepted values are: auto for autodetection based on TR vs IG representation, TR for T cell receptors, IG for B cell receptors, all for all chain types.
 	String? chain 
 
-	# 2.1.1, 2.2.0, 3.0.0, or 3.0.2
-	String? cellranger_version = "3.0.2"
+	# cellranger version
+	String cellranger_version
 	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 	String? zones = "us-central1-b"
 	# Number of cpus per cellranger job
@@ -37,6 +37,8 @@ workflow cellranger_vdj {
 	Int? disk_space = 500
 	# Number of preemptible tries 
 	Int? preemptible = 2
+
+	# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
     String docker_registry
 
 	call run_cellranger_vdj {

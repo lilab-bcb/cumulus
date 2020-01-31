@@ -282,7 +282,7 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		* - **output_directory**
 		  - Output directory
 		  - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_output"
-		  -
+		  - Results are written to $output_directory/$bcl_directory_fastqs/fastq_path/ and will overwrite any existing files at this location.
 		* - run_mkfastq
 		  - If you want to run ``cellranger mkfastq``
 		  - true
@@ -510,10 +510,10 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - cellranger version, could be 3.1.0, 3.0.2, 2.2.0
 		  - "3.1.0"
 		  - "3.1.0"
-		* - cumulus_version
-		  - Cumulus version for extracting feature barcode matrix. Versions available: 0.12.0, 0.11.0.
-		  - "0.12.0"
-		  - "0.12.0"
+		* - cumulus_feature_barcoding_version
+		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.2.0.
+		  - "0.2.0"
+		  - "0.2.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -522,7 +522,7 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  	- "quay.io/cumulus" for backup images on Red Hat registry.
 		  - "cumulusprod"
 		  - "cumulusprod"
-		* - cellranger_mkfastq_docker_registry
+		* - mkfastq_docker_registry
 		  - Docker registry to use for ``cellranger mkfastq``. 
 		    Default is the registry to which only Broad users have access. 
 		    See :ref:`bcl2fastq-docker` for making your own registry.
@@ -625,6 +625,18 @@ Sample sheet
 
 		* - Keyword
 		  - Description
+		* - **GRCh38_atac_v1.2.0**
+		  - Human GRCh38, cellranger-atac reference 1.2.0
+		* - **mm10_atac_v1.2.0** 
+		  - Mouse mm10, cellranger-atac reference 1.2.0
+		* - **hg19_atac_v1.2.0**
+		  - Human hg19, cellranger-atac reference 1.2.0
+		* - **b37_atac_v1.2.0**
+		  - Human b37 build, cellranger-atac reference 1.2.0
+		* - **GRCh38_and_mm10_atac_v1.2.0**
+		  - Human GRCh38 and mouse mm10, cellranger-atac reference 1.2.0
+		* - **hg19_and_mm10_atac_v1.2.0**
+		  - Human hg19 and mouse mm10, cellranger-atac reference 1.2.0
 		* - **GRCh38_atac_v1.1.0**
 		  - Human GRCh38, cellranger-atac reference 1.1.0
 		* - **mm10_atac_v1.1.0** 
@@ -1088,7 +1100,7 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cellranger_atac_create_reference* workflow in the drop-down menu.
 
-2. Upload requred data to Google Bucket
+2. Upload required data to Google Bucket
 =======================================
 
 	Required data include config JSON file, genome FASTA file, gene annotation file (GTF or GFF3 format) and motif input file (JASPAR format).

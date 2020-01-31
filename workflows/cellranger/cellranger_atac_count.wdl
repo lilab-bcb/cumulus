@@ -23,8 +23,8 @@ workflow cellranger_atac_count {
 	# Chose the algorithm for dimensionality reduction prior to clustering and tsne: 'lsa' (default), 'plsa', or 'pca'.
 	String? dim_reduce
 
-	# 1.0.0 or 1.0.1
-	String? cellranger_atac_version = "1.0.1"
+	# 1.2.0 or 1.1.0
+	String? cellranger_atac_version = "1.2.0"
 	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 	String? zones = "us-central1-b"
 	# Number of cpus per cellranger job
@@ -35,7 +35,9 @@ workflow cellranger_atac_count {
 	Int? disk_space = 500
 	# Number of preemptible tries 
 	Int? preemptible = 2
-	String docker_registry
+
+	# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
+	String? docker_registry = "cumulusprod"
 
 	call run_cellranger_atac_count {
 		input:

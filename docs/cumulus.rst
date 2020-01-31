@@ -66,7 +66,7 @@ Alternatively, if you only have one single count matrix for analysis, you can go
 - Drop-seq dge format;
 - csv (no HCA DCP format), tsv or loom formats.
 
-Simply upload your data to the Google Bucket of your workspace, and specify its URL in ``input_file`` field of Cumulus' global inputs (see below). Notice that for dge and loom files, the ``considered_refs`` field in cluster inputs is required.
+Simply upload your data to the Google Bucket of your workspace, and specify its URL in ``input_file`` field of Cumulus' global inputs (see below). For hdf5 files, there is no need to specify genome names. For other formats, you can specify genome name in ``considered_refs`` field in cluster inputs; otherwise, default name ``''`` will be used.
 
 In this case, the **aggregate_matrices** step will be skipped.
 
@@ -1073,11 +1073,14 @@ cumulus_subcluster's outputs
 Load Cumulus results into Seurat  
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
+Load ``h5ad`` File into Seurat
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
 First, you need to set ``output_seurat_compatible`` field to ``true`` in cumulus cluster inputs to generate a Seurat-compatible output file ``output_name.seurat.h5ad``, in addition to the normal result ``output_name.h5ad``.
 
-Notice that python, the `anndata`_ python library with version at least ``0.6.22.post1``, and the ``reticulate`` R library are required to load the result into Seurat.
+Notice that Python, the `anndata`_ python library with version at least ``0.6.22.post1``, and the ``reticulate`` R library are required to load the result into Seurat.
 
-Execute the R code below to load the results into Seurat (working with both Seurat v2 and v3)::
+Execute the R code below to load the ``h5ad`` result into Seurat (working with both Seurat v2 and v3)::
 
 	source("https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cumulus/h5ad2seurat.R")
 	ad <- import("anndata", convert = FALSE)
@@ -1089,6 +1092,28 @@ The resulting Seurat object ``result`` has three data slots:
 	- **raw.data** records filtered raw count matrix. 
 	- **data** records filtered and log-normalized expression matrix. 
 	- **scale.data** records variable-gene-selected, standardized expression matrix that are ready to perform PCA.
+
+
+Load ``loom`` File into Seurat
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+First, you need to set ``output_loom`` field to ``true`` in cumulus cluster inputs to generate a ``loom`` format output file, say ``output_name.loom``, in addition to the normal result ``output_name.h5ad``.
+
+You also need to install ``loomR`` package in your R environment::
+
+	install.package("devtools")
+	devtools::install_github("mojaveazure/loomR", ref = "develop")
+
+Execute the R code below to load the ``loom`` file result into Seurat (working with both Seurat v2 and v3)::
+
+	source("https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cumulus/loom2seurat.R")
+	result <- convert_loom_to_seurat("output_name.loom")
+
+In addition, if you want to set an active cluster label field for the resulting Seurat object, do the following::
+
+	Idents(result) <- result@meta.data$louvain_labels
+
+where ``louvain_labels`` is the key to the Louvain clustering result in Cumulus, which is stored in cell attributes ``result@meta.data``.
 
 ---------------------------------
 
