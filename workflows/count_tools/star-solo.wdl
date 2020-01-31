@@ -48,7 +48,7 @@ workflow starsolo {
     }
 
     output {
-        File output = run_star_solo.output_directory
+        File output = run_star_solo.output_folder
     }
 
 }
@@ -144,7 +144,7 @@ task run_star_solo {
     }
 
     output {
-        File output_directory = 'starsolo'
+        File output_folder = 'starsolo'
     }
 
     runtime {
