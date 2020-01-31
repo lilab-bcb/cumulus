@@ -510,10 +510,10 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - cellranger version, could be 3.1.0, 3.0.2, 2.2.0
 		  - "3.1.0"
 		  - "3.1.0"
-		* - cumulus_version
-		  - Cumulus version for extracting feature barcode matrix. Versions available: 0.12.0, 0.11.0.
-		  - "0.12.0"
-		  - "0.12.0"
+		* - cumulus_feature_barcoding_version
+		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.2.0.
+		  - "0.2.0"
+		  - "0.2.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -522,7 +522,7 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  	- "quay.io/cumulus" for backup images on Red Hat registry.
 		  - "cumulusprod"
 		  - "cumulusprod"
-		* - cellranger_mkfastq_docker_registry
+		* - mkfastq_docker_registry
 		  - Docker registry to use for ``cellranger mkfastq``. 
 		    Default is the registry to which only Broad users have access. 
 		    See :ref:`bcl2fastq-docker` for making your own registry.
