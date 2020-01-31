@@ -282,7 +282,7 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		* - **output_directory**
 		  - Output directory
 		  - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_output"
-		  -
+		  - Results are written to $output_directory/$bcl_directory_fastqs/fastq_path/ and will overwrite any existing files at this location.
 		* - run_mkfastq
 		  - If you want to run ``cellranger mkfastq``
 		  - true
@@ -1100,7 +1100,7 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cellranger_atac_create_reference* workflow in the drop-down menu.
 
-2. Upload requred data to Google Bucket
+2. Upload required data to Google Bucket
 =======================================
 
 	Required data include config JSON file, genome FASTA file, gene annotation file (GTF or GFF3 format) and motif input file (JASPAR format).
