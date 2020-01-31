@@ -495,9 +495,9 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - false
 		  - false
 		* - scaffold_sequence
-		  - Scaffold sequence in sgRNA for Purturb-seq, only used for crispr data type
+		  - Scaffold sequence in sgRNA for Purturb-seq, only used for crispr data type. If it is "", we assume guide barcode starts at position 0 of read 2
 		  - "GTTTAAGAGCTAAGCTGGAA"
-		  - 
+		  - ""
 		* - max_mismatch
 		  - Maximum hamming distance in feature barcodes for the adt task
 		  - 3
