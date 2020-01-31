@@ -140,7 +140,7 @@ task run_star_solo {
         check_call(call_args)
         CODE
 
-        chmod -R a+r starsolo
+        chmod -R a+rx starsolo
         gsutil -m rsync -r starsolo ${output_directory}
         # mkdir -p ${output_directory}
         # cp -r starsolo/* ${output_directory}
