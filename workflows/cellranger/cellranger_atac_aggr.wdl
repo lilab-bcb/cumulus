@@ -41,10 +41,10 @@ workflow cellranger_atac_aggr {
 	# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
 	String? docker_registry = "cumulusprod"
 
-	call run_cellranger_atac_count {
+	call run_cellranger_atac_aggr {
 		input:
-			sample_id = sample_id,
-			input_sample_sheet = input_fastqs_directories,
+			aggr_id = aggr_id,
+			input_counts_directories = input_counts_directories,
 			output_directory = sub(output_directory, "/+$", ""),
 			genome_file = genome_file,
 			normalize = normalize,
@@ -61,19 +61,19 @@ workflow cellranger_atac_aggr {
 
 	output {
 		String output_count_directory = run_cellranger_atac_count.output_count_directory
-		String output_metrics_summary = run_cellranger_atac_count.output_metrics_summary
 		String output_web_summary = run_cellranger_atac_count.output_web_summary
 		File monitoringLog = run_cellranger_atac_aggr.monitoringLog
 	}
 }
 
-task run_cellranger_atac_count {
-	String sample_id
-	String input_fastqs_directories
+task run_cellranger_atac_aggr {
+	String aggr_id
+	String input_counts_directories
 	String output_directory
 	File genome_file
-	Int? force_cells
-	String? dim_reduce
+	String normalize
+	Boolean secondary
+	String dim_reduce
 	String cellranger_atac_version
 	String zones
 	Int num_cpu
@@ -91,37 +91,44 @@ task run_cellranger_atac_count {
 
 		python <<CODE
 		import re
+		import os
 		from subprocess import check_call
 
-		fastqs = []
-		for i, directory in enumerate('${input_fastqs_directories}'.split(',')):
-			directory = re.sub('/+$', '', directory) # remove trailing slashes
-			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/${sample_id}', '.']
-			# call_args = ['cp', '-r', directory + '/${sample_id}', '.']
-			print(' '.join(call_args))
-			check_call(call_args)
-			call_args = ['mv', '${sample_id}', '${sample_id}_' + str(i)]
-			print(' '.join(call_args))
-			check_call(call_args)
-			fastqs.append('${sample_id}_' + str(i))
+		counts = []
+		with open('aggr.csv', 'w') as fout:
+			fout.write('library_id,fragments,cells\n')
+			libs_seen = set()
+			for i, directory in enumerate('${input_counts_directories}'.split(',')):
+				directory = re.sub('/+$', '', directory) # remove trailing slashes
 
-		call_args = ['cellranger-atac', 'count', '--id=results', '--reference=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=${sample_id}', '--jobmode=local']
-		if '${force_cells}' is not '':
-			call_args.append('--force-cells=${force_cells}')
-		if '${dim_reduce}' is not '':
+				library_id = os.path.basename(directory)
+				if library_id in libs_seen:
+					raise Exception("Found duplicated library id " + library_id + "!")
+				libs_seen.add(library_id)
+
+				call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory, '.']
+				# call_args = ['cp', '-r', directory, '.']
+				print(' '.join(call_args))
+				check_call(call_args)
+				counts.append(library_id)
+				fout.write(library_id + "," + library_id + "/fragments.tsv.gz," + library_id + "/singlecell.csv\n")
+
+		call_args = ['cellranger-atac', 'aggr', '--id=results', '--reference=genome_dir', '--csv=aggr.csv', '--normalize=${normalize}', '--jobmode=local']
+		if '${secondary}' is not 'true':
+			call_args.append('--nosecondary')
+		else:
 			call_args.append('--dim-reduce=${dim_reduce}')
 		print(' '.join(call_args))
 		check_call(call_args)
 		CODE
 
-		gsutil -q -m rsync -d -r results/outs ${output_directory}/${sample_id}
-		# cp -r results/outs ${output_directory}/${sample_id}
+		gsutil -q -m rsync -d -r results/outs ${output_directory}/${aggr_id}
+		# cp -r results/outs ${output_directory}/${aggr_id}
 	}
 
 	output {
-		String output_count_directory = "${output_directory}/${sample_id}"
-		String output_metrics_summary = "${output_directory}/${sample_id}/summary.csv"
-		String output_web_summary = "${output_directory}/${sample_id}/web_summary.html"
+		String output_count_directory = "${output_directory}/${aggr_id}"
+		String output_web_summary = "${output_directory}/${aggr_id}/web_summary.html"
 		File monitoringLog = "monitoring.log"
 	}
 
