@@ -1,7 +1,7 @@
 workflow cellranger_atac_aggr {
 	# Aggregate ID
 	String aggr_id
-	# A comma-separated list of input atac count result directories (gs urls)
+	# A comma-separated list of input atac count result directories (gs urls), note that each directory should contain fragments.tsv.gz and singlecell.csv
 	String input_counts_directories	
 	# CellRanger-atac output directory, gs url
 	String output_directory
@@ -60,8 +60,9 @@ workflow cellranger_atac_aggr {
 	}
 
 	output {
-		String output_count_directory = run_cellranger_atac_count.output_count_directory
-		String output_web_summary = run_cellranger_atac_count.output_web_summary
+		String output_aggr_directory = run_cellranger_atac_aggr.output_aggr_directory
+		String output_metrics_summary = run_cellranger_atac_aggr.output_metrics_summary
+		String output_web_summary = run_cellranger_atac_aggr.output_web_summary
 		File monitoringLog = run_cellranger_atac_aggr.monitoringLog
 	}
 }
@@ -127,7 +128,8 @@ task run_cellranger_atac_aggr {
 	}
 
 	output {
-		String output_count_directory = "${output_directory}/${aggr_id}"
+		String output_aggr_directory = "${output_directory}/${aggr_id}"
+		String output_metrics_summary = "${output_directory}/${aggr_id}/summary.csv"
 		String output_web_summary = "${output_directory}/${aggr_id}/web_summary.html"
 		File monitoringLog = "monitoring.log"
 	}
