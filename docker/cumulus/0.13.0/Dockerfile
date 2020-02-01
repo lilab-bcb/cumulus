@@ -49,18 +49,11 @@ RUN pip install --upgrade pip && \
 	pip install pegasuspy==0.16.8
 
 
-RUN wget https://github.com/klarman-cell-observatory/cumulus_feature_barcoding/archive/0.1.0.tar.gz && \
-	tar -zxvf 0.1.0.tar.gz && \
-	mkdir /software && \
-	mv cumulus_feature_barcoding-0.1.0 /software/extract_ADT_UMIs && \
-	rm 0.1.0.tar.gz
-
+RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+RUN chmod a+rx /software/monitor_script.sh
 
-RUN cd /software/extract_ADT_UMIs && make clean && make all && cd ../.. && \
-	chmod a+rx /software/monitor_script.sh
-
-ENV PATH=/software:/software/extract_ADT_UMIs:$PATH
+ENV PATH=/software:$PATH
 
 # Install gcloud 264.0.0
 RUN gsutil -m cp gs://cloud-sdk-release/google-cloud-sdk-264.0.0-linux-x86_64.tar.gz /software && \
