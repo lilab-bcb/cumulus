@@ -125,6 +125,7 @@ task run_cellranger_atac_aggr {
 		CODE
 
 		gsutil -q -m rsync -d -r results/outs ${output_directory}/${aggr_id}
+		# mkdir -p ${output_directory}/${aggr_id}
 		# cp -r results/outs ${output_directory}/${aggr_id}
 	}
 
