@@ -773,6 +773,89 @@ See the table below for important scATAC-seq outputs.
 	  - String
 	  - gs url for a template count_matrix.csv to run cumulus.
 
+Aggregate scATAC-Seq Samples
++++++++++++++++++++++++++++++
+
+To aggregate multiple scATAC-Seq samples, follow the instructions below:
+
+1. Import ``cellranger_atac_aggr`` workflow. Please see Step 1 `here <file:///Users/yy939/GitHub/cumulus/docs/_build/html/cellranger.html#a-general-step-by-step-instruction>`_, and the name of workflow is "**cumulus/cellranger_atac_aggr**".
+
+2. Set the inputs of workflow. Please see the description of inputs below. Notice that required inputs are shown in bold:
+
+.. list-table::
+	:widths: 5 30 30 20
+	:header-rows: 1
+
+	* - Name
+	  - Description
+	  - Example
+	  - Default
+	* - **aggr_id**
+	  - Aggregate ID.
+	  - "aggr_sample"
+	  -
+	* - **input_counts_directories**
+	  - A string contains comma-separated URLs to directories of samples to be aggregated.
+	  - "gs://fc-e0000000-0000-0000-0000-000000000000/data/sample1,gs://fc-e0000000-0000-0000-0000-000000000000/data/sample2"
+	  -
+	* - **output_directory**
+	  - Output directory
+	  - "gs://gs://fc-e0000000-0000-0000-0000-000000000000/aggregate_result"
+	  -
+	* - **genome**
+	  - The reference genome name used by Cell Ranger, can be either a keyword of pre-built genome, or a Google Bucket URL. See `this table <file:///Users/yy939/GitHub/cumulus/docs/_build/html/cellranger.html#single-cell-and-single-nucleus-rna-seq>`_ for the list of keywords of pre-built genomes.
+	  - "GRCh38"
+	  -
+	* - normalize
+	  - Sample normalization mode. 
+	    Options are: ``none``, ``depth``, or ``signal``.
+	  - "none"
+	  - "none"
+	* - secondary
+	  - Perform secondary analysis (dimensionality reduction, clustering and visualization).
+	  - false
+	  - false
+	* - dim_reduce
+	  - Chose the algorithm for dimensionality reduction prior to clustering and tsne. 
+	    Options are: ``lsa``, ``plsa``, or ``pca``.
+	  - "lsa"
+	  - "lsa"
+	* - cellranger_atac_version
+	  - Cell Ranger ATAC version to use. 
+	    Options: ``1.2.0``.
+	  - "1.2.0"
+	  - "1.2.0"
+	* - zones
+	  - Google cloud zones
+	  - “us-central1-a us-west1-a”
+	  - "us-central1-b"
+	* - num_cpu
+	  - Number of cpus to request for cellranger atac aggr.
+	  - 64
+	  - 64
+	* - memory
+	  - Memory size string for cellranger atac aggr.
+	  - "57.6G"
+	  - "57.6G"
+	* - disk_space
+	  - Disk space in GB needed for cellranger atac aggr.
+	  - 500
+	  - 500
+	* - preemptible
+	  - Number of preemptible tries.
+	  - 2
+	  - 2
+	* - docker_registry
+	  - Docker registry to use for cellranger_workflow. Options:
+
+	  	- "cumulusprod" for Docker Hub images; 
+
+	  	- "quay.io/cumulus" for backup images on Red Hat registry.
+	  - "cumulusprod"
+	  - "cumulusprod"
+
+3. Check out the output in ``output_directory/aggr_id`` folder, where ``output_directory`` and ``aggr_id`` are the inputs you set in Step 2.
+
 ---------------------------------
 
 Single-cell immune profiling
@@ -1101,7 +1184,7 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cellranger_atac_create_reference* workflow in the drop-down menu.
 
 2. Upload required data to Google Bucket
-=======================================
+===========================================
 
 	Required data include config JSON file, genome FASTA file, gene annotation file (GTF or GFF3 format) and motif input file (JASPAR format).
 

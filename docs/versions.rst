@@ -20,6 +20,9 @@ Latest version
 	* - cumulus/cellranger_create_reference
 	  - `1 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/1>`_
 	  - Run Cell Ranger tools to build sc/snRNA-seq references.
+	* - cumulus/cellranger_atac_aggr
+	  - `1 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_aggr/1>`_
+	  - Run Cell Ranger tools to aggregate scATAC-seq samples.
 	* - cumulus/cellranger_atac_create_reference
 	  - `1 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_create_reference/1>`_
 	  - Run Cell Ranger tools to build scATAC-seq references.
