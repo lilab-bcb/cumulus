@@ -1070,17 +1070,40 @@ cumulus_subcluster's outputs
 
 ---------------------------------
 
+Load Cumulus results into Pegasus
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`Pegasus <https://pegasus.readthedocs.io>`_ is a Python package for large-scale single-cell/single-nucleus data analysis. To load Cumulus results into Pegasus, we provide instructions based on file format:
+
+* **h5ad**: Annotated H5AD file. This is the standard output format of Cumulus. You can also set its mode by::
+
+	import pegasus as pg
+	adata = pg.read_input("output_name.h5ad")
+
+Sometimes you may also want to specify how the result is loaded into memory. In this case, ``read_input`` has argument ``h5ad_mode``. Please see `its documentation <https://pegasus.readthedocs.io/en/latest/api/pegasus.read_input.html>`_ for details.
+
+* **loom**: When setting **"output_loom"** field in *Cumulus cluster* to **true**, a loom format file will be generated besides H5AD result. To load loom file, you can optionally set its genome name in the following way as this information is not contained by loom file::
+
+	import pegasus as pg
+	data = pg.read_input("output_name.loom", genome = "GRCh38")
+
+After loading, Pegasus manipulate the data matrix in `anndata <https://anndata.readthedocs.io/en/latest/index.html>`_ structure.
+
+------------------------------------
+
 Load Cumulus results into Seurat  
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Load ``h5ad`` File into Seurat
+`Seurat <https://satijalab.org/seurat/>`_ is a single-cell data analysis package written in R.
+
+Load H5AD File into Seurat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-First, you need to set ``output_seurat_compatible`` field to ``true`` in cumulus cluster inputs to generate a Seurat-compatible output file ``output_name.seurat.h5ad``, in addition to the normal result ``output_name.h5ad``.
+First, you need to set **"output_seurat_compatible"** field to **true** in cumulus cluster inputs to generate a Seurat-compatible output file ``output_name.seurat.h5ad``, in addition to the normal result ``output_name.h5ad``.
 
-Notice that Python, the `anndata`_ python library with version at least ``0.6.22.post1``, and the ``reticulate`` R library are required to load the result into Seurat.
+Notice that Python, and Python package `anndata <https://anndata.readthedocs.io/en/latest/index.html>`_ with version at least ``0.6.22.post1``, and R package `reticulate <https://cran.r-project.org/web/packages/reticulate/index.html>`_ are required to load the result into Seurat.
 
-Execute the R code below to load the ``h5ad`` result into Seurat (working with both Seurat v2 and v3)::
+Execute the R code below to load the h5ad result into Seurat (working with both Seurat v2 and v3)::
 
 	source("https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cumulus/h5ad2seurat.R")
 	ad <- import("anndata", convert = FALSE)
@@ -1094,17 +1117,17 @@ The resulting Seurat object ``result`` has three data slots:
 	- **scale.data** records variable-gene-selected, standardized expression matrix that are ready to perform PCA.
 
 
-Load ``loom`` File into Seurat
+Load loom File into Seurat
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-First, you need to set ``output_loom`` field to ``true`` in cumulus cluster inputs to generate a ``loom`` format output file, say ``output_name.loom``, in addition to the normal result ``output_name.h5ad``.
+First, you need to set **"output_loom"** field to **true** in cumulus cluster inputs to generate a loom format output file, say ``output_name.loom``, in addition to the normal result ``output_name.h5ad``.
 
-You also need to install ``loomR`` package in your R environment::
+You also need to install *loomR* package in your R environment::
 
 	install.package("devtools")
 	devtools::install_github("mojaveazure/loomR", ref = "develop")
 
-Execute the R code below to load the ``loom`` file result into Seurat (working with Seurat v3 only)::
+Execute the R code below to load the loom file result into Seurat (working with Seurat v3 only)::
 
 	source("https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cumulus/loom2seurat.R")
 	result <- convert_loom_to_seurat("output_name.loom")
@@ -1114,6 +1137,27 @@ In addition, if you want to set an active cluster label field for the resulting 
 	Idents(result) <- result@meta.data$louvain_labels
 
 where ``louvain_labels`` is the key to the Louvain clustering result in Cumulus, which is stored in cell attributes ``result@meta.data``.
+
+-----------------------------------
+
+Load Cumulus results into SCANPY
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+`SCANPY <https://scanpy.readthedocs.io>`_ is another Python package for single-cell data analysis. We provide instructions on loading Cumulus output into SCANPY based on file format:
+
+* **h5ad**: Annotated H5AD file. This is the standard output format of Cumulus.::
+
+	import scanpy as sc
+	adata = sc.read_h5ad("output_name.h5ad")
+
+* **loom**: This format is generated when setting **"output_loom"** field in Cumulus cluster to **true**. As index names of cell and gene attributes of Cumulus loom file are different from SCANPY's default, you need to specify them when loading.::
+
+  	import scanpy as sc
+  	adata = sc.read_loom("output_name.loom", obs_names = 'obs_names', var_names = 'var_names')
+
+Besides, ``read_loom`` has a boolean ``sparse`` argument to decide whether to read the data matrix as sparse, and its default is ``True``.
+
+After loading, SCANPY manipulates the data matrix in `anndata <https://anndata.readthedocs.io/en/latest/index.html>`_ structure.
 
 ---------------------------------
 
@@ -1139,7 +1183,7 @@ t-SNE plot colored by louvain cluster labels and channel::
 	fig = pg.embedding(adata, basis = 'tsne', keys = ['louvain_labels', 'Channel'])
 	fig.savefig('output_file.tsne.pdf', dpi = 500)
 
-t-SNE plot colored by genes of interest::
+t-SNE plot colored by genes of interes (also known as Feature Plot)::
 
 	fig = pg.embedding(adata, basis = 'tsne', keys = ['CD4', 'CD8A'])
 	fig.savefig('output_file.genes.tsne.pdf', dpi = 500)
