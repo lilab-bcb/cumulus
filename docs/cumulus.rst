@@ -1145,17 +1145,21 @@ Load Cumulus results into SCANPY
 
 `SCANPY <https://scanpy.readthedocs.io>`_ is another Python package for single-cell data analysis. We provide instructions on loading Cumulus output into SCANPY based on file format:
 
-* **h5ad**: Annotated H5AD file. This is the standard output format of Cumulus.::
+* **h5ad**: Annotated H5AD file. This is the standard output format of Cumulus: ::
 
 	import scanpy as sc
 	adata = sc.read_h5ad("output_name.h5ad")
 
-* **loom**: This format is generated when setting **"output_loom"** field in Cumulus cluster to **true**. As index names of cell and gene attributes of Cumulus loom file are different from SCANPY's default, you need to specify them when loading.::
+ometimes you may also want to specify how the result is loaded into memory. In this case, ``read_h5ad`` has argument ``backed``. Please see `SCANPY documentation <https://icb-scanpy.readthedocs-hosted.com/en/stable/api/scanpy.read_h5ad.html>`_ for details.
+
+* **loom**: This format is generated when setting **"output_loom"** field in Cumulus cluster to **true**: ::
 
   	import scanpy as sc
-  	adata = sc.read_loom("output_name.loom", obs_names = 'obs_names', var_names = 'var_names')
+  	adata = sc.read_loom("output_name.loom")
 
-Besides, ``read_loom`` has a boolean ``sparse`` argument to decide whether to read the data matrix as sparse, and its default is ``True``.
+Besides, ``read_loom`` has a boolean ``sparse`` argument to decide whether to read the data matrix as sparse, with default value ``True``. If you want to load it as a dense matrix, simply type: ::
+
+	adata = sc.read_loom("output_name.loom", sparse = False)
 
 After loading, SCANPY manipulates the data matrix in `anndata <https://anndata.readthedocs.io/en/latest/index.html>`_ structure.
 
