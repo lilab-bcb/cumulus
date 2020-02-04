@@ -1150,7 +1150,7 @@ Load Cumulus results into SCANPY
 	import scanpy as sc
 	adata = sc.read_h5ad("output_name.h5ad")
 
-ometimes you may also want to specify how the result is loaded into memory. In this case, ``read_h5ad`` has argument ``backed``. Please see `SCANPY documentation <https://icb-scanpy.readthedocs-hosted.com/en/stable/api/scanpy.read_h5ad.html>`_ for details.
+Sometimes you may also want to specify how the result is loaded into memory. In this case, ``read_h5ad`` has argument ``backed``. Please see `SCANPY documentation <https://icb-scanpy.readthedocs-hosted.com/en/stable/api/scanpy.read_h5ad.html>`_ for details.
 
 * **loom**: This format is generated when setting **"output_loom"** field in Cumulus cluster to **true**: ::
 
