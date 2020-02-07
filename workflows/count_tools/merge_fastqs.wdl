@@ -114,7 +114,7 @@ task run_merge_fastqs {
         dir_count = 0
         for directory in input_dir_list:
             directory = re.sub('/+$', '', directory)
-            call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory, str(dir_count)]
+            call_args = ['gsutil', '-q', '-m', 'rsync', '-r', directory, str(dir_count)]
             # call_args = ['cp', '-r', directory, str(dir_count)]
             print(' '.join(call_args))
             check_call(call_args)
