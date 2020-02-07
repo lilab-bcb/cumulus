@@ -113,9 +113,13 @@ task run_merge_fastqs {
         input_dir_list = list(map(lambda x: x.strip(), "${fastq_directories}".split(',')))
         dir_count = 0
         for directory in input_dir_list:
+            call_args = ['mkdir', '-p', str(dir_count)]
+            print(' '.join(call_args))
+            check_call(call_args)
+
             directory = re.sub('/+$', '', directory)
             call_args = ['gsutil', '-q', '-m', 'rsync', '-r', directory, str(dir_count)]
-            # call_args = ['cp', '-r', directory, str(dir_count)]
+            # call_args = ['rsync', '-r', directory + '/', str(dir_count)]
             print(' '.join(call_args))
             check_call(call_args)
 
