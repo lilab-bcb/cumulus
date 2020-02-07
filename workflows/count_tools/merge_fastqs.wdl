@@ -58,7 +58,7 @@ task set_up_merge_config {
         import os, sys, re
         import pandas as pd
 
-        df = pd.read_csv('${input_tsv_file}', header = 0, dtype = str, index_col = False)
+        df = pd.read_csv('${input_tsv_file}', sep = '\t', header = 0, dtype = str, index_col = False)
         for c in df.columns:
             df[c] = df[c].str.strip()
 
