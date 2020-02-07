@@ -105,7 +105,7 @@ task run_merge_fastqs {
         mkdir result
 
         python <<CODE
-        import re, glob, os
+        import re, os
         import pandas as pd
         import numpy as np
         from subprocess import check_call
@@ -113,22 +113,16 @@ task run_merge_fastqs {
         input_dir_list = list(map(lambda x: x.strip(), "${fastq_directories}".split(',')))
         dir_count = 0
         for directory in input_dir_list:
-            call_args = ['mkdir', '-p', str(dir_count)]
-            print(' '.join(call_args))
-            check_call(call_args)
-
             directory = re.sub('/+$', '', directory)
-            files = glob.glob(directory + '/*.fastq.gz')
-            call_args = ['gsutil', '-q', '-m', 'cp']
-            # call_args = ['cp']
-            call_args.extend(files)
-            call_args.append(str(dir_count))
+            call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory, str(dir_count)]
+            # call_args = ['cp', '-r', directory, str(dir_count)]
             print(' '.join(call_args))
             check_call(call_args)
 
             dir_count += 1
 
-        read_names = pd.Series(list(map(lambda f: f.split('.')[-3].split('_')[-2], os.listdir(str(0))))).unique()
+        fastq_files = [f for f in os.listdir(str(0)) if re.match('.*.fastq.gz', f)]
+        read_names = pd.Series(list(map(lambda f: f.split('.')[-3].split('_')[-2], fastq_files))).unique()
         with open('read_names.txt', 'w') as fo:
             fo.write('\n'.join(read_names) + '\n')
 
@@ -156,9 +150,10 @@ task run_merge_fastqs {
                 check_call(call_args, stdout = merge_out)
         CODE
 
-        gsutil -q -m cp -r result ${output_directory}/${sample_id}
+        gsutil -q -m rsync -r result ${output_directory}/${sample_id}
         gsutil -q -m cp read_names.txt ${output_directory}
-        # cp -r result ${output_directory}/${sample_id}
+        # mkdir -p ${output_directory}/${sample_id}
+        # cp result/* ${output_directory}/${sample_id}
         # cp read_names.txt ${output_directory}
     }
 
