@@ -778,7 +778,7 @@ Aggregate scATAC-Seq Samples
 
 To aggregate multiple scATAC-Seq samples, follow the instructions below:
 
-1. Import ``cellranger_atac_aggr`` workflow. Please see Step 1 `here <file:///Users/yy939/GitHub/cumulus/docs/_build/html/cellranger.html#a-general-step-by-step-instruction>`_, and the name of workflow is "**cumulus/cellranger_atac_aggr**".
+1. Import ``cellranger_atac_aggr`` workflow. Please see Step 1 `here <./cellranger.html#a-general-step-by-step-instruction>`_, and the name of workflow is "**cumulus/cellranger_atac_aggr**".
 
 2. Set the inputs of workflow. Please see the description of inputs below. Notice that required inputs are shown in bold:
 
@@ -800,11 +800,11 @@ To aggregate multiple scATAC-Seq samples, follow the instructions below:
 	  -
 	* - **output_directory**
 	  - Output directory
-	  - "gs://gs://fc-e0000000-0000-0000-0000-000000000000/aggregate_result"
+	  - "gs://fc-e0000000-0000-0000-0000-000000000000/aggregate_result"
 	  -
 	* - **genome**
-	  - The reference genome name used by Cell Ranger, can be either a keyword of pre-built genome, or a Google Bucket URL. See `this table <file:///Users/yy939/GitHub/cumulus/docs/_build/html/cellranger.html#single-cell-and-single-nucleus-rna-seq>`_ for the list of keywords of pre-built genomes.
-	  - "GRCh38"
+	  - The reference genome name used by Cell Ranger, can be either a keyword of pre-built genome, or a Google Bucket URL. See `this table <./cellranger.html#single-cell-and-single-nucleus-rna-seq>`_ for the list of keywords of pre-built genomes.
+	  - "GRCh38_atac_v1.2.0"
 	  -
 	* - normalize
 	  - Sample normalization mode. 
