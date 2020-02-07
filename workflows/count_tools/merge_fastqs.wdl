@@ -23,7 +23,7 @@ workflow merge_fastqs {
                     sample_id = sample_id,
                     fastq_directories = set_up_merge_config.inpdirs[sample_id],
                     output_directory = output_directory,
-                    docker_regsitry = docker_registry,
+                    docker_registry = docker_registry,
                     disk_space = disk_space,
                     zones = zones,
                     memory = memory,
