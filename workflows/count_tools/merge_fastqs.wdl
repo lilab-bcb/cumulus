@@ -1,4 +1,4 @@
-workflow merge_fastqs {
+workflow count_tools_merge_fastqs {
     String input_sample_sheet_tsv
     String output_directory
 
