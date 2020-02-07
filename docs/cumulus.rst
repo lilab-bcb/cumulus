@@ -519,12 +519,12 @@ cluster outputs
 	* - **output_h5ad**
 	  - File
 	  - | Output file in h5ad format (output_name.h5ad).
-	    | To load this file in Python, you need to first install `Pegasus <https://pegasus.readthedocs.io/en/latest/installation.html>`_ on your local machine. Then use ``import pegasus as pg; data = pg.read_input('output_name.h5ad')`` in Python interpreter.
-	    | The log-normalized expression matrix is stored in ``data.X`` as a CSR-format sparse matrix.
+	    | To load this file in Python, you need to first install `Pegasus <https://pegasus.readthedocs.io/en/latest/installation.html>`_ on your local machine. Then use ``import pegasus as pg; data = pg.read_input('output_name.h5ad')`` in Python environment.
+	    | The log-normalized expression matrix is stored in ``data.X`` as a CSR-format sparse matrix, with cell-by-gene shape.
 	    | The ``obs`` field contains cell related attributes, including clustering results.
 	    | For example, ``data.obs_names`` records cell barcodes; ``data.obs['Channel']`` records the channel each cell comes from;
 	    | ``data.obs['n_genes']``, ``data.obs['n_counts']``, and ``data.obs['percent_mito']`` record the number of expressed genes, total UMI count, and mitochondrial rate for each cell respectively;
-	    | ``data.obs['louvain_labels']``, ``data.obs['leiden_labels']``, ``data.obs['spectral_louvain_labels']``, and ``data.obs['spectral_leiden_labels']`` record each cell's cluster labels using different clustring algorithms;
+	    | ``data.obs['louvain_labels']``, ``data.obs['leiden_labels']``, ``data.obs['spectral_louvain_labels']``, and ``data.obs['spectral_leiden_labels']`` record each cell's cluster labels using different clustering algorithms;
 	    | The ``var`` field contains gene related attributes.
 	    | For example, ``data.var_names`` records gene symbols, ``data.var['gene_ids']`` records Ensembl gene IDs, and ``data.var['highly_variable_features']`` records selected variable genes.
 	    | The ``obsm`` field records embedding coordinates.
@@ -532,14 +532,17 @@ cluster outputs
 	    | ``data.obsm['X_umap']`` records UMAP coordinates, ``data.obsm['X_diffmap']`` records diffusion map coordinates,
 	    | ``data.obsm['X_diffmap_pca']`` records the first 3 PCs by projecting the diffusion components using PCA,
 	    | and ``data.obsm['X_fle']`` records the force-directed layout coordinates from the diffusion components.
-	    | The ``varm`` field records DE analysis results if performed: ``data.varm['de_res']``.
 	    | The ``uns`` field stores other related information, such as reference genome (``data.uns['genome']``), kNN on PCA coordinates (``data.uns['pca_knn_indices']`` and ``data.uns['pca_knn_distances']``), etc.
 	* - **output_log**
 	  - File
 	  - This is a copy of the logging module output, containing important intermediate messages
 	* - output_seurat_h5ad
 	  - File
-	  - h5ad file in seurat-compatible manner. This file can be loaded into R and converted into a Seurat object (see `here <./cumulus.html#load-cumulus-results-into-seurat>`_ for instructions)
+	  - | Output file in Seurat-compatible h5ad format (output_name.seurat.h5ad).
+	    | To load this file in Python, first install `Pegasus <https://pegasus.readthedocs.io/en/latest/installation.html>`_ on your local machine. Then use ``import pegasus as pg; data = pg.read_input('output_name.seurat.h5ad')`` in Python environment.
+	    | After loading, ``data`` has the similar structure as in Description of **output_h5ad** in `cluster outputs <./cumulus.html#cluster-outputs>`_ section. 
+	    | In addition, ``data.uns['scale.data']`` records variable-gene-selected and standardized expression matrix which are ready to perform PCA, and ``data.uns['scale.data.rownames']`` records indexes of the selected highly variable genes.
+	    | This file is used for loading in R and converting into a Seurat object (see `here <./cumulus.html#load-h5ad-file-into-seurat>`_ for instructions)
 	* - output_filt_xlsx
 	  - File
 	  - | Spreadsheet containing filtration results (output_name.filt.xlsx).
@@ -564,7 +567,18 @@ cluster outputs
 	    | output_name.filt.mito.pdf, which contains violin plots contrasting mitochondrial rate distributions before and after filtration per channel
 	* - output_loom_file
 	  - File
-	  - Outputted loom file (output_name.loom)
+	  - | Output file in loom format (output_name.loom).
+	    | To load this file in Python, first install `loompy <http://linnarssonlab.org/loompy/installation/index.html>`_. Then type ``from loompy import connect; ds = connect('output_name.loom')`` in Python environment.
+	    | The log-normalized expression matrix is stored in ``ds`` with gene-by-cell shape. ``ds[:, :]`` returns the matrix in dense format; ``ds.layers[''].sparse()`` returns it in sparse format (Scipy COOrdinate sparse matrix).
+	    | The ``ca`` field contains cell related attributes as row attributes, including clustering results and cell embedding coordinates.
+	    | For example, ``ds.ca['obs_names']`` records cell barcodes; ``ds.ca['Channel']`` records the channel each cell comes from;
+	    | ``ds.ca['louvain_labels']``, ``ds.ca['leiden_labels']``, ``ds.ca['spectral_louvain_labels']``, and ``ds.ca['spectral_leiden_labels']`` record each cell's cluster labels using different clustering algorithms; 
+	    | ``ds.ca['X_pca']`` records PCA coordinates, ``ds.ca['X_tsne']`` records t-SNE coordinates,
+	    | ``ds.ca['X_umap']`` records UMAP coordinates, ``ds.ca['X_diffmap']`` records diffusion map coordinates,
+	    | ``ds.ca['X_diffmap_pca']`` records the first 3 PCs by projecting the diffusion components using PCA,
+	    | and ``ds.ca['X_fle']`` records the force-directed layout coordinates from the diffusion components.
+	    | The ``ra`` field contains gene related attributes as column attributes.
+	    | For example, ``ds.ra['var_names']`` records gene symbols, ``ds.ra['gene_ids']`` records Ensembl gene IDs, and ``ds.ra['highly_variable_features']`` records selected variable genes.
 	* - output_parquet_file
 	  - File
 	  - Outputted PARQUET file that contains metadata and expression levels for every gene (output_name.parquet)
@@ -654,10 +668,16 @@ de_analysis outputs
 	  - Description
 	* - output_de_h5ad
 	  - File
-	  - h5ad-formatted results with DE results updated (output_name.h5ad)
+	  - | h5ad-formatted results with DE results updated (output_name.h5ad).
+	    | To load this file in Python, you need to first install `Pegasus <https://pegasus.readthedocs.io/en/latest/installation.html>`_ on your local machine. Then type ``import pegasus as pg; data = pg.read_input('output_name.h5ad')`` in Python environment.
+	    | After loading, ``data`` has the similar structure as in Description of **output_h5ad** in `cluster outputs <./cumulus.html#cluster-outputs>`_ section.
+	    | Besides, there is one additional field ``varm`` which records DE analysis results in ``data.varm['de_res']``. You can use Pandas DataFrame to convert it into a reader-friendly structure: ``import pandas as pd; df = pd.DataFrame(data.varm['de_res'], index = data.var_names)``. Then in the resulting data frame, genes are rows, and those DE test statistics are columns.
+	    | DE analysis in cumulus is performed on each cluster against cells in all the other clusters. For instance, in the data frame, column ``mean_logExpr:1`` refers to the mean expression of genes in log-scale for cells in Cluster 1. The number after colon refers to the cluster label to which this statistic belongs.
 	* - output_de_xlsx
 	  - File
-	  - Spreadsheet reporting DE results (output_name.de.xlsx)
+	  - | Spreadsheet reporting DE results (output_name.de.xlsx)
+	    | Each cluster has two tabs: one for up-regulated genes for this cluster, one for down-regulated ones. In each tab, genes are ranked by AUROC and WAD scores.
+	    | Genes which are not significant in terms of q-values in any of the DE test are not included (at false discovery rate specified in **alpha** field of `de_analysis inputs <./cumulus.html#de-analysis-inputs>`_).
 	* - output_markers_xlsx
 	  - File
 	  - An excel spreadsheet containing detected markers. Each cluster has one tab in the spreadsheet and each tab has three columns, listing markers that are strongly up-regulated, weakly up-regulated and down-regulated (output_name.markers.xlsx)
