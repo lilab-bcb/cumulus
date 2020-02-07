@@ -520,7 +520,7 @@ cluster outputs
 	  - File
 	  - | Output file in h5ad format (output_name.h5ad).
 	    | To load this file in Python, you need to first install `Pegasus <https://pegasus.readthedocs.io/en/latest/installation.html>`_ on your local machine. Then use ``import pegasus as pg; data = pg.read_input('output_name.h5ad')`` in Python environment.
-	    | The log-normalized expression matrix is stored in ``data.X`` as a CSR-format sparse matrix, with cell-by-gene shape.
+	    | The log-normalized expression matrix is stored in ``data.X`` as a Scipy CSR-format sparse matrix, with cell-by-gene shape.
 	    | The ``obs`` field contains cell related attributes, including clustering results.
 	    | For example, ``data.obs_names`` records cell barcodes; ``data.obs['Channel']`` records the channel each cell comes from;
 	    | ``data.obs['n_genes']``, ``data.obs['n_counts']``, and ``data.obs['percent_mito']`` record the number of expressed genes, total UMI count, and mitochondrial rate for each cell respectively;
@@ -540,8 +540,9 @@ cluster outputs
 	  - File
 	  - | Output file in Seurat-compatible h5ad format (output_name.seurat.h5ad).
 	    | To load this file in Python, first install `Pegasus <https://pegasus.readthedocs.io/en/latest/installation.html>`_ on your local machine. Then use ``import pegasus as pg; data = pg.read_input('output_name.seurat.h5ad')`` in Python environment.
-	    | After loading, ``data`` has the similar structure as in Description of **output_h5ad** in `cluster outputs <./cumulus.html#cluster-outputs>`_ section. 
-	    | In addition, ``data.uns['scale.data']`` records variable-gene-selected and standardized expression matrix which are ready to perform PCA, and ``data.uns['scale.data.rownames']`` records indexes of the selected highly variable genes.
+	    | After loading, ``data`` has the similar structure as in Description of **output_h5ad** in `cluster outputs <./cumulus.html#cluster-outputs>`_ section.
+	    | In addition, ``data.raw.X`` records filtered raw count matrix as a Scipy CSR-format sparse matrix, with cell-by-gene shape.
+	    | ``data.uns['scale.data']`` records variable-gene-selected and standardized expression matrix which are ready to perform PCA, and ``data.uns['scale.data.rownames']`` records indexes of the selected highly variable genes.
 	    | This file is used for loading in R and converting into a Seurat object (see `here <./cumulus.html#load-h5ad-file-into-seurat>`_ for instructions)
 	* - output_filt_xlsx
 	  - File
@@ -569,7 +570,7 @@ cluster outputs
 	  - File
 	  - | Output file in loom format (output_name.loom).
 	    | To load this file in Python, first install `loompy <http://linnarssonlab.org/loompy/installation/index.html>`_. Then type ``from loompy import connect; ds = connect('output_name.loom')`` in Python environment.
-	    | The log-normalized expression matrix is stored in ``ds`` with gene-by-cell shape. ``ds[:, :]`` returns the matrix in dense format; ``ds.layers[''].sparse()`` returns it in sparse format (Scipy COOrdinate sparse matrix).
+	    | The log-normalized expression matrix is stored in ``ds`` with gene-by-cell shape. ``ds[:, :]`` returns the matrix in dense format; ``ds.layers[''].sparse()`` returns it as a Scipy COOrdinate sparse matrix.
 	    | The ``ca`` field contains cell related attributes as row attributes, including clustering results and cell embedding coordinates.
 	    | For example, ``ds.ca['obs_names']`` records cell barcodes; ``ds.ca['Channel']`` records the channel each cell comes from;
 	    | ``ds.ca['louvain_labels']``, ``ds.ca['leiden_labels']``, ``ds.ca['spectral_louvain_labels']``, and ``ds.ca['spectral_leiden_labels']`` record each cell's cluster labels using different clustering algorithms; 
