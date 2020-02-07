@@ -68,7 +68,7 @@ task set_up_merge_config {
             print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &')
             sys.exit(1)
 
-        with open('sample_ids.txt') as fo1, open('inpdirs.tsv') as fo2:
+        with open('sample_ids.txt', 'w') as fo1, open('inpdirs.tsv', 'w') as fo2:
             for idx, row in df.iterrows():
                 fo1.write(row['Sample'] + '\n')
                 fo2.write(row['Sample'] + '\t' + row['Flowcells'] + '\n')
@@ -105,7 +105,7 @@ task run_merge_fastqs {
         mkdir result
 
         python <<CODE
-        import re
+        import re, glob, os
         import pandas as pd
         import numpy as np
         from subprocess import check_call
@@ -113,13 +113,16 @@ task run_merge_fastqs {
         input_dir_list = list(map(lambda x: x.strip(), "${fastq_directories}".split(',')))
         dir_count = 0
         for directory in input_dir_list:
-            call_args = ['mkdir', '-p', str(count)]
+            call_args = ['mkdir', '-p', str(dir_count)]
             print(' '.join(call_args))
             check_call(call_args)
 
             directory = re.sub('/+$', '', directory)
-            call_args = ['gsutil', '-q', '-m', 'cp', directory + '/*.fastq.gz', str(count)]
-            # call_args = ['cp', directory + '/*.fastq.gz', str(count)]
+            files = glob.glob(directory + '/*.fastq.gz')
+            call_args = ['gsutil', '-q', '-m', 'cp']
+            # call_args = ['cp']
+            call_args.extend(files)
+            call_args.append(str(dir_count))
             print(' '.join(call_args))
             check_call(call_args)
 
@@ -138,7 +141,7 @@ task run_merge_fastqs {
             lane_ids = np.sort(pd.Series(list(map(lambda f: f.split('.')[-3].split('_')[-3], os.listdir(str(i))))).unique())
 
             for rname in read_names:
-                f_list = [str(i) + '/' + fname_prefix + lane + '_' rname + fname_suffix for lane in lane_ids]
+                f_list = [str(i) + '/' + fname_prefix + lane + '_' + rname + fname_suffix for lane in lane_ids]
                 if rname in fastq_dict.keys():
                     fastq_dict[rname].extend(f_list)
                 else:
@@ -147,14 +150,14 @@ task run_merge_fastqs {
         for rname in read_names:
             call_args = ['cat']
             call_args.extend(fastq_dict[rname])
-            call_args.extend(['>', 'result/${sample_id}_' + rname + '.fastq.gz'])
-            print(' '.join(call_args))
-            check_call(call_args)
+            output_fastq = 'result/${sample_id}_' + rname + '.fastq.gz'
+            print(' '.join(call_args) + ' > ' + output_fastq)
+            with open(output_fastq, 'w') as merge_out:
+                check_call(call_args, stdout = merge_out)
         CODE
 
         gsutil -q -m cp -r result ${output_directory}/${sample_id}
         gsutil -q -m cp read_names.txt ${output_directory}
-        # mkdir -p ${output_directory}/${sample_id}
         # cp -r result ${output_directory}/${sample_id}
         # cp read_names.txt ${output_directory}
     }
