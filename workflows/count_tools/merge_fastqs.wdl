@@ -23,6 +23,7 @@ workflow merge_fastqs {
                     sample_id = sample_id,
                     fastq_directories = set_up_merge_config.inpdirs[sample_id],
                     output_directory = output_directory,
+                    docker_regsitry = docker_registry,
                     disk_space = disk_space,
                     zones = zones,
                     memory = memory,
@@ -118,6 +119,7 @@ task run_merge_fastqs {
 
             directory = re.sub('/+$', '', directory)
             call_args = ['gsutil', '-q', '-m', 'cp', directory + '/*.fastq.gz', str(count)]
+            # call_args = ['cp', directory + '/*.fastq.gz', str(count)]
             print(' '.join(call_args))
             check_call(call_args)
 
@@ -152,7 +154,9 @@ task run_merge_fastqs {
 
         gsutil -q -m cp -r result ${output_directory}/${sample_id}
         gsutil -q -m cp read_names.txt ${output_directory}
+        # mkdir -p ${output_directory}/${sample_id}
         # cp -r result ${output_directory}/${sample_id}
+        # cp read_names.txt ${output_directory}
     }
 
     output {
