@@ -1,46 +1,36 @@
 workflow starsolo {
     File input_sample_sheet
-    File ref_gtf_file
-    File ref_fasta_file
-    String star_index_directory
+    String genome_url
+    String chemistry
     String output_directory
-    Int? num_cpu = 32
-    String? solo_type = 'CB_UMI_Simple'
-    File solo_white_list
-    Int solo_umi_length
-
+    Int num_cpu
+    String star_version
     String? docker_registry = "cumulusprod"
-    String? star_version = '2.7.3a'
     Int? disk_space = 100
     Int? preemptible = 2
     String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
     Int? memory = 32
 
-    call star_genome_generate {
-        input:
-            input_gtf_file = ref_gtf_file,
-            input_fasta_file = ref_fasta_file,
-            output_directory = star_index_directory,
-            num_cpu = num_cpu,
-            docker_registry = docker_registry,
-            star_version = star_version,
-            disk_space = disk_space,
-            zones = zones,
-            memory = memory,
-            preemptible = preemptible
-    }
+    ## Determine solo_type
+    String solo_type = if (chemistry == 'tenXV2' || chemistry == 'tenXV3') then 'CB_UMI_Simple' else 'Droplet'
+
+    File wl_index_file = "gs://regev-lab/resources/count_tools/whitelist_index.tsv"
+    # File wl_index_file = "whitelist_index.tsv"
+    Map[String, String] wl_index2gsurl = read_map(wl_index_file)
+    String whitelist_url = wl_index2gsurl[chemistry]
+
 
     call run_star_solo {
         input:
             input_sample_sheet = input_sample_sheet,
             solo_type = solo_type,
-            white_list = solo_white_list,
-            umi_length = solo_umi_length,
+            chemistry = chemistry,
             num_cpu = num_cpu,
-            genome_dir = star_genome_generate.star_genome_dir,
+            star_version = star_version,
+            genome_url = genome_url + '/starsolo.tar.gz',
+            whitelist_url = whitelist_url,
             output_directory = output_directory,
             docker_registry = docker_registry,
-            star_version = star_version,
             disk_space = disk_space,
             zones = zones,
             memory = memory,
@@ -48,59 +38,20 @@ workflow starsolo {
     }
 
     output {
-        File output = run_star_solo.output_folder
+        File monitoringLog = run_star_solo.monitoringLog
+        String output_folder = run_star_solo.output_folder
     }
 
-}
-
-task star_genome_generate {
-    File input_gtf_file
-    File input_fasta_file
-    String output_directory
-    Int num_cpu
-
-    String docker_registry
-    String star_version
-    Int disk_space
-    String zones
-    Int memory
-    Int preemptible
-
-    command {
-        set -e
-        export TMPDIR=/tmp
-        monitor_script.sh > monitoring.log &
-
-        mkdir star
-        STAR --runMode genomeGenerate --runThreadN ${num_cpu} --genomeDir star --genomeFastaFiles ${input_fasta_file} --sjdbGTFfile ${input_gtf_file} --genomeSAsparseD 3
-        gsutil -m rsync -r star ${output_directory}
-        # mkdir -p ${output_directory}
-        # cp -r star/* ${output_directory}
-    }
-
-    output {
-        File star_genome_dir = 'star'
-    }
-
-    runtime {
-        docker: "${docker_registry}/starsolo:${star_version}"
-        zones: zones
-        memory: "${memory}G"
-        disks: "local-disk ${disk_space} HDD"
-        cpu: "${num_cpu}"
-        preemptible: "${preemptible}"
-    }
 }
 
 task run_star_solo {
     File input_sample_sheet
     String solo_type
-    File white_list
-    Int umi_length
+    String chemistry
     Int num_cpu
-    File genome_dir
+    String genome_url
+    String whitelist_url
     String output_directory
-
     String docker_registry
     String star_version
     Int disk_space
@@ -113,7 +64,14 @@ task run_star_solo {
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
 
-        mkdir starsolo
+        gsutil -q -m cp ${genome_url} genome.tar.gz
+        tar -zxvf genome.tar.gz
+        rm genome.tar.gz
+
+        gsutil -q -m cp ${whitelist_url} whitelist.txt.gz
+        gunzip whitelist.txt.gz
+
+        mkdir result
         
         python <<CODE
         import os
@@ -124,27 +82,30 @@ task run_star_solo {
         r1_fastqs = df['R1_fastq'].values
         r2_fastqs = df['R2_fastq'].values
 
-        call_args = ['STAR', '--soloType', '${solo_type}', '--soloCBwhitelist', '${white_list}', '--soloUMIlen', '${umi_length}', '--genomeDir', '${genome_dir}', '--runThreadN', '${num_cpu}']
+        call_args = ['STAR', '--soloType', '${solo_type}', '--soloCBwhitelist', 'whitelist.txt', '--genomeDir', 'starsolo', '--runThreadN', '${num_cpu}']
+        if '${chemistry}' is 'tenXV3':
+            call_args.extend(['--soloUMIlen', '12'])
 
         file_ext = os.path.splitext(r1_fastqs[0])[-1]
         if file_ext == '.gz':
             call_args.extend(['--readFilesCommand', 'zcat'])
 
         call_args.extend(['--readFilesIn', ','.join(r2_fastqs), ','.join(r1_fastqs)])
-        call_args.extend(['--outFileNamePrefix', 'starsolo/'])
+        call_args.extend(['--outFileNamePrefix', 'result/'])
 
         print(' '.join(call_args))
         check_call(call_args)
         CODE
 
-        gsutil -m cp -r starsolo/* ${output_directory}
+        gsutil -q -m rsync -r result ${output_directory}
         # mkdir -p ${output_directory}
-        # cp -r starsolo/* ${output_directory}
+        # cp -r result/* ${output_directory}
 
     }
 
     output {
-        File output_folder = 'starsolo'
+        File monitoringLog = 'monitoring.log'
+        String output_folder = '${output_directory}'
     }
 
     runtime {
