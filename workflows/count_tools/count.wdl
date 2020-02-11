@@ -8,7 +8,7 @@ workflow count {
     String sample_id
     File r1_fastq
     File r2_fastq
-    File i1_fastq
+    File? i1_fastq
 
     String genome
     String chemistry

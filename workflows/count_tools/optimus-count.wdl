@@ -99,6 +99,7 @@ task get_reference {
         export TMPDIR=/tmp
 
         gsutil -q -m cp ${genome_url} optimus.tar.gz
+        # cp ${genome_url} optimus.tar.gz
         tar -zxvf optimus.tar.gz
         rm optimus.tar.gz
     }
