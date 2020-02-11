@@ -1,4 +1,5 @@
 import "https://api.firecloud.org/ga4gh/v1/tools/alexandria:kallisto-bustools_count/versions/1/plain-WDL/descriptor" as kbc
+# import "../../../kallisto-bustools_workflow/WDL/kallisto-bustools_count.wdl" as kbc
 
 workflow bustools {
     String sample_id
