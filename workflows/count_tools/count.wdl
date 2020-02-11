@@ -67,7 +67,7 @@ workflow count {
                 sample_id = sample_id,
                 r1_fastq = r1_fastq,
                 r2_fastq = r2_fastq,
-                index_url = genome_url + '/alevin.tar.gz',
+                genome_url = genome_url + '/alevin.tar.gz',
                 chemistry = chemistry,
                 output_directory = output_directory,
                 num_cpu = num_cpu,

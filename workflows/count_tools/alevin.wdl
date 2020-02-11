@@ -2,7 +2,7 @@ workflow alevin {
     String sample_id
     File r1_fastq
     File r2_fastq
-    String index_url
+    String genome_url
     String chemistry
     String output_directory
     Int? num_cpu = 32
@@ -26,7 +26,7 @@ workflow alevin {
             sample_id = sample_id,
             r1_fastq = r1_fastq,
             r2_fastq = r2_fastq,
-            index_url = index_url,
+            genome = genome_url,
             chemistry = chemistry,
             library_type = library_type,
             whitelist = whitelist_url,
@@ -52,7 +52,7 @@ task run_alevin {
     String sample_id
     File r1_fastq
     File r2_fastq
-    String index_url
+    File genome
     String library_type
     String chemistry
     File whitelist
@@ -71,9 +71,8 @@ task run_alevin {
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
 
-        gsutil -q -m cp ${index_url} alevin.tar.gz
-        tar -zxvf alevin.tar.gz
-        rm alevin.tar.gz
+        tar -zxvf ${genome}
+        rm ${genome}
 
         python <<CODE
         from subprocess import check_call
