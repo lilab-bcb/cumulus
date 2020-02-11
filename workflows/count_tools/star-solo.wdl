@@ -14,7 +14,7 @@ workflow starsolo {
     Int? memory = 32
 
     ## Determine solo_type
-    String solo_type = if (chemistry == 'tenXV2' || chemistry == 'tenXV3') then 'CB_UMI_Simple' else 'Droplet'
+    String solo_type = if (chemistry == 'tenX_v2' || chemistry == 'tenX_v3') then 'CB_UMI_Simple' else 'Droplet'
 
     File wl_index_file = "gs://regev-lab/resources/count_tools/whitelist_index.tsv"
     # File wl_index_file = "whitelist_index.tsv"
