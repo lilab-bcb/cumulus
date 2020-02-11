@@ -82,7 +82,7 @@ task set_up_merge_config {
     }
 
     runtime {
-        docker: "${docker_registry}/merge-fastqs"
+        docker: "${docker_registry}/count"
         zones: zones
         preemptible: "${preemptible}"
     }
@@ -167,7 +167,7 @@ task run_merge_fastqs {
     }
 
     runtime {
-        docker: "${docker_registry}/merge-fastqs"
+        docker: "${docker_registry}/count"
         zones: zones
         memory: memory
         bootDiskSizeGb: 12
@@ -217,7 +217,7 @@ task generate_merged_count_config {
     }
 
     runtime {
-        docker: "${docker_registry}/merge-fastqs"
+        docker: "${docker_registry}/count"
         zones: zones
         preemptible: "${preemptible}"
     }

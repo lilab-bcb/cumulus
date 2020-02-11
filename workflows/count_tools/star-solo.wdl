@@ -1,5 +1,7 @@
 workflow starsolo {
-    File input_sample_sheet
+    String sample_id
+    File r1_fastq
+    File r2_fastq
     String genome_url
     String chemistry
     String output_directory
@@ -22,13 +24,15 @@ workflow starsolo {
 
     call run_star_solo {
         input:
-            input_sample_sheet = input_sample_sheet,
+            sample_id = sample_id,
+            r1_fastq = r1_fastq,
+            r2_fastq = r2_fastq,
             solo_type = solo_type,
             chemistry = chemistry,
             num_cpu = num_cpu,
             star_version = star_version,
             genome_url = genome_url + '/starsolo.tar.gz',
-            whitelist_url = whitelist_url,
+            whitelist = whitelist_url,
             output_directory = output_directory,
             docker_registry = docker_registry,
             disk_space = disk_space,
@@ -45,12 +49,14 @@ workflow starsolo {
 }
 
 task run_star_solo {
-    File input_sample_sheet
+    String sample_id
+    File r1_fastq
+    File r2_fastq
     String solo_type
     String chemistry
     Int num_cpu
     String genome_url
-    String whitelist_url
+    File whitelist
     String output_directory
     String docker_registry
     String star_version
@@ -65,47 +71,40 @@ task run_star_solo {
         monitor_script.sh > monitoring.log &
 
         gsutil -q -m cp ${genome_url} genome.tar.gz
+        # cp ${genome_url} genome.tar.gz
         tar -zxvf genome.tar.gz
         rm genome.tar.gz
-
-        gsutil -q -m cp ${whitelist_url} whitelist.txt.gz
-        gunzip whitelist.txt.gz
 
         mkdir result
         
         python <<CODE
         import os
-        import pandas as pd
         from subprocess import check_call
 
-        df = pd.read_csv("${input_sample_sheet}")
-        r1_fastqs = df['R1_fastq'].values
-        r2_fastqs = df['R2_fastq'].values
-
-        call_args = ['STAR', '--soloType', '${solo_type}', '--soloCBwhitelist', 'whitelist.txt', '--genomeDir', 'starsolo', '--runThreadN', '${num_cpu}']
+        call_args = ['STAR', '--soloType', '${solo_type}', '--soloCBwhitelist', '${whitelist}', '--genomeDir', 'starsolo', '--runThreadN', '${num_cpu}']
         if '${chemistry}' is 'tenXV3':
             call_args.extend(['--soloUMIlen', '12'])
 
-        file_ext = os.path.splitext(r1_fastqs[0])[-1]
+        file_ext = os.path.splitext('${r1_fastq}')[-1]
         if file_ext == '.gz':
             call_args.extend(['--readFilesCommand', 'zcat'])
 
-        call_args.extend(['--readFilesIn', ','.join(r2_fastqs), ','.join(r1_fastqs)])
+        call_args.extend(['--readFilesIn', '${r2_fastq}', '${r1_fastq}'])
         call_args.extend(['--outFileNamePrefix', 'result/'])
 
         print(' '.join(call_args))
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -r result ${output_directory}
-        # mkdir -p ${output_directory}
-        # cp -r result/* ${output_directory}
+        gsutil -q -m rsync -r result ${output_directory}/${sample_id}
+        # mkdir -p ${output_directory}/${sample_id}
+        # cp -r result/* ${output_directory}/${sample_id}
 
     }
 
     output {
         File monitoringLog = 'monitoring.log'
-        String output_folder = '${output_directory}'
+        String output_folder = '${output_directory}/${sample_id}'
     }
 
     runtime {

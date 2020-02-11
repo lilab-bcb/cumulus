@@ -1,168 +1,104 @@
-workflow bustools {
-    File ref_fasta_file
-    File ref_gtf_file
-    String generate_index_directory
-    Int? num_cpu_ref = 1
+import "https://api.firecloud.org/ga4gh/v1/tools/alexandria:kallisto-bustools_count/versions/1/plain-WDL/descriptor" as kbc
 
-    File input_sample_sheet
+workflow bustools {
+    String sample_id
+    File r1_fastq
+    File r2_fastq
+    String genome_url
     String chemistry
     String output_directory
-    Boolean? output_loom = false
-    Boolean? output_h5ad = false
-    Int? num_cpu_count = 32
+    Int num_cpu
+    Boolean output_loom
+    Boolean output_h5ad
 
 
-    String? docker_registry = "cumulusprod"
-    String? kb_python_version = '0.24'
+    String? docker = "shaleklab/kallisto-bustools"
+    String? bustools_version = '0.24.4'
     Int? disk_space = 100
     Int? preemptible = 2
     String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
     Int? memory = 32
 
-    call run_kb_ref {
-        input:
-            input_fasta_file = ref_fasta_file,
-            input_gtf_file = ref_gtf_file,
-            output_directory = generate_index_directory,
-            num_cpu = num_cpu_ref,
-            docker_registry = docker_registry,
-            kb_python_version = kb_python_version,
-            disk_space = disk_space,
-            zones = zones,
-            memory = memory,
-            preemptible = preemptible
-    }
+    String chemistry_str = if chemistry == 'tenX_v3' then '10XV3' else '10XV2'
 
-    call run_kb_count {
+    call set_up_resources as src {
         input:
-            input_sample_sheet = input_sample_sheet,
-            index = run_kb_ref.output_index,
-            t2g = run_kb_ref.output_t2g,
-            chemistry = chemistry,
-            output_loom = output_loom,
-            output_h5ad = output_h5ad,
             output_directory = output_directory,
-            num_cpu = num_cpu_count,
+            genome_url = genome_url + '/bustools.tar.gz',
             docker_registry = docker_registry,
             kb_python_version = kb_python_version,
-            disk_space = disk_space,
             zones = zones,
-            memory = memory,
             preemptible = preemptible
     }
 
+    call kbc.kallisto_bustools_count as kallisto_bustools_count {
+        input:
+            docker = docker + ':' + kb_python_version,
+            number_cpu_threads = num_cpu,
+            task_memory_GB = memory / 5 * 6,
+            program_memory_GB = memory,
+            preemptible = preemptible,
+            zones = zones,
+            boot_disk_size_GB = 12,
+            bucket = src.output_loc[0],
+            output_path = src.output_loc[1],
+            index = src.output_index,
+            T2G_mapping = src.output_t2g,
+            technology = chemistry_str,
+            R1_fastq = r1_fastq,
+            sample_name = sample_id,
+            R2_fastq = r2_fastq,
+            use_lamanno = false,
+            loom = output_loom,
+            h5ad = output_h5ad,
+            delete_bus_files = false
+    }
+
     output {
-        File output_mtx_file = run_kb_count.output_mtx_file
-        File output_genes_txt = run_kb_count.output_genes_txt
-        File output_barcodes_txt = run_kb_count.output_barcodes_txt
-        File? output_loom_file = run_kb_count.output_loom_file
-        File? output_h5ad_file = run_kb_count.output_h5ad_file
+        String output_folder = kallisto_bustools_count.count_output_path
     }
 }
 
-task run_kb_ref {
+task set_up_resources {
+    String output_directory
+    String genome_url
     String docker_registry
     String kb_python_version
-    Int disk_space
     String zones
-    Int memory
     Int preemptible
-    Int num_cpu
-
-    File input_fasta_file
-    File input_gtf_file
-    String output_directory
 
     command {
         set -e
         export TMPDIR=/tmp
-        monitor_script.sh > monitoring.log &
 
-        kb ref -i transcriptome.idx -g transcripts_to_genes.txt -f1 cdna.fa \
-        ${input_fasta_file} ${input_gtf_file}
-        gsutil -m cp transcriptome.idx transcripts_to_genes.txt cdna.fa ${output_directory}
-        # mkdir -p ${output_directory}
-        # cp transcriptome.idx transcripts_to_genes.txt cdna.fa ${output_directory}
-    }
-
-    output {
-        File output_index = 'transcriptome.idx'
-        File output_t2g = 'transcripts_to_genes.txt'
-        File output_fasta_file = 'cdna.fa'
-    }
-
-    runtime {
-        docker: "${docker_registry}/bustools:${kb_python_version}"
-        zones: zones
-        memory: "${memory}G"
-        disks: "local-disk ${disk_space} HDD"
-        cpu: "${num_cpu}"
-        preemptible: "${preemptible}"
-    }
-}
-
-task run_kb_count {
-    String docker_registry
-    String kb_python_version
-    Int disk_space
-    String zones
-    Int memory
-    Int preemptible
-
-    File input_sample_sheet
-    File index
-    File t2g
-    String chemistry
-    Boolean output_loom
-    Boolean output_h5ad
-    String output_directory
-    Int num_cpu
-
-    command {
-        set -e
-        export TMPDIR=/tmp
-        monitor_script.sh > monitoring.log &
+        gsutil -q -m cp ${genome_url} genome.tar.gz
+        tar -zxvf genome.tar.gz
+        rm genome.tar.gz
 
         python <<CODE
-        import pandas as pd
-        from subprocess import check_call
+        import os
 
-        df = pd.read_csv("${input_sample_sheet}")
-        r1_fastqs = df['R1_fastq'].values
-        r2_fastqs = df['R2_fastq'].values
-        input_fastqs = [item for tup in list(zip(r1_fastqs, r2_fastqs)) for item in tup]
+        dir_list = '${output_directory}'[5:].split('/')
+        bucket = 'gs://' + dir_list[0]
+        output_path = '/'.join(dir_list[1:])
 
-        call_args = ['kb', 'count', '-i', '${index}', '-g', '${t2g}', '-x', '${chemistry}', '-o', 'output', '-t', '${num_cpu}', '-m', '${memory}']
-        if '${output_loom}' is 'true':
-            call_args.append('--loom')
-        if '${output_h5ad}' is 'true':
-            call_args.append('--h5ad')
-        call_args.extend(input_fastqs)
+        with open('output_location.tsv', 'w') as fo:
+            fo.write(bucket + '\t' + output_path + '\n')
 
-        print(' '.join(call_args))
-        check_call(call_args)
         CODE
-
-        gsutil -m cp -r output/* ${output_directory} 
-        # mkdir -p ${output_directory}
-        # cp -r output/* ${output_directory}
     }
 
     output {
-        File output_mtx_file = 'output/counts_unfiltered/cells_x_genes.mtx'
-        File output_genes_txt = 'output/counts_unfiltered/cells_x_genes.genes.txt'
-        File output_barcodes_txt = 'output/counts_unfiltered/cells_x_genes.barcodes.txt'
-        File? output_loom_file = 'output/counts_unfiltered/adata.loom'
-        File? output_h5ad_file = 'output/counts_unfiltered/adata.h5ad'
+        Array[String] output_loc = read_tsv('output_location.tsv')
+        File output_index = 'bustools-ref/transcriptome.idx'
+        File output_t2g = 'bustools-ref/transcripts_to_genes.txt'
+        File output_fasta_file = 'cdna.fa'
+
     }
 
-
     runtime {
-        docker: "${docker_registry}/bustools:${kb_python_version}"
+        docker: "${docker_registry}/kallisto-bustools:${bustools_version}"
         zones: zones
-        memory: "${memory}G"
-        disks: "local-disk ${disk_space} HDD"
-        cpu: "${num_cpu}"
         preemptible: "${preemptible}"
     }
 }
