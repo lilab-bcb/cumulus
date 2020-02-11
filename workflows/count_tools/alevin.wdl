@@ -19,7 +19,7 @@ workflow alevin {
     Map[String, String] wl_index2gsurl = read_map(wl_index_file)
     String whitelist_url = wl_index2gsurl[chemistry]
 
-    String library_type = if (chemistry == 'tenXV2' || chemistry == 'tenXV3' || chemistry == 'Dropseq') then 'ISR' else ''
+    String library_type = if (chemistry == 'tenX_v2' || chemistry == 'tenX_v3' || chemistry == 'Dropseq') then 'ISR' else ''
 
     call run_alevin {
         input:
@@ -77,7 +77,7 @@ task run_alevin {
         python <<CODE
         from subprocess import check_call
 
-        call_args = ['salmon', 'alevin', '-l', '${library_type}', '-1']
+        call_args = ['salmon', 'alevin', '-l', '${library_type}']
         call_args.extend(['-1', '${r1_fastq}'])
         call_args.extend(['-2', '${r2_fastq}'])
         call_args.extend(['-i', 'alevin-ref/salmon_index'])
