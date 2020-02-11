@@ -1,7 +1,6 @@
 import "https://raw.githubusercontent.com/HumanCellAtlas/skylab/optimus_v1.4.0_terra/pipelines/optimus/Optimus.wdl" as opm
 
-
-workflow optimus_count {
+workflow count_tools_optimus {
     String sample_id
     File r1_fastq
     File r2_fastq
@@ -24,7 +23,7 @@ workflow optimus_count {
     Map[String, String] wl_index2gsurl = read_map(wl_index_file)
     String whitelist_url = wl_index2gsurl[chemistry]
     
-    run get_reference as ref {
+    call get_reference as ref {
         input:
             genome_url = genome_url,
             docker_registry = docker_registry,
@@ -34,7 +33,7 @@ workflow optimus_count {
             preemptible = preemptible
     }
 
-    run opm.Optimus as optimus {
+    call opm.Optimus as optimus {
         input:
             version = version,
             sample_id = sample_id,
@@ -48,30 +47,30 @@ workflow optimus_count {
             chemistry = chemistry,
             fastq_suffix = '.gz',
             output_loom = output_loom,
-            optimus.StarAlign = star_align_cpu,
-            optimus.AttachBarcodes = preemptible,
-            optimus.AttachBarcodesNoIndex = preemptible,
-            optimus.CalculateCellMetrics = preemptible,
-            optimus.CalculateGeneMetrics = preemptible,
-            optimus.CellSortBam = preemptible,
-            optimus.CorrectUMItools = preemptible,
-            optimus.CreateSparseCountMatrix = preemptible,
-            optimus.FastqToUBam = preemptible,
-            optimus.GeneSortBam = preemptible,
-            optimus.MergeCellMetrics = preemptible,
-            optimus.MergeCountFiles = preemptible,
-            optimus.MergeGeneMetrics = preemptible,
-            optimus.MergeSorted = preemptible,
-            optimus.ModifyGtf = preemptible,
-            optimus.OptimusZarrConversion = preemptible,
-            optimus.OptimusZarrToLoom = preemptible,
-            optimus.PreCountSort = preemptible,
-            optimus.PreMergeSort = preemptible,
-            optimus.PreUMISort = preemptible,
-            optimus.RunEmptyDrops = preemptible,
-            optimus.SplitBamByCellBarcode = preemptible,
-            optimus.StarAlign = preemptible,
-            optimus.TagGenes = preemptible
+            StarAlign.cpu = star_align_cpu,
+            AttachBarcodes.preemptible = preemptible,
+            AttachBarcodesNoIndex.preemptible = preemptible,
+            CalculateCellMetrics.preemptible = preemptible,
+            CalculateGeneMetrics.preemptible = preemptible,
+            CellSortBam.preemptible = preemptible,
+            CorrectUMItools.preemptible = preemptible,
+            CreateSparseCountMatrix.preemptible = preemptible,
+            FastqToUBam.preemptible = preemptible,
+            GeneSortBam.preemptible = preemptible,
+            MergeCellMetrics.preemptible = preemptible,
+            MergeCountFiles.preemptible = preemptible,
+            MergeGeneMetrics.preemptible = preemptible,
+            MergeSorted.preemptible = preemptible,
+            ModifyGtf.preemptible = preemptible,
+            OptimusZarrConversion.preemptible = preemptible,
+            OptimusZarrToLoom.preemptible = preemptible,
+            PreCountSort.preemptible = preemptible,
+            PreMergeSort.preemptible = preemptible,
+            PreUMISort.preemptible = preemptible,
+            RunEmptyDrops.preemptible = preemptible,
+            SplitBamByCellBarcode.preemptible = preemptible,
+            StarAlign.preemptible = preemptible,
+            TagGenes.preemptible = preemptible
     }
 
     output {

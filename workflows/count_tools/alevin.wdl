@@ -1,19 +1,22 @@
+version 1.0
+
 workflow alevin {
-    String sample_id
-    File r1_fastq
-    File r2_fastq
-    String genome_url
-    String chemistry
-    String output_directory
-    Int? num_cpu = 32
-
-    String? docker_registry = "cumulusprod"
-    String? alevin_version = '1.1'
-    Int? disk_space = 100
-    Int? preemptible = 2
-    String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-    Int? memory = 32
-
+    input {
+        String sample_id
+        File r1_fastq
+        File r2_fastq
+        String genome_url
+        String chemistry
+        String output_directory
+        Int num_cpu = 32
+        String docker_registry = "cumulusprod"
+        String alevin_version = '1.1'
+        Int disk_space = 100
+        Int preemptible = 2
+        String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        Int memory = 32
+    }
+    
     File wl_index_file = "gs://regev-lab/resources/count_tools/whitelist_index.tsv"
     # File wl_index_file = "whitelist_index.tsv"
     Map[String, String] wl_index2gsurl = read_map(wl_index_file)
@@ -49,22 +52,24 @@ workflow alevin {
 
 
 task run_alevin {
-    String sample_id
-    File r1_fastq
-    File r2_fastq
-    File genome
-    String library_type
-    String chemistry
-    File whitelist
-    Int num_cpu
-    String output_directory
-
-    String docker_registry
-    String alevin_version
-    Int disk_space
-    String zones
-    Int memory
-    Int preemptible
+    input {
+        String sample_id
+        File r1_fastq
+        File r2_fastq
+        File genome
+        String library_type
+        String chemistry
+        File whitelist
+        Int num_cpu
+        String output_directory
+        String docker_registry
+        String alevin_version
+        Int disk_space
+        String zones
+        Int memory
+        Int preemptible
+    }
+    
 
     command {
         set -e

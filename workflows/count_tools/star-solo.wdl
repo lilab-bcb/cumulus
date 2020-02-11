@@ -1,17 +1,21 @@
+version 1.0
+
 workflow starsolo {
-    String sample_id
-    File r1_fastq
-    File r2_fastq
-    String genome_url
-    String chemistry
-    String output_directory
-    Int num_cpu
-    String star_version
-    String? docker_registry = "cumulusprod"
-    Int? disk_space = 100
-    Int? preemptible = 2
-    String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-    Int? memory = 32
+    input {
+        String sample_id
+        File r1_fastq
+        File r2_fastq
+        String genome_url
+        String chemistry
+        String output_directory
+        Int num_cpu
+        String star_version
+        String docker_registry = "cumulusprod"
+        Int disk_space = 100
+        Int preemptible = 2
+        String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        Int memory = 32
+    }
 
     ## Determine solo_type
     String solo_type = if (chemistry == 'tenX_v2' || chemistry == 'tenX_v3') then 'CB_UMI_Simple' else 'Droplet'
@@ -49,21 +53,24 @@ workflow starsolo {
 }
 
 task run_star_solo {
-    String sample_id
-    File r1_fastq
-    File r2_fastq
-    String solo_type
-    String chemistry
-    Int num_cpu
-    File genome
-    File whitelist
-    String output_directory
-    String docker_registry
-    String star_version
-    Int disk_space
-    String zones
-    Int memory
-    Int preemptible
+    input {
+        String sample_id
+        File r1_fastq
+        File r2_fastq
+        String solo_type
+        String chemistry
+        Int num_cpu
+        File genome
+        File whitelist
+        String output_directory
+        String docker_registry
+        String star_version
+        Int disk_space
+        String zones
+        Int memory
+        Int preemptible
+    }
+    
 
     command {
         set -e
