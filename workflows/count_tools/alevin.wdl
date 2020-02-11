@@ -78,9 +78,8 @@ task run_alevin {
         from subprocess import check_call
 
         call_args = ['salmon', 'alevin', '-l', '${library_type}', '-1']
-        call_args.extend('${r1_fastq}')
-        call_args.append('-2')
-        call_args.extend('${r2_fastq}')
+        call_args.extend(['-1', '${r1_fastq}'])
+        call_args.extend(['-2', '${r2_fastq}'])
         call_args.extend(['-i', 'alevin-ref/salmon_index'])
         
         if '${chemistry}' is 'tenX_v3':
