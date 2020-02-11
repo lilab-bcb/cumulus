@@ -1,5 +1,5 @@
-#import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_merge_fastqs/versions/2/plain-WDL/descriptor" as mfw
-import "optimus-count" as opm
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_merge_fastqs/versions/2/plain-WDL/descriptor" as mfs
+import "optimus-count.wdl" as opm
 import "star-solo.wdl" as sts
 import "bustools.wdl" as kbc
 import "alevin.wdl" as ale
@@ -39,7 +39,7 @@ workflow count {
     String? bustools_version = '0.24.4'
 
     # Optimus
-
+    Int? optimus_star_align_cpu = 32
 
 
     if (count_tool == 'StarSolo') {
