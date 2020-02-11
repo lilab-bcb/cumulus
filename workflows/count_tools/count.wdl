@@ -62,7 +62,7 @@ workflow count {
     }
 
     if (count_tool == 'Alevin') {
-        call ale.run_alevin as alevin {
+        call ale.alevin as alevin {
             input:
                 sample_id = sample_id,
                 r1_fastq = r1_fastq,
