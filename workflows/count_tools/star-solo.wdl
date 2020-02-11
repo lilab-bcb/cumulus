@@ -31,7 +31,7 @@ workflow starsolo {
             chemistry = chemistry,
             num_cpu = num_cpu,
             star_version = star_version,
-            genome_url = genome_url + '/starsolo.tar.gz',
+            genome = genome_url,
             whitelist = whitelist_url,
             output_directory = output_directory,
             docker_registry = docker_registry,
@@ -55,7 +55,7 @@ task run_star_solo {
     String solo_type
     String chemistry
     Int num_cpu
-    String genome_url
+    File genome
     File whitelist
     String output_directory
     String docker_registry
@@ -70,10 +70,8 @@ task run_star_solo {
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
 
-        gsutil -q -m cp ${genome_url} genome.tar.gz
-        # cp ${genome_url} genome.tar.gz
-        tar -zxvf genome.tar.gz
-        rm genome.tar.gz
+        tar -zxvf ${genome}
+        rm ${genome}
 
         mkdir result
         
@@ -81,8 +79,8 @@ task run_star_solo {
         import os
         from subprocess import check_call
 
-        call_args = ['STAR', '--soloType', '${solo_type}', '--soloCBwhitelist', '${whitelist}', '--genomeDir', 'starsolo', '--runThreadN', '${num_cpu}']
-        if '${chemistry}' is 'tenXV3':
+        call_args = ['STAR', '--soloType', '${solo_type}', '--soloCBwhitelist', '${whitelist}', '--genomeDir', 'starsolo-ref', '--runThreadN', '${num_cpu}']
+        if '${chemistry}' is 'tenX_v3':
             call_args.extend(['--soloUMIlen', '12'])
 
         file_ext = os.path.splitext('${r1_fastq}')[-1]
