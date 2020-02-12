@@ -1,7 +1,7 @@
 version 1.0
 
-# import "https://api.firecloud.org/ga4gh/v1/tools/alexandria:kallisto-bustools_count/versions/1/plain-WDL/descriptor" as kbc
-import "../../../kallisto-bustools_workflow/WDL/kallisto-bustools_count.wdl" as kbc
+import "https://api.firecloud.org/ga4gh/v1/tools/alexandria:kallisto-bustools_count/versions/1/plain-WDL/descriptor" as kbc
+# import "../../../kallisto-bustools_workflow/WDL/kallisto-bustools_count.wdl" as kbc
 
 workflow bustools {
     input {
@@ -43,8 +43,8 @@ workflow bustools {
             preemptible = preemptible,
             zones = zones,
             boot_disk_size_GB = 12,
-            bucket = src.output_loc[0],
-            output_path = src.output_loc[1],
+            bucket = src.bucket,
+            output_path = src.output_path,
             index = src.output_index,
             T2G_mapping = src.output_t2g,
             technology = chemistry_str,
@@ -52,6 +52,7 @@ workflow bustools {
             sample_name = sample_id,
             R2_fastq = r2_fastq,
             use_lamanno = false,
+            bustools_filter = false,
             loom = output_loom,
             h5ad = output_h5ad,
             delete_bus_files = false
@@ -85,18 +86,19 @@ task set_up_resources {
         bucket = 'gs://' + dir_list[0]
         output_path = '/'.join(dir_list[1:])
 
-        with open('output_location.tsv', 'w') as fo:
-            fo.write(bucket + '\t' + output_path + '\n')
+        with open('bucket.txt', 'w') as fo1, open('output_path.txt', 'w') as fo2:
+            fo1.write(bucket)
+            fo2.write(output_path)
 
         CODE
     }
 
     output {
-        Array[String] output_loc = read_tsv('output_location.tsv')
+        String bucket = read_string('bucket.txt')
+        String output_path = read_string('output_path.txt')
         File output_index = 'bustools-ref/transcriptome.idx'
         File output_t2g = 'bustools-ref/transcripts_to_genes.txt'
-        File output_fasta_file = 'cdna.fa'
-
+        File output_fasta_file = 'bustools-ref/cdna.fa'
     }
 
     runtime {
