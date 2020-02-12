@@ -105,7 +105,7 @@ task run_alevin {
 
         gsutil -q -m rsync -r result ${output_directory}/${sample_id}
         # mkdir -p ${output_directory}/${sample_id}
-        # cp -r alevin_output/* ${output_directory}/${sample_id}
+        # cp -r result/* ${output_directory}/${sample_id}
     }
 
     output {
