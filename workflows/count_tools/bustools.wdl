@@ -1,7 +1,7 @@
 version 1.0
 
-# import "https://api.firecloud.org/ga4gh/v1/tools/alexandria:kallisto-bustools_count/versions/2/plain-WDL/descriptor" as kbc
-import "../../../kallisto-bustools_workflow/WDL/kallisto-bustools_count.wdl" as kbc
+import "https://api.firecloud.org/ga4gh/v1/tools/alexandria:kallisto-bustools_count/versions/2/plain-WDL/descriptor" as kbc
+# import "../../../kallisto-bustools_workflow/WDL/kallisto-bustools_count.wdl" as kbc
 
 workflow bustools {
     input {
