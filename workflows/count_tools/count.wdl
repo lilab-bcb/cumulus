@@ -3,6 +3,7 @@ version 1.0
 import "star-solo.wdl" as sts
 import "bustools.wdl" as kbc
 import "alevin.wdl" as ale
+import "optimus-count.wdl" as opm
 
 workflow count {
     input {
@@ -34,6 +35,10 @@ workflow count {
         Boolean bustools_output_h5ad = false
         String bustools_docker = "shaleklab/kallisto-bustools"
         String bustools_version = '0.24.4'
+
+        # Optimus
+        String optimus_version = 'optimus_v1.4.0'
+        Boolean optimus_output_loom = false
     }
     
     File ref_index_file = "gs://regev-lab/resources/count_tools/ref_index.tsv"
@@ -99,11 +104,32 @@ workflow count {
         }
     }
 
+    if (count_tool == 'Optimus') {
+        call opm.optimus_count as Optimus {
+            input:
+                sample_id = sample_id,
+                r1_fastq = r1_fastq,
+                r2_fastq = r2_fastq,
+                i1_fastq = i1_fastq,
+                genome_url = genome_url + '/optimus.tar.gz',
+                chemistry = chemistry,
+                output_directory = output_directory,
+                output_loom = optimus_output_loom,
+                docker_registry = docker_registry,
+                version = optimus_version,
+                disk_space = disk_space,
+                preemptible = preemptible,
+                zones = zones,
+                memory = memory
+        }
+    }
+
     output {
         File? starsolo_monitor = StarSolo.monitoringLog
         String? starsolo_output_folder = StarSolo.output_folder
         File? alevin_monitor = Alevin.monitoringLog
         String? alevin_output_folder = Alevin.output_folder
         String? bustools_output_folder = Bustools.output_folder
+        String? optimus_output_folder = Optimus.output_folder
     }    
 }
