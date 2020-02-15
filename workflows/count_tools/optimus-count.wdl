@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://raw.githubusercontent.com/HumanCellAtlas/skylab/optimus_v1.4.0_terra/pipelines/optimus/Optimus.wdl" as opm
+import "https://raw.githubusercontent.com/lilab-bcb/skylab/cumulus/pipelines/optimus/Optimus.wdl" as opm
 # import "../../../skylab/pipelines/optimus/Optimus.wdl" as opm
 
 workflow optimus_count {
