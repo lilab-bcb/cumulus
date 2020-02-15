@@ -1,5 +1,5 @@
 workflow smartseq2_per_plate {
-	# 3 columns (Cell, Read1, and Read2). gs URL
+	# 2-3 columns (Cell, Read1, and optionally Read2). gs URL
 	File sample_sheet
 	# Plate name
 	String plate_name
@@ -15,7 +15,10 @@ workflow smartseq2_per_plate {
 	# If reference is a url
 	Boolean is_url = sub(reference, "^.+\\.(tgz|gz)$", "URL") == "URL"
 
-	File reference_file = (if is_url then reference else acronym2gsurl[reference])
+	File reference_file = (if is_url then reference else acronym2gsurl[reference + ":" + aligner])
+
+	# Align reads with 'aligner': hisat2-hca, star, bowtie2 (default: hisat2-hca)
+	String? aligner = "hisat2-hca"
 
 	String? smartseq2_version = "1.0.0"
 	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
@@ -26,9 +29,11 @@ workflow smartseq2_per_plate {
 	String? memory = "3.60G"
 	# factor to multiply size of R1 and R2 by
     Float? disk_space_multiplier = 10
-    Int? generate_count_matrix_disk_space = 10
 	# Number of preemptible tries 
 	Int? preemptible = 2
+	# Disk space for count matrix generation task
+    Int? generate_count_matrix_disk_space = 10
+	# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
     String docker_registry
 
 	call parse_sample_sheet {
@@ -40,21 +45,45 @@ workflow smartseq2_per_plate {
 			docker_registry = docker_registry
 	}
 
-	scatter (i in range(length(parse_sample_sheet.cell_ids))) {
-		call run_rsem {
-			input:
-				reference = reference_file,
-				read1 = parse_sample_sheet.read1_list[i],
-				read2 = parse_sample_sheet.read2_list[i],
-				sample_name = parse_sample_sheet.cell_ids[i],
-				smartseq2_version = smartseq2_version,
-				zones = zones,
-				num_cpu = num_cpu,
-				memory = memory,
-				disk_space_multiplier = disk_space_multiplier,
-				preemptible = preemptible,
-				docker_registry = docker_registry
-		}
+	# Paired-end data
+	if (parse_sample_sheet.is_paired) {
+		scatter (i in range(length(parse_sample_sheet.cell_ids))) {
+			call run_rsem {
+				input:
+					reference = reference_file,
+					read1 = parse_sample_sheet.read1_list[i],
+					read2 = parse_sample_sheet.read2_list[i],
+					sample_name = parse_sample_sheet.cell_ids[i],
+					aligner = aligner,
+					smartseq2_version = smartseq2_version,
+					zones = zones,
+					num_cpu = num_cpu,
+					memory = memory,
+					disk_space_multiplier = disk_space_multiplier,
+					preemptible = preemptible,
+					docker_registry = docker_registry
+			}
+		}	
+	}
+
+	# Single-end data
+	if (!parse_sample_sheet.is_paired) {
+		scatter (i in range(length(parse_sample_sheet.cell_ids))) {
+			call run_rsem {
+				input:
+					reference = reference_file,
+					read1 = parse_sample_sheet.read1_list[i],
+					sample_name = parse_sample_sheet.cell_ids[i],
+					aligner = aligner,
+					smartseq2_version = smartseq2_version,
+					zones = zones,
+					num_cpu = num_cpu,
+					memory = memory,
+					disk_space_multiplier = disk_space_multiplier,
+					preemptible = preemptible,
+					docker_registry = docker_registry
+			}
+		}		
 	}
 
 	call generate_count_matrix {
@@ -73,6 +102,7 @@ workflow smartseq2_per_plate {
 	output {
 	    Array[File] rsem_gene = run_rsem.rsem_gene
         Array[File] rsem_isoform = run_rsem.rsem_isoform
+        Array[File] rsem_bam = run_rsem.rsem_bam
         Array[File] rsem_time = run_rsem.rsem_time
         Array[File] rsem_cnt =run_rsem.rsem_cnt
         Array[File] rsem_model = run_rsem.rsem_model
@@ -81,7 +111,6 @@ workflow smartseq2_per_plate {
 		String output_qc_report = generate_count_matrix.output_qc_report
 	}
 }
-
 
 
 task parse_sample_sheet {
@@ -96,14 +125,19 @@ task parse_sample_sheet {
 		export TMPDIR=/tmp
 
 		python <<CODE
-		import pandas as pd 
+		import pandas as pd
 		from subprocess import check_call
 		df = pd.read_csv('${sample_sheet}', header = 0, index_col = 0)
+		is_paired = 'Read2' in df.columns
+		with open('is_paired.txt', 'w') as fo:
+			fo.write('true' if is_paired else 'false')
 		with open('cell_ids.txt', 'w') as fo1, open('read1_list.txt', 'w') as fo2, open('read2_list.txt', 'w') as fo3:
 			for cell_id, row in df.iterrows():
 				fo1.write(cell_id + '\n')
 				fo2.write(row['Read1'] + '\n')
-				fo3.write(row['Read2'] + '\n')
+				if is_paired:
+					fo3.write(row['Read2'])
+				fo3.write('\n')
 		CODE
 	}
 
@@ -111,6 +145,7 @@ task parse_sample_sheet {
 		Array[String] cell_ids = read_lines('cell_ids.txt')
 		Array[String] read1_list = read_lines('read1_list.txt')
 		Array[String] read2_list = read_lines('read2_list.txt')
+		Boolean is_paired = read_boolean('is_paired.txt')
 	}
 
 	runtime {
@@ -123,10 +158,11 @@ task parse_sample_sheet {
 task run_rsem {
 	File reference
 	File read1
-	File read2
+	File? read2
 	String sample_name
+	String aligner
 	String smartseq2_version
-	String zones	
+	String zones
 	Int num_cpu
 	String memory
 	Float? disk_space_multiplier
@@ -140,12 +176,13 @@ task run_rsem {
 		mkdir -p rsem_ref
 		tar xf ${reference} -C rsem_ref --strip-components 1
 		REFERENCE_NAME="$(basename `ls rsem_ref/*.grp` .grp)"
-		rsem-calculate-expression --bowtie2 --paired-end -p ${num_cpu} --append-names --time ${read1} ${read2} rsem_ref/$REFERENCE_NAME ${sample_name}
+		rsem-calculate-expression --${aligner} ${default="--paired-end" read2} -p ${num_cpu} --append-names --time ${read1} ${default="" read2} rsem_ref/$REFERENCE_NAME ${sample_name}
 	}
 
 	output {
 		File rsem_gene = "${sample_name}.genes.results"
 		File rsem_isoform = "${sample_name}.isoforms.results"
+		File rsem_trans_bam = "${sample_name}.transcript.bam"
 		File rsem_time = "${sample_name}.time"
 		File rsem_cnt = "${sample_name}.stat/${sample_name}.cnt"
 		File rsem_model = "${sample_name}.stat/${sample_name}.model"

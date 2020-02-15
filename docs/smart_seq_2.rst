@@ -225,23 +225,36 @@ Please see the description of inputs below. Note that required inputs are shown 
 	  - | File. 
 	    | For example, "gs://fc-e0000000-0000-0000-0000-000000000000/Homo_sapiens.GRCh38.83.gtf"
 	  - 
+	* - **output_directory**
+	  - Google bucket url for the output folder
+	  - "gs://fc-e0000000-0000-0000-0000-000000000000/output_refs"
+	  -
+	* - **genome**
+	  - Output reference genome name
+	  - "GRCm38_ens97filt"
+	  -
+	* - aligner
+	  - Build indices for which aligner, choices are hisat2-hca, star, or bowtie2.
+	  - "hisat2-hca"
+	  - "hisat2-hca"
 	* - smartseq2_version
 	  - | SMART-Seq2 version to use. 
-	    | Versions available: 1.0.0.
-	  - String
-	  - "1.0.0"
+	    | Versions available: 1.1.0.
+	    | Versions obsoleted: 1.0.0.
+	  - "1.1.0"
+	  - "1.1.0"
 	* - docker_registry
 	  - Docker registry to use. Options:
 
 	  	- "cumulusprod" for Docker Hub images; 
 
 	  	- "quay.io/cumulus" for backup images on Red Hat registry.
-	  - String
+	  - "quay.io/cumulus"
 	  - "cumulusprod"
 	* - zones
 	  - Google cloud zones
-	  - String
-	  - "us-east1-b us-east1-c us-east1-d"
+	  - "us-central1-c"
+	  - "us-central1-b"
 	* - cpu
 	  - Number of CPUs
 	  - Integer
@@ -249,7 +262,7 @@ Please see the description of inputs below. Note that required inputs are shown 
 	* - memory
 	  - Memory size string
 	  - String
-	  - "7.2G"
+	  - If aligner is bowtie2 or hisat2-hca, "7.2G"; otherwise "32G"
 	* - extra_disk_space
 	  - Extra disk space in GB
 	  - Integer

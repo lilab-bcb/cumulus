@@ -1,7 +1,7 @@
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:smartseq2_per_plate/versions/3/plain-WDL/descriptor" as ss2pp
 
 workflow smartseq2 {
-	# 4 columns (Cell, Plate, Read1, and Read2). gs URL
+	# 3-4 columns (Cell, Plate, Read1, and optionally Read2). gs URL
 	File input_csv_file
 	# Output directory, gs URL
 	String output_directory
@@ -9,6 +9,8 @@ workflow smartseq2 {
 	String output_directory_stripped = sub(output_directory, "/+$", "")
 	# Reference to align reads against, GRCm38, GRCh38, or mm10
 	String reference
+	# Align reads with 'aligner': hisat2-hca, star, bowtie2 (default: hisat2-hca)
+	String? aligner = "hisat2-hca"
 
 	# smartseq2 version, default to "1.0.0"
 	String? smartseq2_version = "1.0.0"
@@ -22,7 +24,9 @@ workflow smartseq2 {
 	Float? disk_space_multiplier = 11
 	# Number of preemptible tries 
 	Int? preemptible = 2
+	# Disk space for count matrix generation task
     Int? generate_count_matrix_disk_space = 10
+    # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
     String? docker_registry = "cumulusprod"
 
 	call parse_input_csv {
@@ -40,8 +44,10 @@ workflow smartseq2 {
 			input:
 				sample_sheet = parse_input_csv.pn2ss[plate_name],
 				plate_name = plate_name,
+				is_paired = parse_input_csv.is_paired,
 				output_directory = output_directory_stripped,
 				reference = reference,
+				aligner = aligner,
 				smartseq2_version = smartseq2_version,
 				zones = zones,
 				num_cpu = num_cpu,
@@ -56,6 +62,7 @@ workflow smartseq2 {
 	output {
         Array[Array[File]] rsem_gene = smartseq2_per_plate.rsem_gene
         Array[Array[File]] rsem_isoform = smartseq2_per_plate.rsem_isoform
+        Array[Array[File]] rsem_bam = smartseq2_per_plate.rsem_bam
         Array[Array[File]] rsem_time = smartseq2_per_plate.rsem_time
         Array[Array[File]] rsem_cnt =smartseq2_per_plate.rsem_cnt
         Array[Array[File]] rsem_model = smartseq2_per_plate.rsem_model
@@ -83,9 +90,10 @@ task parse_input_csv {
 		from subprocess import check_call
 
 		df = pd.read_csv('${input_csv_file}', header = 0, dtype=str, index_col = 0)
+		extracted_cols = ['Read1', 'Read2'] if 'Read2' in df.columns else ['Read1']
 		with open('plate_names.txt', 'w') as fo1, open('pn2ss.txt', 'w') as fo2:
 			for plate_name in df['Plate'].unique():
-				plate_df = df.loc[df['Plate'] == plate_name, ['Read1', 'Read2']]
+				plate_df = df.loc[df['Plate'] == plate_name, extracted_cols]
 				plate_df.to_csv(plate_name + '_sample_sheet.csv')
 				call_args = ['gsutil', '-q', 'cp', plate_name + '_sample_sheet.csv', '${output_directory}/']
 				# call_args = ['cp', plate_name + '_sample_sheet.csv', '${output_directory}/']
