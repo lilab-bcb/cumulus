@@ -199,6 +199,9 @@ task generate_count_config {
                 if len(input_dir_list) > 1:
                     fo2.write(row['Sample'] + '\t' + row['Flowcells'] + '\n')
                     fo3.write(row['Sample'] + '\t' + "true\n")
+                    read_item = dict()
+                    read_item['read'] = None
+                    data_no_merge[row['Sample']] = read_item
                 else:
                     dir_name = input_dir_list[0]
                     with open(row['Sample'] + "_tmp.txt", 'w') as tmp_fout:
@@ -211,11 +214,14 @@ task generate_count_config {
                             fo3.write(row['Sample'] + '\t' + "false\n")
                             read_item = dict()
                             for rname in read_names:
-                                read_item['rname'] = dir_name + '/' + [f for f in file_list if re.match('.*_' + rname + '_.*.fastq.gz', f)][0]
+                                read_item[rname] = dir_name + '/' + [f for f in file_list if re.match('.*_' + rname + '_[^_]+.fastq.gz', f)][0]
                             data_no_merge[row['Sample']] = read_item
                         else:
                             fo2.write(row['Sample'] + '\t' + row['Flowcells'] + '\n')
                             fo3.write(row['Sample'] + '\t' + "true\n")
+                            read_item = dict()
+                            read_item['read'] = None
+                            data_no_merge[row['Sample']] = read_item
 
         with open('samples_no_merge.json', 'w') as json_fo:
             json.dump(data_no_merge, json_fo)
