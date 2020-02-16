@@ -194,17 +194,17 @@ task generate_count_config {
             data_no_merge = dict()
             for idx, row in df.iterrows():
                 fo1.write(row['Sample'] + '\n')
-                fo2.write(row['Sample'] + '\t' + row['Flowcells'] + '\n')
 
                 input_dir_list = list(map(lambda x: x.strip(), row['Flowcells'].split(',')))
                 if len(input_dir_list) > 1:
+                    fo2.write(row['Sample'] + '\t' + row['Flowcells'] + '\n')
                     fo3.write(row['Sample'] + '\t' + "true\n")
                 else:
                     dir_name = input_dir_list[0]
                     with open(row['Sample'] + "_tmp.txt", 'w') as tmp_fout:
                         check_call(['gsutil', 'ls', dir_name], stdout = tmp_fout)
                     with open(row['Sample'] + "_tmp.txt", 'r') as tmp_fin:
-                        file_list = [os.path.basename(line.rstrip('\n')) for line in fin.read_lines()]
+                        file_list = [os.path.basename(line.rstrip('\n')) for line in tmp_fin.readlines()]
                         read_names = pd.Series(list(map(lambda f: f.split('.')[-3].split('_')[-2], file_list))).unique()
                         if read_names.size == len(file_list):
                             # No need to merge fastqs
@@ -214,6 +214,7 @@ task generate_count_config {
                                 read_item['rname'] = dir_name + '/' + [f for f in file_list if re.match('.*_' + rname + '_.*.fastq.gz', f)][0]
                             data_no_merge[row['Sample']] = read_item
                         else:
+                            fo2.write(row['Sample'] + '\t' + row['Flowcells'] + '\n')
                             fo3.write(row['Sample'] + '\t' + "true\n")
 
         with open('samples_no_merge.json', 'w') as json_fo:
