@@ -1,6 +1,6 @@
 version 1.0
 
-workflow alevin {
+workflow starsolo {
     input {
         String sample_id
         File r1_fastq
@@ -8,35 +8,37 @@ workflow alevin {
         String genome_url
         String chemistry
         String output_directory
-        Int num_cpu = 32
+        Int num_cpu
+        String star_version
         String docker_registry = "cumulusprod"
-        String alevin_version = '1.1'
         Int disk_space = 100
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         Int memory = 32
     }
-    
+
+    ## Determine solo_type
+    String solo_type = if (chemistry == 'tenX_v2' || chemistry == 'tenX_v3') then 'CB_UMI_Simple' else 'Droplet'
+
     File wl_index_file = "gs://regev-lab/resources/count_tools/whitelist_index.tsv"
     # File wl_index_file = "whitelist_index.tsv"
     Map[String, String] wl_index2gsurl = read_map(wl_index_file)
     String whitelist_url = wl_index2gsurl[chemistry]
 
-    String library_type = if (chemistry == 'tenX_v2' || chemistry == 'tenX_v3' || chemistry == 'Dropseq') then 'ISR' else ''
 
-    call run_alevin {
+    call run_star_solo {
         input:
             sample_id = sample_id,
             r1_fastq = r1_fastq,
             r2_fastq = r2_fastq,
-            genome = genome_url,
+            solo_type = solo_type,
             chemistry = chemistry,
-            library_type = library_type,
-            whitelist = whitelist_url,
             num_cpu = num_cpu,
+            star_version = star_version,
+            genome = genome_url,
+            whitelist = whitelist_url,
             output_directory = output_directory,
             docker_registry = docker_registry,
-            alevin_version = alevin_version,
             disk_space = disk_space,
             zones = zones,
             memory = memory,
@@ -44,26 +46,25 @@ workflow alevin {
     }
 
     output {
-        File monitoringLog = run_alevin.monitoringLog
-        String output_folder = run_alevin.output_folder
+        File monitoringLog = run_star_solo.monitoringLog
+        String output_folder = run_star_solo.output_folder
     }
 
 }
 
-
-task run_alevin {
+task run_star_solo {
     input {
         String sample_id
         File r1_fastq
         File r2_fastq
-        File genome
-        String library_type
+        String solo_type
         String chemistry
-        File whitelist
         Int num_cpu
+        File genome
+        File whitelist
         String output_directory
         String docker_registry
-        String alevin_version
+        String star_version
         Int disk_space
         String zones
         Int memory
@@ -79,25 +80,22 @@ task run_alevin {
         tar -zxvf ${genome}
         rm ${genome}
 
+        mkdir result
+        
         python <<CODE
+        import os
         from subprocess import check_call
 
-        call_args = ['salmon', 'alevin', '-l', '${library_type}']
-        call_args.extend(['-1', '${r1_fastq}'])
-        call_args.extend(['-2', '${r2_fastq}'])
-        call_args.extend(['-i', 'alevin-ref/salmon_index'])
-        
+        call_args = ['STAR', '--soloType', '${solo_type}', '--soloCBwhitelist', '${whitelist}', '--genomeDir', 'starsolo-ref', '--runThreadN', '${num_cpu}']
         if '${chemistry}' is 'tenX_v3':
-            call_args.append('--chromiumV3')
-        elif '${chemistry}' is 'tenX_v2':
-            call_args.append('--chromium')
-        else:
-            call_args.append('--dropseq')
+            call_args.extend(['--soloUMIlen', '12'])
 
-        if '${chemistry}' in ['tenX_v2', 'tenX_v3']:
-            call_args.extend(['--whitelist', '${whitelist}'])
+        file_ext = os.path.splitext('${r1_fastq}')[-1]
+        if file_ext == '.gz':
+            call_args.extend(['--readFilesCommand', 'zcat'])
 
-        call_args.extend(['-p', '${num_cpu}', '-o', 'result', '--tgMap', 'alevin-ref/txp2gene.tsv'])
+        call_args.extend(['--readFilesIn', '${r2_fastq}', '${r1_fastq}'])
+        call_args.extend(['--outFileNamePrefix', 'result/'])
 
         print(' '.join(call_args))
         check_call(call_args)
@@ -106,6 +104,7 @@ task run_alevin {
         gsutil -q -m rsync -r result ${output_directory}/${sample_id}
         # mkdir -p ${output_directory}/${sample_id}
         # cp -r result/* ${output_directory}/${sample_id}
+
     }
 
     output {
@@ -114,7 +113,7 @@ task run_alevin {
     }
 
     runtime {
-        docker: "${docker_registry}/alevin:${alevin_version}"
+        docker: "${docker_registry}/starsolo:${star_version}"
         zones: zones
         memory: "${memory}G"
         disks: "local-disk ${disk_space} HDD"

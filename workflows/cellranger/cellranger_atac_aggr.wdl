@@ -99,6 +99,7 @@ task run_cellranger_atac_aggr {
 		with open('aggr.csv', 'w') as fout:
 			fout.write('library_id,fragments,cells\n')
 			libs_seen = set()
+			current_dir = os.getcwd()
 			for i, directory in enumerate('${input_counts_directories}'.split(',')):
 				directory = re.sub('/+$', '', directory) # remove trailing slashes
 
@@ -107,12 +108,12 @@ task run_cellranger_atac_aggr {
 					raise Exception("Found duplicated library id " + library_id + "!")
 				libs_seen.add(library_id)
 
-				call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory, '.']
-				# call_args = ['cp', '-r', directory, '.']
+				call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory, current_dir]
+				# call_args = ['cp', '-r', directory, current_dir]
 				print(' '.join(call_args))
 				check_call(call_args)
 				counts.append(library_id)
-				fout.write(library_id + "," + library_id + "/fragments.tsv.gz," + library_id + "/singlecell.csv\n")
+				fout.write(library_id + "," + current_dir + '/' + library_id + "/fragments.tsv.gz," + current_dir + '/' + library_id + "/singlecell.csv\n")
 
 		call_args = ['cellranger-atac', 'aggr', '--id=results', '--reference=genome_dir', '--csv=aggr.csv', '--normalize=${normalize}', '--jobmode=local']
 		if '${secondary}' is not 'true':
@@ -124,6 +125,7 @@ task run_cellranger_atac_aggr {
 		CODE
 
 		gsutil -q -m rsync -d -r results/outs ${output_directory}/${aggr_id}
+		# mkdir -p ${output_directory}/${aggr_id}
 		# cp -r results/outs ${output_directory}/${aggr_id}
 	}
 
