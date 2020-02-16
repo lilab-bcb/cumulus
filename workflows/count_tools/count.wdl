@@ -200,7 +200,7 @@ task generate_count_config {
                     fo2.write(row['Sample'] + '\t' + row['Flowcells'] + '\n')
                     fo3.write(row['Sample'] + '\t' + "true\n")
                     read_item = dict()
-                    read_item['read'] = None
+                    read_item['read'] = "merged"
                     data_no_merge[row['Sample']] = read_item
                 else:
                     dir_name = input_dir_list[0]
@@ -220,7 +220,7 @@ task generate_count_config {
                             fo2.write(row['Sample'] + '\t' + row['Flowcells'] + '\n')
                             fo3.write(row['Sample'] + '\t' + "true\n")
                             read_item = dict()
-                            read_item['read'] = None
+                            read_item['read'] = "merged"
                             data_no_merge[row['Sample']] = read_item
 
         with open('samples_no_merge.json', 'w') as json_fo:
