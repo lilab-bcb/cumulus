@@ -230,7 +230,7 @@ Please see the description of inputs below. Note that required inputs are shown 
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/output_refs"
 	  -
 	* - **genome**
-	  - Output reference genome name
+	  - Output reference genome name. Output reference is a gzipped tarball with name genome_aligner.tar.gz
 	  - "GRCm38_ens97filt"
 	  -
 	* - aligner
@@ -263,10 +263,10 @@ Please see the description of inputs below. Note that required inputs are shown 
 	  - Memory size string
 	  - String
 	  - If aligner is bowtie2 or hisat2-hca, "7.2G"; otherwise "32G"
-	* - extra_disk_space
-	  - Extra disk space in GB
+	* - disk_space
+	  - Disk space in GB
 	  - Integer
-	  - 15
+	  - 120
 	* - preemptible
 	  - Number of preemptible tries
 	  - Integer
@@ -282,9 +282,9 @@ Outputs
 	* - Name
 	  - Type
 	  - Description
-	* - reference
+	* - output_reference
 	  - File
-	  - The custom Genome reference generated. Its default file name is ``rsem_ref.tar.gz``.
+	  - The custom Genome reference generated. Its default file name is ``genome_aligner.tar.gz``.
 
 
 

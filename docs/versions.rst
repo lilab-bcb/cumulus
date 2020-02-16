@@ -33,7 +33,7 @@ Latest version
 	  - `5 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2/5>`_
 	  - Run Bowtie2 and RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files
 	* - cumulus/smartseq2_create_reference
-	  - `4 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/4>`_
+	  - `7 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/7>`_
 	  - Generate user-customized genome references for SMART-Seq2 data.
 	* - cumulus/cumulus
 	  - `14 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/14>`_

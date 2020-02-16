@@ -20,8 +20,8 @@ workflow smartseq2_create_reference {
         Int cpu = 8
         # Memory to use 
         String memory = (if aligner != "star" then "7.2G" else "32G")
-        # disk space in GB
-        Int extra_disk_space = 15
+        # disk space in GB, set to 120 for STAR (STAR requires at least 100G)
+        Int disk_space = 120
         # Number of preemptible tries 
         Int preemptible = 2
         # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
@@ -43,7 +43,7 @@ workflow smartseq2_create_reference {
             preemptible=preemptible,
             cpu=cpu,
             memory=memory,
-            disk_space=extra_disk_space,
+            disk_space=disk_space,
             docker_registry=docker_registry
     }
 }
@@ -73,9 +73,9 @@ task rsem_prepare_reference {
         rsem-prepare-reference --gtf ~{gtf} --~{aligner} -p ~{cpu} ~{fasta} ~{genome}_~{aligner}/rsem_ref
         tar -czf ~{genome}_~{aligner}.tar.gz ~{genome}_~{aligner}
 
-        # gsutil -m cp ~{genome}_~{aligner}.tar.gz ~{output_dir}
-        mkdir -p ~{output_dir}
-        cp ~{genome}_~{aligner}.tar.gz ~{output_dir}
+        gsutil -m cp ~{genome}_~{aligner}.tar.gz ~{output_dir}
+        # mkdir -p ~{output_dir}
+        # cp ~{genome}_~{aligner}.tar.gz ~{output_dir}
     }
 
     output {
@@ -83,11 +83,11 @@ task rsem_prepare_reference {
     }
 
     runtime {
-        disks: "local-disk " + ceil(disk_space + 8*size(fasta,"GB") + size(gtf,"GB")) + " HDD"
+        disks: "local-disk " + disk_space + " HDD"
         docker: "~{docker_registry}/smartseq2:~{smartseq2_version}"
         zones: zones
-        preemptible: "~{preemptible}"
-        cpu:"~{cpu}"
-        memory:"~{memory}"
+        preemptible: preemptible
+        cpu: cpu
+        memory: memory
     }
 }
