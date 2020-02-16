@@ -1,3 +1,6 @@
+GRCh38_ens93filt_hisat2-hca	gs://regev-lab/resources/smartseq2/GRCh38_ens93filt_hisat2-hca.tar.gz
+GRCh38_ens93filt_star	gs://regev-lab/resources/smartseq2/GRCh38_ens93filt_star.tar.gz
+GRCh38_ens93filt_bowtie2	gs://regev-lab/resources/smartseq2/GRCh38_ens93filt_bowtie2.tar.gz
 GRCm38_ens93filt_hisat2-hca	gs://regev-lab/resources/smartseq2/GRCm38_ens93filt_hisat2-hca.tar.gz
 GRCm38_ens93filt_star	gs://regev-lab/resources/smartseq2/GRCm38_ens93filt_star.tar.gz
 GRCm38_ens93filt_bowtie2	gs://regev-lab/resources/smartseq2/GRCm38_ens93filt_bowtie2.tar.gz

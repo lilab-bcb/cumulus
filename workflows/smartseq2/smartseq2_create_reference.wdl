@@ -73,9 +73,9 @@ task rsem_prepare_reference {
         rsem-prepare-reference --gtf ~{gtf} --~{aligner} -p ~{cpu} ~{fasta} ~{genome}_~{aligner}/rsem_ref
         tar -czf ~{genome}_~{aligner}.tar.gz ~{genome}_~{aligner}
 
-        gsutil -m cp ~{genome}_~{aligner}.tar.gz ~{output_dir}
-        # mkdir -p ~{output_dir}
-        # cp ~{genome}_~{aligner}.tar.gz ~{output_dir}
+        # gsutil -m cp ~{genome}_~{aligner}.tar.gz ~{output_dir}
+        mkdir -p ~{output_dir}
+        cp ~{genome}_~{aligner}.tar.gz ~{output_dir}
     }
 
     output {
