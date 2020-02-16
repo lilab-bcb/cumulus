@@ -43,7 +43,7 @@ task run_merge_fastqs {
         read_names = pd.Series(list(map(lambda f: f.split('.')[-3].split('_')[-2], fastq_files))).unique()
         with open('fastqs.tsv', 'w') as fo:
             for rname in read_names:
-                fastq_file_name = '${output_directory}/merged_fastqs/${sample_id}/${sample_id}_' + rname + '.fastq.gz'
+                fastq_file_name = '${output_directory}/merged_fastqs/${sample_id}/${sample_id}_' + rname + '_merged.fastq.gz'
                 fo.write(rname + '\t' + fastq_file_name + '\n')
 
         fastq_dict = dict()
@@ -64,7 +64,7 @@ task run_merge_fastqs {
         for rname in read_names:
             call_args = ['cat']
             call_args.extend(fastq_dict[rname])
-            output_fastq = 'result/${sample_id}_' + rname + '.fastq.gz'
+            output_fastq = 'result/${sample_id}_' + rname + '_merged.fastq.gz'
             print(' '.join(call_args) + ' > ' + output_fastq)
             with open(output_fastq, 'w') as merge_out:
                 check_call(call_args, stdout = merge_out)
