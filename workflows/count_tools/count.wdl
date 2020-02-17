@@ -4,7 +4,7 @@ import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_merge_fastq
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_starsolo/versions/1/plain-WDL/descriptor" as sts
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_bustools/versions/1/plain-WDL/descriptor" as kbc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_alevin/versions/1/plain-WDL/descriptor" as ale
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_optimus/versions/1/plain-WDL/descriptor" as opm
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_optimus/versions/4/plain-WDL/descriptor" as opm
 
 #import "merge_fastqs.wdl" as mfs
 #import "star-solo.wdl" as sts
