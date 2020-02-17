@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/alexandria:kallisto-bustools_count/versions/1/plain-WDL/descriptor" as kbc
+import "https://api.firecloud.org/ga4gh/v1/tools/alexandria:kallisto-bustools_count/versions/2/plain-WDL/descriptor" as kbc
 # import "../../../kallisto-bustools_workflow/WDL/kallisto-bustools_count.wdl" as kbc
 
 workflow bustools {
@@ -24,7 +24,7 @@ workflow bustools {
         Int memory = 32
     }
     
-    String chemistry_str = if chemistry == 'tenX_v3' then '10XV3' else '10XV2'
+    String chemistry_str = if chemistry == 'tenX_v3' then '10XV3' else if chemistry == 'tenX_v2' then '10XV2' else ''
 
     call set_up_resources as src {
         input:
