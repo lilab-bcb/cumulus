@@ -113,6 +113,7 @@ workflow smartseq2_per_plate {
         Array[File] rsem_isoform = select_first([run_rsem_pe.rsem_isoform, run_rsem_se.rsem_isoform])
         Array[File] rsem_trans_bam = select_first([run_rsem_pe.rsem_trans_bam, run_rsem_se.rsem_trans_bam])
         Array[File] rsem_time = select_first([run_rsem_pe.rsem_time, run_rsem_se.rsem_time])
+        Array[File] aligner_log = select_first([run_rsem_pe.aligner_log, run_rsem_se.aligner_log])
         Array[File] rsem_cnt = select_first([run_rsem_pe.rsem_cnt, run_rsem_se.rsem_cnt])
         Array[File] rsem_model = select_first([run_rsem_pe.rsem_model, run_rsem_se.rsem_model])
         Array[File] rsem_theta = select_first([run_rsem_pe.rsem_theta, run_rsem_se.rsem_theta])
@@ -200,6 +201,7 @@ task run_rsem {
 		File rsem_isoform = "~{sample_name}.isoforms.results"
 		File rsem_trans_bam = "~{sample_name}.transcript.bam"
 		File rsem_time = "~{sample_name}.time"
+		File aligner_log = "~{sample_name}.log"
 		File rsem_cnt = "~{sample_name}.stat/~{sample_name}.cnt"
 		File rsem_model = "~{sample_name}.stat/~{sample_name}.model"
 		File rsem_theta = "~{sample_name}.stat/~{sample_name}.theta"

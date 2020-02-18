@@ -52,15 +52,15 @@ Follow the steps below to extract gene-count matrices from SMART-Seq2 data on Te
 		* - Read1
 		  - Location of the FASTQ file for read1 in the cloud (gsurl).
 		* - Read2
-		  - Location of the FASTQ file for read1 in the cloud (gsurl).
+		  - (Optional). Location of the FASTQ file for read2 in the cloud (gsurl). This field can be skipped for single-end reads.
 
 	Example::
 
 		Cell,Plate,Read1,Read2
 		cell-1,plate-1,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-1_L001_R1_001.fastq.gz,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-1_L001_R2_001.fastq.gz
 		cell-2,plate-1,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-2_L001_R1_001.fastq.gz,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-2_L001_R2_001.fastq.gz
-		cell-3,plate-2,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-3_L001_R1_001.fastq.gz,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-3_L001_R2_001.fastq.gz
-		cell-4,plate-2,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-4_L001_R1_001.fastq.gz,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-4_L001_R2_001.fastq.gz
+		cell-3,plate-2,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-3_L001_R1_001.fastq.gz,
+		cell-4,plate-2,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-4_L001_R1_001.fastq.gz,
 
 
 #. Upload your sample sheet to the workspace bucket.
@@ -107,15 +107,21 @@ Please see the description of inputs below. Note that required inputs are shown 
 	* - **reference**
 	  - Reference transcriptome to align reads to. Acceptable values:
 
-	  	- Pre-created genome references: "GRCh38" for human; "GRCm38" and "mm10" for mouse.
+	    - Pre-created genome references: 
+	  	  - "GRCh38_ens93filt" for human, genome version is GRCh38, gene annotation is generated using human Ensembl 93 GTF according to `cellranger mkgtf`_;
+	  	  - "GRCm38_ens93filt" for mouse, genome version is GRCm38, gene annotation is generated using mouse Ensembl 93 GTF according to `cellranger mkgtf`_;
 	  	- Create a custom genome reference using `smartseq2_create_reference workflow <./smart_seq_2.html#custom-genome>`_, and specify its Google bucket URL here. 
-	  - | "GRCh38", or
+	  - | "GRCh38_ens93filt", or
 	    | "gs://fc-e0000000-0000-0000-0000-000000000000/rsem_ref.tar.gz"
 	  - 
+	* - aligner
+	  - Which aligner to use for read alignment. Options are "hisat2-hca", "star" and "bowtie"
+	  - "star"
+	  - "hisat2-hca"
 	* - smartseq2_version
-	  - SMART-Seq2 version to use. Versions available: 1.0.0.
-	  - "1.0.0"
-	  - "1.0.0"
+	  - SMART-Seq2 version to use. Versions available: 1.1.0.
+	  - "1.1.0"
+	  - "1.1.0"
 	* - docker_registry
 	  - Docker registry to use. Options:
 
@@ -127,7 +133,7 @@ Please see the description of inputs below. Note that required inputs are shown 
 	* - zones
 	  - Google cloud zones
 	  - "us-east1-d us-west1-a us-west1-b"
-	  - "us-east1-d us-west1-a us-west1-b"
+	  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 	* - num_cpu
 	  - Number of cpus to request for one node
 	  - 4
@@ -136,9 +142,13 @@ Please see the description of inputs below. Note that required inputs are shown 
 	  - Memory size string
 	  - "3.60G"
 	  - "3.60G"
-	* - disk_space
-	  - Disk space in GB
-	  - 10
+	* - disk_space_multiplier
+	  - Factor to multiply size of R1 and R2 by for RSEM
+	  - Float
+	  - 11
+	* - generate_count_matrix_disk_space
+	  - Disk space for count matrix generation task in GB
+	  - Integer
 	  - 10
 	* - preemptible
 	  - Number of preemptible tries
@@ -150,9 +160,6 @@ Please see the description of inputs below. Note that required inputs are shown 
 Outputs:
 ^^^^^^^^
 
-See the table below for important outputs.
-
-
 .. list-table::
 	:widths: 5 5 10
 	:header-rows: 1
@@ -163,6 +170,37 @@ See the table below for important outputs.
 	* - output_count_matrix
 	  - Array[String]
 	  - A list of google bucket urls containing gene-count matrices, one per plate. Each gene-count matrix file has the suffix ``.dge.txt.gz``.
+	* - output_qc_report
+	  - Array[String]
+	  - A list of google bucket urls containing simple quality control statistics, one per plate. Each file contains one line per cell and each line has three columns: Total reads, Alignment rate and Unique rate.
+	* - rsem_gene
+	  - Array[Array[File]]
+	  - A 2D array of RSEM gene expression estimation files.
+	* - rsem_gene
+	  - Array[Array[File]]
+	  - A 2D array of RSEM gene expression estimation files.
+	* - rsem_isoform
+	  - Array[Array[File]]
+	  - A 2D array of RSEM isoform expression estimation files.
+	* - rsem_trans_bam
+	  - Array[Array[File]]
+	  - A 2D array of RSEM transcriptomic BAM files.
+	* - rsem_time
+	  - Array[Array[File]]
+	  - A 2D array of RSEM execution time log files.
+	* - aligner_log
+	  - Array[Array[File]]
+	  - A 2D array of Aligner log files.
+	* - rsem_cnt
+	  - Array[Array[File]]
+	  - A 2D array of RSEM count files.
+	* - rsem_model
+	  - Array[Array[File]]
+	  - A 2D array of RSEM model files.
+	* - rsem_theta
+	  - Array[Array[File]]
+	  - A 2D array of RSEM generated theta files.
+
 
 This WDL generates one gene-count matrix per SMART-Seq2 plate. The gene-count matrix uses Drop-Seq format: 
 
@@ -179,7 +217,6 @@ TPM-normalized counts are calculated as follows:
 #. Suppose ``c`` reads are achieved for one cell, then calculate TPM-normalized count for gene ``i`` as ``TPM_i / 1e6 * c``. 
 
 TPM-normalized counts reflect both the relative expression levels and the cell sequencing depth.
-
 
 
 ---------------------------------
@@ -293,5 +330,6 @@ Outputs
 
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
 .. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
+.. _cellranger mkgtf: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/advanced/references
 .. _Terra: https://app.terra.bio/
 

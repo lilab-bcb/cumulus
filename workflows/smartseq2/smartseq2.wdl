@@ -1,7 +1,7 @@
 version 1.0
 
-# import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:smartseq2_per_plate/versions/3/plain-WDL/descriptor" as ss2pp
-import "smartseq2_per_plate.wdl" as ss2pp
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:smartseq2_per_plate/versions/5/plain-WDL/descriptor" as ss2pp
+# import "smartseq2_per_plate.wdl" as ss2pp
 
 workflow smartseq2 {
 	input {
@@ -69,6 +69,7 @@ workflow smartseq2 {
         Array[Array[File]] rsem_isoform = smartseq2_per_plate.rsem_isoform
         Array[Array[File]] rsem_trans_bam = smartseq2_per_plate.rsem_trans_bam
         Array[Array[File]] rsem_time = smartseq2_per_plate.rsem_time
+        Array[Array[File]] aligner_log = smartseq2_per_plate.aligner_log
         Array[Array[File]] rsem_cnt =smartseq2_per_plate.rsem_cnt
         Array[Array[File]] rsem_model = smartseq2_per_plate.rsem_model
         Array[Array[File]] rsem_theta = smartseq2_per_plate.rsem_theta
@@ -105,8 +106,8 @@ task parse_input_csv {
 				else:
 					plate_df = plate_df[['Read1', 'Read2']]
 				plate_df.to_csv(plate_name + '_sample_sheet.csv')
-				# call_args = ['gsutil', '-q', 'cp', plate_name + '_sample_sheet.csv', '~{output_directory}/']
-				call_args = ['cp', plate_name + '_sample_sheet.csv', '~{output_directory}/']
+				call_args = ['gsutil', '-q', 'cp', plate_name + '_sample_sheet.csv', '~{output_directory}/']
+				# call_args = ['cp', plate_name + '_sample_sheet.csv', '~{output_directory}/']
 				print(' '.join(call_args))
 				check_call(call_args)
 				fo1.write(plate_name + '\n')
