@@ -93,7 +93,7 @@ workflow count {
                         sample_id = sample_id,
                         r1_fastq = fastqs['R1'],
                         r2_fastq = fastqs['R2'],
-                        genome_url = genome_url + '/starsolo.tar',
+                        genome_url = genome_url + '/starsolo.tar.gz',
                         chemistry = chemistry,
                         output_directory = output_directory,
                         num_cpu = num_cpu,
