@@ -30,10 +30,10 @@ Latest version
 	  - `1 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_vdj_create_reference/1>`_
 	  - Run Cell Ranger tools to build single-cell immune profiling references.
 	* - cumulus/smartseq2
-	  - `5 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2/5>`_
-	  - Run Bowtie2 and RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files
+	  - `7 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2/7>`_
+	  - Run HISAT2/STAR/Bowtie2-RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files
 	* - cumulus/smartseq2_create_reference
-	  - `4 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/4>`_
+	  - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/8>`_
 	  - Generate user-customized genome references for SMART-Seq2 data.
 	* - cumulus/cumulus
 	  - `15 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/15>`_
