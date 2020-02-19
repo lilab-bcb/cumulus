@@ -17,11 +17,11 @@ workflow smartseq2_create_reference {
         # Google Cloud Zones
         String zones = "us-central1-b"
         # Number of cpus per job
-        Int cpu = 8
+        Int cpu = (if aligner != "star" then 8 else 32)
         # Memory to use 
-        String memory = (if aligner != "star" then "7.2G" else "32G")
+        String memory = (if aligner != "star" then "7.2G" else "120G")
         # disk space in GB, set to 120 for STAR (STAR requires at least 100G)
-        Int disk_space = 120
+        Int disk_space = (if aligner != "star" then 40 else 120)
         # Number of preemptible tries 
         Int preemptible = 2
         # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
@@ -36,7 +36,7 @@ workflow smartseq2_create_reference {
             fasta=fasta,
             gtf=gtf,
             output_dir = output_directory_stripped,
-            reference_name = reference,
+            reference_name = reference_name,
             aligner = aligner,
             smartseq2_version=smartseq2_version,
             zones=zones,
@@ -80,6 +80,7 @@ task rsem_prepare_reference {
 
     output {
         File output_reference = "~{reference_name}_~{aligner}.tar.gz"
+        File monitoring_log = "monitoring.log"
     }
 
     runtime {

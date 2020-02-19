@@ -295,15 +295,15 @@ Please see the description of inputs below. Note that required inputs are shown 
 	* - cpu
 	  - Number of CPUs
 	  - Integer
-	  - 8
+	  - If aligner is bowtie2 or hisat2-hca, 8; otherwise 32
 	* - memory
 	  - Memory size string
 	  - String
-	  - If aligner is bowtie2 or hisat2-hca, "7.2G"; otherwise "32G"
+	  - If aligner is bowtie2 or hisat2-hca, "7.2G"; otherwise "120G"
 	* - disk_space
 	  - Disk space in GB
 	  - Integer
-	  - 120
+	  - If aligner is bowtie2 or hisat2-hca, 40; otherwise 120
 	* - preemptible
 	  - Number of preemptible tries
 	  - Integer
@@ -322,6 +322,9 @@ Outputs
 	* - output_reference
 	  - File
 	  - The custom Genome reference generated. Its default file name is ``genome_aligner.tar.gz``.
+	* - monitoring_log
+	  - File
+	  - CPU and memory profiling log.
 
 
 
