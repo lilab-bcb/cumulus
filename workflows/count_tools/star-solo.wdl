@@ -8,13 +8,13 @@ workflow starsolo {
         String genome_url
         String chemistry
         String output_directory
-        Int num_cpu
+        Int num_cpu = 32
         String star_version
         String docker_registry = "cumulusprod"
         Int disk_space = 100
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-        Int memory = 32
+        Int memory = 100
     }
 
     ## Determine solo_type
@@ -77,8 +77,9 @@ task run_star_solo {
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
 
-        tar -zxvf ${genome}
-        rm ${genome}
+        mkdir genome_ref
+        tar -zxf "~{genome}" -C genome_ref --strip-components 1
+        rm "~{genome}"
 
         mkdir result
         
@@ -86,38 +87,38 @@ task run_star_solo {
         import os
         from subprocess import check_call
 
-        call_args = ['STAR', '--soloType', '${solo_type}', '--soloCBwhitelist', '${whitelist}', '--genomeDir', 'starsolo-ref', '--runThreadN', '${num_cpu}']
-        if '${chemistry}' is 'tenX_v3':
+        call_args = ['STAR', '--soloType', '~{solo_type}', '--soloCBwhitelist', '~{whitelist}', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}', '--outSAMtype', 'BAM', 'Unsorted', '--outSAMheaderHD', '\\@HD', 'VN:1.4', 'SO:unsorted']
+        if '~{chemistry}' is 'tenX_v3':
             call_args.extend(['--soloUMIlen', '12'])
 
-        file_ext = os.path.splitext('${r1_fastq}')[-1]
+        file_ext = os.path.splitext('~{r1_fastq}')[-1]
         if file_ext == '.gz':
             call_args.extend(['--readFilesCommand', 'zcat'])
 
-        call_args.extend(['--readFilesIn', '${r2_fastq}', '${r1_fastq}'])
-        call_args.extend(['--outFileNamePrefix', 'result/'])
+        call_args.extend(['--readFilesIn', '~{r2_fastq}', '~{r1_fastq}'])
+        call_args.extend(['--outFileNamePrefix', 'result/~{sample_id}_'])
 
         print(' '.join(call_args))
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -r result ${output_directory}/${sample_id}
-        # mkdir -p ${output_directory}/${sample_id}
-        # cp -r result/* ${output_directory}/${sample_id}
+        gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
+        # mkdir -p ~{output_directory}/~{sample_id}
+        # cp -r result/* ~{output_directory}/~{sample_id}
 
     }
 
     output {
         File monitoringLog = 'monitoring.log'
-        String output_folder = '${output_directory}/${sample_id}'
+        String output_folder = '~{output_directory}/~{sample_id}'
     }
 
     runtime {
-        docker: "${docker_registry}/starsolo:${star_version}"
+        docker: "~{docker_registry}/starsolo:~{star_version}"
         zones: zones
-        memory: "${memory}G"
-        disks: "local-disk ${disk_space} HDD"
-        cpu: "${num_cpu}"
-        preemptible: "${preemptible}"
+        memory: "~{memory}G"
+        disks: "local-disk ~{disk_space} HDD"
+        cpu: "~{num_cpu}"
+        preemptible: "~{preemptible}"
     }
 }

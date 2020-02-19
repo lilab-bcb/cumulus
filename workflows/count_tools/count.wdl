@@ -1,7 +1,7 @@
 version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_merge_fastqs/versions/4/plain-WDL/descriptor" as mfs
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_starsolo/versions/1/plain-WDL/descriptor" as sts
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_starsolo/versions/7/plain-WDL/descriptor" as sts
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_bustools/versions/1/plain-WDL/descriptor" as kbc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_alevin/versions/1/plain-WDL/descriptor" as ale
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_optimus/versions/4/plain-WDL/descriptor" as opm
@@ -29,23 +29,29 @@ workflow count {
         Int disk_space = 100
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-        Int memory = 32
+
+        # Merge-Fastqs
+        Int merge_fastqs_memory = 32
 
         # Star-Solo
         String starsolo_star_version = "2.7.3a"
+        Int starsolo_memory = 120
 
         # Alevin
         String alevin_version = '1.1'
+        Int alevin_memory = 32
 
         # Bustools
         Boolean bustools_output_loom = false
         Boolean bustools_output_h5ad = false
         String bustools_docker = "shaleklab/kallisto-bustools"
         String bustools_version = '0.24.4'
+        Int bustools_memory = 32
 
         # Optimus
         String optimus_version = 'optimus_v1.4.0'
         Boolean optimus_output_loom = false
+        Int optimus_memory = 32
     }
 
     call generate_count_config as Config {
@@ -74,7 +80,7 @@ workflow count {
                         docker_registry = docker_registry,
                         disk_space = disk_space,
                         zones = zones,
-                        memory = memory,
+                        memory = merge_fastqs_memory,
                         preemptible = preemptible
                 }
             }
@@ -87,7 +93,7 @@ workflow count {
                         sample_id = sample_id,
                         r1_fastq = fastqs['R1'],
                         r2_fastq = fastqs['R2'],
-                        genome_url = genome_url + '/starsolo.tar.gz',
+                        genome_url = genome_url + '/starsolo.tar',
                         chemistry = chemistry,
                         output_directory = output_directory,
                         num_cpu = num_cpu,
@@ -96,7 +102,7 @@ workflow count {
                         disk_space = disk_space,
                         preemptible = preemptible,
                         zones = zones,
-                        memory = memory
+                        memory = starsolo_memory
                 }
             }
 
@@ -115,7 +121,7 @@ workflow count {
                         disk_space = disk_space,
                         preemptible = preemptible,
                         zones = zones,
-                        memory = memory
+                        memory = alevin_memory
                 }
             }
 
@@ -135,7 +141,7 @@ workflow count {
                         disk_space = disk_space,
                         preemptible = preemptible,
                         zones = zones,
-                        memory = memory
+                        memory = bustools_memory
                 }
             }
 
@@ -155,7 +161,7 @@ workflow count {
                         disk_space = disk_space,
                         preemptible = preemptible,
                         zones = zones,
-                        memory = memory
+                        memory = optimus_memory
                 }
             }
 
@@ -185,7 +191,7 @@ task generate_count_config {
         import pandas as pd
         from subprocess import check_call
 
-        df = pd.read_csv('${input_tsv_file}', sep = '\t', header = 0, dtype = str, index_col = False)
+        df = pd.read_csv('~{input_tsv_file}', sep = '\t', header = 0, dtype = str, index_col = False)
         for c in df.columns:
             df[c] = df[c].str.strip()
 
@@ -243,8 +249,8 @@ task generate_count_config {
     }
 
     runtime {
-        docker: "${docker_registry}/count"
+        docker: "~{docker_registry}/count"
         zones: zones
-        preemptible: "${preemptible}"
+        preemptible: "~{preemptible}"
     }
 }
