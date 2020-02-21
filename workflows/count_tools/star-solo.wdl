@@ -14,7 +14,7 @@ workflow starsolo {
         Int disk_space = 100
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-        Int memory = 100
+        Int memory = 120
     }
 
     ## Determine solo_type
@@ -102,7 +102,7 @@ task run_star_solo {
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
+        gsutil -m rsync -r result ~{output_directory}/~{sample_id}
         # mkdir -p ~{output_directory}/~{sample_id}
         # cp -r result/* ~{output_directory}/~{sample_id}
 
