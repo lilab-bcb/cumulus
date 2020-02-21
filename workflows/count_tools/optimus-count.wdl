@@ -86,24 +86,25 @@ task get_reference {
         set -e
         export TMPDIR=/tmp
 
-        tar -zxvf ${genome}
-        rm ${genome}
+        mkdir genome_ref
+        tar -zxf "~{genome}" -C genome_ref --strip-components 1
+        rm "~{genome}"
     }
 
     output {
-        File star_gz = 'optimus-ref/star.tar.gz'
-        File fasta = 'optimus-ref/genome.fa'
-        File gtf = 'optimus-ref/genes.gtf'
+        File star_gz = 'genome_ref/star.tar.gz'
+        File fasta = 'genome_ref/genome.fa'
+        File gtf = 'genome_ref/genes.gtf'
     }
 
     runtime {
-        docker: "${docker_registry}/count"
+        docker: "~{docker_registry}/count"
         zones: zones
         memory: memory
         bootDiskSizeGb: 12
-        disks: "local-disk ${disk_space} HDD"
+        disks: "local-disk ~{disk_space} HDD"
         cpu: 1
-        preemptible: "${preemptible}"
+        preemptible: "~{preemptible}"
     }
 
 }
@@ -127,29 +128,29 @@ task organize_result {
         export TMPDIR=/tmp
 
         mkdir output
-        cp ${sep=" " results} output
+        cp ~{sep=" " results} output
 
         mkdir output/zarr_output
-        cp ${sep=" " zarr_files} output/zarr_output
+        cp ~{sep=" " zarr_files} output/zarr_output
 
-        cp ${loom_file} output
+        cp ~{loom_file} output
 
-        gsutil -q -m rsync -r output ${output_directory}/${sample_id}
-        # mkdir -p ${output_directory}/${sample_id}
-        # cp -r output/* ${output_directory}/${sample_id}
+        gsutil -q -m rsync -r output ~{output_directory}/~{sample_id}
+        # mkdir -p ~{output_directory}/~{sample_id}
+        # cp -r output/* ~{output_directory}/~{sample_id}
     }
 
     output {
-        String output_folder = "${output_directory}/${sample_id}"
+        String output_folder = "~{output_directory}/~{sample_id}"
     }
 
     runtime {
-        docker: "${docker_registry}/count"
+        docker: "~{docker_registry}/count"
         zones: zones
         memory: memory
         bootDiskSizeGb: 12
-        disks: "local-disk ${disk_space} HDD"
+        disks: "local-disk ~{disk_space} HDD"
         cpu: 2
-        preemptible: "${preemptible}"
+        preemptible: "~{preemptible}"
     }
 }
