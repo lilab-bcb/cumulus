@@ -27,6 +27,7 @@ workflow count {
         String docker_registry = "cumulusprod"
         Int num_cpu = 32
         Int disk_space = 500
+        Int memory = 120
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 
@@ -35,23 +36,19 @@ workflow count {
 
         # Star-Solo
         String starsolo_star_version = "2.7.3a"
-        Int starsolo_memory = 120
 
         # Alevin
         String alevin_version = '1.1'
-        Int alevin_memory = 32
 
         # Bustools
         Boolean bustools_output_loom = false
         Boolean bustools_output_h5ad = false
         String bustools_docker = "shaleklab/kallisto-bustools"
         String bustools_version = '0.24.4'
-        Int bustools_memory = 32
 
         # Optimus
         String optimus_version = 'optimus_v1.4.0'
         Boolean optimus_output_loom = false
-        Int optimus_memory = 32
     }
 
     call generate_count_config as Config {
@@ -102,7 +99,7 @@ workflow count {
                         disk_space = disk_space,
                         preemptible = preemptible,
                         zones = zones,
-                        memory = starsolo_memory
+                        memory = memory
                 }
             }
 
@@ -121,7 +118,7 @@ workflow count {
                         disk_space = disk_space,
                         preemptible = preemptible,
                         zones = zones,
-                        memory = alevin_memory
+                        memory = memory
                 }
             }
 
@@ -141,7 +138,7 @@ workflow count {
                         disk_space = disk_space,
                         preemptible = preemptible,
                         zones = zones,
-                        memory = bustools_memory
+                        memory = memory
                 }
             }
 
@@ -161,7 +158,7 @@ workflow count {
                         disk_space = disk_space,
                         preemptible = preemptible,
                         zones = zones,
-                        memory = optimus_memory
+                        memory = memory
                 }
             }
 
