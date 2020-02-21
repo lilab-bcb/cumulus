@@ -141,7 +141,7 @@ Please see the description of inputs below. Note that required inputs are shown 
 	* - memory
 	  - Memory size string
 	  - "3.60G"
-	  - "3.60G"
+	  - If aligner is bowtie2 or hisat2-hca, "3.6G"; otherwise "32G"
 	* - disk_space_multiplier
 	  - Factor to multiply size of R1 and R2 by for RSEM
 	  - Float
