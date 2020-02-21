@@ -76,13 +76,14 @@ task set_up_resources {
         set -e
         export TMPDIR=/tmp
 
-        tar -zxvf ${genome}
-        rm ${genome}
+        mkdir genome_ref
+        tar -zxf "~{genome}" -C genome_ref --strip-components 1
+        rm "~{genome}"
 
         python <<CODE
         import os
 
-        dir_list = '${output_directory}'[5:].split('/')
+        dir_list = '~{output_directory}'[5:].split('/')
         bucket = 'gs://' + dir_list[0]
         output_path = '/'.join(dir_list[1:])
 
@@ -96,14 +97,14 @@ task set_up_resources {
     output {
         String bucket = read_string('bucket.txt')
         String output_path = read_string('output_path.txt')
-        File output_index = 'bustools-ref/transcriptome.idx'
-        File output_t2g = 'bustools-ref/transcripts_to_genes.txt'
-        File output_fasta_file = 'bustools-ref/cdna.fa'
+        File output_index = 'genome_ref/transcriptome.idx'
+        File output_t2g = 'genome_ref/transcripts_to_genes.txt'
+        File output_fasta_file = 'genome_ref/cdna.fa'
     }
 
     runtime {
-        docker: "${docker_registry}/count"
+        docker: "~{docker_registry}/count"
         zones: zones
-        preemptible: "${preemptible}"
+        preemptible: "~{preemptible}"
     }
 }

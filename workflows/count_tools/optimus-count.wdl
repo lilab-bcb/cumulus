@@ -29,7 +29,7 @@ workflow optimus_count {
     
     call get_reference as ref {
         input:
-            genome_url = genome_url,
+            genome = genome_url,
             docker_registry = docker_registry,
             disk_space = disk_space,
             zones = zones,
@@ -37,13 +37,13 @@ workflow optimus_count {
             preemptible = preemptible
     }
 
-    call opm.Optimus as Optimus {
+    call opm.Optimus as optimus {
         input:
             version = version,
             sample_id = sample_id,
             r1_fastq = [r1_fastq],
             r2_fastq = [r2_fastq],
-            i1_fastq = if defined(i1_fastq) then [i1_fastq] else '',
+            i1_fastq = select_all([i1_fastq]),
             tar_star_reference = ref.star_gz,
             annotations_gtf = ref.gtf,
             ref_genome_fasta = ref.fasta,
@@ -57,9 +57,9 @@ workflow optimus_count {
         input:
             output_directory = output_directory,
             sample_id = sample_id,
-            results = [Optimus.bam, Optimus.matrix, Optimus.matrix_row_index, Optimus.matrix_col_index, Optimus.cell_metrics, Optimus.gene_metrics, Optimus.cell_calls],
-            zarr_files = Optimus.zarr_output_files,
-            loom_file = Optimus.loom_output_file,
+            results = [optimus.bam, optimus.matrix, optimus.matrix_row_index, optimus.matrix_col_index, optimus.cell_metrics, optimus.gene_metrics, optimus.cell_calls],
+            zarr_files = optimus.zarr_output_files,
+            loom_file = optimus.loom_output_file,
             docker_registry = docker_registry,
             disk_space = disk_space,
             zones = zones,
@@ -74,7 +74,7 @@ workflow optimus_count {
 
 task get_reference {
     input {
-        String genome_url
+        File genome
         String docker_registry
         Int disk_space
         String zones
@@ -86,26 +86,25 @@ task get_reference {
         set -e
         export TMPDIR=/tmp
 
-        gsutil -q -m cp ${genome_url} optimus.tar.gz
-        # cp ${genome_url} optimus.tar.gz
-        tar -zxvf optimus.tar.gz
-        rm optimus.tar.gz
+        mkdir genome_ref
+        tar -zxf "~{genome}" -C genome_ref --strip-components 1
+        rm "~{genome}"
     }
 
     output {
-        File star_gz = 'optimus-ref/star.tar/gz'
-        File fasta = 'optimus-ref/genome.fa'
-        File gtf = 'optimus-ref/genes.gtf'
+        File star_gz = 'genome_ref/star.tar.gz'
+        File fasta = 'genome_ref/genome.fa'
+        File gtf = 'genome_ref/genes.gtf'
     }
 
     runtime {
-        docker: "${docker_registry}/count"
+        docker: "~{docker_registry}/count"
         zones: zones
         memory: memory
         bootDiskSizeGb: 12
-        disks: "local-disk ${disk_space} HDD"
+        disks: "local-disk ~{disk_space} HDD"
         cpu: 1
-        preemptible: "${preemptible}"
+        preemptible: "~{preemptible}"
     }
 
 }
@@ -129,29 +128,29 @@ task organize_result {
         export TMPDIR=/tmp
 
         mkdir output
-        cp ${sep=" " results} output
+        cp ~{sep=" " results} output
 
         mkdir output/zarr_output
-        cp ${sep=" " zarr_files} output/zarr_output
+        cp ~{sep=" " zarr_files} output/zarr_output
 
-        cp ${loom_file} output
+        cp ~{loom_file} output
 
-        gsutil -q -m rsync -r output ${output_directory}/${sample_id}
-        # mkdir -p ${output_directory}/${sample_id}
-        # cp -r output/* ${output_directory}/${sample_id}
+        gsutil -q -m rsync -r output ~{output_directory}/~{sample_id}
+        # mkdir -p ~{output_directory}/~{sample_id}
+        # cp -r output/* ~{output_directory}/~{sample_id}
     }
 
     output {
-        String output_folder = "${output_directory}/${sample_id}"
+        String output_folder = "~{output_directory}/~{sample_id}"
     }
 
     runtime {
-        docker: "${docker_registry}/count"
+        docker: "~{docker_registry}/count"
         zones: zones
         memory: memory
         bootDiskSizeGb: 12
-        disks: "local-disk ${disk_space} HDD"
+        disks: "local-disk ~{disk_space} HDD"
         cpu: 2
-        preemptible: "${preemptible}"
+        preemptible: "~{preemptible}"
     }
 }

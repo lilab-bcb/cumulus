@@ -24,7 +24,7 @@ task run_merge_fastqs {
         import numpy as np
         from subprocess import check_call
 
-        input_dir_list = list(map(lambda x: x.strip(), "${fastq_directories}".split(',')))
+        input_dir_list = list(map(lambda x: x.strip(), "~{fastq_directories}".split(',')))
         dir_count = 0
         for directory in input_dir_list:
             call_args = ['mkdir', '-p', str(dir_count)]
@@ -43,7 +43,7 @@ task run_merge_fastqs {
         read_names = pd.Series(list(map(lambda f: f.split('.')[-3].split('_')[-2], fastq_files))).unique()
         with open('fastqs.tsv', 'w') as fo:
             for rname in read_names:
-                fastq_file_name = '${output_directory}/merged_fastqs/${sample_id}/${sample_id}_' + rname + '_merged.fastq.gz'
+                fastq_file_name = '~{output_directory}/merged_fastqs/~{sample_id}/~{sample_id}_' + rname + '_merged.fastq.gz'
                 fo.write(rname + '\t' + fastq_file_name + '\n')
 
         fastq_dict = dict()
@@ -64,15 +64,15 @@ task run_merge_fastqs {
         for rname in read_names:
             call_args = ['cat']
             call_args.extend(fastq_dict[rname])
-            output_fastq = 'result/${sample_id}_' + rname + '_merged.fastq.gz'
+            output_fastq = 'result/~{sample_id}_' + rname + '_merged.fastq.gz'
             print(' '.join(call_args) + ' > ' + output_fastq)
             with open(output_fastq, 'w') as merge_out:
                 check_call(call_args, stdout = merge_out)
         CODE
 
-        gsutil -q -m rsync -r result ${output_directory}/merged_fastqs/${sample_id}
-        # mkdir -p ${output_directory}/merged_fastqs/${sample_id}
-        # cp result/* ${output_directory}/merged_fastqs/${sample_id}
+        gsutil -q -m rsync -r result ~{output_directory}/merged_fastqs/~{sample_id}
+        # mkdir -p ~{output_directory}/merged_fastqs/~{sample_id}
+        # cp result/* ~{output_directory}/merged_fastqs/~{sample_id}
     }
 
     output {
@@ -81,12 +81,12 @@ task run_merge_fastqs {
     }
 
     runtime {
-        docker: "${docker_registry}/count"
+        docker: "~{docker_registry}/count"
         zones: zones
         memory: memory
         bootDiskSizeGb: 12
-        disks: "local-disk ${disk_space} HDD"
+        disks: "local-disk ~{disk_space} HDD"
         cpu: 3
-        preemptible: "${preemptible}"
+        preemptible: "~{preemptible}"
     }
 }

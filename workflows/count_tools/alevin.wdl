@@ -76,49 +76,50 @@ task run_alevin {
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
 
-        tar -zxvf ${genome}
-        rm ${genome}
+        mkdir genome_ref
+        tar -zxf "~{genome}" -C genome_ref --strip-components 1
+        rm "~{genome}"
 
         python <<CODE
         from subprocess import check_call
 
-        call_args = ['salmon', 'alevin', '-l', '${library_type}']
-        call_args.extend(['-1', '${r1_fastq}'])
-        call_args.extend(['-2', '${r2_fastq}'])
-        call_args.extend(['-i', 'alevin-ref/salmon_index'])
+        call_args = ['salmon', 'alevin', '-l', '~{library_type}']
+        call_args.extend(['-1', '~{r1_fastq}'])
+        call_args.extend(['-2', '~{r2_fastq}'])
+        call_args.extend(['-i', 'genome_ref/salmon_index'])
         
-        if '${chemistry}' is 'tenX_v3':
+        if '~{chemistry}' is 'tenX_v3':
             call_args.append('--chromiumV3')
-        elif '${chemistry}' is 'tenX_v2':
+        elif '~{chemistry}' is 'tenX_v2':
             call_args.append('--chromium')
         else:
             call_args.append('--dropseq')
 
-        if '${chemistry}' in ['tenX_v2', 'tenX_v3']:
-            call_args.extend(['--whitelist', '${whitelist}'])
+        if '~{chemistry}' in ['tenX_v2', 'tenX_v3']:
+            call_args.extend(['--whitelist', '~{whitelist}'])
 
-        call_args.extend(['-p', '${num_cpu}', '-o', 'result', '--tgMap', 'alevin-ref/txp2gene.tsv'])
+        call_args.extend(['-p', '~{num_cpu}', '-o', 'result', '--tgMap', 'genome_ref/txp2gene.tsv'])
 
         print(' '.join(call_args))
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -r result ${output_directory}/${sample_id}
-        # mkdir -p ${output_directory}/${sample_id}
-        # cp -r result/* ${output_directory}/${sample_id}
+        gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
+        # mkdir -p ~{output_directory}/~{sample_id}
+        # cp -r result/* ~{output_directory}/~{sample_id}
     }
 
     output {
         File monitoringLog = 'monitoring.log'
-        String output_folder = '${output_directory}/${sample_id}'
+        String output_folder = '~{output_directory}/~{sample_id}'
     }
 
     runtime {
-        docker: "${docker_registry}/alevin:${alevin_version}"
+        docker: "~{docker_registry}/alevin:~{alevin_version}"
         zones: zones
-        memory: "${memory}G"
-        disks: "local-disk ${disk_space} HDD"
-        cpu: "${num_cpu}"
-        preemptible: "${preemptible}"
+        memory: "~{memory}G"
+        disks: "local-disk ~{disk_space} HDD"
+        cpu: "~{num_cpu}"
+        preemptible: "~{preemptible}"
     }
 }
