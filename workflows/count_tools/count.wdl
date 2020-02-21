@@ -26,7 +26,7 @@ workflow count {
 
         String docker_registry = "cumulusprod"
         Int num_cpu = 32
-        Int disk_space = 100
+        Int disk_space = 500
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 
