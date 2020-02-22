@@ -15,13 +15,12 @@ workflow bustools {
         Boolean output_loom
         Boolean output_h5ad  
 
-        String? docker = "shaleklab/kallisto-bustools"
         String docker_registry = "cumulusprod"
-        String? bustools_version = '0.24.4'
-        Int disk_space = 100
+        String bustools_version = '0.24.4'
+        Int disk_space = 500
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-        Int memory = 32
+        Int memory = 120
     }
     
     String chemistry_str = if chemistry == 'tenX_v3' then '10XV3' else if chemistry == 'tenX_v2' then '10XV2' else ''
@@ -37,12 +36,13 @@ workflow bustools {
 
     call kbc.kallisto_bustools_count as kallisto_bustools_count {
         input:
-            docker = docker + ':' + bustools_version,
+            docker = "shaleklab/kallisto-bustools:" + bustools_version,
             number_cpu_threads = num_cpu,
             task_memory_GB = memory,
             preemptible = preemptible,
             zones = zones,
             boot_disk_size_GB = 12,
+            disks = "local-disk " + disk_space + " HDD",
             bucket = src.bucket,
             output_path = src.output_path,
             index = src.output_index,
