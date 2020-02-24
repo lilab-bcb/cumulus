@@ -38,7 +38,7 @@ workflow bustools {
         input:
             docker = "shaleklab/kallisto-bustools:" + bustools_version,
             number_cpu_threads = num_cpu,
-            task_memory_GB = memory,
+            task_memory_GB = memory / 5 * 6,
             preemptible = preemptible,
             zones = zones,
             boot_disk_size_GB = 12,
@@ -52,7 +52,7 @@ workflow bustools {
             sample_name = sample_id,
             R2_fastq = r2_fastq,
             use_lamanno = false,
-            bustools_filter = false,
+            bustools_filter = true,
             loom = output_loom,
             h5ad = output_h5ad,
             delete_bus_files = false

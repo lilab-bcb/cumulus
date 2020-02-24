@@ -2,7 +2,7 @@ version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_merge_fastqs/versions/5/plain-WDL/descriptor" as mfs
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_starsolo/versions/10/plain-WDL/descriptor" as sts
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_bustools/versions/2/plain-WDL/descriptor" as kbc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_bustools/versions/3/plain-WDL/descriptor" as kbc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_alevin/versions/2/plain-WDL/descriptor" as ale
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_optimus/versions/5/plain-WDL/descriptor" as opm
 
@@ -135,6 +135,7 @@ workflow count {
                         output_loom = bustools_output_loom,
                         output_h5ad = bustools_output_h5ad,
                         bustools_version = bustools_version,
+                        docker_registry = docker_registry,
                         disk_space = disk_space,
                         preemptible = preemptible,
                         zones = zones,
@@ -157,6 +158,7 @@ workflow count {
                         version = optimus_version,
                         disk_space = disk_space,
                         preemptible = preemptible,
+                        cpu_for_copy = num_cpu,
                         zones = zones,
                         memory = memory
                 }
