@@ -119,7 +119,7 @@ A general step-by-step instruction
 4. Launch analysis
 ++++++++++++++++++
 
-	In your workspace, open ``cellranger_workflow`` in ``WORKFLOWS`` tab. Select the desired snapshot version (e.g. latest). Select ``Process single workflow from files`` as below
+	In your workspace, open ``cellranger_workflow`` in ``WORKFLOWS`` tab. Select the desired snapshot version (e.g. latest). Select ``Run workflow with inputs defined by file paths`` as below
 
 		.. image:: images/single_workflow.png
 
