@@ -24,10 +24,8 @@ RUN git clone https://github.com/lh3/bioawk.git /software/bioawk && \
     cd /software/bioawk && make
 
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
-ADD make_transcripts_fa.sh /software
-ADD make_tgmap.sh /software
 
-RUN chmod a+rx /software/monitor_script.sh /software/make_transcripts_fa.sh /software/make_tgmap.sh
+RUN chmod a+rx /software/monitor_script.sh
 
 # Install gcloud 264.0.0
 RUN gsutil -m cp gs://cloud-sdk-release/google-cloud-sdk-264.0.0-linux-x86_64.tar.gz /software && \
