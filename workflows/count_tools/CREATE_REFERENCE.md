@@ -55,8 +55,6 @@ mkdir /projects/optimus-ref
 cp /projects/mm10/fasta/genome.fa /projects/optimus-ref
 cp /projects/mm10/genes/genes.gtf /projects/optimus-ref
 cp -r /projects/mm10/star projects/optimus-ref
-
-
 ```
 
 Then you have to compress ``star`` folder into ``.tar`` format, which is required by Optimus:
