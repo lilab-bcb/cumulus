@@ -943,10 +943,6 @@ For scIR-seq data, ``cellranger_workflow`` takes Illumina outputs as input and r
 	  - Do not align reads to reference V(D)J sequences before de novo assembly
 	  - false
 	  - false
-	* - vdj_chain
-	  - Force the web summary HTML and metrics summary CSV to only report on a particular chain type. The accepted values are: auto for autodetection based on TR vs IG representation, TR for T cell receptors, IG for B cell receptors, all for all chain types
-	  - TR
-	  - 
 	* - cellranger_version
 	  - cellranger version, could be 3.1.0, 3.0.2, 2.2.0 
 	  - "3.1.0"

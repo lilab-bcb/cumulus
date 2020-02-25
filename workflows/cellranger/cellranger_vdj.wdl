@@ -22,8 +22,6 @@ workflow cellranger_vdj {
 	Int? force_cells
 	# Do not align reads to reference V(D)J sequences before de novo assembly. Default: false
 	Boolean? denovo = false
-	# Force the web summary HTML and metrics summary CSV to only report on a particular chain type. The accepted values are: auto for autodetection based on TR vs IG representation, TR for T cell receptors, IG for B cell receptors, all for all chain types.
-	String? chain 
 
 	# cellranger version
 	String cellranger_version
@@ -49,7 +47,6 @@ workflow cellranger_vdj {
 			genome_file = genome_file,
 			force_cells = force_cells,
 			denovo = denovo,
-			chain = chain,
 			cellranger_version = cellranger_version,
 			zones = zones,
 			num_cpu = num_cpu,
@@ -74,7 +71,6 @@ task run_cellranger_vdj {
 	File genome_file
 	Int? force_cells
 	Boolean denovo
-	String? chain
 	String cellranger_version
 	String zones
 	Int num_cpu
@@ -111,10 +107,6 @@ task run_cellranger_vdj {
 			call_args.append('--force-cells=${force_cells}')
 		if '${denovo}' is not 'false':
 			call_args.append('--denovo')
-		if '${chain}' in ['auto', 'TR', 'IG', 'all']:
-			call_args.append('--chain=${chain}')
-		elif '${chain}' is not '':
-			print('Unrecognized --chain value: ${chain}!')
 		print(' '.join(call_args))
 		check_call(call_args)
 		CODE

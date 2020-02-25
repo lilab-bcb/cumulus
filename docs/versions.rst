@@ -15,10 +15,10 @@ Latest version
 	  - Snapshot
 	  - Function
 	* - cumulus/cellranger_workflow
-	  - `7 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/7>`_
+	  - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/8>`_
 	  - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
 	* - cumulus/cellranger_create_reference
-	  - `1 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/1>`_
+	  - `6 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/6>`_
 	  - Run Cell Ranger tools to build sc/snRNA-seq references.
 	* - cumulus/cellranger_atac_aggr
 	  - `1 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_aggr/1>`_
