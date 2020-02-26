@@ -2,7 +2,7 @@ import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/v
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq/versions/2/plain-WDL/descriptor" as cram
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/3/plain-WDL/descriptor" as crc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/2/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/3/plain-WDL/descriptor" as crv
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/4/plain-WDL/descriptor" as crv
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/5/plain-WDL/descriptor" as ca
 
 workflow cellranger_workflow {
@@ -41,8 +41,6 @@ workflow cellranger_workflow {
 
     # Do not align reads to reference V(D)J sequences before de novo assembly. Default: false
     Boolean? vdj_denovo = false
-    # Force the web summary HTML and metrics summary CSV to only report on a particular chain type. The accepted values are: auto for autodetection based on TR vs IG representation, TR for T cell receptors, IG for B cell receptors, all for all chain types.
-    String? vdj_chain 
 
     # For extracting ADT count
 
@@ -208,7 +206,6 @@ workflow cellranger_workflow {
                         genome = generate_count_config.sample2genome[sample_id],
                         force_cells = force_cells,
                         denovo = vdj_denovo,
-                        chain = vdj_chain,
                         cellranger_version = cellranger_version,
                         zones = zones,
                         num_cpu = num_cpu,

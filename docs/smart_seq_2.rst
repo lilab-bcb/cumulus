@@ -76,7 +76,7 @@ Follow the steps below to extract gene-count matrices from SMART-Seq2 data on Te
 
 	Moreover, in the workflow page, click ``Export to Workspace...`` button, and select the workspace to which you want to export *smartseq2* workflow in the drop-down menu.
 
-#. In your workspace, open ``smartseq2`` in ``WORKFLOWS`` tab. Select ``Process single workflow from files`` as below
+#. In your workspace, open ``smartseq2`` in ``WORKFLOWS`` tab. Select ``Run workflow with inputs defined by file paths`` as below
 
 	.. image:: images/single_workflow.png
 
@@ -232,7 +232,7 @@ We also provide a way of generating user-customized Genome references for SMART-
 
 	Moreover, in the workflow page, click ``Export to Workflow...`` button, and select the workspace to which you want to export ``smartseq2_create_reference`` in the drop-down menu.
 
-#. In your workspace, open ``smartseq2_create_reference`` in ``WORKFLOWS`` tab. Select ``Process single workflow from files`` as below
+#. In your workspace, open ``smartseq2_create_reference`` in ``WORKFLOWS`` tab. Select ``Run workflow with inputs defined by file paths`` as below
 
 	.. image:: images/single_workflow.png
 

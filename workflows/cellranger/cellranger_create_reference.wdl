@@ -1,21 +1,25 @@
+version 1.0
+
 workflow cellranger_create_reference {
     # Output directory, gs URL
-    String output_directory
-    File? input_sample_sheet
-    String? input_gtf
-    String? input_fasta
-    String? genome
-    String? attributes
-    Boolean pre_mrna = false
-    String? ref_version
+    input {
+        String output_directory
+        File? input_sample_sheet
+        String? input_gtf
+        String? input_fasta
+        String? genome
+        String? attributes
+        Boolean pre_mrna = false
+        String? ref_version
 
-    String? docker_registry = "cumulusprod"
-    String? cellranger_version = '3.1.0'
-    Int? disk_space = 100
-    Int? preemptible = 2
-    String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-    Int? num_cpu = 1
-    Int? memory = 32
+        String docker_registry = "cumulusprod"
+        String cellranger_version = '3.1.0'
+        Int disk_space = 100
+        Int preemptible = 2
+        String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        Int num_cpu = 32
+        Int memory = 32    
+    }
 
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "/+$", "")
@@ -70,15 +74,17 @@ workflow cellranger_create_reference {
 
 
 task generate_create_reference_config {
-    File? input_sample_sheet
-    String? input_gtf_file
-    String? input_fasta
-    String? genome
-    String? attributes
-    String cellranger_version
-    String docker_registry
-    Int preemptible
-    String zones
+    input {
+        File? input_sample_sheet
+        String? input_gtf_file
+        String? input_fasta
+        String? genome
+        String? attributes
+        String cellranger_version
+        String docker_registry
+        Int preemptible
+        String zones    
+    }
 
     command {
         set -e
@@ -105,7 +111,11 @@ task generate_create_reference_config {
                 fo2.write(row['Fasta'] + '\n')
                 fo3.write(row['Genes'] + '\t' + row['Attributes'] + '\n')
                 new_genome.append(row['Genome'])
-            print('_and_'.join(new_genome))
+
+        concated_genome = '_and_'.join(new_genome)
+        if concated_genome == '':
+            raise ValueError("Genome attribute must be set!")
+        print(concated_genome)
         CODE
     }
 
@@ -119,21 +129,23 @@ task generate_create_reference_config {
     runtime {
         docker: "${docker_registry}/cellranger:${cellranger_version}"
         zones: zones
-        preemptible: "${preemptible}"
+        preemptible: preemptible
     }
 }
 
 task run_filter_gtf {
-    File input_gtf_file
-    String? attributes
-    Boolean pre_mrna
+    input {
+        File input_gtf_file
+        String? attributes
+        Boolean pre_mrna
 
-    String docker_registry
-    String cellranger_version
-    Int disk_space
-    String zones
-    Int memory
-    Int preemptible
+        String docker_registry
+        String cellranger_version
+        Int disk_space
+        String zones
+        Int memory
+        Int preemptible    
+    }
 
     command {
         set -e
@@ -157,7 +169,7 @@ task run_filter_gtf {
         root, ext = os.path.splitext(input_gtf_file)
         file_name = os.path.basename(root)
 
-        output_gtf_file = input_gtf_file # in case no filtering		
+        output_gtf_file = input_gtf_file # in case no filtering
 
         if '${attributes}' is not '':
             file_name += '.filt'
@@ -178,13 +190,14 @@ task run_filter_gtf {
             with open(output_gtf_file, 'w') as fo1:
                 check_call(call_args, stdout = fo1)
 
-        with open('gtf_file.txt', 'w') as fo2:
-            fo2.write(output_gtf_file + '\n')
+        call_args = ['mv', output_gtf_file, 'run_filter_gtf_out.gtf']
+        print(' '.join(call_args))
+        check_call(call_args)
         CODE
     }
 
     output {
-        File output_gtf_file = read_string('gtf_file.txt')
+        File output_gtf_file = "run_filter_gtf_out.gtf"
     }
 
     runtime {
@@ -193,25 +206,27 @@ task run_filter_gtf {
         memory: "${memory}G"
         disks: "local-disk ${disk_space} HDD"
         cpu: 1
-        preemptible: "${preemptible}"
+        preemptible: preemptible
     }
 }
 
 task run_cellranger_mkref {
-    Array[String] genomes
-    Array[File] fastas
-    Array[File] gtfs
-    String output_genome
-    String output_dir
-    String? ref_version
+    input {
+        Array[String] genomes
+        Array[File] fastas
+        Array[File] gtfs
+        String output_genome
+        String output_dir
+        String? ref_version
 
-    String docker_registry
-    String cellranger_version
-    Int disk_space
-    Int preemptible
-    String zones
-    Int num_cpu
-    Int memory
+        String docker_registry
+        String cellranger_version
+        Int disk_space
+        Int preemptible
+        String zones
+        Int num_cpu
+        Int memory
+    }
 
     command {
         set -e
@@ -257,8 +272,8 @@ task run_cellranger_mkref {
     }
 
     output {
-        String output_reference = '${output_genome}.tar.gz'
-        File monitoringLog = 'monitoring.log'
+        String output_reference = "${output_dir}/${output_genome}.tar.gz"
+        File monitoringLog = "monitoring.log"
     }
 
     runtime {
@@ -266,7 +281,7 @@ task run_cellranger_mkref {
         zones: zones
         memory: "${memory}G"
         disks: "local-disk ${disk_space} HDD"
-        cpu: "${num_cpu}"
-        preemptible: "${preemptible}"
+        cpu: num_cpu
+        preemptible: preemptible
     }
 }
