@@ -3,9 +3,6 @@ Cell Ranger alternatives to generate gene-count matrices for 10X data
 
 This ``count`` workflow generates gene-count matrices from 10X FASTQ data using alternative methods other than Cell Ranger.
 
-Generate gene-count matrices from FASTQ files
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
 Prepare input data and import workflow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -58,6 +55,8 @@ Prepare input data and import workflow
 		Sample	Flowcells
 		sample_1	gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/sample_1_fastqs,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/sample_1_fastqs
 		sample_2	gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/sample_2_fastqs
+
+	Moreover, if one flowcell of a sample contains multiple FASTQ files for each read, i.e. sequences from multiple lanes, you should keep your sample sheet as the same, and *count* workflow will automatically merge lanes altogether for the sample before performing counting.
 
 	**3.2 Upload your sample sheet to the workspace bucket:**
 
