@@ -22,7 +22,7 @@ workflow count {
 
         # Count
         Boolean run_count = true 
-        String? count_tool
+        String count_tool = "StarSolo"
 
         String docker_registry = "cumulusprod"
         Int num_cpu = 32
