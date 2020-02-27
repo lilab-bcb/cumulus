@@ -1,3 +1,4 @@
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_count_multi_species/versions/1/plain-WDL/descriptor" as dropseq_count_multi_species_wdl
 workflow dropseq_count {
 	String sample_id
 	File input_bam
@@ -11,6 +12,7 @@ workflow dropseq_count {
 	String? dge_prep_memory = "3750M"
 	String? dge_memory = "3750M"
 	String docker_registry
+	Array[String] species
 
 	call DigitalExpressionPrep {
 		input:
@@ -38,18 +40,40 @@ workflow dropseq_count {
 			docker_registry=docker_registry
 	}
 
-	call DigitalExpression {
-		input:
-			preemptible=preemptible,
-			output_directory=output_directory,
-			input_bam=DigitalExpressionPrep.bam,
-			sample_id=sample_id,
-			barcodes=CollectCellBarcodes.cell_barcodes,
-			memory=dge_memory,
-			zones=zones,
-			drop_seq_tools_version=drop_seq_tools_version,
-			docker_registry=docker_registry
+    if(defined(species) && length(species)>1) {
+        scatter(s in species) {
+             call dropseq_count_multi_species_wdl.dropseq_count_multi_species as dge_species {
+                input:
+                    sample_id=sample_id,
+                    input_bam=input_bam,
+                    barcodes=CollectCellBarcodes.cell_barcodes,
+                    species=s,
+                    output_directory=output_directory,
+                    drop_seq_tools_version=drop_seq_tools_version,
+                    dge_memory=dge_memory,
+                    docker_registry=docker_registry,
+                    dge_memory=dge_memory,
+                    preemptible = preemptible,
+                    zones = zones
+            }
+        }
+    }
+
+    if(!defined(species) || length(species)<=1) {
+        call DigitalExpression {
+            input:
+                preemptible=preemptible,
+                output_directory=output_directory,
+                input_bam=DigitalExpressionPrep.bam,
+                sample_id=sample_id,
+                barcodes=CollectCellBarcodes.cell_barcodes,
+                memory=dge_memory,
+                zones=zones,
+                drop_seq_tools_version=drop_seq_tools_version,
+                docker_registry=docker_registry
+        }
 	}
+
 	output {
 		String bead_synthesis_stats = DigitalExpressionPrep.bead_synthesis_stats
 		String bead_synthesis_summary = DigitalExpressionPrep.bead_synthesis_summary
@@ -62,10 +86,15 @@ workflow dropseq_count {
 
 		String cell_barcodes = CollectCellBarcodes.cell_barcodes
 
-		String dge=DigitalExpression.dge
-		String dge_summary = DigitalExpression.dge_summary
-		String dge_reads=DigitalExpression.dge_reads
-		String dge_summary_reads = DigitalExpression.dge_summary_reads
+		String? dge=DigitalExpression.dge
+		String? dge_summary = DigitalExpression.dge_summary
+		String? dge_reads=DigitalExpression.dge_reads
+		String? dge_summary_reads = DigitalExpression.dge_summary_reads
+
+		Array[String]? dge_multi_species = dge_species.dge
+        Array[String]? dge_summary_multi_species = dge_species.dge_summary
+        Array[String]? dge_reads_multi_species =dge_species.dge_reads
+        Array[String]? dge_summary_reads_multi_species = dge_species.dge_summary_reads
 	}
 	
 }

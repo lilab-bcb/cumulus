@@ -207,6 +207,10 @@ Please see the description of important inputs below.
 dropseq_workflow Terra Release Notes
 ===================================================
 
+**Version 7**
+
+- Added support for multi-species genomes (Barnyard experiments)
+
 **Version 6**
 
 - Added star_extra_disk_space and star_disk_space_multiplier workflow inputs to adjust disk space allocated for STAR alignment task.
