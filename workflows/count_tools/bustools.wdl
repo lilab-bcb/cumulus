@@ -1,6 +1,7 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/alexandria:kallisto-bustools_count/versions/2/plain-WDL/descriptor" as kbc
+import "https://raw.githubusercontent.com/ShalekLab/kallisto-bustools_workflow/yiming/WDL/kallisto-bustools_count.wdl" as kbc
+# import "https://api.firecloud.org/ga4gh/v1/tools/alexandria:kallisto-bustools_count/versions/2/plain-WDL/descriptor" as kbc
 # import "../../../kallisto-bustools_workflow/WDL/kallisto-bustools_count.wdl" as kbc
 
 workflow bustools {
@@ -38,7 +39,7 @@ workflow bustools {
         input:
             docker = "shaleklab/kallisto-bustools:" + bustools_version,
             number_cpu_threads = num_cpu,
-            task_memory_GB = memory,
+            task_memory_GB = memory / 5 * 6,
             preemptible = preemptible,
             zones = zones,
             boot_disk_size_GB = 12,
@@ -52,7 +53,7 @@ workflow bustools {
             sample_name = sample_id,
             R2_fastq = r2_fastq,
             use_lamanno = false,
-            bustools_filter = false,
+            bustools_filter = true,
             loom = output_loom,
             h5ad = output_h5ad,
             delete_bus_files = false

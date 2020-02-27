@@ -16,6 +16,7 @@ workflow optimus_count {
 
         String docker_registry = "cumulusprod"
         String version = 'optimus_v1.4.0'
+        Int cpu_for_copy = 32
         Int disk_space = 100
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
@@ -32,6 +33,7 @@ workflow optimus_count {
             genome = genome_url,
             docker_registry = docker_registry,
             disk_space = disk_space,
+            cpu = cpu_for_copy,
             zones = zones,
             memory = memory,
             preemptible = preemptible
@@ -62,6 +64,7 @@ workflow optimus_count {
             loom_file = optimus.loom_output_file,
             docker_registry = docker_registry,
             disk_space = disk_space,
+            cpu = cpu_for_copy,
             zones = zones,
             memory = memory,
             preemptible = preemptible
@@ -78,6 +81,7 @@ task get_reference {
         String docker_registry
         Int disk_space
         String zones
+        Int cpu
         Int memory
         Int preemptible
     }
@@ -103,7 +107,7 @@ task get_reference {
         memory: memory
         bootDiskSizeGb: 12
         disks: "local-disk ~{disk_space} HDD"
-        cpu: 1
+        cpu: "~{cpu}"
         preemptible: "~{preemptible}"
     }
 
@@ -119,6 +123,7 @@ task organize_result {
         String docker_registry
         Int disk_space
         String zones
+        Int cpu
         Int memory
         Int preemptible
     }
@@ -150,7 +155,7 @@ task organize_result {
         memory: memory
         bootDiskSizeGb: 12
         disks: "local-disk ~{disk_space} HDD"
-        cpu: 2
+        cpu: "~{cpu}"
         preemptible: "~{preemptible}"
     }
 }
