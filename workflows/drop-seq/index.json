@@ -20,7 +20,11 @@
     "gene_intervals": "gs://regev-lab/resources/DropSeq/human_mouse/hg19_mm10_transgenes.genes.intervals",
     "genome_dict": "gs://regev-lab/resources/DropSeq/human_mouse/hg19_mm10_transgenes.dict",
     "star_cpus": 32,
-    "star_memory": "120G"
+    "star_memory": "120G",
+    "species": [
+      "HUMAN",
+      "MOUSE"
+    ]
   },
   "mmul_8.0.1": {
     "refflat": "gs://regev-lab/resources/DropSeq/MMUL_8_0_1/MMUL_8_0_1.refFlat",
