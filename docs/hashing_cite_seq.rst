@@ -43,7 +43,7 @@ Follow the steps below to run **cumulus** for cell-hashing/nuclei-hashing/CITE-S
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cumulus_hashing_cite_seq* workflow in the drop-down menu.
 
-#. In your workspace, open ``cumulus_hashing_cite_seq`` in ``WORKFLOWS`` tab. Select ``Process single workflow from files`` as below
+#. In your workspace, open ``cumulus_hashing_cite_seq`` in ``WORKFLOWS`` tab. Select ``Run workflow with inputs defined by file paths`` as below
 
 	.. image:: images/single_workflow.png
 

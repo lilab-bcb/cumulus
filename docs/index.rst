@@ -10,6 +10,7 @@
    versions
    cellranger
    bcl2fastq
+   count
    smart_seq_2
    drop_seq
    hashing_cite_seq

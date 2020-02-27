@@ -1,12 +1,12 @@
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:bcl2fastq/versions/2/plain-WDL/descriptor" as bcl2fastq_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropest/versions/3/plain-WDL/descriptor" as dropest_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_align/versions/4/plain-WDL/descriptor" as dropseq_align_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_count/versions/3/plain-WDL/descriptor" as dropseq_count_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_count/versions/4/plain-WDL/descriptor" as dropseq_count_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_prepare_fastq/versions/4/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_qc/versions/3/plain-WDL/descriptor" as dropseq_qc_wdl
 
 workflow dropseq_workflow {
-    # Either a list of flowcell URLS or a tab separated file with no header with sample_id tab r1 tab r2
+    # Either a list of flowcell URLs or a tab separated file with no header with sample_id tab r1 tab r2
     File input_tsv_file
     # Output directory, gs URL
     String output_directory
@@ -75,7 +75,7 @@ workflow dropseq_workflow {
     String? star_memory
 
     # extra disk space for STAR
-    Float star_extra_disk_space = 2
+    Float star_extra_disk_space = 3
     # multiply size of input bam by this factor
     Float star_disk_space_multiplier = 4
 
@@ -88,11 +88,13 @@ workflow dropseq_workflow {
     String? zones = "us-east1-d us-west1-a us-west1-b"
     String? drop_seq_tools_version = "2.3.0"
     String? bcl2fastq_version = "2.20.0.422"
+    String? dropseq_report_version = "1.0.0"
     String? dropest_version = "0.8.6"
     String? merge_bam_alignment_memory="13G"
     Int? sort_bam_max_records_in_ram = 2000000
     String? drop_deq_tools_prep_bam_memory = "3750M"
     String? drop_deq_tools_dge_memory = "3750M"
+    Array[String]? species # for mixed species
 
     if (run_bcl2fastq) {
         scatter (row in input_tsv) {
@@ -127,6 +129,7 @@ workflow dropseq_workflow {
             acronym_file=acronym_file,
             star_cpus = star_cpus,
             star_memory = star_memory,
+            species = species,
             reference=reference,
             docker_registry=docker_registry_stripped,
     }
@@ -195,7 +198,6 @@ workflow dropseq_workflow {
                     zones = zones,
                     preemptible = preemptible,
                     docker_registry=docker_registry_stripped
-
             }
         }
 
@@ -206,6 +208,7 @@ workflow dropseq_workflow {
                     dge_prep_memory = drop_deq_tools_prep_bam_memory,
                     dge_memory = drop_deq_tools_dge_memory,
                     drop_seq_tools_version=drop_seq_tools_version,
+                    species=generate_count_config.species_list,
                     output_directory = output_directory_stripped + '/' + row[0],
                     input_bam = dropseq_align.aligned_tagged_bam,
                     force_cells = drop_seq_tools_force_cells,
@@ -236,17 +239,18 @@ workflow dropseq_workflow {
     call collect_summary {
         input:
             dge_summary=dropseq_count.dge_summary,
+            dge_summary_multi_species=dropseq_count.dge_summary_multi_species,
             bead_synthesis_summary=dropseq_count.bead_synthesis_summary,
             star_log_final=dropseq_align.star_log_final,
             adapter_trimming_report=dropseq_prepare_fastq.adapter_trimming_report,
             polyA_trimming_report= dropseq_prepare_fastq.polyA_trimming_report,
             sc_rnaseq_metrics_report=dropseq_qc.sc_rnaseq_metrics_report,
-            drop_seq_tools_version=drop_seq_tools_version,
             zones = zones,
             preemptible = preemptible,
             sample_id=dropseq_align.output_sample_id,
             output_directory=output_directory,
-            docker_registry=docker_registry_stripped
+            docker_registry=docker_registry_stripped,
+            version=dropseq_report_version
     }
 
     output {
@@ -260,7 +264,6 @@ workflow dropseq_workflow {
         Array[String] aligned_bam=dropseq_align.aligned_bam
         Array[String] star_log_final = dropseq_align.star_log_final
 
-
         Array[String?] bead_synthesis_stats = dropseq_count.bead_synthesis_stats
         Array[String?] bead_synthesis_summary = dropseq_count.bead_synthesis_summary
         Array[String?] bead_synthesis_report = dropseq_count.bead_synthesis_report
@@ -270,10 +273,16 @@ workflow dropseq_workflow {
         Array[String?] cumplot=dropseq_count.cumplot
         Array[String?] reads_plot=dropseq_count.reads_plot
         Array[String?] cell_barcodes = dropseq_count.cell_barcodes
+
         Array[String?] dge=dropseq_count.dge
         Array[String?] dge_summary = dropseq_count.dge_summary
         Array[String?] dge_reads=dropseq_count.dge_reads
         Array[String?] dge_summary_reads = dropseq_count.dge_summary_reads
+
+        Array[Array[String]?] dge_multi_species = dropseq_count.dge_multi_species
+        Array[Array[String]?] dge_summary_multi_species = dropseq_count.dge_summary_multi_species
+        Array[Array[String]?] dge_reads_multi_species =dropseq_count.dge_reads_multi_species
+        Array[Array[String]?] dge_summary_reads_multi_species = dropseq_count.dge_summary_reads_multi_species
 
         Array[String?] dropest_count_matrices = dropest.count_matrices
         Array[String?] dropest_count_matrix = dropest.count_matrix
@@ -285,11 +294,10 @@ workflow dropseq_workflow {
 }
 
 
-
-
 task collect_summary {
     Array[String] sample_id
     Array[String?] dge_summary
+    Array[Array[String]?] dge_summary_multi_species
     Array[String?] bead_synthesis_summary
     Array[String] star_log_final
     Array[String] adapter_trimming_report
@@ -299,15 +307,16 @@ task collect_summary {
     String output_directory
     String zones
     Int preemptible
-    String drop_seq_tools_version
+    String version
     String docker_registry
 
     command {
         set -e
 
-        python /software/summary.py \
+        python /software/report.py \
         --sample_id '${sep="," sample_id}' \
         --dge_summary '${sep="," dge_summary}' \
+        --dge_summary_multi_species '${sep="," dge_summary_multi_species}' \
         --star_log '${sep="," star_log_final}' \
         --adapter_trimming_report '${sep="," adapter_trimming_report}' \
         --polyA_trimming_report '${sep="," polyA_trimming_report}' \
@@ -326,7 +335,7 @@ task collect_summary {
         bootDiskSizeGb: 12
         disks: "local-disk 2 HDD"
         memory:"1GB"
-        docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
+        docker: "${docker_registry}/dropseq_report:${version}"
         zones: zones
         preemptible: "${preemptible}"
     }
@@ -344,6 +353,7 @@ task generate_count_config {
     String drop_seq_tools_version
     String reference
     Int? star_cpus
+    Array[String]? species
     String? star_memory
     Boolean is_reference_url = sub(reference, "^gs://.+", "URL") == "URL"
     File config_file = (if is_reference_url then reference else acronym_file)
@@ -364,6 +374,9 @@ task generate_count_config {
 
         disk_space_multiplier = ${disk_space_multiplier}
         bcl2fastq_sample_sheets = '${sep="," bcl2fastq_sample_sheets}'.split(',')
+        species = '${sep="," species}'.split(',')
+        if len(species) == 1 and species[0] == '':
+            species = []
         bcl2fastq_sample_sheets = list(filter(lambda x: x.strip() != '', bcl2fastq_sample_sheets))
 
         if len(bcl2fastq_sample_sheets) == 0:  # no bcl2fastq run, already a sample sheet with name, r1, r2
@@ -411,7 +424,7 @@ task generate_count_config {
             config = config[reference.lower()]
         with open('star_genome.txt', 'wt') as w1, open('refflat.txt', 'wt') as w2, open('gene_intervals.txt', 'wt') as w3, \
             open('genome_fasta.txt', 'wt') as w4, open('genome_dict.txt', 'wt') as w5, open('star_memory.txt', 'wt') as w6, \
-            open('star_cpu.txt', 'wt') as w7:
+            open('star_cpu.txt', 'wt') as w7, open('species.txt', 'wt') as w8:
             w1.write(config['star_genome'])
             w2.write(config['refflat'])
             w3.write(config['gene_intervals'])
@@ -427,11 +440,18 @@ task generate_count_config {
             if star_cpus != '':
                 cpu = star_cpus
             w7.write(str(cpu))
+            if len(species) == 0:
+                species = config.get('species')
+            if species is not None and len(species) > 0:
+                for s in species:
+                    w8.write(s + '\n')
+
         CODE
     }
 
     output {
         String star_genome = read_string('star_genome.txt')
+        Array[String] species_list = read_lines('species.txt')
         String refflat = read_string('refflat.txt')
         String gene_intervals = read_string('gene_intervals.txt')
         String genome_fasta = read_string('genome_fasta.txt')

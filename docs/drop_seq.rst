@@ -86,7 +86,7 @@ Additionally the pipeline provides the option to generate count matrices using  
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace you want to export *dropseq_workflow* workflow in the drop-down menu.
 
-#. In your workspace, open ``dropseq_workflow`` in ``WORKFLOWS`` tab. Select ``Process single workflow from files`` as below
+#. In your workspace, open ``dropseq_workflow`` in ``WORKFLOWS`` tab. Select ``Run workflow with inputs defined by file paths`` as below
 
 	.. image:: images/single_workflow.png
 
@@ -206,6 +206,10 @@ Please see the description of important inputs below.
 
 dropseq_workflow Terra Release Notes
 ===================================================
+
+**Version 7**
+
+- Added support for multi-species genomes (Barnyard experiments)
 
 **Version 6**
 

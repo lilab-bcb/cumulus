@@ -45,7 +45,7 @@ This workflow runs demuxlet_ to deconvolute sample identity when multiple sample
 
 	Next, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace you want to export to in the drop-down menu.
 
-#. In your workspace, open ``demuxlet`` in ``WORKFLOWS`` tab. Select ``Process single workflow from files`` as below
+#. In your workspace, open ``demuxlet`` in ``WORKFLOWS`` tab. Select ``Run workflow with inputs defined by file paths`` as below
 
 	.. image:: images/single_workflow.png
 

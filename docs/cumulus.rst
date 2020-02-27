@@ -50,7 +50,7 @@ You are free to add any other columns and these columns will be used in selectin
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cumulus* workflow in the drop-down menu.
 
-#. In your workspace, open ``cumulus`` in ``WORKFLOWS`` tab. Select ``Process single workflow from files`` as below
+#. In your workspace, open ``cumulus`` in ``WORKFLOWS`` tab. Select ``Run workflow with inputs defined by file paths`` as below
 
 	.. image:: images/single_workflow.png
 
@@ -949,7 +949,7 @@ Once we have **cumulus** outputs, we could further analyze a subset of cells by 
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export cumulus workflow in the drop-down menu.
 
-#. In your workspace, open ``cumulus_subcluster`` in ``WORKFLOWS`` tab. Select ``Process single workflow from files`` as below
+#. In your workspace, open ``cumulus_subcluster`` in ``WORKFLOWS`` tab. Select ``Run workflow with inputs defined by file paths`` as below
 
 	.. image:: images/single_workflow.png
 
