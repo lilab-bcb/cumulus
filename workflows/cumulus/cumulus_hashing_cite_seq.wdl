@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/7/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/8/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus_hashing_cite_seq {
@@ -7,8 +7,8 @@ workflow cumulus_hashing_cite_seq {
 	# Output directory, gs url
 	String output_directory
 
-	# cumulus version, default to "0.13.0"
-	String? cumulus_version = "0.13.0"
+	# cumulus version, default to "0.14.0"
+	String? cumulus_version = "0.14.0"
 	# Docker registry to use
 	String? docker_registry = "cumulusprod"
 	# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
