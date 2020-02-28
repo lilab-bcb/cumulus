@@ -45,7 +45,7 @@ RUN pip install --upgrade pip && \
 	pip install umap-learn==0.3.10 && \
 	pip install torch==1.4.0 && \
 	pip install harmony-pytorch==0.1.1 && \
-	pip install pegasuspy==0.16.10
+	pip install pegasuspy==0.16.11
 
 
 RUN mkdir /software
