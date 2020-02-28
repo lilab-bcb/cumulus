@@ -1,3 +1,11 @@
+Version 0.14.0 `February 28, 2020`
+-----------------------------------
+
+* Added support for gene-count matrices generation using alternative tools (STARsolo, Optimus, Salmon alevin, Kallisto BUStools).
+* Cumulus can process demultiplexed data with remapped singlets names and subset of singlets.
+* Update VDJ related inputs in Cellranger workflow.
+* SMART-Seq2 and Count workflows are in OpenWDL version 1.0.
+
 Version 0.13.0 `February 7, 2020`
 -----------------------------------
 
