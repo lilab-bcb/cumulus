@@ -42,10 +42,10 @@ Latest version
 	  - `16 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/16>`_
 	  - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
 	* - cumulus/cumulus_subcluster
-	  - `9 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_subcluster/9>`_
+	  - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_subcluster/10>`_
 	  - Run subcluster analysis using cumulus
 	* - cumulus/cumulus_hashing_cite_seq
-	  - `7 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_hashing_cite_seq/7>`_
+	  - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_hashing_cite_seq/8>`_
 	  - Run cumulus for cell-hashing/nucleus-hashing/CITE-Seq analysis
 	  
 
