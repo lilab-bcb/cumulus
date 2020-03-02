@@ -47,13 +47,13 @@ Or use the following commdands for MacOS installation::
     cd altocumulus
     pip install -e .
 
-When the installation is done, type ``alto fc_run -h`` in terminal to see if you can see the help information.
+When the installation is done, type ``alto run -h`` in terminal to see if you can see the help information.
 
 
-Run Terra workflows via ``alto fc_run``
+Run Terra workflows via ``alto run``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**alto fc_run** runs a Terra method. Features:
+**alto run** runs a Terra method. Features:
 
 - Uploads local files/directories in your inputs to a Google Cloud bucket updates the file paths to point to the Google Cloud bucket. 
 
@@ -99,7 +99,7 @@ Required options are in bold.
 Example
 ++++++++
 
-This example shows how to use ``alto fc_run`` to run cellranger_workflow to extract gene-count matrices from sequencing output.
+This example shows how to use ``alto run`` to run cellranger_workflow to extract gene-count matrices from sequencing output.
 
 #. Prepare your sample sheet ``example_sample_sheet.csv`` as the following::
 
@@ -130,16 +130,16 @@ This example shows how to use ``alto fc_run`` to run cellranger_workflow to extr
 
 #. Run the following command to kick off your Terra workflow::
 
-    alto fc_run -m cumulus/cellranger_workflow -i inputs.json -w myworkspace_namespace/myworkspace_name -o inputs_updated.json
+    alto run -m cumulus/cellranger_workflow -i inputs.json -w myworkspace_namespace/myworkspace_name -o inputs_updated.json
 
    where ``myworkspace_namespace/myworkspace_name`` should be replaced by your workspace namespace and name.
 
 
-Upon success, ``alto fc_run`` returns a URL pointing to the submitted Terra job for you to monitor.
+Upon success, ``alto run`` returns a URL pointing to the submitted Terra job for you to monitor.
 
 If for any reason, your job failed. You could rerun it without uploading files again via the following command::
 
-    alto fc_run -m cumulus/cellranger_workflow -i inputs_updated.json -w myworkspace_namespace/myworkspace_name
+    alto run -m cumulus/cellranger_workflow -i inputs_updated.json -w myworkspace_namespace/myworkspace_name
 
 because ``inputs_updated.json`` is the updated version of ``inputs.json`` with all local paths being replaced by their corresponding Google bucket URLs after uploading.
 
