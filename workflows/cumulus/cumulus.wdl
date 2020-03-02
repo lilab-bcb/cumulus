@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/7/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/8/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
@@ -52,6 +52,10 @@ workflow cumulus {
 	Int? min_genes_on_raw
 	# If input data are CITE-Seq data
 	Boolean? cite_seq
+	# Remap singlet names using <remap_string>, where <remap_string> takes the format "new_name_i:old_name_1,old_name_2;new_name_ii:old_name_3;...". For example, if we hashed 5 libraries from 3 samples sample1_lib1, sample1_lib2, sample2_lib1, sample2_lib2 and sample3, we can remap them to 3 samples using this string: "sample1:sample1_lib1,sample1_lib2;sample2:sample2_lib1,sample2_lib2". After that, original singlet names will be kept in metadate field with key name 'assignment.orig'.
+	String? remap_singlets
+	# If select singlets, only select singlets in the <subset_string>, which takes the format "name1,name2,...". Note that if --remap-singlets is specified, subsetting happens after remapping. For example, we can only select singlets from sampe 1 and 3 using "sample1,sample3".
+	String? subset_singlets
 	# For CITE-Seq surface protein expression, make all cells with expression > <percentile> to the value at <percentile> to smooth outlier. Set <percentile> to 100.0 to turn this option off. [default: 99.99]
 	Float? cite_seq_capping
 	# If write cell and gene filtration results as a spreadsheet. [default: true]
@@ -271,6 +275,8 @@ workflow cumulus {
 			black_list = black_list,
 			min_genes_on_raw = min_genes_on_raw,
 			select_singlets = if is_sample_sheet then false else select_only_singlets,
+			remap_singlets = remap_singlets,
+			subset_singlets = subset_singlets,
 			cite_seq = cite_seq,
 			cite_seq_capping = cite_seq_capping,
 			output_filtration_results = output_filtration_results,

@@ -81,6 +81,8 @@ task run_cumulus_cluster {
 	String? black_list
 	Int? min_genes_on_raw
 	Boolean? select_singlets
+	String? remap_singlets
+	String? subset_singlets
 	Boolean? cite_seq
 	Float? cite_seq_capping
 	Boolean? output_filtration_results
@@ -166,6 +168,10 @@ task run_cumulus_cluster {
 			call_args.extend(['--min-genes-on-raw', '${min_genes_on_raw}'])
 		if '${select_singlets}' is 'true':
 			call_args.append('--select-singlets')
+		if '${remap_singlets}' is not '':
+			call_args.extend(['--remap-singlets', '${remap_singlets}'])
+		if '${subset_singlets}' is not '':
+			call_args.extend(['--subset-singlets', '${subset_singlets}'])
 		if '${cite_seq}' is 'true':
 			call_args.append('--cite-seq')
 		if '${cite_seq_capping}' is not '':
