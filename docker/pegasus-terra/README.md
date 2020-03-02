@@ -6,7 +6,7 @@ Pegasus is a Python package for analyzing transcriptomes of large-scale single-c
 
 |Image Version|Docker Image URL|Release Date|
 |---|---|---|
-|0.16.8|cumulusprod/pegasus-terra:0.16.8|2020/02/06|
+|0.16.11|cumulusprod/pegasus-terra:0.16.11|2020/03/02|
 
 ## Image Content
 
