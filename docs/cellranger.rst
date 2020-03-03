@@ -30,7 +30,19 @@ A general step-by-step instruction
 	
 	``-m`` means copy in parallel, ``-r`` means copy the directory recursively, and ``gs://fc-e0000000-0000-0000-0000-000000000000`` should be replaced by your own workspace Google bucket URL.
 
-	Note: Broad users need to be on an UGER node (not a login node) in order to use the ``-m`` flag
+	**Note 1**: If input is a folder of BCL files, users do not need to upload the whole folder to the Google bucket. Instead, they only need to upload the following files::
+
+		RunInfo.xml
+		RTAComplete.txt
+		runParameters.xml
+		Data/Intensities/s.locs
+		Data/Intensities/BaseCalls
+
+	If data are generated using MiSeq or NextSeq, the location files are inside lane subfloders ``L001`` under ``Data/Intensities/``. In addition, if users' data only come from a subset of lanes (e.g. ``L001`` and ``L002``), users only need to upload lane subfolders from the subset (e.g. ``Data/Intensities/BaseCalls/L001, Data/Intensities/BaseCalls/L002`` and ``Data/Intensities/L001, Data/Intensities/L002`` if sequencer is MiSeq or NextSeq).
+
+	Users can submit jobs through command line interface (CLI) using ``altocumulus``, which will smartly upload BCL folders according to the above rules. 
+
+	**Note 2**: Broad users need to be on an UGER node (not a login node) in order to use the ``-m`` flag
 
 	Request an UGER node::
 
@@ -418,7 +430,7 @@ Sample sheet
 
 	**Note 2**: It is users' responsibility to avoid index collision between 10x genomics' RNA indexes (e.g. SI-GA-A8) and Illumina index sequences for used here (e.g. ``ATTACTCG``).
 
-	**Note 3**: For NextSeq runs, please reverse complement the index primer sequence (e.g. convert ``ATTACTCG`` to ``CGAGTAAT``).
+	**Note 3**: For NextSeq runs, please reverse complement the index primer sequence (e.g. use reverse complement ``CGAGTAAT`` instead of ``ATTACTCG``).
 
 #. *Chemistry* column.
 	
