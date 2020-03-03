@@ -21,7 +21,7 @@ Follow the steps below to run **cumulus** for cell-hashing/nuclei-hashing/CITE-S
 
 	Note that in the example above, sample_2 is 10x genomics' v3 chemistry. Cumulus can automatically detect v2/v3 chemistry when loading hdf5 files.
 
-#. Create an additional antibody-control sheet **antibody_control.csv** if you have CITE-Seq data. This sheet contains 2 columns --- *Antibody* and *Control*. 
+#. (Optional) Create an additional antibody-control sheet **antibody_control.csv** if you have CITE-Seq data and IgG controls for each antibody. This sheet contains 2 columns --- *Antibody* and *Control*. 
 
 	Example::
 
@@ -103,7 +103,7 @@ cumulus_hashing_cite_seq inputs:
 	  - "XIST"
 	  - 
 	* - antibody_control_csv
-	  - merge_rna_adt parameter. This is a CSV file containing the IgG control information for each antibody.
+	  - Optional merge_rna_adt parameter. If there is no IgG control information, leave this option blank. Otherwise, specify a CSV file containing the IgG control information for each antibody. 
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/antibody_control.csv"
 	  - 
 	* - cumulus_version
