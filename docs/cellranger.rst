@@ -418,6 +418,8 @@ Sample sheet
 
 	**Note 2**: It is users' responsibility to avoid index collision between 10x genomics' RNA indexes (e.g. SI-GA-A8) and Illumina index sequences for used here (e.g. ``ATTACTCG``).
 
+	**Note 3**: For NextSeq runs, please reverse complement the index primer sequence (e.g. convert ``ATTACTCG`` to ``CGAGTAAT``).
+
 #. *Chemistry* column.
 	
 	The following keywords are accepted for *Chemistry* column:
