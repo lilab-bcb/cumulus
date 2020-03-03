@@ -37,7 +37,7 @@ RUN pip install --upgrade pip && \
 	pip install statsmodels==0.10.1 && \
 	pip install tables==3.5.2 && \
 	pip install anndata==0.6.22.post1 && \
-	pip install hnswlib==0.3.2.0 && \
+	pip install hnswlib==0.3.4 && \
 	pip install fisher==0.1.9 && \
 	pip install python-igraph==0.7.1.post6 && \
 	pip install louvain-github==0.6.1.post1 && \
