@@ -424,13 +424,13 @@ Sample sheet
 
 #. **Index** column.
 
-	The index can be either Illumina index primer sequence (e.g. ``ATTACTCG``, also known as ``D701``), or `10x single cell 3' sample index set names`_ (e.g. SI-GA-A12). 
+	The ADT/HTO index can be either Illumina index primer sequence (e.g. ``ATTACTCG``, also known as ``D701``), or `10x single cell 3' sample index set names`_ (e.g. SI-GA-A12). 
 
-	**Note 1**: All index sequences (including 10x's) should have the same length (8 bases). If one index sequence is shorter (e.g. ATCACG), pad it with P7 sequence (e.g. ATCACGAT).
+	**Note 1**: All ADT/HTO index sequences (including 10x's) should have the same length (8 bases). If one index sequence is shorter (e.g. ATCACG), pad it with P7 sequence (e.g. ATCACGAT).
 
 	**Note 2**: It is users' responsibility to avoid index collision between 10x genomics' RNA indexes (e.g. SI-GA-A8) and Illumina index sequences for used here (e.g. ``ATTACTCG``).
 
-	**Note 3**: For NextSeq runs, please reverse complement the index primer sequence (e.g. use reverse complement ``CGAGTAAT`` instead of ``ATTACTCG``).
+	**Note 3**: For NextSeq runs, please reverse complement the ADT/HTO index primer sequence (e.g. use reverse complement ``CGAGTAAT`` instead of ``ATTACTCG``).
 
 #. *Chemistry* column.
 	
