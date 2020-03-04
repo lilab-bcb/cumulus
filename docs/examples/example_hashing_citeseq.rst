@@ -132,7 +132,6 @@ Copy or upload them to ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir``.
 		{
 			"cumulus_hashing_cite_seq.input_sample_sheet" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/cell_hashing_sample_sheet.csv",
 			"cumulus_hashing_cite_seq.output_directory" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/",
-			"cumulus_hashing_cite_seq.demuxEM_min_num_genes" : 500,
 			"cumulus_hashing_cite_seq.demuxEM_generate_diagnostic_plots" : true
 		}
 
@@ -268,7 +267,7 @@ First, install *altocumulus* by following `altocumulus installation instruction 
 
    Now run the following command in the same directory on your local machine::
 
-   	alto fc_run -m cumulus/cellranger_workflow -w ws-lab/ws-01 --bucket-folder my-dir -i cellranger_input.json -o cellranger_input_updated.json
+   	alto run -m cumulus/cellranger_workflow -w ws-lab/ws-01 --bucket-folder my-dir -i cellranger_input.json -o cellranger_input_updated.json
 
    Notice that if the execution failed, you could rerun the execution by setting ``cellranger_input_updated.json`` for ``-i`` option to use the sample sheet already uploaded to Google bucket. Similarly below.
 
@@ -283,7 +282,7 @@ First, install *altocumulus* by following `altocumulus installation instruction 
 
    Run the following command in the same directory on your local machine::
 
-	alto fc_run -m cumulus/cumulus_hashing_cite_seq -w ws-lab/ws-01 --bucket-folder my-dir -i cell_hashing_inputs.json -o cell_hashing_inputs_updated.json
+	alto run -m cumulus/cumulus_hashing_cite_seq -w ws-lab/ws-01 --bucket-folder my-dir -i cell_hashing_inputs.json -o cell_hashing_inputs_updated.json
 
 #. For Phase 3 above, similarly, in the same directory of your ``cite_seq_sample_sheet.csv`` file, prepare JSON file ``cite_seq_inputs.json`` as below::
 
@@ -296,7 +295,7 @@ First, install *altocumulus* by following `altocumulus installation instruction 
 
    Run the following command in the same directory on your local machine::
 
-	alto fc_run -m cumulus/cumulus_hashing_cite_seq -w ws-lab/ws-01 --bucket-folder my-dir -i cite_seq_inputs.json -o cite_seq_inputs_updated.json
+	alto run -m cumulus/cumulus_hashing_cite_seq -w ws-lab/ws-01 --bucket-folder my-dir -i cite_seq_inputs.json -o cite_seq_inputs_updated.json
 
 #. For Phase 4 above, similarly, in the same directory of your ``cumulus_count_matrix.csv`` file, prepare JSON file ``cumulus_inputs.json`` as below::
 
@@ -318,7 +317,7 @@ First, install *altocumulus* by following `altocumulus installation instruction 
 
    Run the following command in the same directory of your ``cumulus_inputs.json`` file::
 
-	alto fc_run -m cumulus/cumulus -w ws-lab/ws-01 --bucket-folder my-dir/results -i cumulus_inputs.json -o cumulus_inputs_updated.json
+	alto run -m cumulus/cumulus -w ws-lab/ws-01 --bucket-folder my-dir/results -i cumulus_inputs.json -o cumulus_inputs_updated.json
 
 
 .. _Terra: https://app.terra.bio/
