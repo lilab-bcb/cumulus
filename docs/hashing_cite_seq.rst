@@ -107,9 +107,9 @@ cumulus_hashing_cite_seq inputs:
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/antibody_control.csv"
 	  - 
 	* - cumulus_version
-	  - cumulus version to use. Versions available: 0.13.0, 0.12.0, 0.11.0, 0.10.0.
-	  - "0.13.0"
-	  - "0.13.0"
+	  - cumulus version to use. Versions available: 0.14.0, 0.13.0, 0.12.0, 0.11.0, 0.10.0.
+	  - "0.14.0"
+	  - "0.14.0"
 	* - docker_registry
 	  - Docker registry to use. Options:
 
