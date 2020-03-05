@@ -13,7 +13,7 @@ convert_loom_to_seurat <- function(from) {
         stop("Convertion from loom to Seurat object only works for Seurat v3!")
     }
 
-    x.loom <- connect(from, mode = 'r')
+    x.loom <- connect(from, mode = 'r', skip.validate = TRUE)
     seurat.object <- as.Seurat(x.loom, cells = 'obs_names', features = 'var_names')
 
     cell.attrs <- hdf5r::list.datasets(
