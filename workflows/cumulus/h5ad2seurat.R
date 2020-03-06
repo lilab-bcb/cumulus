@@ -117,7 +117,7 @@ convert_h5ad_to_seurat <- function(from) {
 	for (embed.key in obsm_keys) {
 		if (startsWith(embed.key, "X_")) {
 			embed.type <- substr(embed.key, 3, nchar(embed.key))
-			embed.name <- switch(embed.type, "pca" = "PC", "tsne" = "tSNE", "diffmap_pca" = "DIFFMAPPCA", toupper(embed.type))
+			embed.name <- switch(embed.type, "pca" = "PC", "tsne" = "tSNE", "diffmap_pca" = "DIFFMAPPCA", "pca_harmony" = "HARMONYPC", toupper(embed.type))
 			embed.name <- paste0(embed.name, "_")
 			if (!isV3 && embed.name == "PC_") { embed.name = "PC" }
 			embed.content = py_to_r(from$obsm$get(embed.key))

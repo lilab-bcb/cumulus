@@ -34,7 +34,7 @@ convert_loom_to_seurat <- function(from) {
     for (embed.key in embed.attrs) {
         if (startsWith(embed.key, "X_")) {
             embed.type <- substr(embed.key, 3, nchar(embed.key))
-            embed.name <- switch(embed.type, "pca" = "PC", "tsne" = "tSNE", "diffmap_pca" = "DIFFMAPPCA", toupper(embed.type))
+            embed.name <- switch(embed.type, "pca" = "PC", "tsne" = "tSNE", "diffmap_pca" = "DIFFMAPPCA", "pca_harmony" = "HARMONYPC", toupper(embed.type))
             embed.name <- paste0(embed.name, "_")
             embed.content <- t(x = x.loom[['col_attrs']][[embed.key]][, ])
             colnames(x = embed.content) <- paste0(embed.name, 1:ncol(x = embed.content))
