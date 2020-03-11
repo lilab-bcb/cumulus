@@ -21,13 +21,13 @@ RUN pip install --upgrade pip && \
 	pip install numpy==1.16.4 && \
 	pip install Cython==0.29.13 && \
 	pip install pybind11==2.3.0 && \
-	pip install h5py==2.9.0 && \
+	pip install h5py==2.10.0 && \
 	pip install fitsne==1.0.1 && \
 	pip install joblib==0.13.2 && \
 	pip install leidenalg==0.7.0 && \
 	pip install lightgbm==2.2.1 && \
 	pip install llvmlite==0.31.0 && \
-	pip install loompy==2.0.17 && \
+	pip install loompy==3.0.6 && \
 	pip install natsort==6.0.0 && \
 	pip install numba==0.47.0 && \
 	pip install pandas==1.0.1 && \
