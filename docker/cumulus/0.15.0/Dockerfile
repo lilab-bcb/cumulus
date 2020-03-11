@@ -44,7 +44,7 @@ RUN pip install --upgrade pip && \
 	pip install MulticoreTSNE-modified==0.1 && \
 	pip install umap-learn==0.3.10 && \
 	pip install torch==1.4.0 && \
-	pip install harmony-pytorch==0.1.1 && \
+	pip install harmony-pytorch==0.1.2 && \
 	pip install pegasuspy==0.17.0
 
 
