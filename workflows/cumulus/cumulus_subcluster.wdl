@@ -8,8 +8,8 @@ workflow cumulus_subcluster {
 	# Specify which cells will be included in the subcluster analysis. This field contains one or more <subset_selection> strings separated by ';'. Each <subset_selection> string takes the format of ‘attr:value,…,value’, which means select cells with attr in the values. If multiple <subset_selection> strings are specified, the subset of cells selected is the intersection of these strings.
 	String subset_selections
 
-	# cumulus version, default to "0.14.0"
-	String? cumulus_version = "0.14.0"
+	# cumulus version, default to "0.15.0"
+	String? cumulus_version = "0.15.0"
 	# Docker registry to use
 	String? docker_registry = "cumulusprod"
 	# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
