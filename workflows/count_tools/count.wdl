@@ -220,6 +220,7 @@ task generate_count_config {
                         # check_call(['ls', dir_name], stdout = tmp_fout)
                     with open(row['Sample'] + "_tmp.txt", 'r') as tmp_fin:
                         file_list = [os.path.basename(line.rstrip('\n')) for line in tmp_fin.readlines()]
+                        file_list = [f for f in file_list if f] # Remove empty strings.
                         read_names = pd.Series(list(map(lambda f: f.split('.')[-3].split('_')[-2], file_list))).unique()
                         if read_names.size == len(file_list):
                             # No need to merge fastqs
