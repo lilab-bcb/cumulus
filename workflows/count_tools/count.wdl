@@ -4,7 +4,7 @@ import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_merge_fastq
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_starsolo/versions/10/plain-WDL/descriptor" as sts
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_bustools/versions/4/plain-WDL/descriptor" as kbc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_alevin/versions/2/plain-WDL/descriptor" as ale
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_optimus/versions/6/plain-WDL/descriptor" as opm
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_optimus/versions/7/plain-WDL/descriptor" as opm
 
 #import "merge_fastqs.wdl" as mfs
 #import "star-solo.wdl" as sts
@@ -47,8 +47,7 @@ workflow count {
         String bustools_version = '0.24.4'
 
         # Optimus
-        String optimus_version = 'optimus_v1.4.0'
-        Boolean optimus_output_loom = false
+        Boolean optimus_output_loom = true
     }
 
     call generate_count_config as Config {
@@ -155,7 +154,6 @@ workflow count {
                         output_directory = output_directory,
                         output_loom = optimus_output_loom,
                         docker_registry = docker_registry,
-                        version = optimus_version,
                         disk_space = disk_space,
                         preemptible = preemptible,
                         cpu_for_copy = num_cpu,

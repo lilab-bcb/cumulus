@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://raw.githubusercontent.com/lilab-bcb/skylab/cumulus/pipelines/optimus/Optimus.wdl" as opm
+import "https://raw.githubusercontent.com/HumanCellAtlas/skylab/optimus_v2.0.0_terra/pipelines/optimus/Optimus.wdl" as opm
 # import "../../../skylab/pipelines/optimus/Optimus.wdl" as opm
 
 workflow optimus_count {
@@ -15,7 +15,7 @@ workflow optimus_count {
         Boolean output_loom
 
         String docker_registry = "cumulusprod"
-        String version = 'optimus_v1.4.0'
+        String version = 'optimus_v2.0.0'
         Int cpu_for_copy = 32
         Int disk_space = 100
         Int preemptible = 2
@@ -138,7 +138,12 @@ task organize_result {
         mkdir output/zarr_output
         cp ~{sep=" " zarr_files} output/zarr_output
 
-        cp ~{loom_file} output
+        python <<CODE
+        from subprocess import check_call
+
+        if '~{loom_file}' is not '':
+            check_call(['cp', '~{loom_file}', 'output'])
+        CODE
 
         gsutil -q -m rsync -r output ~{output_directory}/~{sample_id}
         # mkdir -p ~{output_directory}/~{sample_id}
