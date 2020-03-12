@@ -138,7 +138,12 @@ task organize_result {
         mkdir output/zarr_output
         cp ~{sep=" " zarr_files} output/zarr_output
 
-        cp ~{loom_file} output
+        python <<CODE
+        from subprocess import check_call
+
+        if '~{loom_file}' is not '':
+            check_call(['cp', '~{loom_file}', 'output'])
+        CODE
 
         gsutil -q -m rsync -r output ~{output_directory}/~{sample_id}
         # mkdir -p ~{output_directory}/~{sample_id}
