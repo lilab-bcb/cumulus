@@ -1,50 +1,53 @@
+version 1.0
+
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/8/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus_hashing_cite_seq {
-	# An sample sheet contains RNA and ADT data correspondence
-	File input_sample_sheet
-	# Output directory, gs url
-	String output_directory
+	input {
+		# An sample sheet contains RNA and ADT data correspondence
+		File input_sample_sheet
+		# Output directory, gs url
+		String output_directory
 
-	# cumulus version, default to "0.15.0"
-	String? cumulus_version = "0.15.0"
-	# Docker registry to use
-	String? docker_registry = "cumulusprod"
-	# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-	String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-	# Number of cpus
-	Int? num_cpu = 8
-	# Memory string
-	String? memory = "10G"
-	# Disk space in GB
-	Int? disk_space = 20
-	# Number of preemptible tries 
-	Int? preemptible = 2
+		# cumulus version, default to "0.15.0"
+		String cumulus_version = "0.15.0"
+		# Docker registry to use
+		String docker_registry = "cumulusprod"
+		# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+		String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+		# Number of cpus
+		Int num_cpu = 8
+		# Memory string
+		String memory = "10G"
+		# Disk space in GB
+		Int disk_space = 20
+		# Number of preemptible tries 
+		Int preemptible = 2
 
-	# Reference genome
-	String? genome
+		# Reference genome
+		String? genome
 
-	# demuxEM parameters
-	# Only demultiplex cells/nuclei with at least <demuxEM_min_num_genes> expressed genes. [default: 100]
-	Int? demuxEM_min_num_genes
-	# The Dirichlet prior concentration parameter (alpha) on samples. An alpha value < 1.0 will make the prior sparse.
-	Float? demuxEM_alpha_on_samples
-	# Only demultiplex cells/nuclei with at least <demuxEM_min_num_umis> of UMIs. [default: 100]
-	Int? demuxEM_min_num_umis
-	# Any cell/nucleus with less than <count> hashtags from the signal will be marked as unknown. [default: 10.0]
-	Float? demuxEM_min_signal_hashtag
-	# The random seed used in the KMeans algorithm to separate empty ADT droplets from others. [default: 0]
-	Int? demuxEM_random_state
-	# Generate a series of diagnostic plots, including the background/signal between HTO counts, estimated background probabilities, HTO distributions of cells and non-cells etc. [default: true]
-	Boolean? demuxEM_generate_diagnostic_plots = true
-	# Generate violin plots using gender-specific genes (e.g. Xist). <demuxEM_generate_gender_plot> is a comma-separated list of gene names.
-	String? demuxEM_generate_gender_plot
+		# demuxEM parameters
+		# Only demultiplex cells/nuclei with at least <demuxEM_min_num_genes> expressed genes. [default: 100]
+		Int? demuxEM_min_num_genes
+		# The Dirichlet prior concentration parameter (alpha) on samples. An alpha value < 1.0 will make the prior sparse.
+		Float? demuxEM_alpha_on_samples
+		# Only demultiplex cells/nuclei with at least <demuxEM_min_num_umis> of UMIs. [default: 100]
+		Int? demuxEM_min_num_umis
+		# Any cell/nucleus with less than <count> hashtags from the signal will be marked as unknown. [default: 10.0]
+		Float? demuxEM_min_signal_hashtag
+		# The random seed used in the KMeans algorithm to separate empty ADT droplets from others. [default: 0]
+		Int? demuxEM_random_state
+		# Generate a series of diagnostic plots, including the background/signal between HTO counts, estimated background probabilities, HTO distributions of cells and non-cells etc. [default: true]
+		Boolean demuxEM_generate_diagnostic_plots = true
+		# Generate violin plots using gender-specific genes (e.g. Xist). <demuxEM_generate_gender_plot> is a comma-separated list of gene names.
+		String? demuxEM_generate_gender_plot
 
-	# merge_rna_adt parameters
-	# A CSV file containing the IgG control information for each antibody.
-	File? antibody_control_csv
-
+		# merge_rna_adt parameters
+		# A CSV file containing the IgG control information for each antibody.
+		File? antibody_control_csv
+	}
 
 
 	call tasks.generate_hashing_cite_seq_tasks as generate_hashing_cite_seq_tasks {
