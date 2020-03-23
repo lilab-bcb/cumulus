@@ -54,7 +54,13 @@ RUN conda install -y python==3.6.10 && \
     pip install pandas && \
     pip install scipy && \
     pip install pystan==2.17.1.0 && \
-    pip install pyfaidx
+    pip install pyfaidx && \
+    pip install networkx
+
+RUN cd /opt && \
+    git clone https://github.com/klarman-cell-observatory/pegasusio.git && \
+    cd pegasusio && \
+    pip install .
 
 RUN cd /opt && \
     wget -O htslib.tar.bz2 https://github.com/samtools/htslib/releases/download/1.9/htslib-1.9.tar.bz2 && \
