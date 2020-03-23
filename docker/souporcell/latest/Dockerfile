@@ -9,7 +9,8 @@ RUN apt-get update && apt-get install -y \
         zlib1g-dev \
         libbz2-dev \
         liblzma-dev \
-        git
+        git \
+        unzip
 
 RUN cd /opt && \
     wget -O minimap2.tar.gz https://github.com/lh3/minimap2/archive/v2.7.tar.gz && \
@@ -39,7 +40,10 @@ RUN bash -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y'
 ENV PATH=/opt/.cargo/bin:$PATH
 
 RUN cd /opt && \
-    git clone https://github.com/wheaton5/souporcell.git && \
+    wget https://github.com/wheaton5/souporcell/archive/88b9ce68051beaddba3b292d629d6d5c813f4e6f.zip -O souporcell.zip && \
+    unzip souporcell.zip && \
+    rm souporcell.zip && \
+    mv souporcell-88b9ce68051beaddba3b292d629d6d5c813f4e6f souporcell && \
     cd souporcell/troublet && \
     cargo build --release && \
     cd /opt/souporcell/souporcell && \
