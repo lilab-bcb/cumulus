@@ -43,11 +43,9 @@ Or use the following commdands for MacOS installation::
 
     conda create -n alto -y pip
     source activate alto
-    git clone https://github.com/klarman-cell-observatory/altocumulus.git
-    cd altocumulus
-    pip install -e .
+    pip install altocumulus
 
-When the installation is done, type ``alto run -h`` in terminal to see if you can see the help information.
+When the installation is done, type ``alto -h`` in terminal to see if you can see the help information.
 
 
 Run Terra workflows via ``alto run``
@@ -57,7 +55,7 @@ Run Terra workflows via ``alto run``
 
 - Uploads local files/directories in your inputs to a Google Cloud bucket updates the file paths to point to the Google Cloud bucket. 
 
-   Your sample sheet can point to local file paths. In this case, ``alto run`` will take care of uploading directories (e.g. fastq directories) and modifying the sample sheet to point to a Google Cloud bucket.
+   Your sample sheet can point to local file paths. In this case, ``alto run`` will take care of uploading directories smartly (e.g. only upload necessary files in BCL folders) and modifying the sample sheet to point to a Google Cloud bucket.
 
 - Creates or uses an existing workspace.
 

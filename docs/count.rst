@@ -190,16 +190,11 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	    | This input only works when setting *count_tool* to ``Bustools``.
 	  - "0.24.4"
 	  - "0.24.4"
-	* - optimus_version
-	  - | Optimus version to use. Currently only support 1.4.0.
-	    | This input only works when setting *count_tool* to ``Bustools``.
-	  - "optimus_v1.4.0"
-	  - "optimus_v1.4.0"
 	* - optimus_output_loom
 	  - | If Optimus generates gene-count matrices in ``loom`` format.
 	    | This input only works when setting *count_tool* to ``Optimus``.
-	  - false
-	  - false
+	  - true
+	  - true
 
 
 Workflow outputs
