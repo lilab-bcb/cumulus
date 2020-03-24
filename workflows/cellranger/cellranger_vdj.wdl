@@ -1,43 +1,46 @@
+version 1.0
+
 workflow cellranger_vdj {
-	# Sample ID
-	String sample_id
-	# A comma-separated list of input FASTQs directories (gs urls)
-	String input_fastqs_directories
-	# CellRanger output directory, gs url
-	String output_directory
+	input {
+		# Sample ID
+		String sample_id
+		# A comma-separated list of input FASTQs directories (gs urls)
+		String input_fastqs_directories
+		# CellRanger output directory, gs url
+		String output_directory
 
-	# GRCh38_vdj, GRCm38_vdj or a URL to a tar.gz file
-	String genome
+		# GRCh38_vdj, GRCm38_vdj or a URL to a tar.gz file
+		String genome
 
+		# Force pipeline to use this number of cells, bypassing the cell detection algorithm.
+		Int? force_cells
+		# Do not align reads to reference V(D)J sequences before de novo assembly. Default: false
+		Boolean denovo = false
 
-	File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
+		# cellranger version
+		String cellranger_version
+		# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
+		String zones = "us-central1-b"
+		# Number of cpus per cellranger job
+		Int num_cpu = 32
+		# Memory string, e.g. 120G
+		String memory = "120G"
+		# Disk space in GB
+		Int disk_space = 500
+		# Number of preemptible tries 
+		Int preemptible = 2
+
+		# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
+    	String docker_registry
+    }
+
+    File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
 	# File acronym_file = "index.tsv"
 	Map[String, String] acronym2gsurl = read_map(acronym_file)
 	# If reference is a url
 	Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
 
 	File genome_file = (if is_url then genome else acronym2gsurl[genome])
-
-	# Force pipeline to use this number of cells, bypassing the cell detection algorithm.
-	Int? force_cells
-	# Do not align reads to reference V(D)J sequences before de novo assembly. Default: false
-	Boolean? denovo = false
-
-	# cellranger version
-	String cellranger_version
-	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
-	String? zones = "us-central1-b"
-	# Number of cpus per cellranger job
-	Int? num_cpu = 32
-	# Memory string, e.g. 120G
-	String? memory = "120G"
-	# Disk space in GB
-	Int? disk_space = 500
-	# Number of preemptible tries 
-	Int? preemptible = 2
-
-	# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-    String docker_registry
 
 	call run_cellranger_vdj {
 		input:
@@ -65,19 +68,21 @@ workflow cellranger_vdj {
 }
 
 task run_cellranger_vdj {
-	String sample_id
-	String input_fastqs_directories
-	String output_directory
-	File genome_file
-	Int? force_cells
-	Boolean denovo
-	String cellranger_version
-	String zones
-	Int num_cpu
-	String memory
-	Int disk_space
-	Int preemptible
-	String docker_registry
+	input {
+		String sample_id
+		String input_fastqs_directories
+		String output_directory
+		File genome_file
+		Int? force_cells
+		Boolean denovo
+		String cellranger_version
+		String zones
+		Int num_cpu
+		String memory
+		Int disk_space
+		Int preemptible
+		String docker_registry
+	}
 
 	command {
 		set -e

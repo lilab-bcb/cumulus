@@ -1,45 +1,49 @@
+version 1.0
+
 workflow cumulus_adt {
-	# Sample ID
-	String sample_id
-	# A comma-separated list of input FASTQs directories (gs urls)
-	String input_fastqs_directories
-	# Output directory, gs url
-	String output_directory
+	input {
+		# Sample ID
+		String sample_id
+		# A comma-separated list of input FASTQs directories (gs urls)
+		String input_fastqs_directories
+		# Output directory, gs url
+		String output_directory
 
-	# 10x genomics chemistry 
-	String chemistry
+		# 10x genomics chemistry 
+		String chemistry
 
-	# data type, either adt or crispr
-	String data_type
+		# data type, either adt or crispr
+		String data_type
+
+		# feature barcodes in csv format
+		File feature_barcode_file
+
+		# scaffold sequence for Perturb-seq, default is "", which for Perturb-seq means barcode starts at position 0 of read 2
+		String scaffold_sequence = ""
+
+		# maximum hamming distance in feature barcodes
+		Int max_mismatch = 3
+		# minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for crispr
+		Float min_read_ratio = 0.1
+
+		# cumulus_feature_barcoding version
+		String cumulus_feature_barcoding_version
+		# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
+		String zones = "us-central1-b"
+		# Memory string, e.g. 32G
+		String memory = "32G"
+		# Disk space in GB
+		Int disk_space = 100
+		# Number of preemptible tries 
+		Int preemptible = 2
+
+		# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
+		String docker_registry = "cumulusprod"
+	}
 
 	# cell barcodes white list, from 10x genomics, can be either v2 or v3 chemistry
 	File cell_barcode_file = (if chemistry == "SC3Pv3" then "gs://regev-lab/resources/cellranger/3M-february-2018.txt.gz" else "gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz")
 	# File cell_barcode_file = (if chemistry == "SC3Pv3" then "3M-february-2018.txt.gz" else "737K-august-2016.txt.gz")
-
-	# feature barcodes in csv format
-	File feature_barcode_file
-
-	# scaffold sequence for Perturb-seq, default is "", which for Perturb-seq means barcode starts at position 0 of read 2
-	String? scaffold_sequence = ""
-
-	# maximum hamming distance in feature barcodes
-	Int? max_mismatch = 3
-	# minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for crispr
-	Float? min_read_ratio = 0.1
-
-	# cumulus_feature_barcoding version
-	String cumulus_feature_barcoding_version
-	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
-	String? zones = "us-central1-b"
-	# Memory string, e.g. 32G
-	String? memory = "32G"
-	# Disk space in GB
-	Int? disk_space = 100
-	# Number of preemptible tries 
-	Int? preemptible = 2
-
-	# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-	String? docker_registry = "cumulusprod"
 
 
 	call run_generate_count_matrix_ADTs {
@@ -69,22 +73,24 @@ workflow cumulus_adt {
 }
 
 task run_generate_count_matrix_ADTs {
-	String sample_id
-	String input_fastqs_directories
-	String output_directory
-	String chemistry
-	String data_type
-	File cell_barcodes
-	File feature_barcodes
-	String scaffold_sequence
-	Int max_mismatch
-	Float min_read_ratio
-	String cumulus_feature_barcoding_version
-	String zones
-	String memory
-	Int disk_space
-	Int preemptible
-	String docker_registry
+	input {
+		String sample_id
+		String input_fastqs_directories
+		String output_directory
+		String chemistry
+		String data_type
+		File cell_barcodes
+		File feature_barcodes
+		String scaffold_sequence
+		Int max_mismatch
+		Float min_read_ratio
+		String cumulus_feature_barcoding_version
+		String zones
+		String memory
+		Int disk_space
+		Int preemptible
+		String docker_registry
+	}
 
 	command {
 		set -e

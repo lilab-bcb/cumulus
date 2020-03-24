@@ -1,17 +1,21 @@
-workflow cellranger_vdj_create_reference {
-    String? docker_registry = "cumulusprod"
-    String? cellranger_version = '3.1.0'
-    Int? disk_space = 100
-    Int? preemptible = 2
-    String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-    String? memory = "32G"
+version 1.0
 
-    File input_fasta
-    File input_gtf
-    # Output directory, gs URL
-    String output_directory
-    String genome
-    String? ref_version
+workflow cellranger_vdj_create_reference {
+    input {
+        String docker_registry = "cumulusprod"
+        String cellranger_version = '3.1.0'
+        Int disk_space = 100
+        Int preemptible = 2
+        String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        String memory = "32G"
+
+        File input_fasta
+        File input_gtf
+        # Output directory, gs URL
+        String output_directory
+        String genome
+        String ref_version = ""
+    }
 
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "/+$", "")
@@ -33,17 +37,19 @@ workflow cellranger_vdj_create_reference {
 }
 
 task run_cellranger_vdj_create_reference {
-    String docker_registry
-    String cellranger_version
-    Int disk_space
-    Int preemptible
-    String zones
-    String memory
-    File input_fasta
-    File input_gtf
-    String output_dir
-    String genome
-    String ref_version
+    input {
+        String docker_registry
+        String cellranger_version
+        Int disk_space
+        Int preemptible
+        String zones
+        String memory
+        File input_fasta
+        File input_gtf
+        String output_dir
+        String genome
+        String ref_version
+    }
 
     command {
         set -e
