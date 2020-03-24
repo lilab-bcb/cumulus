@@ -207,6 +207,10 @@ Please see the description of important inputs below.
 dropseq_workflow Terra Release Notes
 ===================================================
 
+**Version 8**
+
+- Added additional parameters for bcl2fastq
+
 **Version 7**
 
 - Added support for multi-species genomes (Barnyard experiments)
