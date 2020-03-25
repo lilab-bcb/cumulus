@@ -52,19 +52,17 @@ RUN cd /opt && \
 ENV PATH=/opt/souporcell:/opt/souporcell/troublet/target/release:$PATH
 
 RUN conda install -y python==3.6.10 && \
-    pip install pysam && \
-    pip install pyvcf && \
-    pip install numpy && \
-    pip install pandas && \
-    pip install scipy && \
+    pip install numpy==1.18.2 && \
+    pip install pandas==1.0.3 && \
+    pip install scipy==1.4.1 && \
+    pip install pysam==0.15.4 && \
+    pip install pyvcf==0.6.8 && \
     pip install pystan==2.17.1.0 && \
-    pip install pyfaidx && \
-    pip install networkx
-
-RUN cd /opt && \
-    git clone https://github.com/klarman-cell-observatory/pegasusio.git && \
-    cd pegasusio && \
-    pip install .
+    pip install pyfaidx==0.5.8 && \
+    pip install anndata==0.7.1 && \
+    pip install zarr==2.4.0 && \
+    pip install networkx==2.4 && \
+    pip install pegasusio==0.1.1
 
 RUN cd /opt && \
     wget -O htslib.tar.bz2 https://github.com/samtools/htslib/releases/download/1.9/htslib-1.9.tar.bz2 && \
@@ -108,5 +106,8 @@ RUN cd /opt && \
 
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/souporcell/extract_barcodes_for_souporcell.py /opt
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/souporcell/match_donors.py /opt
+
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /opt
+RUN chmod a+rx /opt/monitor_script.sh
 
 ENV PATH=/opt/vartrix:/opt:$PATH
