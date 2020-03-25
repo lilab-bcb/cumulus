@@ -93,7 +93,11 @@ task generate_demux_config {
                 fo_h5.write(row['Sample'] + '\t' + row['H5_file'] + '\n')
                 fo_bam.write(row['Sample'] + '\t' + row['Bam_file'] + '\n')
                 fo_vcf.write(row['Sample'] + '\t' + row['Genotypes'] + '\n')
-                fo_donors.write(row['Sample'] + '\t' + row['Donors'] + '\n')
+
+                if 'Donors' in df.columns:
+                    fo_donors.write(row['Sample'] + '\t' + row['Donors'] + '\n')
+                else:
+                    fo_donors.write(row['Sample'] + '\tnull\n')
                 fo_clusters.write(row['Sample'] + '\t' + row['Clusters'] + '\n')
         CODE
     }
@@ -152,7 +156,7 @@ task run_souporcell_demux {
         from subprocess import check_call
 
         call_args = ['python', '/opt/match_donors.py']
-        if donor_names is not '':
+        if donor_names is not 'null':
             call_args.extend(['--donor-names', '${donor_names}'])
 
         call_args.extend(['result/cluster_genotypes.vcf', '~{input_vcf_gz}', 'result/clusters.tsv', '~{input_h5}', 'result/~{sample_id}_demux.zarr'])
