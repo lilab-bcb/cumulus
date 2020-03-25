@@ -75,26 +75,26 @@ task generate_demux_config {
         export TMPDIR=/tmp
 
         python <<CODE
-            import re, sys
-            import pandas as pd
+        import re, sys
+        import pandas as pd
 
-            df = pd.read_csv('~{input_sample_sheet}', header = 0, dtype = str, index_col = False)
-            for c in df.columns:
-                df[c] = df[c].str.strip()
-            regex_pat = re.compile('[^a-zA-Z0-9_-]')
-            if any(df['Sample'].str.contains(regex_pat)):
-                print('Sample must contain only alphanumeric characters, hyphens, and underscores.')
-                print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &')
-                sys.exit(1)
+        df = pd.read_csv('~{input_sample_sheet}', header = 0, dtype = str, index_col = False)
+        for c in df.columns:
+            df[c] = df[c].str.strip()
+        regex_pat = re.compile('[^a-zA-Z0-9_-]')
+        if any(df['Sample'].str.contains(regex_pat)):
+            print('Sample must contain only alphanumeric characters, hyphens, and underscores.')
+            print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &')
+            sys.exit(1)
             
-            with open('run_ids.txt', 'w') as fo_ids, open('h5s.txt', 'w') as fo_h5, open('bams.txt', 'w') as fo_bam, open('vcfs.txt', 'w') as fo_vcf, open('donor_names.txt', 'w') as fo_donors, open('n_clusters.txt', 'w') as fo_clusters:
-                for idx, row in df.iterrows():
-                    fo_ids.write(row['Sample'] + '\n')
-                    fo_h5.write(row['Sample'] + '\t' + row['H5_file'] + '\n')
-                    fo_bam.write(row['Sample'] + '\t' + row['Bam_file'] + '\n')
-                    fo_vcf.write(row['Sample'] + '\t' + row['Genotypes'] + '\n')
-                    fo_donors.write(row['Sample'] + '\t' + row['Donors'] + '\n')
-                    fo_clusters.write(row['Sample'] + '\t' + row['Clusters'] + '\n')
+        with open('run_ids.txt', 'w') as fo_ids, open('h5s.txt', 'w') as fo_h5, open('bams.txt', 'w') as fo_bam, open('vcfs.txt', 'w') as fo_vcf, open('donor_names.txt', 'w') as fo_donors, open('n_clusters.txt', 'w') as fo_clusters:
+            for idx, row in df.iterrows():
+                fo_ids.write(row['Sample'] + '\n')
+                fo_h5.write(row['Sample'] + '\t' + row['H5_file'] + '\n')
+                fo_bam.write(row['Sample'] + '\t' + row['Bam_file'] + '\n')
+                fo_vcf.write(row['Sample'] + '\t' + row['Genotypes'] + '\n')
+                fo_donors.write(row['Sample'] + '\t' + row['Donors'] + '\n')
+                fo_clusters.write(row['Sample'] + '\t' + row['Clusters'] + '\n')
         CODE
     }
 
