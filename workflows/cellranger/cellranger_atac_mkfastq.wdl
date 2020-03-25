@@ -113,7 +113,7 @@ task run_cellranger_atac_mkfastq {
 
 	output {
 		String output_fastqs_directory = "~{output_directory}/~{run_id}_fastqs"
-		String output_fastqs_flowcell_directory = select_first(read_lines("output_fastqs_flowcell_directory.txt"))
+		String output_fastqs_flowcell_directory = read_lines("output_fastqs_flowcell_directory.txt")[0]
 		File monitoringLog = "monitoring.log"
 	}
 
