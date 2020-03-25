@@ -97,56 +97,56 @@ task run_cellranger_count {
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
 		mkdir -p genome_dir
-		tar xf ${genome_file} -C genome_dir --strip-components 1
+		tar xf ~{genome_file} -C genome_dir --strip-components 1
 
 		python <<CODE
 		import re
 		from subprocess import check_call
 
 		fastqs = []
-		for i, directory in enumerate('${input_fastqs_directories}'.split(',')):
+		for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
 			directory = re.sub('/+$', '', directory) # remove trailing slashes 
-			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/${sample_id}', '.']
-			# call_args = ['cp', '-r', directory + '/${sample_id}', '.']
+			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/~{sample_id}', '.']
+			# call_args = ['cp', '-r', directory + '/~{sample_id}', '.']
 			print(' '.join(call_args))
 			check_call(call_args)
-			call_args = ['mv', '${sample_id}', '${sample_id}_' + str(i)]
+			call_args = ['mv', '~{sample_id}', '~{sample_id}_' + str(i)]
 			print(' '.join(call_args))
 			check_call(call_args)
-			fastqs.append('${sample_id}_' + str(i))
+			fastqs.append('~{sample_id}_' + str(i))
 	
-		call_args = ['cellranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=${sample_id}']
-		if '${cellranger_version}' != '2.0.2':
-			call_args.append('--chemistry=${chemistry}')
+		call_args = ['cellranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}']
+		if '~{cellranger_version}' != '2.0.2':
+			call_args.append('--chemistry=~{chemistry}')
 			call_args.append('--jobmode=local')
-		if '${force_cells}' is not '':
-			call_args.append('--force-cells=${force_cells}')
-		if '${expect_cells}' is not '':
-			call_args.append('--expect-cells=${expect_cells}')
-		if '${secondary}' is not 'true':
+		if '~{force_cells}' is not '':
+			call_args.append('--force-cells=~{force_cells}')
+		if '~{expect_cells}' is not '':
+			call_args.append('--expect-cells=~{expect_cells}')
+		if '~{secondary}' is not 'true':
 			call_args.append('--nosecondary')
 		print(' '.join(call_args))
 		check_call(call_args)
 		CODE
 
-		gsutil -q -m rsync -d -r results/outs ${output_directory}/${sample_id}
-		# cp -r results/outs ${output_directory}/${sample_id}
+		gsutil -q -m rsync -d -r results/outs ~{output_directory}/~{sample_id}
+		# cp -r results/outs ~{output_directory}/~{sample_id}
 	}
 
 	output {
-		String output_count_directory = "${output_directory}/${sample_id}"
-		String output_metrics_summary = "${output_directory}/${sample_id}/metrics_summary.csv"
-		String output_web_summary = "${output_directory}/${sample_id}/web_summary.html"
+		String output_count_directory = "~{output_directory}/~{sample_id}"
+		String output_metrics_summary = "~{output_directory}/~{sample_id}/metrics_summary.csv"
+		String output_web_summary = "~{output_directory}/~{sample_id}/web_summary.html"
 		File monitoringLog = "monitoring.log"
 	}
 
 	runtime {
-		docker: "${docker_registry}/cellranger:${cellranger_version}"
+		docker: "~{docker_registry}/cellranger:~{cellranger_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
-		disks: "local-disk ${disk_space} HDD"
-		cpu: "${num_cpu}"
-		preemptible: "${preemptible}"
+		disks: "local-disk ~{disk_space} HDD"
+		cpu: "~{num_cpu}"
+		preemptible: "~{preemptible}"
 	}
 }

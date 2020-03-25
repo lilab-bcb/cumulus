@@ -61,7 +61,7 @@ task run_cellranger_vdj_create_reference {
         from subprocess import check_call
 
         # Unzip fa if needed.
-        fa_file = '${input_fasta}'
+        fa_file = '~{input_fasta}'
         root, ext = os.path.splitext(fa_file)
         if ext == '.gz':
             call_args = ['gunzip', '-f', fa_file]
@@ -70,7 +70,7 @@ task run_cellranger_vdj_create_reference {
             fa_file = root
 
         # Unzip gtf if needed.
-        gtf_file = '${input_gtf}'
+        gtf_file = '~{input_gtf}'
         root, ext = os.path.splitext(gtf_file)
         if ext == '.gz':
             call_args = ['gunzip', '-f', gtf_file]
@@ -78,32 +78,32 @@ task run_cellranger_vdj_create_reference {
             check_call(call_args)
             gtf_file = root
 
-        call_args = ['cellranger', 'mkvdjref', '--genome=${genome}', '--fasta=' + fa_file, '--genes=' + gtf_file]
+        call_args = ['cellranger', 'mkvdjref', '--genome=~{genome}', '--fasta=' + fa_file, '--genes=' + gtf_file]
 
-        if '${ref_version}' is not '':
-            call_args.append('--ref-version=${ref_version}')
+        if '~{ref_version}' is not '':
+            call_args.append('--ref-version=~{ref_version}')
 
         print(' '.join(call_args))
         check_call(call_args)
         CODE
 
-        tar -czf ${genome}.tar.gz ${genome}
-        gsutil -m cp ${genome}.tar.gz ${output_dir}
-        # mkdir -p ${output_dir}
-        # cp ${genome}.tar.gz ${output_dir}
+        tar -czf ~{genome}.tar.gz ~{genome}
+        gsutil -m cp ~{genome}.tar.gz ~{output_dir}
+        # mkdir -p ~{output_dir}
+        # cp ~{genome}.tar.gz ~{output_dir}
     }
 
     output {
-        File output_reference = "${genome}.tar.gz"
+        File output_reference = "~{genome}.tar.gz"
         File monitoringLog = "monitoring.log"
     }
 
     runtime {
-        docker: "${docker_registry}/cellranger:${cellranger_version}"
+        docker: "~{docker_registry}/cellranger:~{cellranger_version}"
         zones: zones
         memory: memory
-        disks: "local-disk ${disk_space} HDD"
+        disks: "local-disk ~{disk_space} HDD"
         cpu: 1
-        preemptible: "${preemptible}"
+        preemptible: "~{preemptible}"
     }
 }

@@ -1,14 +1,40 @@
+version 1.0
+
 workflow cellranger_atac_aggr {
-	# Aggregate ID
-	String aggr_id
-	# A comma-separated list of input atac count result directories (gs urls), note that each directory should contain fragments.tsv.gz and singlecell.csv
-	String input_counts_directories	
-	# CellRanger-atac output directory, gs url
-	String output_directory
+	input {
+		# Aggregate ID
+		String aggr_id
+		# A comma-separated list of input atac count result directories (gs urls), note that each directory should contain fragments.tsv.gz and singlecell.csv
+		String input_counts_directories	
+		# CellRanger-atac output directory, gs url
+		String output_directory
 
-	# Keywords or a URL to a tar.gz file
-	String genome
+		# Keywords or a URL to a tar.gz file
+		String genome
 
+		# Sample normalization MODE: none (default), depth, signal
+		String normalize = "none"
+		# Perform secondary analysis (dimensionality reduction, clustering and visualization). Default: false
+		Boolean secondary = false
+		# Chose the algorithm for dimensionality reduction prior to clustering and tsne: 'lsa' (default), 'plsa', or 'pca'.
+		String dim_reduce = "lsa"
+
+		# 1.2.0 or 1.1.0
+		String cellranger_atac_version = "1.2.0"
+		# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
+		String zones = "us-central1-b"
+		# Number of cpus per cellranger job
+		Int num_cpu = 64
+		# Memory string, e.g. 57.6G
+		String memory = "57.6G"
+		# Disk space in GB
+		Int disk_space = 500
+		# Number of preemptible tries 
+		Int preemptible = 2
+
+		# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
+		String docker_registry = "cumulusprod"
+	}
 
 	File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
 	# File acronym_file = "index.tsv"
@@ -17,29 +43,6 @@ workflow cellranger_atac_aggr {
 	Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
 
 	File genome_file = (if is_url then genome else acronym2gsurl[genome])
-
-	# Sample normalization MODE: none (default), depth, signal
-	String? normalize = "none"
-	# Perform secondary analysis (dimensionality reduction, clustering and visualization). Default: false
-	Boolean? secondary = false
-	# Chose the algorithm for dimensionality reduction prior to clustering and tsne: 'lsa' (default), 'plsa', or 'pca'.
-	String? dim_reduce = "lsa"
-
-	# 1.2.0 or 1.1.0
-	String? cellranger_atac_version = "1.2.0"
-	# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
-	String? zones = "us-central1-b"
-	# Number of cpus per cellranger job
-	Int? num_cpu = 64
-	# Memory string, e.g. 57.6G
-	String? memory = "57.6G"
-	# Disk space in GB
-	Int? disk_space = 500
-	# Number of preemptible tries 
-	Int? preemptible = 2
-
-	# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-	String? docker_registry = "cumulusprod"
 
 	call run_cellranger_atac_aggr {
 		input:
@@ -68,27 +71,29 @@ workflow cellranger_atac_aggr {
 }
 
 task run_cellranger_atac_aggr {
-	String aggr_id
-	String input_counts_directories
-	String output_directory
-	File genome_file
-	String normalize
-	Boolean secondary
-	String dim_reduce
-	String cellranger_atac_version
-	String zones
-	Int num_cpu
-	String memory
-	Int disk_space
-	Int preemptible
-	String docker_registry
+	input {
+		String aggr_id
+		String input_counts_directories
+		String output_directory
+		File genome_file
+		String normalize
+		Boolean secondary
+		String dim_reduce
+		String cellranger_atac_version
+		String zones
+		Int num_cpu
+		String memory
+		Int disk_space
+		Int preemptible
+		String docker_registry
+	}
 
 	command {
 		set -e
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
 		mkdir -p genome_dir
-		tar xf ${genome_file} -C genome_dir --strip-components 1
+		tar xf ~{genome_file} -C genome_dir --strip-components 1
 
 		python <<CODE
 		import re
@@ -100,7 +105,7 @@ task run_cellranger_atac_aggr {
 			fout.write('library_id,fragments,cells\n')
 			libs_seen = set()
 			current_dir = os.getcwd()
-			for i, directory in enumerate('${input_counts_directories}'.split(',')):
+			for i, directory in enumerate('~{input_counts_directories}'.split(',')):
 				directory = re.sub('/+$', '', directory) # remove trailing slashes
 
 				library_id = os.path.basename(directory)
@@ -115,34 +120,34 @@ task run_cellranger_atac_aggr {
 				counts.append(library_id)
 				fout.write(library_id + "," + current_dir + '/' + library_id + "/fragments.tsv.gz," + current_dir + '/' + library_id + "/singlecell.csv\n")
 
-		call_args = ['cellranger-atac', 'aggr', '--id=results', '--reference=genome_dir', '--csv=aggr.csv', '--normalize=${normalize}', '--jobmode=local']
-		if '${secondary}' is not 'true':
+		call_args = ['cellranger-atac', 'aggr', '--id=results', '--reference=genome_dir', '--csv=aggr.csv', '--normalize=~{normalize}', '--jobmode=local']
+		if '~{secondary}' is not 'true':
 			call_args.append('--nosecondary')
 		else:
-			call_args.append('--dim-reduce=${dim_reduce}')
+			call_args.append('--dim-reduce=~{dim_reduce}')
 		print(' '.join(call_args))
 		check_call(call_args)
 		CODE
 
-		gsutil -q -m rsync -d -r results/outs ${output_directory}/${aggr_id}
-		# mkdir -p ${output_directory}/${aggr_id}
-		# cp -r results/outs ${output_directory}/${aggr_id}
+		gsutil -q -m rsync -d -r results/outs ~{output_directory}/~{aggr_id}
+		# mkdir -p ~{output_directory}/~{aggr_id}
+		# cp -r results/outs ~{output_directory}/~{aggr_id}
 	}
 
 	output {
-		String output_aggr_directory = "${output_directory}/${aggr_id}"
-		String output_metrics_summary = "${output_directory}/${aggr_id}/summary.csv"
-		String output_web_summary = "${output_directory}/${aggr_id}/web_summary.html"
+		String output_aggr_directory = "~{output_directory}/~{aggr_id}"
+		String output_metrics_summary = "~{output_directory}/~{aggr_id}/summary.csv"
+		String output_web_summary = "~{output_directory}/~{aggr_id}/web_summary.html"
 		File monitoringLog = "monitoring.log"
 	}
 
 	runtime {
-		docker: "${docker_registry}/cellranger-atac:${cellranger_atac_version}"
+		docker: "~{docker_registry}/cellranger-atac:~{cellranger_atac_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
-		disks: "local-disk ${disk_space} HDD"
-		cpu: "${num_cpu}"
-		preemptible: "${preemptible}"
+		disks: "local-disk ~{disk_space} HDD"
+		cpu: "~{num_cpu}"
+		preemptible: "~{preemptible}"
 	}
 }
