@@ -72,8 +72,7 @@ def parse_reference_vcf(reference_vcf: str, snp2geno: dict, sample_names: List[s
 				fields = line.strip()[1:].split('\t')
 				assert check_colnames(fields)
 				ref_names = fields[9:]
-				assert len(ref_names) == nsample
-				mmat = np.zeros((nsample, nsample), dtype = int)
+				mmat = np.zeros((len(ref_names), nsample), dtype = int)
 			else:
 				fields = line.strip().split('\t')
 				snp = SNP(fields[0], fields[1], fields[3], fields[4])
@@ -106,23 +105,32 @@ def find_max_matching(ref_names: List[str], sample_names: List[str], mmat: np.ar
 	import networkx as nx
 	from networkx.algorithms import bipartite
 
-	nsample = len(ref_names)
+	nref = len(ref_names)
+	nsample = len(sample_names)
 
 	G = nx.Graph()
 	G.add_nodes_from(ref_names, bipartite = 0)
 	G.add_nodes_from(sample_names, bipartite = 1)
-	G.add_weighted_edges_from([(ref_names[x], sample_names[y], -mmat[x, y]) for x, y in itertools.product(range(nsample), range(nsample))])
+	G.add_weighted_edges_from([(ref_names[x], sample_names[y], -mmat[x, y]) for x, y in itertools.product(range(nref), range(nsample))])
 	result = bipartite.matching.minimum_weight_full_matching(G)
 
-	sample_n2i = {}
-	for i, sample_name in enumerate(sample_names):
-		sample_n2i[sample_name] = i
+	for j, sample_name in enumerate(sample_names):
+		if sample_name not in result:
+			i = np.where(mmat[:, j] == mmat[:, j].max())[0][0]
+			result[sample_name] = ref_names[i]
+			if isinstance(result[ref_names[i]], str):
+				result[ref_names[i]] = [result[ref_names[i]]]
+			result[ref_names[i]].append(sample_name)
 
+	ref_n2i = {}
 	for i, ref_name in enumerate(ref_names):
-		j = sample_n2i[result[ref_name]]
-		if mmat[i, j] != mmat[i].max():
-			k = np.where(mmat[i] == mmat[i].max())[0][0]
-			print("Warning: ref {} shares most SNPs with {}, but matches to {}!".format(ref_name[5:], sample_names[k], sample_names[j]))
+		ref_n2i[ref_name] = i
+
+	for j, sample_name in enumerate(sample_names):
+		i = ref_n2i[result[sample_name]]
+		if mmat[i, j] != mmat[:, j].max():
+			k = np.where(mmat[:, j] == mmat[:, j].max())[0][0]
+			print("Warning: souporcell donor {} shares most SNPs with ref donor {}, but matches to ref donor {}!".format(sample_name, ref_names[k][5:], ref_names[i][5:]))
 
 	print()
 	for sample_name in sample_names:

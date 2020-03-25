@@ -1,17 +1,21 @@
-workflow cellranger_vdj_create_reference {
-    String? docker_registry = "cumulusprod"
-    String? cellranger_version = '3.1.0'
-    Int? disk_space = 100
-    Int? preemptible = 2
-    String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-    String? memory = "32G"
+version 1.0
 
-    File input_fasta
-    File input_gtf
-    # Output directory, gs URL
-    String output_directory
-    String genome
-    String? ref_version
+workflow cellranger_vdj_create_reference {
+    input {
+        String docker_registry = "cumulusprod"
+        String cellranger_version = '3.1.0'
+        Int disk_space = 100
+        Int preemptible = 2
+        String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        String memory = "32G"
+
+        File input_fasta
+        File input_gtf
+        # Output directory, gs URL
+        String output_directory
+        String genome
+        String ref_version = ""
+    }
 
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "/+$", "")
@@ -33,17 +37,19 @@ workflow cellranger_vdj_create_reference {
 }
 
 task run_cellranger_vdj_create_reference {
-    String docker_registry
-    String cellranger_version
-    Int disk_space
-    Int preemptible
-    String zones
-    String memory
-    File input_fasta
-    File input_gtf
-    String output_dir
-    String genome
-    String ref_version
+    input {
+        String docker_registry
+        String cellranger_version
+        Int disk_space
+        Int preemptible
+        String zones
+        String memory
+        File input_fasta
+        File input_gtf
+        String output_dir
+        String genome
+        String ref_version
+    }
 
     command {
         set -e
@@ -55,7 +61,7 @@ task run_cellranger_vdj_create_reference {
         from subprocess import check_call
 
         # Unzip fa if needed.
-        fa_file = '${input_fasta}'
+        fa_file = '~{input_fasta}'
         root, ext = os.path.splitext(fa_file)
         if ext == '.gz':
             call_args = ['gunzip', '-f', fa_file]
@@ -64,7 +70,7 @@ task run_cellranger_vdj_create_reference {
             fa_file = root
 
         # Unzip gtf if needed.
-        gtf_file = '${input_gtf}'
+        gtf_file = '~{input_gtf}'
         root, ext = os.path.splitext(gtf_file)
         if ext == '.gz':
             call_args = ['gunzip', '-f', gtf_file]
@@ -72,32 +78,32 @@ task run_cellranger_vdj_create_reference {
             check_call(call_args)
             gtf_file = root
 
-        call_args = ['cellranger', 'mkvdjref', '--genome=${genome}', '--fasta=' + fa_file, '--genes=' + gtf_file]
+        call_args = ['cellranger', 'mkvdjref', '--genome=~{genome}', '--fasta=' + fa_file, '--genes=' + gtf_file]
 
-        if '${ref_version}' is not '':
-            call_args.append('--ref-version=${ref_version}')
+        if '~{ref_version}' is not '':
+            call_args.append('--ref-version=~{ref_version}')
 
         print(' '.join(call_args))
         check_call(call_args)
         CODE
 
-        tar -czf ${genome}.tar.gz ${genome}
-        gsutil -m cp ${genome}.tar.gz ${output_dir}
-        # mkdir -p ${output_dir}
-        # cp ${genome}.tar.gz ${output_dir}
+        tar -czf ~{genome}.tar.gz ~{genome}
+        gsutil -m cp ~{genome}.tar.gz ~{output_dir}
+        # mkdir -p ~{output_dir}
+        # cp ~{genome}.tar.gz ~{output_dir}
     }
 
     output {
-        File output_reference = "${genome}.tar.gz"
+        File output_reference = "~{genome}.tar.gz"
         File monitoringLog = "monitoring.log"
     }
 
     runtime {
-        docker: "${docker_registry}/cellranger:${cellranger_version}"
+        docker: "~{docker_registry}/cellranger:~{cellranger_version}"
         zones: zones
         memory: memory
-        disks: "local-disk ${disk_space} HDD"
+        disks: "local-disk ~{disk_space} HDD"
         cpu: 1
-        preemptible: "${preemptible}"
+        preemptible: "~{preemptible}"
     }
 }

@@ -1,100 +1,106 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/versions/3/plain-WDL/descriptor" as crac
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq/versions/2/plain-WDL/descriptor" as cram
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/3/plain-WDL/descriptor" as crc
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/2/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/4/plain-WDL/descriptor" as crv
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/5/plain-WDL/descriptor" as ca
+version 1.0
+
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/versions/4/plain-WDL/descriptor" as crac
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq/versions/3/plain-WDL/descriptor" as cram
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/4/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/3/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/5/plain-WDL/descriptor" as crv
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/6/plain-WDL/descriptor" as ca
 
 workflow cellranger_workflow {
-    # 5 - 8 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry, DataType, FeatureBarcodeFile]). gs URL
-    File input_csv_file
-    # Output directory, gs URL
-    String output_directory
+    input {
+        # 5 - 8 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry, DataType, FeatureBarcodeFile]). gs URL
+        File input_csv_file
+        # Output directory, gs URL
+        String output_directory
+
+        # If run cellranger mkfastq
+        Boolean run_mkfastq = true
+        # If run cellranger count
+        Boolean run_count = true
+
+        # for mkfastq
+
+        # Whether to delete input_bcl_directory, default: false
+        Boolean delete_input_bcl_directory = false
+        # Number of allowed mismatches per index
+        Int? mkfastq_barcode_mismatches
+
+        # common to cellranger count/vdj and cellranger-atac count
+
+        # Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells.
+        Int? force_cells
+
+        # For count
+
+        # Expected number of recovered cells. Mutually exclusive with force_cells
+        Int? expect_cells
+        # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
+        Boolean secondary = false
+
+        # For vdj
+
+        # Do not align reads to reference V(D)J sequences before de novo assembly. Default: false
+        Boolean vdj_denovo = false
+
+        # For extracting ADT count
+
+        # scaffold sequence for Perturb-seq, default is "", which for Perturb-seq means barcode starts at position 0 of read 2
+        String scaffold_sequence = ""
+        # maximum hamming distance in feature barcodes
+        Int max_mismatch = 3
+        # minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for data type crispr
+        Float min_read_ratio = 0.1
+
+        # For atac
+
+        # For atac, choose the algorithm for dimensionality reduction prior to clustering and tsne: 'lsa' (default), 'plsa', or 'pca'.
+        String? atac_dim_reduce
+
+
+        # 3.1.0, 3.0.2, 2.2.0 
+        String cellranger_version = "3.1.0"
+        # 1.2.0, 1.1.0
+        String cellranger_atac_version = "1.2.0"
+        # cumulus_feature_barcoding version, default to "0.2.0"
+        String cumulus_feature_barcoding_version = "0.2.0"
+        # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
+        String docker_registry = "cumulusprod"
+        # cellranger/cellranger-atac mkfastq registry, default to gcr.io/broad-cumulus
+        String mkfastq_docker_registry = "gcr.io/broad-cumulus"
+        # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        # Number of cpus per cellranger job
+        Int num_cpu = 32
+        # Memory string
+        String memory = "120G"
+
+        # Number of cpus for cellranger-atac count
+        Int atac_num_cpu = 64
+        # Memory string for cellranger-atac count
+        String atac_memory = "57.6G"
+
+        # Optional memory string for cumulus_adt
+        String feature_memory = "32G"
+        # Optional disk space for mkfastq.
+        Int mkfastq_disk_space = 1500
+        # Optional disk space needed for cell ranger count.
+        Int count_disk_space = 500    
+        # Optional disk space needed for cell ranger vdj.
+        Int vdj_disk_space = 500    
+        # Optional disk space needed for cumulus_adt
+        Int feature_disk_space = 100
+        # Optional disk space needed for cellranger-atac count
+        Int atac_disk_space = 500
+        # Number of preemptible tries 
+        Int preemptible = 2
+    }
+
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "/+$", "")
 
-    # If run cellranger mkfastq
-    Boolean run_mkfastq = true
-    # If run cellranger count
-    Boolean run_count = true
-
-    # for mkfastq
-
-    # Whether to delete input_bcl_directory, default: false
-    Boolean? delete_input_bcl_directory = false
-    # Number of allowed mismatches per index
-    Int? mkfastq_barcode_mismatches
-
-    # common to cellranger count/vdj and cellranger-atac count
-
-    # Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells.
-    Int? force_cells
-
-    # For count
-
-    # Expected number of recovered cells. Mutually exclusive with force_cells
-    Int? expect_cells
-    # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
-    Boolean? secondary = false
-
-    # For vdj
-
-    # Do not align reads to reference V(D)J sequences before de novo assembly. Default: false
-    Boolean? vdj_denovo = false
-
-    # For extracting ADT count
-
-    # scaffold sequence for Perturb-seq, default is "", which for Perturb-seq means barcode starts at position 0 of read 2
-    String? scaffold_sequence = ""
-    # maximum hamming distance in feature barcodes
-    Int? max_mismatch = 3
-    # minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for data type crispr
-    Float? min_read_ratio = 0.1
-
-    # For atac
-
-    # For atac, choose the algorithm for dimensionality reduction prior to clustering and tsne: 'lsa' (default), 'plsa', or 'pca'.
-    String? atac_dim_reduce
-
-
-    # 3.1.0, 3.0.2, 2.2.0 
-    String? cellranger_version = "3.1.0"
-    # 1.2.0, 1.1.0
-    String? cellranger_atac_version = "1.2.0"
-    # cumulus_feature_barcoding version, default to "0.2.0"
-    String? cumulus_feature_barcoding_version = "0.2.0"
-    # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-    String? docker_registry = "cumulusprod"
-    String? docker_registry_stripped = sub(docker_registry, "/+$", "")
-    # cellranger/cellranger-atac mkfastq registry, default to gcr.io/broad-cumulus
-    String? mkfastq_docker_registry = "gcr.io/broad-cumulus"
-    String? mkfastq_docker_registry_stripped = sub(mkfastq_docker_registry, "/+$", "")
-    # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-    String? zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-    # Number of cpus per cellranger job
-    Int? num_cpu = 32
-    # Memory string
-    String? memory = "120G"
-
-    # Number of cpus for cellranger-atac count
-    Int? atac_num_cpu = 64
-    # Memory string for cellranger-atac count
-    String? atac_memory = "57.6G"
-
-    # Optional memory string for cumulus_adt
-    String? feature_memory = "32G"
-    # Optional disk space for mkfastq.
-    Int? mkfastq_disk_space = 1500
-    # Optional disk space needed for cell ranger count.
-    Int? count_disk_space = 500    
-    # Optional disk space needed for cell ranger vdj.
-    Int? vdj_disk_space = 500    
-    # Optional disk space needed for cumulus_adt
-    Int? feature_disk_space = 100
-    # Optional disk space needed for cellranger-atac count
-    Int? atac_disk_space = 500
-    # Number of preemptible tries 
-    Int? preemptible = 2
+    String docker_registry_stripped = sub(docker_registry, "/+$", "")
+    String mkfastq_docker_registry_stripped = sub(mkfastq_docker_registry, "/+$", "")
 
     if (run_mkfastq) {
         call generate_bcl_csv {
@@ -288,12 +294,14 @@ workflow cellranger_workflow {
 }
 
 task generate_bcl_csv {
-    File input_csv_file
-    String output_dir
-    String cellranger_version
-    String zones
-    Int preemptible
-    String docker_registry
+    input {
+        File input_csv_file
+        String output_dir
+        String cellranger_version
+        String zones
+        Int preemptible
+        String docker_registry
+    }
 
     command {
         set -e
@@ -306,7 +314,7 @@ task generate_bcl_csv {
         import pandas as pd 
         from subprocess import check_call
 
-        df = pd.read_csv('${input_csv_file}', header = 0, dtype=str, index_col=False)
+        df = pd.read_csv('~{input_csv_file}', header = 0, dtype=str, index_col=False)
         for c in df.columns:
             df[c] = df[c].str.strip()
         df['Flowcell'] = df['Flowcell'].map(lambda x: re.sub('/+$', '', x)) # remove trailing slashes
@@ -320,8 +328,8 @@ task generate_bcl_csv {
                 run_id = os.path.basename(input_dir)
                 bcl_df = df.loc[df['Flowcell'] == input_dir, ['Lane', 'Sample', 'Index']]
                 bcl_df.to_csv(run_id + '_bcl.csv', index = False)
-                call_args = ['gsutil', 'cp', run_id + '_bcl.csv', '${output_dir}/']
-                # call_args = ['cp', run_id + '_bcl.csv', '${output_dir}/']
+                call_args = ['gsutil', 'cp', run_id + '_bcl.csv', '~{output_dir}/']
+                # call_args = ['cp', run_id + '_bcl.csv', '~{output_dir}/']
                 print(' '.join(call_args))
                 check_call(call_args)
                 if 'DataType' in df.columns and df.loc[df['Flowcell'] == input_dir, 'DataType'].iat[0] == 'atac':
@@ -329,7 +337,7 @@ task generate_bcl_csv {
                 else:
                     fo1.write(run_id + '\n')
                 fo2.write(run_id + '\t' + input_dir + '\n')
-                fo3.write(run_id + '\t${output_dir}/' + run_id + '_bcl.csv\n')
+                fo3.write(run_id + '\t~{output_dir}/' + run_id + '_bcl.csv\n')
         CODE
     }
 
@@ -341,23 +349,25 @@ task generate_bcl_csv {
     }
 
     runtime {
-        docker: "${docker_registry}/cellranger:${cellranger_version}"
+        docker: "~{docker_registry}/cellranger:~{cellranger_version}"
         zones: zones
-        preemptible: "${preemptible}"
+        preemptible: "~{preemptible}"
     }
 }
 
 task generate_count_config {
-    File input_csv_file
-    String output_dir
-    Array[String]? run_ids
-    Array[String]? fastq_dirs
-    Array[String]? run_ids_atac
-    Array[String]? fastq_dirs_atac
-    String cellranger_version
-    String zones
-    Int preemptible
-    String docker_registry
+    input {
+        File input_csv_file
+        String output_dir
+        Array[String]? run_ids
+        Array[String]? fastq_dirs
+        Array[String]? run_ids_atac
+        Array[String]? fastq_dirs_atac
+        String cellranger_version
+        String zones
+        Int preemptible
+        String docker_registry
+    }
 
     command {
         set -e
@@ -370,16 +380,16 @@ task generate_count_config {
         import pandas as pd
         from subprocess import check_call
 
-        df = pd.read_csv('${input_csv_file}', header = 0, dtype=str)
+        df = pd.read_csv('~{input_csv_file}', header = 0, dtype=str)
         for c in df.columns:
             df[c] = df[c].str.strip()
 
         df['Flowcell'] = df['Flowcell'].map(lambda x: re.sub('/+$', '', x)) # remove trailing slashes
-        run_ids = '${sep="," run_ids}'.split(',')
-        fastq_dirs = '${sep="," fastq_dirs}'.split(',')
+        run_ids = '~{sep="," run_ids}'.split(',')
+        fastq_dirs = '~{sep="," fastq_dirs}'.split(',')
 
-        run_ids.extend('${sep="," run_ids_atac}'.split(','))
-        fastq_dirs.extend('${sep="," fastq_dirs_atac}'.split(','))
+        run_ids.extend('~{sep="," run_ids_atac}'.split(','))
+        fastq_dirs.extend('~{sep="," fastq_dirs_atac}'.split(','))
 
         rid2fdir = dict()
         for run_id, fastq_dir in zip(run_ids, fastq_dirs):
@@ -445,10 +455,10 @@ task generate_count_config {
                     n_fbf += 1
 
                 if data_type == 'rna':
-                    prefix = '${output_dir}/' + sample_id
+                    prefix = '~{output_dir}/' + sample_id
                     bam = prefix + '/possorted_genome_bam.bam'
                     bai = prefix + '/possorted_genome_bam.bam.bai'
-                    if int('${cellranger_version}'.split('.')[0]) >= 3:
+                    if int('~{cellranger_version}'.split('.')[0]) >= 3:
                         count_matrix = prefix + '/filtered_feature_bc_matrix.h5'
                         barcodes = prefix + '/filtered_feature_bc_matrix/barcodes.tsv.gz'
                     else:
@@ -465,9 +475,9 @@ task generate_count_config {
                 fo9.write('null\tnull\n')
         CODE
 
-        gsutil -m cp count_matrix.csv ${output_dir}/
-        #mkdir -p ${output_dir}
-        #cp count_matrix.csv ${output_dir}/
+        gsutil -m cp count_matrix.csv ~{output_dir}/
+        #mkdir -p ~{output_dir}
+        #cp count_matrix.csv ~{output_dir}/
     }
 
     output {
@@ -475,7 +485,7 @@ task generate_count_config {
         Map[String, String] sample2dir = read_map('sample2dir.txt')
         Map[String, String] sample2genome = read_map('sample2genome.txt')
         Map[String, String] sample2chemistry = read_map('sample2chemistry.txt')
-        String count_matrix = "${output_dir}/count_matrix.csv"
+        String count_matrix = "~{output_dir}/count_matrix.csv"
         Array[String] sample_vdj_ids = read_lines('sample_vdj_ids.txt')
         Array[String] sample_feature_ids = read_lines('sample_feature_ids.txt')
         Map[String, String] sample2datatype = read_map('sample2datatype.txt')
@@ -484,27 +494,29 @@ task generate_count_config {
     }
 
     runtime {
-        docker: "${docker_registry}/cellranger:${cellranger_version}"
+        docker: "~{docker_registry}/cellranger:~{cellranger_version}"
         zones: zones
-        preemptible: "${preemptible}"
+        preemptible: "~{preemptible}"
     }
 }
 
 task collect_summaries {
-    Array[File] summaries
-    Array[String] sample_ids
-    String cellranger_version
-    String zones
-    Int preemptible
-    String docker_registry
+    input {
+        Array[File] summaries
+        Array[String] sample_ids
+        String cellranger_version
+        String zones
+        Int preemptible
+        String docker_registry
+    }
 
     command {
         python <<CODE
         import pandas as pd
         import os
         import xlsxwriter
-        summaries = pd.read_csv('${write_lines(summaries)}', header = None)
-        sample_ids = pd.read_csv('${write_lines(sample_ids)}', header = None).applymap(lambda x: os.path.basename(x))
+        summaries = pd.read_csv('~{write_lines(summaries)}', header = None)
+        sample_ids = pd.read_csv('~{write_lines(sample_ids)}', header = None).applymap(lambda x: os.path.basename(x))
         df_info = pd.concat([summaries, sample_ids], axis = 1)
         df_info.columns = ['summary', 'sample_id']
         dfs = []
@@ -525,8 +537,8 @@ task collect_summaries {
     }
 
     runtime {
-        docker: "${docker_registry}/cellranger:${cellranger_version}"
+        docker: "~{docker_registry}/cellranger:~{cellranger_version}"
         zones: zones
-        preemptible: "${preemptible}"
+        preemptible: "~{preemptible}"
     }
 }

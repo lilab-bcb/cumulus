@@ -1,0 +1,1 @@
+docker build . -t souporcell:2020.03
