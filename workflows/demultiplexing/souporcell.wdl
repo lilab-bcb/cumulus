@@ -90,7 +90,7 @@ task run_souporcell {
         if '~{input_genotype}' is not 'null':
             call_args.extend(['--ref-genotypes', '~{input_genotype}'])
 
-        if donor_rename is not '':
+        if '~{donor_rename}' is not '':
             call_args.extend(['--donor-names', '${donor_rename}'])
             
         call_args.extend(['result/cluster_genotypes.vcf', 'result/clusters.tsv', '~{input_rna}', 'result/~{sample_id}_demux.zarr'])
