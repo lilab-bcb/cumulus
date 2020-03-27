@@ -86,15 +86,14 @@ task run_souporcell {
         from subprocess import check_call
 
         call_args = ['python', '/opt/match_donors.py']
-        if donor_rename is not '':
-            call_args.extend(['--donor-names', '${donor_rename}'])
-
-        call_args.append('result/cluster_genotypes.vcf')
 
         if '~{input_genotype}' is not 'null':
-            call_args.append('~{input_genotype}')
+            call_args.extend(['--ref-genotypes', '~{input_genotype}'])
 
-        call_args.extend(['result/clusters.tsv', '~{input_rna}', 'result/~{sample_id}_demux.zarr'])
+        if donor_rename is not '':
+            call_args.extend(['--donor-names', '${donor_rename}'])
+            
+        call_args.extend(['result/cluster_genotypes.vcf', 'result/clusters.tsv', '~{input_rna}', 'result/~{sample_id}_demux.zarr'])
 
         print(' '.join(call_args))
         check_call(call_args, stdout = 'result/match_donors.log')
