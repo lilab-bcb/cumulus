@@ -96,11 +96,13 @@ task run_souporcell {
         call_args.extend(['result/cluster_genotypes.vcf', 'result/clusters.tsv', '~{input_rna}', 'result/~{sample_id}_demux.zarr'])
 
         print(' '.join(call_args))
-        check_call(call_args, stdout = 'result/match_donors.log')
+
+        with open('match_donors.log', 'w') as fout:
+            check_call(call_args, stdout = fout)
         CODE
 
         mkdir buffer
-        cp result/match_donors.log buffer
+        cp match_donors.log buffer
         cp result/~{sample_id}_demux.zarr buffer
         cp result/clusters.tsv buffer
         gsutil -q -m rsync -r buffer ~{output_directory}/~{sample_id}
