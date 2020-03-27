@@ -13,10 +13,10 @@ import pegasusio
 
 parser = argparse.ArgumentParser(description='Match souporcell results with donor names.')
 parser.add_argument('cluster_genotypes', metavar = 'cluster_genotypes.vcf', help = 'Genotypes detected by freebayes from RNA-seq reads.')
-parser.add_argument('ref_genotypes', metavar = 'reference_genotypes.vcf.gz', help = 'Reference genotypes called from exome or genome sequencing data.')
 parser.add_argument('demux_res', metavar = 'clusters.tsv', help = 'Souporcell demultiplexing results.')
 parser.add_argument('raw_mat', metavar = 'raw_feature_bc_matrix.h5', help = 'Raw gene count matrix in 10x format.')
 parser.add_argument('out_file', metavar = 'output_result.zarr', help = 'Output zarr file.')
+parser.add_argument('--ref-genotypes', metavar = 'reference_genotypes.vcf.gz', dest = 'ref_genotypes', help = 'Reference genotypes called from exome or genome sequencing data.')
 parser.add_argument('--donor-names', dest = 'ref_names', help = 'A comma-separated list containing donor names that are used to replace the ones in reference_genotypes.vcf.gz. Must match the order in the .vcf.gz file.')
 args = parser.parse_args()
 
@@ -177,10 +177,19 @@ def write_output(assignment_file: str, input_mat_file: str, output_zarr_file: st
 
 	pegasusio.write_output(data, output_zarr_file, zarr_zipstore = True)
 
+def set_matching_no_reference(sample_numbers: List[str]) -> dict:
+	matching = dict()
+	for sample_number in sample_numbers:
+		matching['_ref_Donor' + sample_number] = sample_number
+		matching[sample_number] = '_ref_Donor' + sample_number
 
+	return matching 
 
 sample_names, snp2geno = parse_denovo_vcf(args.cluster_genotypes)
-ref_names, mmat = parse_reference_vcf(args.ref_genotypes, snp2geno, sample_names)
-ref_names = replace_ref_names(args.ref_names, ref_names)
-matching = find_max_matching(ref_names, sample_names, mmat)
+if args.ref_genotypes is not None:
+	ref_names, mmat = parse_reference_vcf(args.ref_genotypes, snp2geno, sample_names)
+	ref_names = replace_ref_names(args.ref_names, ref_names)
+	matching = find_max_matching(ref_names, sample_names, mmat)
+else:
+	matching = set_matching_no_reference(sample_names)
 write_output(args.demux_res, args.raw_mat, args.out_file, matching)
