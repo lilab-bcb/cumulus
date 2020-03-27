@@ -117,4 +117,4 @@ RUN gsutil -m cp gs://cloud-sdk-release/google-cloud-sdk-264.0.0-linux-x86_64.ta
     cd google-cloud-sdk && \
     ./install.sh
 
-ENV PATH=/opt/google-cloud-sdk/bin:PATH
+ENV PATH=/opt/google-cloud-sdk/bin:$PATH
