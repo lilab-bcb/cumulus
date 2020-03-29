@@ -8,13 +8,13 @@ workflow demuxlet {
         String input_bam
         String ref_genotypes
         Int min_num_genes
-        Int min_MQ = 20
-        String alpha = "0.1,0.2,0.3,0.4,0.5"
-        Int min_TD = 0
-        String tag_group = "CB"
-        String tag_UMI  = "UB"
         String field = "GT"
-        Float geno_error = 0.1
+        Int? min_MQ
+        String? alpha
+        Int? min_TD
+        String? tag_group
+        String? tag_UMI
+        Float? geno_error
 
         String zones = "us-central1-b us-east1-d us-west1-a us-west1-b"
         Int num_cpu = 1
@@ -22,11 +22,6 @@ workflow demuxlet {
         Int extra_disk_space = 2
         Int preemptible = 2
         String docker_registry = "cumulusprod"
-        # gs://fc-xx/out/filtered_feature_bc_matrix.h5
-        # gs://fc-xx/out/possorted_genome_bam.bam
-        # gs://fc-xx/out/possorted_genome_bam.bam.bai
-        # gs://fc-xx/out/filtered_feature_bc_matrix/barcodes.tsv.gz
-        
     }
 
     call demuxlet_task {
@@ -53,7 +48,8 @@ workflow demuxlet {
     }
 
     output {
-        File output_tsv  = demuxlet_task.output_tsv
+        String output_folder = demuxlet_task.output_folder
+        File output_zarr = demuxlet_task.output_zarr
         File monitoringLog = demuxlet_task.monitoringLog
     }
 
@@ -67,13 +63,13 @@ task demuxlet_task {
         File input_bam
         File ref_genotypes
         Int min_num_genes
-        Int min_MQ
-        String alpha
-        Int min_TD
-        String tag_group
-        String tag_UMI
         String field
-        Float geno_error
+        Int? min_MQ
+        String? alpha
+        Int? min_TD
+        String? tag_group
+        String? tag_UMI
+        Float? geno_error
 
         String docker_registry
         Int num_cpu
@@ -112,17 +108,24 @@ task demuxlet_task {
 
         print(' '.join(call_args))
         check_call(call_args)
+
+        import pegasusio as pio
+        df = pd.read_csv("~{sample_id}.best", sep = '\t', header = 0, index_col = 'BARCODE')
+        
         CODE
+
+
 
     }
 
     output {
-        File output_tsv  = "~{sample_id}.best"
+        String output_folder = "~{output_directory}/~{sample_id}"
+        File output_zarr  = "~{sample_id}_demux.zarr"
         File monitoringLog = "monitoring.log"
     }
 
     runtime {
-        docker: "~{docker_registry}/demuxlet:0.1-beta"
+        docker: "~{docker_registry}/demuxlet:0.1b"
         zones: zones
         memory: "~{memory}G"
         bootDiskSizeGb: 12
