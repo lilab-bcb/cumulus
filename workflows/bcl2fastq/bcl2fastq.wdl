@@ -80,7 +80,7 @@ task run_bcl2fastq {
 
 		bcl2fastq \
 		--output-dir out \
-		${true="---no-lane-splitting" false="" no_lane_splitting} \
+		${true="--no-lane-splitting" false="" no_lane_splitting} \
 		${"--sample-sheet " + sample_sheet} \
 		${"--minimum-trimmed-read-length " + minimum_trimmed_read_length} \
 		${"--mask-short-adapter-reads " + mask_short_adapter_reads} \
