@@ -83,12 +83,13 @@ task demuxlet_task {
         set -e
         monitor_script.sh > monitoring.log &
 
+        mkdir result
         python /software/extract_barcodes_from_rna.py ~{input_rna} ~{sample_id}.barcodes.tsv ~{min_num_genes}
 
         python <<CODE
         from subprocess import check_call
 
-        call_args = ['popscle', 'demuxlet', '--sam', '~{input_bam}', '--vcf', '~{ref_genotypes}', '--group-list', '~{sample_id}.barcodes.tsv', '--field', '~{field}', '--out', '~{sample_id}']
+        call_args = ['popscle', 'demuxlet', '--sam', '~{input_bam}', '--vcf', '~{ref_genotypes}', '--group-list', '~{sample_id}.barcodes.tsv', '--field', '~{field}', '--out', 'result/~{sample_id}']
 
         if '~{min_MQ}' is not '':
             call_args.extend(['--min-MQ', '~{min_MQ}'])
@@ -108,19 +109,18 @@ task demuxlet_task {
 
         print(' '.join(call_args))
         check_call(call_args)
-
-        import pegasusio as pio
-        df = pd.read_csv("~{sample_id}.best", sep = '\t', header = 0, index_col = 'BARCODE')
-        
         CODE
 
+        python /software/generate_zarr.py result/~{sample_id}.best ~{input_rna} result/~{sample_id}_demux.zarr
 
-
+        gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
+        # mkdir ~{output_directory}/~{sample_id}
+        # cp result/* ~{output_directory}/~{sample_id}
     }
 
     output {
         String output_folder = "~{output_directory}/~{sample_id}"
-        File output_zarr  = "~{sample_id}_demux.zarr"
+        File output_zarr  = "result/~{sample_id}_demux.zarr"
         File monitoringLog = "monitoring.log"
     }
 
