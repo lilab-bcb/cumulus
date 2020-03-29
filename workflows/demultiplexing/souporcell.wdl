@@ -7,18 +7,21 @@ workflow souporcell {
         String input_rna
         String input_bam
         String genome_url
-        String ref_genotypes
+        String ref_genotypes_url
         Int min_num_genes
         Int num_clusters
         String donor_rename = ''
         String souporcell_version = "2020.03"
-
         String docker_registry = "cumulusprod"
         Int num_cpu = 32
         Int disk_space = 500
         Int memory = 120
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+    }
+
+    if (ref_genotypes_url != 'null') {
+        File ref_genotypes = ref_genotypes_url
     }
 
     call run_souporcell {
@@ -28,7 +31,7 @@ workflow souporcell {
             input_rna = input_rna,
             input_bam = input_bam,
             genome = genome_url,
-            ref_genotypes = if ref_genotypes != 'null' then ref_genotypes else '',
+            ref_genotypes = ref_genotypes,
             min_num_genes = min_num_genes,
             num_clusters = num_clusters,
             donor_rename = donor_rename,

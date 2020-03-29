@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/1/plain-WDL/descriptor" as soc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/3/plain-WDL/descriptor" as soc
 
 #import "souporcell.wdl" as soc
 #import "demuxlet.wdl" as dmx
@@ -73,7 +73,7 @@ workflow demultiplexing {
                         input_rna = Config.id2rna[pooling_id],
                         input_bam = Config.id2tag[pooling_id],
                         genome_url = genome_url,
-                        ref_genotypes = Config.id2genotype[pooling_id],
+                        ref_genotypes_url = Config.id2genotype[pooling_id],
                         min_num_genes = min_num_genes,
                         num_clusters = souporcell_num_clusters,
                         donor_rename = souporcell_rename_donors,
