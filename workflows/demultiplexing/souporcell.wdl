@@ -28,7 +28,7 @@ workflow souporcell {
             input_rna = input_rna,
             input_bam = input_bam,
             genome = genome_url,
-            ref_genotypes = ref_genotypes,
+            ref_genotypes = if ref_genotypes != 'null' then ref_genotypes else '',
             min_num_genes = min_num_genes,
             num_clusters = num_clusters,
             donor_rename = donor_rename,
@@ -44,6 +44,7 @@ workflow souporcell {
     output {
         String output_folder = "~{output_directory}"
         File output_zarr = run_souporcell.output_zarr
+        File monitoringLog = run_souporcell.monitoringLog
     }
 
 }
@@ -55,7 +56,7 @@ task run_souporcell {
         File input_rna
         File input_bam
         File genome
-        File ref_genotypes
+        File? ref_genotypes
         Int min_num_genes
         Int num_clusters
         String donor_rename
@@ -87,7 +88,7 @@ task run_souporcell {
 
         call_args = ['python', '/opt/match_donors.py']
 
-        if '~{ref_genotypes}' is not 'null':
+        if '~{ref_genotypes}' is not '':
             call_args.extend(['--ref-genotypes', '~{ref_genotypes}'])
 
         if '~{donor_rename}' is not '':
