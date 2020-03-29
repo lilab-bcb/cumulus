@@ -109,6 +109,7 @@ task run_souporcell {
         cp match_donors.log buffer
         cp result/~{sample_id}_demux.zarr buffer
         cp result/clusters.tsv buffer
+        cp result/cluster_genotypes.vcf buffer
         gsutil -q -m rsync -r buffer ~{output_directory}/~{sample_id}
         # mkdir -p ~{output_directory}/~{sample_id}
         # cp -r buffer/* ~{output_directory}/~{sample_id}
@@ -116,7 +117,7 @@ task run_souporcell {
 
     output {
         String output_folder = "~{output_directory}/~{sample_id}"
-        File output_zarr = "~{output_directory}/~{sample_id}/~{sample_id}_demux.zarr"
+        File output_zarr = "buffer/~{sample_id}_demux.zarr"
         File monitoringLog = "monitoring.log"
     }
 

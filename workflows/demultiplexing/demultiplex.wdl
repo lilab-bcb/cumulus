@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/3/plain-WDL/descriptor" as soc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/4/plain-WDL/descriptor" as soc
 
 #import "souporcell.wdl" as soc
 #import "demuxlet.wdl" as dmx
