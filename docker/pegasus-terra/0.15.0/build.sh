@@ -1,1 +1,0 @@
-docker build -t pegasus-terra-0.15.0 .
