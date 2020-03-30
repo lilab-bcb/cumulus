@@ -3,6 +3,7 @@ version 1.0
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/4/plain-WDL/descriptor" as soc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/2/plain-WDL/descriptor" as dmx
 
+import "demuxEM.wdl" as dem
 #import "souporcell.wdl" as soc
 #import "demuxlet.wdl" as dmx
 
@@ -31,6 +32,10 @@ workflow demultiplexing {
 		Boolean demuxEM_generate_diagnostic_plots = true
 		# Generate violin plots using gender-specific genes (e.g. Xist). <demuxEM_generate_gender_plot> is a comma-separated list of gene names.
 		String? demuxEM_generate_gender_plot
+        String demuxEM_version = "0.1"
+        Int demuxEM_num_cpu = 8
+        Int demuxEM_disk_space = 20
+        Int demuxEM_memory = 10
 
         # For souporcell
         Int souporcell_num_clusters = 1
@@ -61,7 +66,30 @@ workflow demultiplexing {
     }
 
     if (Config.hashing_ids[0] != '') {
-        
+        scatter (hashing_id in Config.hashing_ids) {
+            call dem.demuxEM as demuxEM {
+                input:
+                    sample_id = hashing_id,
+                    output_directory = output_directory,
+                    input_rna = Config.id2rna[hashing_id],
+                    input_adt_csv = Config.id2tag[hashing_id],
+                    genome = genome,
+                    alpha_on_samples = demuxEM_alpha_on_samples,
+                    min_num_genes = min_num_genes,
+                    min_num_umis = demuxEM_min_num_umis,
+                    min_signal_hashtag = demuxEM_min_signal_hashtag,
+                    random_state = demuxEM_random_state,
+                    generate_diagnostic_plots = demuxEM_generate_diagnostic_plots,
+                    generate_gender_plot = demuxEM_generate_gender_plot,
+                    docker_registry = docker_registry,
+                    demuxEM_version = demuxEM_version,
+                    zones = zones,
+                    num_cpu = demuxEM_num_cpu,
+                    memory = demuxEM_memory,
+                    disk_space = demuxEM_disk_space,
+                    preemptible = preemptible
+            }
+        }
     }
 
     if (Config.pooling_ids[0] != '') {
