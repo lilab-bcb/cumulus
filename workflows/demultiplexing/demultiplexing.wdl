@@ -1,6 +1,7 @@
 version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/4/plain-WDL/descriptor" as soc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/2/plain-WDL/descriptor" as dmx
 
 #import "souporcell.wdl" as soc
 #import "demuxlet.wdl" as dmx
@@ -87,22 +88,22 @@ workflow demultiplexing {
                 }
             }
 
-            #if (demultiplexing_algorithm == "demuxlet") {
-            #    call dmx.demuxlet as demuxlet {
-            #        input:
-            #            sample_id = pooling_id,
-            #            output_directory = output_directory,
-            #            input_rna = Config.id2rna[pooling_id],
-            #            input_bam = Config.id2tag[pooling_id],
-            #            ref_genotypes = Config.id2genotype[pooling_id],
-            #            min_num_genes = min_num_genes,
-            #            docker_registry = docker_registry,
-            #            extra_disk_space = demuxlet_disk_space,
-            #            memory = demuxlet_memory,
-            #            zones = zones,
-            #            preemptible = preemptible
-            #    }
-            #}
+            if (demultiplexing_algorithm == "demuxlet") {
+                call dmx.demuxlet as demuxlet {
+                    input:
+                        sample_id = pooling_id,
+                        output_directory = output_directory,
+                        input_rna = Config.id2rna[pooling_id],
+                        input_bam = Config.id2tag[pooling_id],
+                        ref_genotypes = Config.id2genotype[pooling_id],
+                        min_num_genes = min_num_genes,
+                        docker_registry = docker_registry,
+                        extra_disk_space = demuxlet_disk_space,
+                        memory = demuxlet_memory,
+                        zones = zones,
+                        preemptible = preemptible
+                }
+            }
         }
     }
 

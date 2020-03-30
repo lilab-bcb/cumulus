@@ -114,7 +114,7 @@ task demuxlet_task {
         python /software/generate_zarr.py result/~{sample_id}.best ~{input_rna} result/~{sample_id}_demux.zarr
 
         gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
-        # mkdir ~{output_directory}/~{sample_id}
+        # mkdir -p ~{output_directory}/~{sample_id}
         # cp result/* ~{output_directory}/~{sample_id}
     }
 
