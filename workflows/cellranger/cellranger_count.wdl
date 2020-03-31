@@ -12,8 +12,6 @@ workflow cellranger_count {
 		# GRCh38, hg19, mm10, GRCh38_and_mm10, GRCh38_premrna, mm10_premrna, GRCh38_premrna_and_mm10_premrna or a URL to a tar.gz file
 		String genome
 
-		File genome_file = (if is_url then genome else acronym2gsurl[genome])
-
 		# chemistry of the channel
 		String chemistry = "auto"
 		# Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells.
@@ -45,6 +43,8 @@ workflow cellranger_count {
 	Map[String, String] acronym2gsurl = read_map(acronym_file)
 	# If reference is a url
 	Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
+
+	File genome_file = (if is_url then genome else acronym2gsurl[genome])
 
 	call run_cellranger_count {
 		input:
