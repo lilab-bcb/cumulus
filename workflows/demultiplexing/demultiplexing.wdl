@@ -59,7 +59,6 @@ workflow demultiplexing {
     call generate_demux_config as Config {
         input:
             input_sample_sheet = input_sample_sheet,
-            souporcell_version = souporcell_version,
             docker_registry = docker_registry,
             zones = zones,
             preemptible = preemptible
@@ -144,7 +143,6 @@ workflow demultiplexing {
 task generate_demux_config {
     input {
         File input_sample_sheet
-        String souporcell_version
         String docker_registry
         String zones
         Int preemptible
