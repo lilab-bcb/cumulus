@@ -13,6 +13,7 @@
    count
    smart_seq_2
    drop_seq
+   demultiplexing
    hashing_cite_seq
    cumulus
    demuxlet
