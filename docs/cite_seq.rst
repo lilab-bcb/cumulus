@@ -11,6 +11,8 @@ Follow the steps below to run **cumulus** for CITE-Seq data on Terra_.
 
 #. Create a sample sheet, **sample_sheet_cite_seq.csv**, which describes the metadata for each pair of RNA and antibody hashtag data. The sample sheet should contain 3 columns --- *OUTNAME*, *RNA*, and *ADT*. *OUTNAME* is the output name for one pair of RNA and ADT data. *RNA* and *ADT* are the raw gene count matrix and the ADT count matrix generated in Step 1, respectively.
 
+	There is one optional column *TYPE*. It is kept for backward compatibility with sample sheets working with old versions of Cumulus WDL for CITE-Seq analysis. ``cite-seq`` is the only value accepted for this column.
+
 	Example::
 
 		OUTNAME,RNA,ADT
@@ -136,10 +138,23 @@ In the output subfolder of each CITE-Seq RNA-ADT data pair, you can find the fol
 
 ---------------------------------
 
-Load Cite-Seq results into Python and R
+Load CITE-Seq assay into Python and R
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
+To load CITE-Seq assay into Python, you need to install Python package `pegasusio <https://pypi.org/project/pegasusio/>`_ first. Then follow the codes below::
 
+	import pegasusio as io
+	data = io.read_input("output_name.h5sc")
+
+Once you load the data object, you can get its CITE-Seq count matrix by ``data.get_data('CITE_Seq_<ref-genome>')``, and RNA count matrix by ``data.get_data('<ref-genome>')``, where ``<ref-genome>`` is the reference genome name of the assay.
+
+To load the assay into R, you need to install R package ``reticulate`` in addition to Python package ``pegasusio``. Then follow the codes below::
+
+	library(reticulate)
+	ad <- import("pegasusio", convert = FALSE)
+	data <- ad$read_input("output_name.h5sc")
+
+And similarly, its CITE-Seq count matrix is achieved by ``data$get_data('CITE_Seq_<ref-genome>')``, and its RNA count matrix by ``data$get_data('<ref-genome>')``, where ``<ref-genome>`` is the reference genome name of the assay.
 
 
 .. _cellranger_workflow tutorial: ./cellranger.html
