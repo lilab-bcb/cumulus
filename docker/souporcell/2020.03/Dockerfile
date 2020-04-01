@@ -37,10 +37,10 @@ RUN bash -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y'
 ENV PATH=/opt/.cargo/bin:$PATH
 
 RUN cd /opt && \
-    wget https://github.com/wheaton5/souporcell/archive/88b9ce68051beaddba3b292d629d6d5c813f4e6f.zip -O souporcell.zip && \
+    wget https://github.com/wheaton5/souporcell/archive/eeddcde5892c5cbf8aba2149f0e77756f830a5ae.zip -O souporcell.zip && \
     unzip souporcell.zip && \
     rm souporcell.zip && \
-    mv souporcell-88b9ce68051beaddba3b292d629d6d5c813f4e6f souporcell && \
+    mv souporcell-eeddcde5892c5cbf8aba2149f0e77756f830a5ae souporcell && \
     cd souporcell/troublet && \
     cargo build --release && \
     cd /opt/souporcell/souporcell && \

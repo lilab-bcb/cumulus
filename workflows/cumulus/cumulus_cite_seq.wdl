@@ -61,6 +61,7 @@ task generate_cite_seq_tasks {
         export TMPDIR=/tmp
 
         python <<CODE
+        import re
         import pandas as pd
 
         df = pd.read_csv('~{input_sample_sheet}', header = 0, dtype = str, index_col = False)
@@ -77,6 +78,9 @@ task generate_cite_seq_tasks {
                 fo_ids.write(row['OUTNAME'] + '\n')
                 fo_rnas.write(row['OUTNAME'] + '\t' + row['RNA'] + '\n')
                 fo_adts.write(row['OUTNAME'] + '\t' + row['ADT'] + '\n')
+
+                if 'TYPE' in df.columns:
+                    assert row['TYPE'] == 'cite-seq'
         CODE
     }
 
