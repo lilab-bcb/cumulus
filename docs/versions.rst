@@ -46,10 +46,10 @@ Latest version
 	  - Run subcluster analysis using cumulus
 	* - cumulus/demultiplexing
 	  - `7 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/7>`_
-	  - Run tools (demuxEM, souporcell, or demuxlet) for demultiplexing cell-hashing/nucleus-hashing/droplet data.
-	* - cumulus/cumulus_hashing_cite_seq
-	  - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_hashing_cite_seq/10>`_
-	  - Run cumulus for cell-hashing/nucleus-hashing/CITE-Seq analysis
+	  - Run tools (demuxEM, souporcell, or demuxlet) for cell-hashing/nucleus-hashing/genetic-pooling analysis.
+	* - cumulus/cumulus_cite_seq
+	  - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_cite_seq/1>`_
+	  - Run cumulus for CITE-Seq analysis
 
 Stable version - v0.14.0
 ^^^^^^^^^^^^^^^^^^^^^^^^^
