@@ -51,8 +51,8 @@ Follow the steps below to run **cumulus** for CITE-Seq data on Terra_.
 
 ---------------------------------
 
-cumulus_cite_seq inputs:
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+cumulus_cite_seq workflow inputs:
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table::
 	:widths: 5 20 10 5
@@ -109,7 +109,7 @@ cumulus_cite_seq inputs:
 
 ---------------------------------
 
-cumulus_cite_seq outputs
+cumulus_cite_seq workflow outputs
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 See the table below for important *cumulus_cite_seq* outputs:
