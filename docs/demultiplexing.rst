@@ -147,9 +147,9 @@ Below are inputs for *demultiplexing* workflow. Notice that required inputs are 
 	  - "XIST"
 	  -
 	* - demuxEM_version
-	  - demuxEM version to use. Currently only support "0.1".
-	  - "0.1"
-	  - "0.1"
+	  - demuxEM version to use. Currently only support "0.1.0".
+	  - "0.1.0"
+	  - "0.1.0"
 	* - demuxEM_num_cpu
 	  - demuxEM parameter. Number of CPUs to request for demuxEM per pair.
 	  - 8

@@ -1,9 +1,10 @@
 version 1.0
 
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/1/plain-WDL/descriptor" as dem
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/4/plain-WDL/descriptor" as soc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/2/plain-WDL/descriptor" as dmx
 
-import "demuxEM.wdl" as dem
+#import "demuxEM.wdl" as dem
 #import "souporcell.wdl" as soc
 #import "demuxlet.wdl" as dmx
 
@@ -32,7 +33,7 @@ workflow demultiplexing {
 		Boolean demuxEM_generate_diagnostic_plots = true
 		# Generate violin plots using gender-specific genes (e.g. Xist). <demuxEM_generate_gender_plot> is a comma-separated list of gene names.
 		String? demuxEM_generate_gender_plot
-        String demuxEM_version = "0.1"
+        String demuxEM_version = "0.1.0"
         Int demuxEM_num_cpu = 8
         Int demuxEM_disk_space = 20
         Int demuxEM_memory = 10
