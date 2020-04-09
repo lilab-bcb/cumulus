@@ -8,6 +8,7 @@ workflow souporcell {
         String input_bam
         String genome_url
         String ref_genotypes_url
+        Boolean de_novo_mode
         Int min_num_genes
         Int num_clusters
         String donor_rename = ''
@@ -32,6 +33,7 @@ workflow souporcell {
             input_bam = input_bam,
             genome = genome_url,
             ref_genotypes = ref_genotypes,
+            de_novo_mode = de_novo_mode,
             min_num_genes = min_num_genes,
             num_clusters = num_clusters,
             donor_rename = donor_rename,
@@ -60,6 +62,7 @@ task run_souporcell {
         File input_bam
         File genome
         File? ref_genotypes
+        Boolean de_novo_mode
         Int min_num_genes
         Int num_clusters
         String donor_rename
@@ -84,25 +87,39 @@ task run_souporcell {
 
         mkdir result
         python /opt/extract_barcodes_from_rna.py ~{input_rna} result/~{sample_id}.barcodes.tsv ~{min_num_genes}
-        souporcell_pipeline.py -i ~{input_bam} -b result/~{sample_id}.barcodes.tsv -f genome_ref/fasta/genome.fa -t ~{num_cpu} -o result -k ~{num_clusters}
 
         python <<CODE
         from subprocess import check_call
 
-        call_args = ['python', '/opt/match_donors.py']
+        souporcell_call_args = ['souporcell_pipeline.py', '-i', '~{input_bam}', 'result/~{sample_id}.barcodes.tsv', '-f', 'genome_ref/fasta/genome.fa', '-t', '~{num_cpu}', '-o', 'result', '-k', '~{num_clusters}']
+
+        if '~{ref_genotypes}' is not '' and '~{de_novo_mode}' is 'false':
+            with open('ref_genotypes.vcf', 'w') as fout:
+                check_call(['gunzip', '-k', '~{ref_genotypes}', '-c'], stdout = fout)
+
+            souporcell_call_args.extend(['--known_genotypes', 'ref_genotypes.vcf'])
+
+            if '~{donor_rename}' is not '':
+                name_list = '~{donor_rename}'.split(',')
+                souporcell_call_args.extend(['--known_genotypes_sample_names'] + name_list)
+
+        print(' '.join(souporcell_call_args))
+        check_call(souporcell_call_args)
+
+        match_call_args = ['python', '/opt/match_donors.py']
 
         if '~{ref_genotypes}' is not '':
-            call_args.extend(['--ref-genotypes', '~{ref_genotypes}'])
+            match_call_args.extend(['--ref-genotypes', '~{ref_genotypes}'])
 
         if '~{donor_rename}' is not '':
-            call_args.extend(['--donor-names', '${donor_rename}'])
+            match_call_args.extend(['--donor-names', '~{donor_rename}'])
             
-        call_args.extend(['result/cluster_genotypes.vcf', 'result/clusters.tsv', '~{input_rna}', 'result/~{sample_id}_demux.zarr'])
+        match_call_args.extend(['result/cluster_genotypes.vcf', 'result/clusters.tsv', '~{input_rna}', 'result/~{sample_id}_demux.zarr'])
 
-        print(' '.join(call_args))
+        print(' '.join(match_call_args))
 
         with open('match_donors.log', 'w') as fout:
-            check_call(call_args, stdout = fout)
+            check_call(match_call_args, stdout = fout)
         CODE
 
         mkdir buffer
