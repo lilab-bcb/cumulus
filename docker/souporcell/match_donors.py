@@ -91,11 +91,13 @@ def parse_reference_vcf(reference_vcf: str, snp2geno: dict, sample_names: List[s
 	return ref_names, mmat
 
 
-def replace_ref_names(ref_str: str, ref_names: List[str]) -> List[str]:
+def replace_ref_names(ref_str: str, ref_names: List[str], has_ref_genotypes: bool) -> List[str]:
 	if ref_str is not None:
 		res_arr = ref_str.split(',')
 		assert len(res_arr) == len(ref_names)
 		ref_names = res_arr
+	elif not has_ref_genotypes:
+		ref_names = ['Donor' + x for x in ref_names]
 	ref_names = ['_ref_' + x for x in ref_names]
 	return ref_names
 
@@ -177,19 +179,22 @@ def write_output(assignment_file: str, input_mat_file: str, output_zarr_file: st
 
 	pegasusio.write_output(data, output_zarr_file, zarr_zipstore = True)
 
-def set_matching_no_reference(sample_numbers: List[str]) -> dict:
+def set_matching_no_reference(sample_numbers: List[str], ref_names: List[str]) -> dict:
+	assert len(sample_numbers) == len(ref_names)
 	matching = dict()
-	for sample_number in sample_numbers:
-		matching['_ref_Donor' + sample_number] = sample_number
-		matching[sample_number] = '_ref_Donor' + sample_number
+	pairs = list(zip(sample_numbers, ref_names))
+	for (sample_number, ref_name) in pairs:
+		matching[sample_number] = ref_name
+		matching[ref_name] = sample_number
 
 	return matching 
 
 sample_names, snp2geno = parse_denovo_vcf(args.cluster_genotypes)
 if args.ref_genotypes is not None:
 	ref_names, mmat = parse_reference_vcf(args.ref_genotypes, snp2geno, sample_names)
-	ref_names = replace_ref_names(args.ref_names, ref_names)
+	ref_names = replace_ref_names(args.ref_names, ref_names, has_ref_genotypes = True)
 	matching = find_max_matching(ref_names, sample_names, mmat)
 else:
-	matching = set_matching_no_reference(sample_names)
+	ref_names = replace_ref_names(args.ref_names, sample_names, has_ref_genotypes = False)
+	matching = set_matching_no_reference(sample_names, ref_names)
 write_output(args.demux_res, args.raw_mat, args.out_file, matching)

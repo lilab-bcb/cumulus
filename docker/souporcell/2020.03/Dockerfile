@@ -59,7 +59,7 @@ RUN conda install -y python==3.6.10 && \
     pip install anndata==0.7.1 && \
     pip install zarr==2.4.0 && \
     pip install networkx==2.4 && \
-    pip install pegasusio==0.1.1
+    pip install pegasusio==0.1.3
 
 RUN cd /opt && \
     wget -O htslib.tar.bz2 https://github.com/samtools/htslib/releases/download/1.9/htslib-1.9.tar.bz2 && \
