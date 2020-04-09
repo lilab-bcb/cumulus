@@ -16,7 +16,7 @@ workflow demuxEM {
         String? generate_gender_plot
 
         String docker_registry = "cumulusprod"
-        String demuxEM_version = "0.1"
+        String demuxEM_version = "0.1.0"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         Int num_cpu = 8
         Int memory = 10
@@ -49,7 +49,7 @@ workflow demuxEM {
 
     output {
         String output_folder = run_demuxEM.output_folder
-        File output_h5sc = run_demuxEM.output_h5sc
+        File output_zarr = run_demuxEM.output_zarr
         File monitoringLog = run_demuxEM.monitoringLog
     }
 }
@@ -85,7 +85,7 @@ task run_demuxEM {
 
         python <<CODE
         from subprocess import check_call
-        call_args = ['demuxEM', '~{input_adt_csv}', '~{input_rna}', '~{sample_id}', '-p', '~{num_cpu}']
+        call_args = ['demuxEM', '~{input_rna}', '~{input_adt_csv}', '~{sample_id}', '-p', '~{num_cpu}']
         if '~{genome}' is not '':
             call_args.extend(['--genome', '~{genome}'])
         if '~{alpha_on_samples}' is not '':
@@ -107,7 +107,7 @@ task run_demuxEM {
         CODE
 
         mkdir result
-        cp ~{sample_id}_demux.h5sc ~{sample_id}_ADTs.h5ad ~{sample_id}_demux.h5ad ~{sample_id}.*.pdf result
+        cp ~{sample_id}_demux.zarr ~{sample_id}.out.demuxEM.zarr ~{sample_id}.*.pdf result
         gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
         # mkdir -p ~{output_directory}/~{sample_id}
         # cp result/* ~{output_directory}/~{sample_id}
@@ -115,7 +115,7 @@ task run_demuxEM {
 
     output {
         String output_folder = "~{output_directory}/~{sample_id}"
-        File output_h5sc = "result/~{sample_id}_demux.h5sc"
+        File output_zarr = "result/~{sample_id}_demux.zarr"
         File monitoringLog = "monitoring.log"
     }
 
