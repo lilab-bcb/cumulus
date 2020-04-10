@@ -1,8 +1,8 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/1/plain-WDL/descriptor" as dem
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/4/plain-WDL/descriptor" as soc
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/2/plain-WDL/descriptor" as dmx
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/2/plain-WDL/descriptor" as dem
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/5/plain-WDL/descriptor" as soc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/3/plain-WDL/descriptor" as dmx
 
 #import "demuxEM.wdl" as dem
 #import "souporcell.wdl" as soc
@@ -33,13 +33,14 @@ workflow demultiplexing {
 		Boolean demuxEM_generate_diagnostic_plots = true
 		# Generate violin plots using gender-specific genes (e.g. Xist). <demuxEM_generate_gender_plot> is a comma-separated list of gene names.
 		String? demuxEM_generate_gender_plot
-        String demuxEM_version = "0.1.0"
+        String demuxEM_version = "0.1.1"
         Int demuxEM_num_cpu = 8
         Int demuxEM_disk_space = 20
         Int demuxEM_memory = 10
 
         # For souporcell
         Int souporcell_num_clusters = 1
+        Boolean souporcell_de_novo_mode = true
         String souporcell_rename_donors = ""
         String souporcell_version = "2020.03"
         Int souporcell_num_cpu = 32
@@ -47,6 +48,7 @@ workflow demultiplexing {
         Int souporcell_memory = 120
 
         # For demuxlet
+        String demuxlet_version = "0.1b"
         Int demuxlet_memory = 10
         Int demuxlet_disk_space = 2
 
@@ -103,6 +105,7 @@ workflow demultiplexing {
                         input_bam = Config.id2tag[pooling_id],
                         genome_url = genome_url,
                         ref_genotypes_url = Config.id2genotype[pooling_id],
+                        de_novo_mode = souporcell_de_novo_mode,
                         min_num_genes = min_num_genes,
                         num_clusters = souporcell_num_clusters,
                         donor_rename = souporcell_rename_donors,
@@ -126,6 +129,7 @@ workflow demultiplexing {
                         ref_genotypes = Config.id2genotype[pooling_id],
                         min_num_genes = min_num_genes,
                         docker_registry = docker_registry,
+                        demuxlet_version = demuxlet_version,
                         extra_disk_space = demuxlet_disk_space,
                         memory = demuxlet_memory,
                         zones = zones,

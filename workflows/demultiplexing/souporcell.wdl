@@ -91,7 +91,7 @@ task run_souporcell {
         python <<CODE
         from subprocess import check_call
 
-        souporcell_call_args = ['souporcell_pipeline.py', '-i', '~{input_bam}', 'result/~{sample_id}.barcodes.tsv', '-f', 'genome_ref/fasta/genome.fa', '-t', '~{num_cpu}', '-o', 'result', '-k', '~{num_clusters}']
+        souporcell_call_args = ['souporcell_pipeline.py', '-i', '~{input_bam}', '-b', 'result/~{sample_id}.barcodes.tsv', '-f', 'genome_ref/fasta/genome.fa', '-t', '~{num_cpu}', '-o', 'result', '-k', '~{num_clusters}']
 
         if '~{ref_genotypes}' is not '' and '~{de_novo_mode}' is 'false':
             with open('ref_genotypes.vcf', 'w') as fout:
