@@ -16,7 +16,7 @@ workflow demuxEM {
         String? generate_gender_plot
 
         String docker_registry = "cumulusprod"
-        String demuxEM_version = "0.1.0"
+        String demuxEM_version = "0.1.1"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         Int num_cpu = 8
         Int memory = 10

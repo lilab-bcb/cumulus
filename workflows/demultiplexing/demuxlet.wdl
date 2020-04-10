@@ -22,6 +22,7 @@ workflow demuxlet {
         Int extra_disk_space = 2
         Int preemptible = 2
         String docker_registry = "cumulusprod"
+        String demuxlet_version = "0.1b"
     }
 
     call demuxlet_task {
@@ -40,6 +41,7 @@ workflow demuxlet {
             field = field,
             geno_error = geno_error,
             docker_registry = docker_registry,
+            demuxlet_version = demuxlet_version,
             num_cpu = num_cpu,
             memory = memory,
             extra_disk_space = extra_disk_space,
@@ -72,6 +74,7 @@ task demuxlet_task {
         Float? geno_error
 
         String docker_registry
+        String demuxlet_version
         Int num_cpu
         Int memory
         Int extra_disk_space
@@ -125,7 +128,7 @@ task demuxlet_task {
     }
 
     runtime {
-        docker: "~{docker_registry}/demuxlet:0.1b"
+        docker: "~{docker_registry}/demuxlet:~{demuxlet_version}"
         zones: zones
         memory: "~{memory}G"
         bootDiskSizeGb: 12
