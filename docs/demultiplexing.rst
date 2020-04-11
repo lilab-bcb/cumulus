@@ -204,7 +204,7 @@ souporcell inputs
 	* - souporcell_de_novo_mode
 	  - | souporcell parameter. 
 	    | If ``true``, run souporcell in de novo mode without reference genotypes; and if a reference genotype vcf file is provided in the sample sheet, use it **only** for matching the cluster labels computed by souporcell.
-	    | If ``false``, run souporcell with ``--known_genotypes`` option enabled for the reference genotype vcf file specified in sample sheet, and use donor names in this vcf file for matching the resulting cluster names.
+	    | If ``false``, run souporcell with ``--known_genotypes`` option using the reference genotype vcf file specified in sample sheet, and *souporcell_rename_donors* is required in this case.
 	  - true
 	  - true
 	* - souporcell_num_clusters
@@ -274,7 +274,7 @@ See the table below for *demultiplexing* workflow outputs.
 	  - A list of Google Bucket URLs of the output folders. Each folder is associated with one RNA-hashtag pair in the given sample sheet.
 	* - output_zarr_files
 	  - Array[File]
-	  - A list of demultiplexed RNA count matrices in zarr format. Each zarr file is associated with one RNA-hashtag pair in the given sample sheet.
+	  - A list of demultiplexed RNA count matrices in zarr format. Each zarr file is associated with one RNA-hashtag pair in the given sample sheet. Please refere to section `load demultiplexing results into Python and R`_ for its structure.
 
 In the output subfolder of each cell-hashing/nuclei-hashing RNA-hashtag data pair, you can find the following files:
 
@@ -291,7 +291,7 @@ In the output subfolder of each cell-hashing/nuclei-hashing RNA-hashtag data pai
 	    | To load this file into Python, you need to first install `Pegasusio`_ on your local machine. Then use ``import pegasusio as io; data = io.read_input("output_name.out.demuxEM.zarr")`` in Python environment.
 	    | It contains 2 UnimodalData objects: one with key ``hashing`` is the hashtag count matrix, the other one with genome name key is the demultiplexed RNA count matrix.
 	    | To load the hashtag count matrix, type ``hash_data = data.get_data('hashing')``. The count matrix is ``hash_data.X``; cell barcode attributes are stored in ``hash_data.obs``; sample names are in ``hash_data.var_names``. Moreover, the estimated background probability regarding hashtags is in ``hash_data.uns['background_probs']``.
-	    | To load the RNA matrix, type ``rna_data = data.get_data('<genome>')``, where ``<genome>`` is the genome name of the data. It only contains cells which have estimated sample assignments. The count matrix is ``rna_data.X``. Cell barcode attributes are stored in ``rna_data.obs``: ``rna_data.obs['demux_type']`` stores the estimated droplet types (singlet/doublet/unknown) of cells; ``rna_data.obs['assignment']`` stores the estimated hashtag(s) that each cell belongs to.
+	    | To load the RNA matrix, type ``rna_data = data.get_data('<genome>')``, where ``<genome>`` is the genome name of the data. It only contains cells which have estimated sample assignments. The count matrix is ``rna_data.X``. Cell barcode attributes are stored in ``rna_data.obs``: ``rna_data.obs['demux_type']`` stores the estimated droplet types (singlet/doublet/unknown) of cells; ``rna_data.obs['assignment']`` stores the estimated hashtag(s) that each cell belongs to. Moreover, for cell-hashing/nucleus-hashing data, you can find estimated sample fractions (sample1, sample2, ..., samplen, background) for each droplet in ``rna_data.obsm['raw_probs']``.
 	* - output_name.ambient_hashtag.hist.png
 	  - Optional output. A histogram plot depicting hashtag distributions of empty droplets and non-empty droplets.
 	* - output_name.background_probabilities.bar.png
@@ -347,7 +347,7 @@ Once you load the data object, you can find estimated droplet types (singlet/dou
 
 You can also find estimated sample assignments in ``data.obs['assignment']``.
 
-For cell-hashing/nucleus-hashing data, you can find estimated sample fractions (sample1, sample2, ..., samplen, background) for each droplet in ``data.obsm['raw_probs']``.
+For cell-hashing/nucleus-hashing data, if one sample name can correspond to multiple feature barcodes, each feature barcode is assigned to a unique sample name, and this deduplicated sample assignment results are in ``data.obs['assignment.dedup']``.
 
 To load the results into R, you need to install R package ``reticulate`` in addition to Python package ``pegasusio``. Then follow the codes below::
 
@@ -355,7 +355,7 @@ To load the results into R, you need to install R package ``reticulate`` in addi
 	ad <- import("pegasusio", convert = FALSE)
 	data <- ad$read_input("output_name_demux.zarr")
 
-Results are in ``data$obs['demux_type']``, ``data$obs['assignment']``, and ``data$obsm['raw_probs']`` (this exists in cell-hashing/nucleus-hashing results only).
+Results are in ``data$obs['demux_type']``, ``data$obs['assignment']``, and similarly as above, for cell-hashing/nucleus-hashing data, you'll find an additional field ``data$obs['assignment.dedup']`` for deduplicated sample assignment in the case that one sample name can correspond to multiple feature barcodes.
 
 
 .. _cellranger_workflow tutorial: ./cellranger.html
