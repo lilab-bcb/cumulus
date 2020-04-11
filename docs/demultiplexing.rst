@@ -1,4 +1,4 @@
-Demultiplex cell-hashing/nucleus-hashing/genetic-pooling sc/snRNA-Seq data
+Demultiplex genetic-pooling/cell-hashing/nucleus-hashing sc/snRNA-Seq data
 --------------------------------------------------------------------------
 
 This ``demultiplexing`` workflow generates gene-count matrices from cell-hashing/nucleus-hashing/genetic-pooling data by demultiplexing.
@@ -6,7 +6,7 @@ This ``demultiplexing`` workflow generates gene-count matrices from cell-hashing
 demuxEM is used for analyzing cell-hashing/nucleus-hashing data, while souporcell and demuxlet are for genetic-pooling data.
 
 Prepare input data and import workflow
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 1. Run ``cellranger_workflow``
 ++++++++++++++++++++++++++++++++
@@ -76,7 +76,11 @@ Import *demultiplexing* workflow to your workspace.
 Workflow inputs
 ^^^^^^^^^^^^^^^^
 
-Below are inputs for *demultiplexing* workflow. Notice that required inputs are in bold.
+Below are inputs for *demultiplexing* workflow. We'll first introduce global inputs, and then inputs for each of the demultiplexing tools. Notice that required inputs are in bold.
+
+global inputs
++++++++++++++++
+
 
 .. list-table::
 	:widths: 5 20 10 5
@@ -126,6 +130,20 @@ Below are inputs for *demultiplexing* workflow. Notice that required inputs are 
 	  - Number of maximum preemptible tries allowed.
 	  - 2
 	  - 2
+
+
+demuxEM inputs
+++++++++++++++++
+
+.. list-table::
+	:widths: 5 20 10 5
+	:header-rows: 1
+
+
+	* - Name
+	  - Description
+	  - Example
+	  - Default
 	* - demuxEM_alpha_on_samples
 	  - demuxEM parameter. The Dirichlet prior concentration parameter (alpha) on samples. An alpha value < 1.0 will make the prior sparse.
 	  - 0.0
@@ -166,12 +184,27 @@ Below are inputs for *demultiplexing* workflow. Notice that required inputs are 
 	  - demuxEM parameter. Disk space (integer) in GB needed for demuxEM per pair.
 	  - 20
 	  - 20
+
+souporcell inputs
+++++++++++++++++++
+
+.. list-table::
+	:widths: 5 20 10 5
+	:header-rows: 1
+
+
+	* - Name
+	  - Description
+	  - Example
+	  - Default
 	* - souporcell_version
 	  - souporcell version to use. Currently only support "2020.03".
 	  - "2020.03"
 	  - "2020.03"
 	* - souporcell_de_novo_mode
-	  - souporcell parameter. If ``true``, run souporcell de novo mode without reference genotypes; otherwise, a reference genotype vcf file specified in sample sheet will be used.
+	  - | souporcell parameter. 
+	    | If ``true``, run souporcell in de novo mode without reference genotypes; and if a reference genotype vcf file is provided in the sample sheet, use it **only** for matching the cluster labels computed by souporcell.
+	    | If ``false``, run souporcell with ``--known_genotypes`` option enabled for the reference genotype vcf file specified in sample sheet, and use donor names in this vcf file for matching the resulting cluster names.
 	  - true
 	  - true
 	* - souporcell_num_clusters
@@ -195,6 +228,19 @@ Below are inputs for *demultiplexing* workflow. Notice that required inputs are 
 	  - souporcell parameter. Disk space (integer) in GB needed for souporcell per pair.
 	  - 500
 	  - 500
+
+demuxlet inputs
++++++++++++++++++
+
+.. list-table::
+	:widths: 5 20 10 5
+	:header-rows: 1
+
+
+	* - Name
+	  - Description
+	  - Example
+	  - Default
 	* - demuxlet_version
 	  - demuxlet version to use. Currently only support "0.1b".
 	  - "0.1b"
@@ -209,7 +255,7 @@ Below are inputs for *demultiplexing* workflow. Notice that required inputs are 
 	  - 2
 	  - 2
 
-
+---------------------
 
 Workflow outputs
 ^^^^^^^^^^^^^^^^^^
@@ -223,9 +269,12 @@ See the table below for *demultiplexing* workflow outputs.
 	* - Name
 	  - Type
 	  - Description
-	* - output_folder
-	  - String
-	  - Google Bucket URL of output directory. Within it, each folder is for one RNA-hashtag data pair in the input sample sheet.
+	* - output_folders
+	  - Array[String]
+	  - A list of Google Bucket URLs of the output folders. Each folder is associated with one RNA-hashtag pair in the given sample sheet.
+	* - output_zarr_files
+	  - Array[File]
+	  - A list of demultiplexed RNA count matrices in zarr format. Each zarr file is associated with one RNA-hashtag pair in the given sample sheet.
 
 In the output subfolder of each cell-hashing/nuclei-hashing RNA-hashtag data pair, you can find the following files:
 
@@ -235,14 +284,14 @@ In the output subfolder of each cell-hashing/nuclei-hashing RNA-hashtag data pai
 
 	* - Name
 	  - Description
+	* - output_name_demux.zarr
+	  - Demultiplexed RNA count matrix in zarr format. Please refer to section `load demultiplexing results into Python and R`_ for its structure.
 	* - output_name.out.demuxEM.zarr
 	  - | RNA expression matrix with demultiplexed sample identities in zarr format.
 	    | To load this file into Python, you need to first install `Pegasusio`_ on your local machine. Then use ``import pegasusio as io; data = io.read_input("output_name.out.demuxEM.zarr")`` in Python environment.
 	    | It contains 2 UnimodalData objects: one with key ``hashing`` is the hashtag count matrix, the other one with genome name key is the demultiplexed RNA count matrix.
 	    | To load the hashtag count matrix, type ``hash_data = data.get_data('hashing')``. The count matrix is ``hash_data.X``; cell barcode attributes are stored in ``hash_data.obs``; sample names are in ``hash_data.var_names``. Moreover, the estimated background probability regarding hashtags is in ``hash_data.uns['background_probs']``.
 	    | To load the RNA matrix, type ``rna_data = data.get_data('<genome>')``, where ``<genome>`` is the genome name of the data. It only contains cells which have estimated sample assignments. The count matrix is ``rna_data.X``. Cell barcode attributes are stored in ``rna_data.obs``: ``rna_data.obs['demux_type']`` stores the estimated droplet types (singlet/doublet/unknown) of cells; ``rna_data.obs['assignment']`` stores the estimated hashtag(s) that each cell belongs to.
-	* - output_name_demux.zarr
-	  - Demultiplexed RNA count matrix in zarr format. Please refer to section `load demultiplexing results into Python and R`_ for its structure.
 	* - output_name.ambient_hashtag.hist.png
 	  - Optional output. A histogram plot depicting hashtag distributions of empty droplets and non-empty droplets.
 	* - output_name.background_probabilities.bar.png
