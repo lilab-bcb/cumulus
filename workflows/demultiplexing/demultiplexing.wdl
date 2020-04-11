@@ -140,9 +140,9 @@ workflow demultiplexing {
     }
 
     output {
-        String output_folder = "~{output_directory}"
+        Array[String] output_folders = select_all(flatten(select_all([demuxEM.output_folder, souporcell.output_folder, demuxlet.output_folder])))
+        Array[File] output_zarr_files = select_all(flatten(select_all([demuxEM.output_zarr, souporcell.output_zarr, demuxlet.output_zarr])))
     }
-
 }
 
 task generate_demux_config {
