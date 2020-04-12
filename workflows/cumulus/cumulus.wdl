@@ -7,9 +7,9 @@ workflow cumulus {
 	input {
 		# Input file: can be either a csv-formatted file containing information of each scRNA-Seq run or a single input file
 		File input_file
-		# If input file is a sample sheet in csv format.
-		Boolean is_sample_sheet = sub(input_file, "^.+\\.csv$", "CSV") == "CSV"
-		# Google bucket, subdirectory name and results name prefix
+		# Google bucket and directory name.
+		String output_directory
+		# Results name prefix and subdirectory name.
 		String output_name
 
 		# cumulus version, default to "0.15.0"
@@ -249,10 +249,16 @@ workflow cumulus {
 		Boolean output_dense = false
 	}
 
+	# Output directory, with trailing slashes stripped
+	String output_directory_stripped = sub(output_directory, "/+$", "")
+	# If input file is a sample sheet in csv format.
+	Boolean is_sample_sheet = sub(input_file, "^.+\\.csv$", "CSV") == "CSV"
+
 	if (is_sample_sheet) {
 		call tasks.run_cumulus_aggregate_matrices as aggregate_matrices {
 			input:
 				input_count_matrix_csv = input_file,
+				output_directory = output_directory_stripped,
 				output_name = output_name,
 				restrictions = restrictions,
 				attributes = attributes,
@@ -273,6 +279,7 @@ workflow cumulus {
 	call tasks.run_cumulus_cluster as cluster {
 		input:
 			input_file = if is_sample_sheet then select_first([aggregate_matrices.output_h5sc]) else input_file,
+			output_directory = output_directory_stripped,
 			output_name = output_name,
 			considered_refs = considered_refs,
 			channel = channel,
@@ -356,6 +363,7 @@ workflow cumulus {
 		call tasks.run_cumulus_de_analysis as de_analysis {
 			input:
 				input_h5ad = cluster.output_h5ad,
+				output_directory = output_directory_stripped,
 				output_name = output_name,
 				labels = cluster_labels,
 				alpha = alpha,
@@ -385,6 +393,7 @@ workflow cumulus {
 		call tasks.run_cumulus_plot as plot {
 			input:
 				input_h5ad = cluster.output_h5ad,
+				output_directory = output_directory_stripped,
 				output_name = output_name,
 				plot_composition = plot_composition,
 				plot_tsne = plot_tsne,
@@ -409,6 +418,7 @@ workflow cumulus {
 		call tasks.run_cumulus_scp_output as scp_output {
 			input:
 				input_h5ad = cluster.output_h5ad,
+				output_directory = output_directory_stripped,
 				output_name = output_name,
 				output_dense = output_dense,
 				cumulus_version = cumulus_version,

@@ -6,6 +6,7 @@ workflow cumulus_tasks {
 task run_cumulus_aggregate_matrices {
 	input {
 		File input_count_matrix_csv
+		String output_directory
 		String output_name
 		String cumulus_version
 		String zones
@@ -20,8 +21,6 @@ task run_cumulus_aggregate_matrices {
 		String docker_registry
 	}
 
-	String out_name = basename(output_name)
-
 	command {
 		set -e
 		export TMPDIR=/tmp
@@ -29,7 +28,7 @@ task run_cumulus_aggregate_matrices {
 		python <<CODE
 		from subprocess import check_call
 
-		call_args = ['pegasus', 'aggregate_matrix', '~{input_count_matrix_csv}', '~{out_name}']
+		call_args = ['pegasus', 'aggregate_matrix', '~{input_count_matrix_csv}', '~{output_name}']
 		if '~{restrictions}' is not '':
 			ress = '~{restrictions}'.split(';')
 			for res in ress:
@@ -46,18 +45,17 @@ task run_cumulus_aggregate_matrices {
 		print(' '.join(call_args))
 		check_call(call_args)
 
-		import os
-		dest = os.path.dirname('~{output_name}') + '/'
+		dest = '~{output_directory}' + '/' + '~{output_name}'
 		# check_call(['mkdir', '-p', dest])
-		# call_args = ['cp', '~{out_name}.h5sc', dest]
-		call_args = ['gsutil', 'cp', '~{out_name}.h5sc', dest]
+		# call_args = ['cp', '~{output_name}.h5sc', dest]
+		call_args = ['gsutil', 'cp', '~{output_name}.h5sc', dest]
 		print(' '.join(call_args))
 		check_call(call_args)
 		CODE
 	}
 
 	output {
-		File output_h5sc = '~{out_name}.h5sc'
+		File output_h5sc = '~{output_name}.h5sc'
 	}
 
 	runtime {
@@ -74,6 +72,7 @@ task run_cumulus_aggregate_matrices {
 task run_cumulus_cluster {
 	input {
 		File input_file
+		String output_directory
 		String output_name
 		String cumulus_version
 		String zones
@@ -153,8 +152,6 @@ task run_cumulus_cluster {
 		String docker_registry
 	}
 
-	String out_name = basename(output_name)
-
 	command {
 		set -e
 		export TMPDIR=/tmp
@@ -163,7 +160,7 @@ task run_cumulus_cluster {
 		python <<CODE
 		from subprocess import check_call
 
-		call_args = ['pegasus', 'cluster', '~{input_file}', '~{out_name}', '-p', '~{num_cpu}']
+		call_args = ['pegasus', 'cluster', '~{input_file}', '~{output_name}', '-p', '~{num_cpu}']
 		if '~{considered_refs}' is not '':
 			call_args.extend(['--considered-refs', '~{considered_refs}'])
 		if '~{channel}' is not '':
@@ -303,24 +300,24 @@ task run_cumulus_cluster {
 		print(' '.join(call_args))
 		check_call(call_args)
 		if '~{output_parquet}' is 'true':
-			call_args = ['pegasus', 'parquet', '~{out_name}.h5ad', '~{out_name}', '-p', '~{num_cpu}']
+			call_args = ['pegasus', 'parquet', '~{output_name}.h5ad', '~{output_name}', '-p', '~{num_cpu}']
 			print(' '.join(call_args))
 			check_call(call_args)
 
-		import os, glob
-		dest = os.path.dirname('~{output_name}') + '/'
+		import glob
+		dest = '~{output_directory}' + '/' + '~{output_name}'
 		# check_call(['mkdir', '-p', dest])
-		files = ['~{out_name}.h5ad', '~{out_name}.log']
+		files = ['~{output_name}.h5ad', '~{output_name}.log']
 		if '~{output_seurat_compatible}' is 'true':
-			files.append('~{out_name}.seurat.h5ad')
+			files.append('~{output_name}.seurat.h5ad')
 		if '~{output_filtration_results}' is 'true':
-			files.append('~{out_name}.filt.xlsx')
+			files.append('~{output_name}.filt.xlsx')
 		if '~{plot_filtration_results}' is 'true':
-			files.extend(glob.glob('~{out_name}.filt.*.pdf'))
+			files.extend(glob.glob('~{output_name}.filt.*.pdf'))
 		if '~{output_loom}' is 'true':
-			files.append('~{out_name}.loom')
+			files.append('~{output_name}.loom')
 		if '~{output_parquet}' is 'true':
-			files.append('~{out_name}.parquet')
+			files.append('~{output_name}.parquet')
 		for file in files:
 			# call_args = ['cp', file, dest]
 			call_args = ['gsutil', '-m', 'cp', file, dest]
@@ -330,13 +327,13 @@ task run_cumulus_cluster {
 	}
 
 	output {
-		File output_h5ad = "~{out_name}.h5ad"
-		Array[File] output_seurat_h5ad = glob("~{out_name}.seurat.h5ad")
-		Array[File] output_filt_xlsx = glob("~{out_name}.filt.xlsx")
-		Array[File] output_filt_plot = glob("~{out_name}.filt.*.pdf")
-		Array[File] output_loom_file = glob("~{out_name}.loom")
-		Array[File] output_parquet_file = glob("~{out_name}.parquet")
-		File output_log = "~{out_name}.log"
+		File output_h5ad = "~{output_name}.h5ad"
+		Array[File] output_seurat_h5ad = glob("~{output_name}.seurat.h5ad")
+		Array[File] output_filt_xlsx = glob("~{output_name}.filt.xlsx")
+		Array[File] output_filt_plot = glob("~{output_name}.filt.*.pdf")
+		Array[File] output_loom_file = glob("~{output_name}.loom")
+		Array[File] output_parquet_file = glob("~{output_name}.parquet")
+		File output_log = "~{output_name}.log"
 		File monitoringLog = "monitoring.log"
 	}
 
@@ -354,6 +351,7 @@ task run_cumulus_cluster {
 task run_cumulus_de_analysis {
 	input {
 		File input_h5ad
+		String output_directory
 		String output_name
 		String cumulus_version
 		String zones	
@@ -380,8 +378,6 @@ task run_cumulus_de_analysis {
 		String docker_registry
 	}
 
-	String out_name = basename(output_name)
-
 	command {
 		set -e
 		export TMPDIR=/tmp
@@ -390,10 +386,10 @@ task run_cumulus_de_analysis {
 		python <<CODE
 		from subprocess import check_call
 
-		call_args = ['mv', '-f', '~{input_h5ad}', '~{out_name}.h5ad']
+		call_args = ['mv', '-f', '~{input_h5ad}', '~{output_name}.h5ad']
 		print(' '.join(call_args))
 		check_call(call_args)			
-		call_args = ['pegasus', 'de_analysis', '~{out_name}.h5ad', '~{out_name}.de.xlsx', '-p', '~{num_cpu}']
+		call_args = ['pegasus', 'de_analysis', '~{output_name}.h5ad', '~{output_name}.de.xlsx', '-p', '~{num_cpu}']
 		if '~{labels}' is not '':
 			call_args.extend(['--labels', '~{labels}'])
 		if '~{alpha}' is not '':
@@ -409,7 +405,7 @@ task run_cumulus_de_analysis {
 		print(' '.join(call_args))
 		check_call(call_args)
 		if '~{find_markers_lightgbm}' is 'true':
-			call_args = ['pegasus', 'find_markers', '~{out_name}.h5ad', '~{out_name}.markers.xlsx', '-p', '~{num_cpu}']
+			call_args = ['pegasus', 'find_markers', '~{output_name}.h5ad', '~{output_name}.markers.xlsx', '-p', '~{num_cpu}']
 			if '~{labels}' is not '':
 				call_args.extend(['--labels', '~{labels}'])
 			if '~{remove_ribo}' is 'true':
@@ -421,7 +417,7 @@ task run_cumulus_de_analysis {
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{annotate_cluster}' is 'true':
-			call_args = ['pegasus', 'annotate_cluster', '~{out_name}.h5ad', '~{out_name}.anno.txt']
+			call_args = ['pegasus', 'annotate_cluster', '~{output_name}.h5ad', '~{output_name}.anno.txt']
 			if '~{organism}' is not '':
 				call_args.extend(['--marker-file', '~{organism}'])
 			if '~{annotate_de_test}' is not '':
@@ -433,14 +429,13 @@ task run_cumulus_de_analysis {
 			print(' '.join(call_args))
 			check_call(call_args)
 
-		import os
-		dest = os.path.dirname('~{output_name}') + '/'
+		dest = '~{output_directory}' + '/' + '~{output_name}'
 		# check_call(['mkdir', '-p', dest])
-		files = ['~{out_name}.h5ad', '~{out_name}.de.xlsx']
+		files = ['~{output_name}.h5ad', '~{output_name}.de.xlsx']
 		if '~{find_markers_lightgbm}' is 'true':
-			files.append('~{out_name}.markers.xlsx')
+			files.append('~{output_name}.markers.xlsx')
 		if '~{annotate_cluster}' is 'true':
-			files.append('~{out_name}.anno.txt')
+			files.append('~{output_name}.anno.txt')
 		for file in files:
 			# call_args = ['cp', file, dest]
 			call_args = ['gsutil', 'cp', file, dest]
@@ -450,10 +445,10 @@ task run_cumulus_de_analysis {
 	}
 
 	output {
-		File output_de_h5ad = "~{out_name}.h5ad"
-		File output_de_xlsx = "~{out_name}.de.xlsx"
-		Array[File] output_markers_xlsx = glob("~{out_name}.markers.xlsx")
-		Array[File] output_anno_file = glob("~{out_name}.anno.txt")
+		File output_de_h5ad = "~{output_name}.h5ad"
+		File output_de_xlsx = "~{output_name}.de.xlsx"
+		Array[File] output_markers_xlsx = glob("~{output_name}.markers.xlsx")
+		Array[File] output_anno_file = glob("~{output_name}.anno.txt")
 		File monitoringLog = "monitoring.log"
 	}
 
@@ -471,6 +466,7 @@ task run_cumulus_de_analysis {
 task run_cumulus_plot {
 	input {
 		File input_h5ad
+		String output_directory
 		String output_name
 		String cumulus_version
 		String zones
@@ -490,8 +486,6 @@ task run_cumulus_plot {
 		String docker_registry
 	}
 
-	String out_name = basename(output_name)
-
 	command {
 		set -e
 		export TMPDIR=/tmp
@@ -502,51 +496,50 @@ task run_cumulus_plot {
 			pairs = '~{plot_composition}'.split(',')
 			for pair in pairs:
 				lab, attr = pair.split(':')
-				call_args = ['pegasus', 'plot', 'composition', '--cluster-labels', lab, '--attribute', attr, '--style', 'normalized', '--not-stacked', '~{input_h5ad}', '~{out_name}.' + lab + '.' + attr + '.composition.pdf']
+				call_args = ['pegasus', 'plot', 'composition', '--cluster-labels', lab, '--attribute', attr, '--style', 'normalized', '--not-stacked', '~{input_h5ad}', '~{output_name}.' + lab + '.' + attr + '.composition.pdf']
 				print(' '.join(call_args))
 				check_call(call_args)
 		if '~{plot_tsne}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter',  '--basis', 'tsne', '--attributes', '~{plot_tsne}', '~{input_h5ad}', '~{out_name}.tsne.pdf']
+			call_args = ['pegasus', 'plot', 'scatter',  '--basis', 'tsne', '--attributes', '~{plot_tsne}', '~{input_h5ad}', '~{output_name}.tsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_fitsne}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'fitsne', '--attributes', '~{plot_fitsne}', '~{input_h5ad}', '~{out_name}.fitsne.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'fitsne', '--attributes', '~{plot_fitsne}', '~{input_h5ad}', '~{output_name}.fitsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_umap}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'umap', '--attributes', '~{plot_umap}', '~{input_h5ad}', '~{out_name}.umap.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'umap', '--attributes', '~{plot_umap}', '~{input_h5ad}', '~{output_name}.umap.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_fle}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'fle', '--attributes', '~{plot_fle}', '~{input_h5ad}', '~{out_name}.fle.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'fle', '--attributes', '~{plot_fle}', '~{input_h5ad}', '~{output_name}.fle.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_diffmap}' is not '':
 			attrs = '~{plot_diffmap}'.split(',')
 			for attr in attrs:
-				call_args = ['pegasus', 'iplot', '--attribute', attr, 'diffmap_pca', '~{input_h5ad}', '~{out_name}.' + attr + '.diffmap_pca.html']
+				call_args = ['pegasus', 'iplot', '--attribute', attr, 'diffmap_pca', '~{input_h5ad}', '~{output_name}.' + attr + '.diffmap_pca.html']
 				print(' '.join(call_args))
 				check_call(call_args)
 		if '~{plot_citeseq_fitsne}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'citeseq_fitsne', '--attributes', '~{plot_citeseq_fitsne}', '~{input_h5ad}', '~{out_name}.citeseq.fitsne.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'citeseq_fitsne', '--attributes', '~{plot_citeseq_fitsne}', '~{input_h5ad}', '~{output_name}.citeseq.fitsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_net_tsne}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_tsne', '--attributes', '~{plot_net_tsne}', '~{input_h5ad}', '~{out_name}.net.tsne.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_tsne', '--attributes', '~{plot_net_tsne}', '~{input_h5ad}', '~{output_name}.net.tsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_net_umap}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_umap', '--attributes', '~{plot_net_umap}', '~{input_h5ad}', '~{out_name}.net.umap.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_umap', '--attributes', '~{plot_net_umap}', '~{input_h5ad}', '~{output_name}.net.umap.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_net_fle}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_fle', '--attributes', '~{plot_net_fle}', '~{input_h5ad}', '~{out_name}.net.fle.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_fle', '--attributes', '~{plot_net_fle}', '~{input_h5ad}', '~{output_name}.net.fle.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 
-		import os
 		import glob
-		dest = os.path.dirname('~{output_name}') + '/'
+		dest = '~{output_directory}' + '/' + '~{output_name}'
 		# check_call(['mkdir', '-p', dest])
 		files = glob.glob('*.pdf')
 		files.extend(glob.glob('*.html'))
@@ -578,6 +571,7 @@ task run_cumulus_plot {
 task run_cumulus_scp_output {
 	input {
 		File input_h5ad
+		String output_directory
 		String output_name
 		Boolean output_dense
 		String cumulus_version
@@ -588,19 +582,16 @@ task run_cumulus_scp_output {
 		String docker_registry
 	}
 
-	String out_name = basename(output_name)
-
 	command {
 		set -e
 		export TMPDIR=/tmp
-		export DIRNAME=`dirname ~{output_name}`
-		pegasus scp_output ~{true='--dense' false='' output_dense} ~{input_h5ad} ~{out_name}
-		# mkdir -p $DIRNAME ; cp ~{out_name}.scp.* $DIRNAME
-		gsutil -m cp ~{out_name}.scp.* $DIRNAME
+		pegasus scp_output ~{true='--dense' false='' output_dense} ~{input_h5ad} ~{output_name}
+		# mkdir -p $DIRNAME ; cp ~{output_name}.scp.* $DIRNAME
+		gsutil -m cp ~{output_name}.scp.* ~{output_directory}/~{output_name}
 	}
 
 	output {
-		Array[File] output_scp_files = glob("~{out_name}.scp.*")
+		Array[File] output_scp_files = glob("~{output_name}.scp.*")
 	}
 
 	runtime {
@@ -617,6 +608,7 @@ task run_cumulus_scp_output {
 task run_cumulus_subcluster {
 	input {
 		File input_h5ad
+		String output_directory
 		String output_name
 		String cumulus_version
 		String zones
@@ -677,8 +669,6 @@ task run_cumulus_subcluster {
 		String docker_registry
 	}
 
-	String out_name = basename(output_name)
-
 	command {
 		set -e
 		export TMPDIR=/tmp
@@ -686,7 +676,7 @@ task run_cumulus_subcluster {
 
 		python <<CODE
 		from subprocess import check_call
-		call_args = ['pegasus', 'subcluster', '~{input_h5ad}', '~{out_name}', '-p', '~{num_cpu}']
+		call_args = ['pegasus', 'subcluster', '~{input_h5ad}', '~{output_name}', '-p', '~{num_cpu}']
 		if '~{subset_selections}' is not '':
 			sels = '~{subset_selections}'.split(';')
 			for sel in sels:
@@ -790,18 +780,17 @@ task run_cumulus_subcluster {
 		print(' '.join(call_args))
 		check_call(call_args)
 		if '~{output_parquet}' is 'true':
-			call_args = ['pegasus', 'parquet', '~{out_name}.h5ad', '~{out_name}', '-p', '~{num_cpu}']
+			call_args = ['pegasus', 'parquet', '~{output_name}.h5ad', '~{output_name}', '-p', '~{num_cpu}']
 			print(' '.join(call_args))
 			check_call(call_args)
 
-		import os
-		dest = os.path.dirname('~{output_name}') + '/'
+		dest = '~{output_directory}' + '/' + '~{output_name}'
 		# check_call(['mkdir', '-p', dest])
-		files = ['~{out_name}.h5ad', '~{out_name}.log']
+		files = ['~{output_name}.h5ad', '~{output_name}.log']
 		if '~{output_loom}' is 'true':
-			files.append('~{out_name}.loom')
+			files.append('~{output_name}.loom')
 		if '~{output_parquet}' is 'true':
-			files.append('~{out_name}.parquet')
+			files.append('~{output_name}.parquet')
 		for file in files:
 			# call_args = ['cp', file, dest]
 			call_args = ['gsutil', 'cp', file, dest]
@@ -811,10 +800,10 @@ task run_cumulus_subcluster {
 	}
 
 	output {
-		File output_h5ad = "~{out_name}.h5ad"
-		File output_log = "~{out_name}.log"
-		Array[File] output_loom_file = glob("~{out_name}.loom")
-		Array[File] output_parquet_file = glob("~{out_name}.parquet")
+		File output_h5ad = "~{output_name}.h5ad"
+		File output_log = "~{output_name}.log"
+		Array[File] output_loom_file = glob("~{output_name}.loom")
+		Array[File] output_parquet_file = glob("~{output_name}.parquet")
 		File monitoringLog = "monitoring.log"
 	}
 

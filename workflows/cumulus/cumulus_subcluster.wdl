@@ -6,7 +6,9 @@ import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/
 workflow cumulus_subcluster {
 	input {
 		File input_h5ad
-		# google bucket, subdirectory name and results name prefix
+		# google bucket and directory name.
+		String output_directory
+		# results name prefix and its subdirectory name.
 		String output_name
 		# Specify which cells will be included in the subcluster analysis. This field contains one or more <subset_selection> strings separated by ';'. Each <subset_selection> string takes the format of ‘attr:value,…,value’, which means select cells with attr in the values. If multiple <subset_selection> strings are specified, the subset of cells selected is the intersection of these strings.
 		String subset_selections
@@ -193,9 +195,12 @@ workflow cumulus_subcluster {
 		Boolean output_dense = false
 	}
 
+	String output_directory_stripped = sub(output_directory, "/+$", "")
+
 	call tasks.run_cumulus_subcluster as subcluster {
 		input:
 			input_h5ad = input_h5ad,
+			output_directory = output_directory_stripped,
 			output_name = output_name,
 			subset_selections = subset_selections,
 			correct_batch_effect = correct_batch_effect,
@@ -260,6 +265,7 @@ workflow cumulus_subcluster {
 		call tasks.run_cumulus_de_analysis as de_analysis {
 			input:
 				input_h5ad = subcluster.output_h5ad,
+				output_directory = output_directory_stripped,
 				output_name = output_name,
 				labels = cluster_labels,
 				alpha = alpha,
@@ -289,6 +295,7 @@ workflow cumulus_subcluster {
 		call tasks.run_cumulus_plot as plot {
 			input:
 				input_h5ad = subcluster.output_h5ad,
+				output_directory = output_directory,
 				output_name = output_name,
 				plot_composition = plot_composition,
 				plot_tsne = plot_tsne,
@@ -312,6 +319,7 @@ workflow cumulus_subcluster {
 		call tasks.run_cumulus_scp_output as scp_output {
 			input:
 				input_h5ad = subcluster.output_h5ad,
+				output_directory = output_directory,
 				output_name = output_name,
 				output_dense = output_dense,
 				cumulus_version = cumulus_version,
