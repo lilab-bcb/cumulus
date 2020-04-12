@@ -586,7 +586,7 @@ task run_cumulus_scp_output {
 		set -e
 		export TMPDIR=/tmp
 		pegasus scp_output ~{true='--dense' false='' output_dense} ~{input_h5ad} ~{output_name}
-		# mkdir -p $DIRNAME ; cp ~{output_name}.scp.* $DIRNAME
+		# mkdir -p ~{output_directory}/~{output_name} ; cp ~{output_name}.scp.* ~{output_directory}/~{output_name}
 		gsutil -m cp ~{output_name}.scp.* ~{output_directory}/~{output_name}
 	}
 
