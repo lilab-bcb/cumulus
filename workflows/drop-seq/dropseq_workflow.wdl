@@ -1,4 +1,4 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:bcl2fastq/versions/2/plain-WDL/descriptor" as bcl2fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:bcl2fastq/versions/3/plain-WDL/descriptor" as bcl2fastq_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropest/versions/3/plain-WDL/descriptor" as dropest_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_align/versions/4/plain-WDL/descriptor" as dropseq_align_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_count/versions/4/plain-WDL/descriptor" as dropseq_count_wdl
@@ -23,7 +23,7 @@ workflow dropseq_workflow {
     # hg19, mm10, hg19_mm10, mmul_8.0.1 or a path to a custom reference JSON file
     String reference
     File? acronym_file = "gs://regev-lab/resources/DropSeq/index.json"
-    String? bcl2fastq_docker_registry = "gcr.io/broad-cumulus"
+    String bcl2fastq_docker_registry = "gcr.io/broad-cumulus"
     String bcl2fastq_docker_registry_stripped = sub(bcl2fastq_docker_registry, "/+$", "")
     String docker_registry = "cumulusprod"
     # docker_registry with trailing slashes stripped

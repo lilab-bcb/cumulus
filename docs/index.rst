@@ -13,9 +13,9 @@
    count
    smart_seq_2
    drop_seq
-   hashing_cite_seq
+   demultiplexing
+   cite_seq
    cumulus
-   demuxlet
    command_line
    examples/index
    contribution

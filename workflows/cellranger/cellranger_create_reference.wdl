@@ -93,16 +93,16 @@ task generate_create_reference_config {
         python <<CODE
         import pandas as pd
 
-        if '${input_sample_sheet}' is not '':			
-            df = pd.read_csv('${input_sample_sheet}', header = 0, dtype = str, index_col=False)
+        if '~{input_sample_sheet}' is not '':			
+            df = pd.read_csv('~{input_sample_sheet}', header = 0, dtype = str, index_col=False)
             for c in df.columns:
                 df[c] = df[c].str.strip()
         else:
             df = pd.DataFrame()
-            df['Genome'] = ['${genome}']
-            df['Fasta'] = ['${input_fasta}']
-            df['Genes'] = ['${input_gtf_file}']
-            df['Attributes'] = ['${attributes}']
+            df['Genome'] = ['~{genome}']
+            df['Fasta'] = ['~{input_fasta}']
+            df['Genes'] = ['~{input_gtf_file}']
+            df['Attributes'] = ['~{attributes}']
             
         with open('genome_names.txt', 'w') as fo1, open('fasta_files.txt', 'w') as fo2, open('filt_gtf_input.tsv', 'w') as fo3:
             new_genome = []
@@ -127,7 +127,7 @@ task generate_create_reference_config {
     }
 
     runtime {
-        docker: "${docker_registry}/cellranger:${cellranger_version}"
+        docker: "~{docker_registry}/cellranger:~{cellranger_version}"
         zones: zones
         preemptible: preemptible
     }
@@ -157,7 +157,7 @@ task run_filter_gtf {
         from subprocess import check_call
 
         # unzip gtf file if needed.
-        input_gtf_file = '${input_gtf_file}'
+        input_gtf_file = '~{input_gtf_file}'
         root, ext = os.path.splitext(input_gtf_file)
 
         if ext == '.gz':
@@ -171,18 +171,18 @@ task run_filter_gtf {
 
         output_gtf_file = input_gtf_file # in case no filtering
 
-        if '${attributes}' is not '':
+        if '~{attributes}' is not '':
             file_name += '.filt'
             output_gtf_file = file_name + '.gtf'
             call_args = ['cellranger', 'mkgtf', input_gtf_file, output_gtf_file]
-            attrs = '${attributes}'.split(';')
+            attrs = '~{attributes}'.split(';')
             for attr in attrs:
                 call_args.append('--attribute=' + attr)
             print(' '.join(call_args))
             check_call(call_args)
             input_gtf_file = output_gtf_file
 
-        if '${pre_mrna}' is 'true':
+        if '~{pre_mrna}' is 'true':
             file_name += '.pre_mrna'
             output_gtf_file = file_name + '.gtf'
             call_args = ['awk', 'BEGIN\\x7BFS="\\\\t"; OFS="\\\\t"\\x7D \\x243 == "transcript" \\x7B\\x243="exon"; print\\x7D', input_gtf_file]
@@ -201,10 +201,10 @@ task run_filter_gtf {
     }
 
     runtime {
-        docker: "${docker_registry}/cellranger:${cellranger_version}"
+        docker: "~{docker_registry}/cellranger:~{cellranger_version}"
         zones: zones
-        memory: "${memory}G"
-        disks: "local-disk ${disk_space} HDD"
+        memory: "~{memory}G"
+        disks: "local-disk ~{disk_space} HDD"
         cpu: 1
         preemptible: preemptible
     }
@@ -237,9 +237,9 @@ task run_cellranger_mkref {
         import os
         from subprocess import check_call
 
-        genome_list = '${sep="," genomes}'.split(',')
-        input_fasta_list = '${sep="," fastas}'.split(',')
-        gtf_list = '${sep="," gtfs}'.split(',')
+        genome_list = '~{sep="," genomes}'.split(',')
+        input_fasta_list = '~{sep="," fastas}'.split(',')
+        gtf_list = '~{sep="," gtfs}'.split(',')
 
         fasta_list = []
         for fa_file in input_fasta_list:
@@ -257,30 +257,30 @@ task run_cellranger_mkref {
         for genome, fasta, gtf in zip(genome_list, fasta_list, gtf_list):
             call_args.extend(['--genome=' + genome, '--fasta=' + fasta, '--genes=' + gtf])
 
-        call_args.extend(['--nthreads=${num_cpu}', '--memgb=${memory}'])
-        if '${ref_version}' is not '':
-            call_args.append('--ref-version=${ref_version}')
+        call_args.extend(['--nthreads=~{num_cpu}', '--memgb=~{memory}'])
+        if '~{ref_version}' is not '':
+            call_args.append('--ref-version=~{ref_version}')
 
         print(' '.join(call_args))
         check_call(call_args)
         CODE
 
-        tar -czf ${output_genome}.tar.gz ${output_genome}
-        gsutil cp ${output_genome}.tar.gz ${output_dir}
-        # mkdir -p ${output_dir}
-        # cp ${output_genome}.tar.gz ${output_dir}
+        tar -czf ~{output_genome}.tar.gz ~{output_genome}
+        gsutil cp ~{output_genome}.tar.gz ~{output_dir}
+        # mkdir -p ~{output_dir}
+        # cp ~{output_genome}.tar.gz ~{output_dir}
     }
 
     output {
-        String output_reference = "${output_dir}/${output_genome}.tar.gz"
+        String output_reference = "~{output_dir}/~{output_genome}.tar.gz"
         File monitoringLog = "monitoring.log"
     }
 
     runtime {
-        docker: "${docker_registry}/cellranger:${cellranger_version}"
+        docker: "~{docker_registry}/cellranger:~{cellranger_version}"
         zones: zones
-        memory: "${memory}G"
-        disks: "local-disk ${disk_space} HDD"
+        memory: "~{memory}G"
+        disks: "local-disk ~{disk_space} HDD"
         cpu: num_cpu
         preemptible: preemptible
     }

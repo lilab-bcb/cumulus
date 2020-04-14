@@ -15,7 +15,7 @@ Latest version
 	  - Snapshot
 	  - Function
 	* - cumulus/cellranger_workflow
-	  - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/8>`_
+	  - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/10>`_
 	  - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
 	* - cumulus/count
 	  - `13 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/13>`_
@@ -24,13 +24,13 @@ Latest version
 	  - `6 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/6>`_
 	  - Run Cell Ranger tools to build sc/snRNA-seq references.
 	* - cumulus/cellranger_atac_aggr
-	  - `1 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_aggr/1>`_
+	  - `2 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_aggr/2>`_
 	  - Run Cell Ranger tools to aggregate scATAC-seq samples.
 	* - cumulus/cellranger_atac_create_reference
-	  - `1 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_create_reference/1>`_
+	  - `2 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_create_reference/2>`_
 	  - Run Cell Ranger tools to build scATAC-seq references.
 	* - cumulus/cellranger_vdj_create_reference
-	  - `1 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_vdj_create_reference/1>`_
+	  - `2 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_vdj_create_reference/2>`_
 	  - Run Cell Ranger tools to build single-cell immune profiling references.
 	* - cumulus/smartseq2
 	  - `7 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2/7>`_
@@ -39,14 +39,17 @@ Latest version
 	  - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/8>`_
 	  - Generate user-customized genome references for SMART-Seq2 data.
 	* - cumulus/cumulus
-	  - `18 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/18>`_
+	  - `19 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/19>`_
 	  - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
 	* - cumulus/cumulus_subcluster
-	  - `12 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_subcluster/12>`_
+	  - `13 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_subcluster/13>`_
 	  - Run subcluster analysis using cumulus
-	* - cumulus/cumulus_hashing_cite_seq
-	  - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_hashing_cite_seq/10>`_
-	  - Run cumulus for cell-hashing/nucleus-hashing/CITE-Seq analysis
+	* - cumulus/demultiplexing
+	  - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/10>`_
+	  - Run tools (demuxEM, souporcell, or demuxlet) for cell-hashing/nucleus-hashing/genetic-pooling analysis.
+	* - cumulus/cumulus_cite_seq
+	  - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_cite_seq/1>`_
+	  - Run cumulus for CITE-Seq analysis
 
 Stable version - v0.14.0
 ^^^^^^^^^^^^^^^^^^^^^^^^^

@@ -116,14 +116,18 @@ global inputs
 	  - Input CSV sample sheet describing metadata of each 10x channel, or a single input count matrix file
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_count_matrix.csv"
 	  - 
+	* - **output_directory**
+	  - Google bucket URL of the output directory.
+	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir"
+	  -
 	* - **output_name**
-	  - This is the prefix for all output files. It should contain the google bucket url, subdirectory name and output name prefix
-	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir/my_results"
+	  - This is the name of subdirectory for the current sample.
+	  - "my_sample"
 	  - 
 	* - cumulus_version
-	  - cumulus version to use. Versions available: 0.14.0, 0.13.0, 0.12.0, 0.11.0, 0.10.0.
-	  - "0.14.0"
-	  - "0.14.0"
+	  - cumulus version to use. Versions available: 0.15.0, 0.13.0, 0.12.0, 0.11.0, 0.10.0.
+	  - "0.15.0"
+	  - "0.15.0"
 	* - docker_registry
 	  - Docker registry to use. Options:
 

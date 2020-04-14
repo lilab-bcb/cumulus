@@ -11,7 +11,9 @@ Workflows
 ^^^^^^^^^^^^
 Workflows such as **cellranger_workflow** and **dropseq_workflow** provide the option of running ``bcl2fastq``. We provide dockers
 containing ``bcl2fastq`` that are accessible only by members of the Broad Institute. Non-Broad Institute members will have to provide
-their own docker images.
+their own docker images. Please note that if you're a Broad Institute member and are not able to pull the docker image, please check
+https://app.terra.bio/#groups to see that you're a member of the all_broad_users group. If not, please contact
+Terra support and ask to be added to the all_broad_users@firecloud.org group.
 
 Docker
 ^^^^^^^^^^^^^^^

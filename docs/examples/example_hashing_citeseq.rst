@@ -17,7 +17,7 @@ Then upload your BCL directories to Google bucket of your workspace using gsutil
 
 	gsutil -m cp -r /my-local-path/BCL/* gs://fc-e0000000-0000-0000-0000-000000000000/data-source
 
-where ``/my-local-path/BCL`` is the path to the top-level directory of your BCL files on your local machine, and ``data-source`` is the folder on Google bucket to hold the uploaded data.
+where option ``-m`` means copy in parallel, ``-r`` means copy the directory recursively, ``/my-local-path/BCL`` is the path to the top-level directory of your BCL files on your local machine, and ``data-source`` is the folder on Google bucket to hold the uploaded data.
 
 ------------------------
 
@@ -29,7 +29,7 @@ First step is to extract gene-count matrices from sequencing output.
 
 You need two original files from your dataset to start:
 
-	* Cell-Hashing Index CSV file, say its filename is ``cell_hashing_index.csv``, of format *feature_barcode,feature_name*. See an example below::
+	* Cell-Hashing Index CSV file, say its filename is ``cell_hashing_index.csv``, of format "*feature_barcode,feature_name*". See an example below::
 
 		AATCATCACAAGAAA,CB1
 		GGTCACTGTTACGTA,CB2
@@ -49,9 +49,9 @@ Then upload them to your Google Bucket using gsutil_. Assuming both files are in
 
 	gsutil -m cp -r /Users/foo/data-source gs://fc-e0000000-0000-0000-0000-000000000000/data-source
 
-where option ``-m`` means copy in parallel, ``-r`` means copy the directory recursively, and ``gs://fc-e0000000-0000-0000-0000-000000000000/data-source`` is your working directory at cloud side, which can be changed at your will.
+where ``gs://fc-e0000000-0000-0000-0000-000000000000/data-source`` is your working directory at cloud side, which can be changed at your will.
 
-Next, create a sample sheet, ``cellranger_sample_sheet.csv``, on your local machine with content below::
+Next, create a sample sheet, ``cellranger_sample_sheet.csv``, for Cell Ranger processing. Below is an example::
 
 	Sample,Reference,Flowcell,Lane,Index,DataType,FeatureBarcodeFile
 	sample_control,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/data-source,2,SI-GA-F1,rna
@@ -61,13 +61,13 @@ Next, create a sample sheet, ``cellranger_sample_sheet.csv``, on your local mach
 
 For the details on how to prepare this sample sheet, please refer to Step 3 of `Cell Ranger sample sheet instruction`_.
 
-	.. _Cell Ranger sample sheet instruction: ../cellranger.html
+	.. _Cell Ranger sample sheet instruction: ../cellranger.html#prepare-a-sample-sheet
 
 When you are done with the sample sheet, upload it to Google bucket::
 
 	gsutil cp cellranger_sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/
 
-Now we are ready to set up **cellranger_workflow** workflow for this phase. If your workspace doesn't have this workflow, import it to your workspace by following Step 5 and 6 of `cellranger_workflow documentation <../cellranger.html>`_. 
+Now we are ready to set up **cellranger_workflow** workflow for this phase. If your workspace doesn't have this workflow, import it to your workspace by following `cellranger_workflow import instructions <../cellranger.html#import-cellranger-workflow>`_. 
 
 Then prepare a JSON file, ``cellranger_inputs.json``, which is used to set up the workflow inputs::
 
@@ -78,7 +78,7 @@ Then prepare a JSON file, ``cellranger_inputs.json``, which is used to set up th
 
 where ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir`` is the remote directory in which the output of cellranger_workflow will be generated. For the details on the options above, please refer to `Cell Ranger workflow inputs`_.
 
-	.. _Cell Ranger workflow inputs: ../cellranger.html#cellranger-workflow-inputs
+	.. _Cell Ranger workflow inputs: ../cellranger.html#workflow-input
 
 When you are done with the JSON file, on cellranger_workflow workflow page, upload ``cellranger_inputs.json`` by clicking ``upload json`` link as below:
 
@@ -114,32 +114,29 @@ Copy or upload them to ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir``.
 2. Demultiplex Cell-Hashing Data
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-	#. Prepare a sample sheet, ``cell_hashing_sample_sheet.csv``, with the following content::
+	#. Prepare a sample sheet, ``demultiplex_sample_sheet.csv``, with the following content::
 
-		OUTNAME,RNA,ADT,TYPE
+		OUTNAME,RNA,TagFile,TYPE
 		exp,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/raw_feature_bc_matrix.h5,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/sample_cell_hashing.csv,cell-hashing
 
-	   where **OUTNAME** specifies the subfolder and file names of output, which is free to change, **RNA** and **ADT** columns specify the RNA and ADT meta-data of samples, and **TYPE** is ``cell-hashing`` for this phase.
+	   where **OUTNAME** specifies the subfolder and file names of output, which is free to change, **RNA** and **TagFile** columns specify the RNA and hashing tag meta-data of samples, and **TYPE** is ``cell-hashing`` for this phase.
 
 	   Then upload it to Google bucket::
 
-	   	gsutil cp cell_hashing_sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/
+	   	gsutil cp demultiplex_sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/
 
-	#. If your workspace doesn't have **cumulus_hashing_cite_seq** workflow, import it to your workspace by following Step 5 and 6 of `cumulus_hashing_cite_seq documentation <../hashing_cite_seq.html>`_.
+	#. If your workspace doesn't have **demultiplexing** workflow, import it to your workspace by following Step 2 of `demultiplexing workflow preparation instructions <../demultiplexing.html#prepare-input-data-and-import-workflow>`_.
 	
-	#. Prepare an input JSON file, ``cell_hashing_inputs.json`` with the following content to set up cumulus_hashing_cite_seq workflow inputs::
+	#. Prepare an input JSON file, ``demultiplex_inputs.json`` with the following content to set up cumulus_hashing_cite_seq workflow inputs::
 
 		{
-			"cumulus_hashing_cite_seq.input_sample_sheet" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/cell_hashing_sample_sheet.csv",
-			"cumulus_hashing_cite_seq.output_directory" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/",
-			"cumulus_hashing_cite_seq.demuxEM_generate_diagnostic_plots" : true
+			"demultiplexing.input_sample_sheet" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/demultiplex_sample_sheet.csv",
+			"demultiplexing.output_directory" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/"
 		}
 
-	   For the details on these options, please refer to `cell-hashing/nuclei-hashing inputs`_.
+	   For the details on these options, please refer to `demultiplexing workflow inputs <../demultiplexing.html#workflow-inputs>`_.
 
-	   .. _cell-hashing/nuclei-hashing inputs: ../hashing_cite_seq.html#cumulus-hashing-cite-seq-inputs
-
-	#. On the page of cumulus_hashing_cite_seq workflow, upload ``cell_hashing_inputs.json`` by clicking ``upload json`` link. Save the inputs, and click ``RUN ANALYSIS`` button to start the job.
+	#. On the page of cumulus_hashing_cite_seq workflow, upload ``demultiplex_inputs.json`` by clicking ``upload json`` link. Save the inputs, and click ``RUN ANALYSIS`` button to start the job.
 
 When the execution is done, you'll get a processed file, ``exp_demux.h5sc``, stored on cloud ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp/``.
 
@@ -151,10 +148,10 @@ When the execution is done, you'll get a processed file, ``exp_demux.h5sc``, sto
 
 	#. Prepare a sample sheet, ``cite_seq_sample_sheet.csv``, with the following content::
 
-		OUTNAME,RNA,ADT,TYPE
-		exp_raw,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp/exp_demux.h5sc,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/sample_cite_seq.csv,cite-seq
+		OUTNAME,RNA,ADT
+		exp_raw,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp/exp_demux.h5sc,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/sample_cite_seq.csv
 
-	   The structure of sample sheet here is the same as Phase 2. The difference is that you are now using the demultiplexed output ``h5sc`` file from Phase 2 as **RNA** here, and the sample **TYPE** is now ``cite-seq``.
+	   The structure of sample sheet here is the same as Phase 2. The difference is that you are now using the demultiplexed output ``h5sc`` file from Phase 2 as **RNA** here.
 
 	   Then upload it to Google bucket::
 
@@ -163,16 +160,16 @@ When the execution is done, you'll get a processed file, ``exp_demux.h5sc``, sto
 	#. Prepare an input JSON file, ``cite_seq_inputs.json``, in the same directory as above, with the following content::
 
 		{
-			"cumulus_hashing_cite_seq.input_sample_sheet" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/cite_seq_sample_sheet.csv",
-			"cumulus_hashing_cite_seq.output_directory" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/",
-			"cumulus_hashing_cite_seq.antibody_control_csv" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/citeseq_antibody_control.csv"
+			"cumulus_cite_seq.input_sample_sheet" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/cite_seq_sample_sheet.csv",
+			"cumulus_cite_seq.output_directory" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/",
+			"cumulus_cite_seq.antibody_control_csv" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/citeseq_antibody_control.csv"
 		}
 
-	   For the details on these options, please refer to `cell-hashing/nuclei-hashing inputs`_.
+	   For the details on these options, please refer to `cumulus_cite_seq workflow inputs <../cite_seq.html#cumulus-cite-seq-workflow-inputs>`_.
 
-	#. On **cumulus_hashing_cite_seq** workflow page, clear all previous inputs, and then upload ``cite_seq_inputs.json`` by clicking ``upload json`` link. Save the new inputs, and click ``RUN ANALYSIS`` button to start the job.
+	#. On **cumulus_cite_seq** workflow page, clear all previous inputs, and then upload ``cite_seq_inputs.json`` by clicking ``upload json`` link. Save the new inputs, and click ``RUN ANALYSIS`` button to start the job.
 
-When the execution is done, you'll get a merged raw matrices file, ``exp_raw.h5sc``, stored on cloud ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw``.
+When the execution is done, you'll get a merged raw matrices file, ``exp_raw.zarr``, stored on cloud ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw``.
 
 
 -------------------
@@ -183,7 +180,7 @@ When the execution is done, you'll get a merged raw matrices file, ``exp_raw.h5s
 	#. Prepare a sample sheet, ``cumulus_count_matrix.csv``, with the following content::
 
 		Sample,Location
-		exp,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw/exp_raw.h5sc
+		exp,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw/exp_raw.zarr
 
 	   This sample sheet describes the metadata for each 10x channel (as one row in the sheet). **Sample** specifies the name for each channel, which can be renamed; **Location** specifies the file location, which is the output of Phase 3.
 
@@ -216,7 +213,7 @@ When the execution is done, you'll get a merged raw matrices file, ``exp_raw.h5s
 	   Alternatively, if you have only one count matrix for analysis and has skipped Step 1, directly set its location in ``cumulus.input_file`` parameter above. For this example, it is::
 
 		{
-			"cumulus.input_file" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw/exp_raw.h5sc",
+			"cumulus.input_file" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw/exp_raw.zarr",
 			... ...
 		}
 
@@ -234,7 +231,7 @@ When the execution is done, you'll get a merged raw matrices file, ``exp_raw.h5s
 
 When the execution is done, you'll get the following results stored on cloud ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/results/`` to check:
 	
-	* ``exp_merged_out.h5sc``: The aggregated count matrix data. This file doesn't exist if your ``cumulus.input_file`` parameter is not a sample sheet.
+	* ``exp_merged_out.zarr``: The aggregated count matrix data. This file doesn't exist if your ``cumulus.input_file`` parameter is not a sample sheet.
 	* ``exp_merged_out.h5ad``: The processed RNA matrix data.
 	* ``exp_merged_out.filt.xlsx``: The Quality-Control (QC) summary of the raw data.
 	* ``exp_merged_out.filt.{UMI, gene, mito}.pdf``: The QC plots of the raw data.

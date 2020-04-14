@@ -13,6 +13,8 @@ workflow bcl2fastq {
 	Int? barcode_mismatches
 	String? use_bases_mask
 	Boolean? create_fastq_for_index_reads = false
+	Boolean? ignore_missing_bcls = false
+	Boolean? no_lane_splitting = true
 	String? bcl2fastq_version = "2.20.0.422"
 	String docker_registry = "gcr.io/broad-cumulus"
 	String docker_registry_stripped = sub(docker_registry, "/+$", "")
@@ -28,10 +30,12 @@ workflow bcl2fastq {
 			zones = zones,
 			num_cpu = num_cpu,
 			use_bases_mask=use_bases_mask,
+			ignore_missing_bcls=ignore_missing_bcls,
 			minimum_trimmed_read_length=minimum_trimmed_read_length,
 			mask_short_adapter_reads=mask_short_adapter_reads,
 			barcode_mismatches = barcode_mismatches,
 			barcode_mismatches=barcode_mismatches,
+			no_lane_splitting=no_lane_splitting,
 			create_fastq_for_index_reads=create_fastq_for_index_reads,
 			memory = memory,
 			docker_registry = docker_registry_stripped,
@@ -59,6 +63,8 @@ task run_bcl2fastq {
 	Int? barcode_mismatches
 	String? use_bases_mask
 	Boolean create_fastq_for_index_reads
+	Boolean no_lane_splitting
+	Boolean ignore_missing_bcls
 	String run_id = basename(input_bcl_directory)
 	String bcl2fastq_version
 	File? sample_sheet
@@ -74,13 +80,14 @@ task run_bcl2fastq {
 
 		bcl2fastq \
 		--output-dir out \
-		--no-lane-splitting \
+		${true="--no-lane-splitting" false="" no_lane_splitting} \
 		${"--sample-sheet " + sample_sheet} \
 		${"--minimum-trimmed-read-length " + minimum_trimmed_read_length} \
 		${"--mask-short-adapter-reads " + mask_short_adapter_reads} \
 		${"--barcode-mismatches " + barcode_mismatches} \
 		${"--use-bases-mask " + use_bases_mask} \
-		${true="--create-fastq-for-index-reads" false="" create_fastq_for_index_reads}
+		${true="--create-fastq-for-index-reads" false="" create_fastq_for_index_reads} \
+		${true="--ignore-missing-bcls" false="" ignore_missing_bcls}
 
 		cd out
 
