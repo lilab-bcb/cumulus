@@ -6,7 +6,8 @@ RUN apt-get update && apt-get install -y wget build-essential curl libncurses5-d
     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    apt-get update && apt-get install -y google-cloud-sdk && \
+    apt-get update && apt-get install -y google-cloud-sdk=264.0.0-0 && \
+    apt-get --q -y autoremove && \
     apt-get clean
 
 RUN cd /opt && \
@@ -108,13 +109,3 @@ ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/do
 RUN chmod a+rx /opt/monitor_script.sh
 
 ENV PATH=/opt/vartrix:/opt:$PATH
-
-# Install gcloud 264.0.0
-RUN gsutil -m cp gs://cloud-sdk-release/google-cloud-sdk-264.0.0-linux-x86_64.tar.gz /opt && \
-    cd /opt && \
-    tar -zxvf google-cloud-sdk-264.0.0-linux-x86_64.tar.gz && \
-    rm google-cloud-sdk-264.0.0-linux-x86_64.tar.gz && \
-    cd google-cloud-sdk && \
-    ./install.sh
-
-ENV PATH=/opt/google-cloud-sdk/bin:$PATH

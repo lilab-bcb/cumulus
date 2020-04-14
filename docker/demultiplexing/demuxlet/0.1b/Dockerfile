@@ -6,10 +6,11 @@ RUN apt-get update && \
     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    apt-get update && apt-get install -y google-cloud-sdk && \
+    apt-get update && apt-get install -y google-cloud-sdk=264.0.0-0 && \
+    apt-get -qq -y autoremove && \
     apt-get clean
 
-RUN conda install pandas
+RUN conda install -c anaconda pandas==1.0.3
 
 RUN conda install -c bioconda popscle
 
@@ -23,13 +24,3 @@ ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/do
 RUN chmod a+rx /software/monitor_script.sh
 
 ENV PATH=/software:$PATH
-
-# Install gcloud 264.0.0
-RUN gsutil -m cp gs://cloud-sdk-release/google-cloud-sdk-264.0.0-linux-x86_64.tar.gz /software && \
-    cd /software && \
-    tar -zxf google-cloud-sdk-264.0.0-linux-x86_64.tar.gz && \
-    rm google-cloud-sdk-264.0.0-linux-x86_64.tar.gz && \
-    cd google-cloud-sdk && \
-    ./install.sh
-
-ENV PATH=/software/google-cloud-sdk/bin:$PATH
