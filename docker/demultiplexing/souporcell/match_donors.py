@@ -97,7 +97,7 @@ def replace_ref_names(ref_str: str, ref_names: List[str], has_ref_genotypes: boo
 		assert len(res_arr) == len(ref_names)
 		ref_names = res_arr
 	elif not has_ref_genotypes:
-		ref_names = ['Donor' + x for x in ref_names]
+		ref_names = ['Donor' + str(int(x) + 1) for x in ref_names]
 	ref_names = ['_ref_' + x for x in ref_names]
 	return ref_names
 
