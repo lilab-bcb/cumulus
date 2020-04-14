@@ -18,8 +18,8 @@ RUN pip install Cython==0.29.16 && \
     pip install pegasusio==0.1.3
 
 RUN mkdir /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/souporcell/extract_barcodes_from_rna.py /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/demuxlet/generate_zarr.py /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/demultiplexing/souporcell/extract_barcodes_from_rna.py /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/demultiplexing/demuxlet/generate_zarr.py /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
 RUN chmod a+rx /software/monitor_script.sh
 

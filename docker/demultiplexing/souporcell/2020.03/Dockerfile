@@ -102,8 +102,8 @@ RUN cd /opt && \
     tar -zxvf vartrix.tar.gz -C vartrix --strip-components 1 && \
     rm vartrix.tar.gz
 
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/souporcell/extract_barcodes_from_rna.py /opt
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/souporcell/match_donors.py /opt
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/demultiplexing/souporcell/extract_barcodes_from_rna.py /opt
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/demultiplexing/souporcell/match_donors.py /opt
 
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /opt
 RUN chmod a+rx /opt/monitor_script.sh
