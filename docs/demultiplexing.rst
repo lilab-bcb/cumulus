@@ -112,8 +112,8 @@ global inputs
 	  - "souporcell"
 	* - min_num_genes
 	  - Only demultiplex cells/nuclei with at least <min_num_genes> expressed genes
-	  - 500
-	  - 500
+	  - 100
+	  - 100
 	* - docker_registry
 	  - Docker registry to use. Notice that docker image for Bustools is seperate.
 
@@ -122,6 +122,10 @@ global inputs
 	  	- "quay.io/cumulus" for backup images on Red Hat registry.
 	  - "cumulusprod"
 	  - "cumulusprod"
+	* - config_version
+	  - Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Currently only one version is available: "0.1".
+	  - "0.1"
+	  - "0.1"
 	* - zones
 	  - Google cloud zones to consider for execution.
 	  - "us-east1-d us-west1-a us-west1-b"

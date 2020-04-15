@@ -99,9 +99,10 @@ task run_souporcell {
 
             souporcell_call_args.extend(['--known_genotypes', 'ref_genotypes.vcf'])
 
-            if '~{donor_rename}' is not '':
-                name_list = '~{donor_rename}'.split(',')
-                souporcell_call_args.extend(['--known_genotypes_sample_names'] + name_list)
+            assert '~{donor_rename}' is not ''
+            
+            name_list = '~{donor_rename}'.split(',')
+            souporcell_call_args.extend(['--known_genotypes_sample_names'] + name_list)
 
         print(' '.join(souporcell_call_args))
         check_call(souporcell_call_args)
