@@ -70,7 +70,7 @@ Simply upload your data to the Google Bucket of your workspace, and specify its 
 
 In this case, the **aggregate_matrices** step will be skipped.
 
-Case Three: Multiple sample without aggregation
+Case Three: Multiple samples without aggregation
 +++++++++++++++++++++++++++++++++++++++++++++++++
 
 Sometimes, you may want to run Cumulus on multiple samples simultaneously. This is different from Case one, because samples are analyzed separately without aggregation.
