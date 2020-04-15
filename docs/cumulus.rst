@@ -70,6 +70,40 @@ Simply upload your data to the Google Bucket of your workspace, and specify its 
 
 In this case, the **aggregate_matrices** step will be skipped.
 
+Case Three: Multiple samples without aggregation
++++++++++++++++++++++++++++++++++++++++++++++++++
+
+Sometimes, you may want to run Cumulus on multiple samples simultaneously. This is different from Case one, because samples are analyzed separately without aggregation.
+
+#. To do it, you need to first `create a data table`_ on Terra. An example TSV file is the following::
+
+	entity:cumulus_test_id	input_h5
+	5k_pbmc_v3	gs://fc-e0000000-0000-0000-0000-000000000000/5k_pbmc_v3/raw_feature_bc_matrix.h5
+	1k_pbmc_v3	gs://fc-e0000000-0000-0000-0000-000000000000/1k_pbmc_v3/raw_feature_bc_matrix.h5
+
+You are free to add more columns, but sample ids and URLs to RNA count matrix files are required. I'll use this example TSV file for the rest of steps in this case.
+
+#. Upload your TSV file to your workspace. Open the ``DATA`` tab on your workspace. Then click the upload button on left ``TABLE`` panel, and select the TSV file above. When uploading is done, you'll see a new data table with name "cumulus_test":
+
+	.. image:: images/data_table.png
+
+#. Import *cumulus* workflow to your workspace as in Case one. Then open ``cumulus`` in ``WORKFLOW`` tab. Select ``Run workflow(s) with inputs defined by data table``, and choose *cumulus_test* from the drop-down menu.
+
+	.. image:: images/multi_samples.png
+
+#. In the input field, specify:
+
+  - ``input_file``: Type ``this.input_h5``, where ``this`` refers to the data table selected, and ``input_h5`` is the column name in this data table for RNA count matrices.
+  - ``output_directory``: Type Google bucket URL for the main output folder. For example, ``gs://fc-e0000000-0000-0000-0000-000000000000/cumulus_results``.
+  - ``output_name``: Type ``this.cumulus_test_id``, where ``cumulus_test_id`` is the column name in data table for sample ids.
+
+An example is in the screen shot below:
+
+	.. image:: images/multi_inputs.png
+
+Then finish setting up other inputs following the description in sections below. When you are done, click ``SAVE``, and then ``RUN ANALYSIS``.
+
+When all the jobs are done, you'll find output for the 2 samples in subfolders ``gs://fc-e0000000-0000-0000-0000-000000000000/cumulus_results/5k_pbmc_v3`` and ``gs://fc-e0000000-0000-0000-0000-000000000000/cumulus_results/1k_pbmc_v3``, respectively.
 
 ---------------------------------
 
@@ -93,7 +127,7 @@ Cumulus steps:
 	- **diffmap** plots which are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components. 
 	- If input is CITE-Seq data, there will be **citeseq_fitsne** plots which are FIt-SNE plots based on epitope expression.
 
-#. **organize_results**. Copy analysis results from execution environment to destination location on Google bucket.
+#. **organize_results**. Copy analysis results from execution environment to destination location on Google bucket. The output organization is as follows: one top-level output folder specified by ``output_directory`` in `global inputs`_; each sample has all it output files in a distinct subfolder, with name specified by ``output_name`` in `global inputs`_; within this subfolder, each file has a common filename prefix specified by ``output_name``.
 
 In the following sections, we will first introduce global inputs and then introduce the WDL inputs and outputs for each step separately. But please note that you need to set inputs from all steps simultaneously in the Terra WDL.
 
@@ -121,7 +155,7 @@ global inputs
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir"
 	  -
 	* - **output_name**
-	  - This is the name of subdirectory for the current sample.
+	  - This is the name of subdirectory for the current sample; and all output files within the subdirectory will have this string as the common filename prefix.
 	  - "my_sample"
 	  - 
 	* - cumulus_version
@@ -1241,3 +1275,5 @@ Composition plot on louvain cluster labels colored by channel::
 .. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
 .. _Terra: https://app.terra.bio/
 .. _Single Cell Portal: https://portals.broadinstitute.org/single_cell
+.. _global inputs: ./cumulus.html#global-inputs
+.. _create a data table: https://support.terra.bio/hc/en-us/articles/360025758392

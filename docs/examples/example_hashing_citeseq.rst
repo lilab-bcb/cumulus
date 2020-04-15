@@ -138,7 +138,7 @@ Copy or upload them to ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir``.
 
 	#. On the page of cumulus_hashing_cite_seq workflow, upload ``demultiplex_inputs.json`` by clicking ``upload json`` link. Save the inputs, and click ``RUN ANALYSIS`` button to start the job.
 
-When the execution is done, you'll get a processed file, ``exp_demux.h5sc``, stored on cloud ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp/``.
+When the execution is done, you'll get a processed file, ``exp_demux.zarr``, stored on cloud ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp/``.
 
 
 ----------------------------------------------------
@@ -149,7 +149,7 @@ When the execution is done, you'll get a processed file, ``exp_demux.h5sc``, sto
 	#. Prepare a sample sheet, ``cite_seq_sample_sheet.csv``, with the following content::
 
 		OUTNAME,RNA,ADT
-		exp_raw,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp/exp_demux.h5sc,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/sample_cite_seq.csv
+		exp_raw,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp/exp_demux.zarr,gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/sample_cite_seq.csv
 
 	   The structure of sample sheet here is the same as Phase 2. The difference is that you are now using the demultiplexed output ``h5sc`` file from Phase 2 as **RNA** here.
 
@@ -196,7 +196,8 @@ When the execution is done, you'll get a merged raw matrices file, ``exp_raw.zar
 
 		{
 			"cumulus.input_file" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/cumulus_count_matrix.csv",
-			"cumulus.output_name" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/results/exp_merged_out",
+			"cumulus.output_directory" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/results",
+			"cumulus.output_name" : "exp_merged_out",
 			"cumulus.num_cpu" : 8,
 			"cumulus.select_only_singlets" : true,
 			"cumulus.cite_seq" : true,
@@ -229,7 +230,7 @@ When the execution is done, you'll get a merged raw matrices file, ``exp_raw.zar
 
 	#. On the page of cumulus workflow, upload ``cumulus_inputs.json`` by clicking ``upload json`` link. Save the inputs, and click ``RUN ANALYSIS`` button to start the job.
 
-When the execution is done, you'll get the following results stored on cloud ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/results/`` to check:
+When the execution is done, you'll get the following results stored on cloud ``gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/results/exp_merged_out/`` to check:
 	
 	* ``exp_merged_out.zarr``: The aggregated count matrix data. This file doesn't exist if your ``cumulus.input_file`` parameter is not a sample sheet.
 	* ``exp_merged_out.h5ad``: The processed RNA matrix data.
@@ -268,31 +269,31 @@ First, install *altocumulus* by following `altocumulus installation instruction 
 
    Notice that if the execution failed, you could rerun the execution by setting ``cellranger_input_updated.json`` for ``-i`` option to use the sample sheet already uploaded to Google bucket. Similarly below.
 
-#. For Phase 2 above, similarly, in the same directory of your ``cell_hashing_sample_sheet.csv`` file, prepare JSON file ``cell_hashing_inputs.json`` as below::
+#. For Phase 2 above, similarly, in the same directory of your ``demultiplex_sample_sheet.csv`` file, prepare JSON file ``demultiplex_inputs.json`` as below::
 
 	{
-		"cumulus_hashing_cite_seq.input_sample_sheet" : "cell_hashing_sample_sheet.csv",
+		"demultiplexing.input_sample_sheet" : "demultiplex_sample_sheet.csv",
 		... ...
 	}
 
-   where all the rest parameters remain the same as in Phase 2. Import **cumulus_hashing_cite_seq** workflow to your workspace as usual.
+   where all the rest parameters remain the same as in Phase 2. Import **demultiplexing** workflow to your workspace as usual.
 
    Run the following command in the same directory on your local machine::
 
-	alto run -m cumulus/cumulus_hashing_cite_seq -w ws-lab/ws-01 --bucket-folder my-dir -i cell_hashing_inputs.json -o cell_hashing_inputs_updated.json
+	alto run -m cumulus/demultiplexing -w ws-lab/ws-01 --bucket-folder my-dir -i demultiplex_inputs.json -o demultiplex_inputs_updated.json
 
 #. For Phase 3 above, similarly, in the same directory of your ``cite_seq_sample_sheet.csv`` file, prepare JSON file ``cite_seq_inputs.json`` as below::
 
 	{
-		"cumulus_hashing_cite_seq.input_sample_sheet" : "cite_seq_sample_sheet.csv",
+		"cumulus_cite_seq.input_sample_sheet" : "cite_seq_sample_sheet.csv",
 		... ...
 	}
 
-   where all the rest parameters remain the same as in Phase 3.
+   where all the rest parameters remain the same as in Phase 3. Import **cumulus_cite_seq** workflow to your workspace as usual.
 
    Run the following command in the same directory on your local machine::
 
-	alto run -m cumulus/cumulus_hashing_cite_seq -w ws-lab/ws-01 --bucket-folder my-dir -i cite_seq_inputs.json -o cite_seq_inputs_updated.json
+	alto run -m cumulus/cumulus_cite_seq -w ws-lab/ws-01 --bucket-folder my-dir -i cite_seq_inputs.json -o cite_seq_inputs_updated.json
 
 #. For Phase 4 above, similarly, in the same directory of your ``cumulus_count_matrix.csv`` file, prepare JSON file ``cumulus_inputs.json`` as below::
 
@@ -306,11 +307,11 @@ First, install *altocumulus* by following `altocumulus installation instruction 
    **Alternatively**, if your input is not a sample sheet, simply set your ``cumulus_inputs.json`` as::
 
 	{
-		"cumulus.input_file" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw/exp_raw.h5sc",
+		"cumulus.input_file" : "gs://fc-e0000000-0000-0000-0000-000000000000/my-dir/exp_raw/exp_raw.zarr",
 		... ...
 	}
 
-   where all the rest parameters remain the same.
+   where all the rest parameters remain the same. Import **cumulus** workflow to your workspace as usual.
 
    Run the following command in the same directory of your ``cumulus_inputs.json`` file::
 
