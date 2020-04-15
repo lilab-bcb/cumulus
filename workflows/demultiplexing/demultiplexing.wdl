@@ -1,7 +1,7 @@
 version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/2/plain-WDL/descriptor" as dem
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/5/plain-WDL/descriptor" as soc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/6/plain-WDL/descriptor" as soc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/3/plain-WDL/descriptor" as dmx
 
 #import "demuxEM.wdl" as dem
@@ -14,7 +14,7 @@ workflow demultiplexing {
         String output_directory
         String genome
         String demultiplexing_algorithm = "souporcell"
-        Int min_num_genes = 500
+        Int min_num_genes = 100
 
         String docker_registry = "cumulusprod"
         Int preemptible = 2
@@ -52,7 +52,11 @@ workflow demultiplexing {
         Int demuxlet_memory = 10
         Int demuxlet_disk_space = 2
 
+        String config_version = "0.1"
+
     }
+
+    String output_directory_stripped = sub(output_directory, "/+$", "")
 
     File ref_index_file = "gs://regev-lab/resources/cellranger/index.tsv"
     # File ref_index_file = "index.tsv"
@@ -62,6 +66,7 @@ workflow demultiplexing {
     call generate_demux_config as Config {
         input:
             input_sample_sheet = input_sample_sheet,
+            config_version = config_version,
             docker_registry = docker_registry,
             zones = zones,
             preemptible = preemptible
@@ -72,7 +77,7 @@ workflow demultiplexing {
             call dem.demuxEM as demuxEM {
                 input:
                     sample_id = hashing_id,
-                    output_directory = output_directory,
+                    output_directory = output_directory_stripped,
                     input_rna = Config.id2rna[hashing_id],
                     input_adt_csv = Config.id2tag[hashing_id],
                     genome = genome,
@@ -100,7 +105,7 @@ workflow demultiplexing {
                 call soc.souporcell as souporcell {
                     input:
                         sample_id = pooling_id,
-                        output_directory = output_directory,
+                        output_directory = output_directory_stripped,
                         input_rna = Config.id2rna[pooling_id],
                         input_bam = Config.id2tag[pooling_id],
                         genome_url = genome_url,
@@ -123,7 +128,7 @@ workflow demultiplexing {
                 call dmx.demuxlet as demuxlet {
                     input:
                         sample_id = pooling_id,
-                        output_directory = output_directory,
+                        output_directory = output_directory_stripped,
                         input_rna = Config.id2rna[pooling_id],
                         input_bam = Config.id2tag[pooling_id],
                         ref_genotypes = Config.id2genotype[pooling_id],
@@ -148,6 +153,7 @@ workflow demultiplexing {
 task generate_demux_config {
     input {
         File input_sample_sheet
+        String config_version
         String docker_registry
         String zones
         Int preemptible
@@ -201,7 +207,7 @@ task generate_demux_config {
     }
 
     runtime {
-        docker: "~{docker_registry}/config"
+        docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: "~{preemptible}"
     }

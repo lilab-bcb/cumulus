@@ -45,7 +45,7 @@ Latest version
 	  - `13 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_subcluster/13>`_
 	  - Run subcluster analysis using cumulus
 	* - cumulus/demultiplexing
-	  - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/10>`_
+	  - `12 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/12>`_
 	  - Run tools (demuxEM, souporcell, or demuxlet) for cell-hashing/nucleus-hashing/genetic-pooling analysis.
 	* - cumulus/cumulus_cite_seq
 	  - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_cite_seq/1>`_
