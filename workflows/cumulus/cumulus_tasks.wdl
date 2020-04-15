@@ -45,7 +45,7 @@ task run_cumulus_aggregate_matrices {
 		print(' '.join(call_args))
 		check_call(call_args)
 
-		dest = '~{output_directory}' + '/' + '~{output_name}'
+		dest = '~{output_directory}' + '/' + '~{output_name}' + '/'
 		# check_call(['mkdir', '-p', dest])
 		# call_args = ['cp', '~{output_name}.h5sc', dest]
 		call_args = ['gsutil', 'cp', '~{output_name}.h5sc', dest]
@@ -305,7 +305,7 @@ task run_cumulus_cluster {
 			check_call(call_args)
 
 		import glob
-		dest = '~{output_directory}' + '/' + '~{output_name}'
+		dest = '~{output_directory}' + '/' + '~{output_name}' + '/'
 		# check_call(['mkdir', '-p', dest])
 		files = ['~{output_name}.h5ad', '~{output_name}.log']
 		if '~{output_seurat_compatible}' is 'true':
@@ -429,7 +429,7 @@ task run_cumulus_de_analysis {
 			print(' '.join(call_args))
 			check_call(call_args)
 
-		dest = '~{output_directory}' + '/' + '~{output_name}'
+		dest = '~{output_directory}' + '/' + '~{output_name}' + '/'
 		# check_call(['mkdir', '-p', dest])
 		files = ['~{output_name}.h5ad', '~{output_name}.de.xlsx']
 		if '~{find_markers_lightgbm}' is 'true':
@@ -539,7 +539,7 @@ task run_cumulus_plot {
 			check_call(call_args)
 
 		import glob
-		dest = '~{output_directory}' + '/' + '~{output_name}'
+		dest = '~{output_directory}' + '/' + '~{output_name}' + '/'
 		# check_call(['mkdir', '-p', dest])
 		files = glob.glob('*.pdf')
 		files.extend(glob.glob('*.html'))
@@ -587,7 +587,7 @@ task run_cumulus_scp_output {
 		export TMPDIR=/tmp
 		pegasus scp_output ~{true='--dense' false='' output_dense} ~{input_h5ad} ~{output_name}
 		# mkdir -p ~{output_directory}/~{output_name} ; cp ~{output_name}.scp.* ~{output_directory}/~{output_name}
-		gsutil -m cp ~{output_name}.scp.* ~{output_directory}/~{output_name}
+		gsutil -m cp ~{output_name}.scp.* ~{output_directory}/~{output_name}/
 	}
 
 	output {
@@ -784,7 +784,7 @@ task run_cumulus_subcluster {
 			print(' '.join(call_args))
 			check_call(call_args)
 
-		dest = '~{output_directory}' + '/' + '~{output_name}'
+		dest = '~{output_directory}' + '/' + '~{output_name}' + '/'
 		# check_call(['mkdir', '-p', dest])
 		files = ['~{output_name}.h5ad', '~{output_name}.log']
 		if '~{output_loom}' is 'true':
@@ -814,178 +814,6 @@ task run_cumulus_subcluster {
 		bootDiskSizeGb: 12
 		disks: "local-disk ~{disk_space} HDD"
 		cpu: num_cpu
-		preemptible: preemptible
-	}
-}
-
-task generate_hashing_cite_seq_tasks {
-	input {
-		File input_sample_sheet
-		String cumulus_version
-		String zones
-		Int preemptible
-		String docker_registry
-	}
-
-	command {
-		set -e
-		export TMPDIR=/tmp
-
-		python <<CODE
-		import pandas as pd 
-		from subprocess import check_call
-
-		df = pd.read_csv('~{input_sample_sheet}', header = 0, index_col = 0)
-		with open('hashing.txt', 'w') as fo1, open('cite_seq.txt', 'w') as fo2, open('id2rna.txt', 'w') as fo3, open('id2adt.txt', 'w') as fo4:
-			for outname, row in df.iterrows():
-				if row['TYPE'] == 'cite-seq':
-					fo2.write(outname + '\n')
-				else:
-					assert row['TYPE'] in ['cell-hashing', 'nuclei-hashing']
-					fo1.write(outname + '\n')
-				fo3.write(outname + '\t' + row['RNA'] + '\n')
-				fo4.write(outname + '\t' + row['ADT'] + '\n')
-		CODE
-	}
-
-	output {
-		Array[String] hashing_ids = read_lines('hashing.txt')
-		Array[String] cite_seq_ids = read_lines('cite_seq.txt')
-		Map[String, String] id2rna = read_map('id2rna.txt')
-		Map[String, String] id2adt = read_map('id2adt.txt')
-	}
-
-	runtime {
-		docker: "~{docker_registry}/cumulus:~{cumulus_version}"
-		zones: zones
-		preemptible: preemptible
-	}
-}
-
-task run_cumulus_demuxEM {
-	input {
-		File input_adt_csv
-		File input_raw_gene_bc_matrices_h5
-		String output_dir
-		String output_name
-		String cumulus_version
-		String zones
-		Int num_cpu
-		String memory
-		Int disk_space
-		Int preemptible
-		String? genome
-		Float? alpha_on_samples
-		Int? min_num_genes
-		Int? min_num_umis
-		Float? min_signal_hashtag
-		Int? random_state
-		Boolean? generate_diagnostic_plots
-		String? generate_gender_plot
-		String docker_registry
-	}
-
-	command {
-		set -e
-		export TMPDIR=/tmp
-		monitor_script.sh > monitoring.log &
-
-		python <<CODE
-		from subprocess import check_call
-		call_args = ['pegasus', 'demuxEM', '~{input_adt_csv}', '~{input_raw_gene_bc_matrices_h5}', '~{output_name}', '-p', '~{num_cpu}']
-		if '~{genome}' is not '':
-			call_args.extend(['--genome', '~{genome}'])
-		if '~{alpha_on_samples}' is not '':
-			call_args.extend(['--alpha_on_samples', '~{alpha_on_samples}'])
-		if '~{min_num_genes}' is not '':
-			call_args.extend(['--min-num-genes', '~{min_num_genes}'])
-		if '~{min_num_umis}' is not '':
-			call_args.extend(['--min-num-umis', '~{min_num_umis}'])
-		if '~{min_signal_hashtag}' is not '':
-			call_args.extend(['--min-signal-hashtag', '~{min_signal_hashtag}'])
-		if '~{random_state}' is not '':
-			call_args.extend(['--random-state', '~{random_state}'])
-		if '~{generate_diagnostic_plots}' is 'true':
-			call_args.append('--generate-diagnostic-plots')
-		if '~{generate_gender_plot}' is not '':
-			call_args.extend(['--generate-gender-plot', '~{generate_gender_plot}'])
-		print(' '.join(call_args))
-		check_call(call_args)
-		CODE
-
-		gsutil -q cp ~{output_name}_demux.h5sc ~{output_dir}/~{output_name}/
-		gsutil -q cp ~{output_name}_ADTs.h5ad ~{output_dir}/~{output_name}/
-		gsutil -q cp ~{output_name}_demux.h5ad ~{output_dir}/~{output_name}/
-		gsutil -q -m cp ~{output_name}.*.pdf ~{output_dir}/~{output_name}/
-		# mkdir -p ~{output_dir}/~{output_name}
-		# cp ~{output_name}_demux.h5sc ~{output_dir}/~{output_name}/
-		# cp ~{output_name}_ADTs.h5ad ~{output_dir}/~{output_name}/
-		# cp ~{output_name}_demux.h5ad ~{output_dir}/~{output_name}/
-		# cp ~{output_name}.*.pdf ~{output_dir}/~{output_name}/
-	}
-
-	output {
-		String output_folder = "~{output_dir}/~{output_name}"
-		File monitoringLog = "monitoring.log"
-	}
-
-	runtime {
-		docker: "~{docker_registry}/cumulus:~{cumulus_version}"
-		zones: zones
-		memory: memory
-		bootDiskSizeGb: 12
-		disks: "local-disk ~{disk_space} HDD"
-		cpu: num_cpu
-		preemptible: preemptible
-	}
-}
-
-task run_cumulus_merge_rna_adt {
-	input {
-		File input_raw_gene_bc_matrices_h5
-		File input_adt_csv
-		File? antibody_control_csv
-		String output_dir
-		String output_name
-		String cumulus_version
-		String zones
-		String memory
-		Int disk_space
-		Int preemptible
-		String docker_registry
-	}
-
-	command {
-		set -e
-		export TMPDIR=/tmp
-		monitor_script.sh > monitoring.log &
-
-		python <<CODE
-		from subprocess import check_call
-		call_args = ['pegasus', 'merge_rna_adt', '~{input_raw_gene_bc_matrices_h5}', '~{input_adt_csv}', '~{output_name}']
-		if '~{antibody_control_csv}' is not '':
-			call_args.extend(['--antibody-control-csv', '~{antibody_control_csv}'])
-		print(' '.join(call_args))
-		check_call(call_args)
-		CODE
-
-		gsutil -q cp ~{output_name}.h5sc ~{output_dir}/~{output_name}/
-		# mkdir -p ~{output_dir}/~{output_name}
-		# cp ~{output_name}.h5sc ~{output_dir}/~{output_name}/
-	}
-
-	output {
-		String output_folder = "~{output_dir}/~{output_name}"
-		File monitoringLog = "monitoring.log"
-	}
-
-	runtime {
-		docker: "~{docker_registry}/cumulus:~{cumulus_version}"
-		zones: zones
-		memory: memory
-		bootDiskSizeGb: 12
-		disks: "local-disk ~{disk_space} HDD"
-		cpu: 1
 		preemptible: preemptible
 	}
 }
