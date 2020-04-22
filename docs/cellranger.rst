@@ -1151,9 +1151,9 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - 1
 		  - 1
 		* - memory
-		  - Memory size string for cellranger-atac mkref
-		  - "32G"
-		  - "32G"
+		  - Memory size in GB
+		  - 32
+		  - 32
 		* - disk_space
 		  - Optional disk space in GB
 		  - 100
