@@ -1,64 +1,66 @@
-FROM continuumio/miniconda3:4.7.12
+FROM debian:buster-slim
 SHELL ["/bin/bash", "-c"]
 
 RUN mkdir -p /usr/share/man/man1 && \
-    apt-get update && apt-get install --no-install-recommends -y \
+    apt-get -qq update && \
+    apt-get -qq -y install --no-install-recommends \ 
         build-essential \
         automake \
         zlib1g-dev \
         libxml2-dev \
         cmake \
         gnupg \
-        lsb-release \
         libfftw3-dev \
         default-jdk \
-        curl && \
-    export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
-    echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    apt-get update && apt-get install -y google-cloud-sdk
+        curl \
+        python3 \
+        python3-dev \
+        python3-pip 
 
-RUN pip install --upgrade pip && \
-    pip install numpy==1.17.4 && \
-    pip install Cython==0.29.13 && \
-    pip install pybind11==2.4.3 && \
-    pip install h5py==2.10.0 && \
-    pip install fitsne==1.0.1 && \
-    pip install joblib==0.13.2 && \
-    pip install leidenalg==0.7.0 && \
-    pip install lightgbm==2.2.1 && \
-    pip install llvmlite==0.31.0 && \
-    pip install loompy==3.0.6 && \
-    pip install natsort==6.0.0 && \
-    pip install numba==0.48.0 && \
-    pip install pandas==0.25.3 && \
-    pip install scikit-learn==0.21.3 && \
-    pip install scikit-misc==0.1.1 && \
-    pip install scipy==1.2.2 && \
-    pip install statsmodels==0.10.1 && \
-    pip install tables==3.6.1 && \
-    pip install torch==1.4.0 && \
-    pip install anndata==0.6.22.post1 && \
-    pip install harmony-pytorch==0.1.1 && \
-    pip install hnswlib==0.3.2.0 && \
-    pip install fisher==0.1.9 && \
-    pip install python-igraph==0.7.1.post6 && \
-    pip install louvain-github==0.6.1.post1 && \
-    pip install MulticoreTSNE-modified==0.1 && \
-    pip install umap-learn==0.3.10 && \
-    pip install pegasuspy==0.16.8
+RUN pip3 install setuptools==46.1.3 --no-cache-dir && \
+    pip3 install numpy==1.18.2 --no-cache-dir && \
+    pip3 install pandas==1.0.3 --no-cache-dir && \
+    pip3 install scipy==1.4.1 --no-cache-dir && \
+    pip3 install Cython==0.29.16 --no-cache-dir && \
+    pip3 install pybind11==2.4.3 --no-cache-dir && \
+    pip3 install scikit-learn==0.22.2.post1 --no-cache-dir && \
+    pip3 install h5py==2.10.0 --no-cache-dir && \
+    pip3 install fitsne==1.1.1 --no-cache-dir && \
+    pip3 install joblib==0.14.1 --no-cache-dir && \
+    pip3 install python-igraph==0.7.1.post6 --no-cache-dir && \
+    pip3 install leidenalg==0.7.0 --no-cache-dir && \
+    pip3 install lightgbm==2.2.1 --no-cache-dir && \
+    pip3 install llvmlite==0.31.0 --no-cache-dir && \
+    pip3 install loompy==3.0.6 --no-cache-dir && \
+    pip3 install natsort==7.0.1 --no-cache-dir && \
+    pip3 install numba==0.48.0 --no-cache-dir && \
+    pip3 install scikit-misc==0.1.1 --no-cache-dir && \
+    pip3 install statsmodels==0.11.1 --no-cache-dir && \
+    pip3 install tables==3.6.1 --no-cache-dir && \
+    pip3 install anndata==0.7.1 --no-cache-dir && \
+    pip3 install hnswlib==0.3.4 --no-cache-dir && \
+    pip3 install fisher==0.1.9 --no-cache-dir && \
+    pip3 install louvain-github==0.6.1.post1 --no-cache-dir && \
+    pip3 install MulticoreTSNE-modified==0.1 --no-cache-dir && \
+    pip3 install umap-learn==0.3.10 --no-cache-dir && \
+    pip3 install torch==1.4.0 --no-cache-dir && \
+    pip3 install harmony-pytorch==0.1.3 --no-cache-dir && \
+    pip3 install bokeh==2.0.0 --no-cache-dir && \
+    pip3 install scplot==0.0.16 --no-cache-dir && \
+    pip3 install pegasuspy==0.17.1 --no-cache-dir
+
+RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \ 
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
+    apt-get update -y && apt-get install -y google-cloud-sdk=290.0.0-0
+
+RUN apt-get -qq -y remove curl gnupg cmake python3-pip ca-certificates && \
+    apt-get -qq -y autoremove && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/log/dpkg.log && \
+    rm /usr/bin/python && ln -s /usr/bin/python3 /usr/bin/python
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
-
 RUN chmod a+rx /software/monitor_script.sh
 
-# Install gcloud 264.0.0
-RUN gsutil -m cp gs://cloud-sdk-release/google-cloud-sdk-264.0.0-linux-x86_64.tar.gz /software && \
-	cd /software && \
-	tar -zxvf google-cloud-sdk-264.0.0-linux-x86_64.tar.gz && \
-	rm google-cloud-sdk-264.0.0-linux-x86_64.tar.gz && \
-	cd google-cloud-sdk && \
-	./install.sh
-
-ENV PATH=/software/google-cloud-sdk/bin:/software:$PATH
+ENV PATH=/software:$PATH
