@@ -266,7 +266,7 @@ task run_cellranger_mkref {
         CODE
 
         tar -czf ~{output_genome}.tar.gz ~{output_genome}
-        gsutil cp ~{output_genome}.tar.gz ~{output_dir}
+        gsutil cp ~{output_genome}.tar.gz ~{output_dir}/
         # mkdir -p ~{output_dir}
         # cp ~{output_genome}.tar.gz ~{output_dir}
     }
