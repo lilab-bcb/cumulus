@@ -53,7 +53,7 @@ RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.c
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
     apt-get update -y && apt-get install -y google-cloud-sdk=290.0.0-0
 
-RUN apt-get -qq -y remove curl gnupg cmake python3-pip ca-certificates && \
+RUN apt-get -qq -y remove curl gnupg cmake python3-pip && \
     apt-get -qq -y autoremove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log && \
