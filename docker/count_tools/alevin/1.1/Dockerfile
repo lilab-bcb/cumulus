@@ -1,18 +1,26 @@
-FROM continuumio/miniconda3:4.6.14
+FROM debian:buster-slim
 SHELL ["/bin/bash", "-c"]
 
-RUN apt-get update -qq && \
-    apt-get install -y wget git cmake && \
-    apt-get install --no-install-recommends -y build-essential cmake gnupg lsb-release curl bison zlib1g-dev && \
-    export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
-    echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    apt-get update && apt-get install -y google-cloud-sdk && \
-    apt-get clean
+RUN apt-get -qq update && \
+    apt-get -qq -y install --no-install-recommends \
+        build-essential \
+        cmake \
+        gnupg \
+        curl \
+        bison \
+        git \
+        cmake \
+        wget \
+        zlib1g-dev \
+        python3 \
+        python3-pip
 
-RUN pip install --upgrade pip && \
-    pip install numpy==1.18.1 && \
-    pip install pandas==0.25.3
+RUN pip3 install numpy==1.18.1 --no-cache-dir && \
+    pip3 install pandas==1.0.3 --no-cache-dir
+
+RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \ 
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
+    apt-get update -y && apt-get install -y google-cloud-sdk=290.0.0-0
 
 RUN wget https://github.com/COMBINE-lab/salmon/releases/download/v1.1.0/salmon-1.1.0_linux_x86_64.tar.gz && \
     tar -zxvf salmon-1.1.0_linux_x86_64.tar.gz && \
@@ -23,16 +31,13 @@ RUN wget https://github.com/COMBINE-lab/salmon/releases/download/v1.1.0/salmon-1
 RUN git clone https://github.com/lh3/bioawk.git /software/bioawk && \
     cd /software/bioawk && make
 
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+RUN apt-get -qq -y remove curl gnupg cmake python3-pip git wget && \
+    apt-get -qq -y autoremove && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/log/dpkg.log && \
+    rm /usr/bin/python && ln -s /usr/bin/python3 /usr/bin/python
 
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
 RUN chmod a+rx /software/monitor_script.sh
 
-# Install gcloud 264.0.0
-RUN gsutil -m cp gs://cloud-sdk-release/google-cloud-sdk-264.0.0-linux-x86_64.tar.gz /software && \
-    cd /software && \
-    tar -zxvf google-cloud-sdk-264.0.0-linux-x86_64.tar.gz && \
-    rm google-cloud-sdk-264.0.0-linux-x86_64.tar.gz && \
-    cd google-cloud-sdk && \
-    ./install.sh
-
-ENV PATH=/software/google-cloud-sdk/bin:/software:/software/bioawk:/software/salmon/bin:$PATH
+ENV PATH=/software:/software/bioawk:/software/salmon/bin:$PATH
