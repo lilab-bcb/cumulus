@@ -322,6 +322,9 @@ dropseq_workflow Terra Release Notes
 
 dropseq_bundle Terra Release Notes
 ===================================================
+**Version 4**
+
+- Added create_intervals_memory and extra_star_flags inputs
 
 **Version 3**
 
