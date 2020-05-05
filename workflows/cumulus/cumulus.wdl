@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/11/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/12/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
@@ -19,7 +19,7 @@ workflow cumulus {
 		# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		# Number of cpus per cumulus job
-		Int num_cpu = 64
+		Int num_cpu = 32
 		# Memory size string
 		String memory = "200G"
 		# Total disk space
@@ -71,8 +71,6 @@ workflow cumulus {
 		Boolean? output_seurat_compatible
 		# If output loom-formatted file [default: false]
 		Boolean? output_loom
-		# If output parquet-formatted file [default: false]
-		Boolean output_parquet = false
 		# Only keep cells with at least <number> of genes. [default: 500]
 		Int? min_genes
 		# Only keep cells with less than <number> of genes. [default: 6000]
@@ -240,6 +238,9 @@ workflow cumulus {
 		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FLEs side by side based on net FLE result.
 		String? plot_net_fle
 
+		# for cirro_output
+		# If generate Cirrocumulus inputs
+		Boolean generate_cirro_inputs = false
 
 		# for scp_output
 
@@ -295,7 +296,6 @@ workflow cumulus {
 			plot_filtration_figsize = plot_filtration_figsize,
 			output_seurat_compatible = output_seurat_compatible,
 			output_loom = output_loom,
-			output_parquet = output_parquet,
 			min_genes = min_genes,
 			max_genes = max_genes,
 			min_umis = min_umis,
@@ -414,6 +414,22 @@ workflow cumulus {
 		}
 	}
 
+	if (generate_cirro_inputs) {
+		call tasks.run_cumulus_cirro_output as cirro_output {
+			input:
+				input_h5ad = cluster.output_h5ad,
+				output_directory = output_directory_stripped,
+				output_name = output_name,
+				cumulus_version = cumulus_version,
+				zones = zones,
+				memory = memory,
+				disk_space = disk_space,
+				num_cpu = num_cpu,
+				preemptible = preemptible,
+				docker_registry = docker_registry
+		}
+	}
+
 	if (generate_scp_outputs) {
 		call tasks.run_cumulus_scp_output as scp_output {
 			input:
@@ -438,13 +454,13 @@ workflow cumulus {
 		Array[File] output_filt_xlsx = cluster.output_filt_xlsx
 		Array[File] output_filt_plot = cluster.output_filt_plot
 		Array[File] output_loom_file = cluster.output_loom_file
-		Array[File] output_parquet_file = cluster.output_parquet_file
 		File? output_de_h5ad = de_analysis.output_de_h5ad
 		File? output_de_xlsx =  de_analysis.output_de_xlsx
 		Array[File]? output_markers_xlsx =  de_analysis.output_markers_xlsx
 		Array[File]? output_anno_file =  de_analysis.output_anno_file
 		Array[File]? output_pdfs = plot.output_pdfs
 		Array[File]? output_htmls = plot.output_htmls
+		String? output_cirro_folder = cirro_output.output_cirro_folder
 		Array[File]? output_scp_files= scp_output.output_scp_files
 	}
 }

@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/10/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/12/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus_subcluster {
@@ -20,7 +20,7 @@ workflow cumulus_subcluster {
 		# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		# Number of cpus per cumulus job
-		Int num_cpu = 64
+		Int num_cpu = 32
 		# Memory size string
 		String memory = "200G"
 		# Total disk space
@@ -39,8 +39,6 @@ workflow cumulus_subcluster {
 		String? batch_group_by
 		# If output loom-formatted file [default: false]
 		Boolean? output_loom
-		# If output parquet-formatted file [default: false]
-		Boolean? output_parquet
 		# Highly variable feature selection method. <flavor> can be 'pegasus' or 'Seurat'. [default: pegasus]
 		String? select_hvf_flavor
 		# Select top <nfeatures> highly variable features. If <flavor> is 'Seurat' and <nfeatures> is 'None', select HVGs with z-score cutoff at 0.5. [default: 2000]
@@ -186,6 +184,9 @@ workflow cumulus_subcluster {
 		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FLEs side by side based on net FLE result.
 		String? plot_net_fle
 
+		# for cirro_output
+		# If generate Cirrocumulus inputs
+		Boolean generate_cirro_inputs = false
 
 		# for scp_output
 
@@ -207,7 +208,6 @@ workflow cumulus_subcluster {
 			correction_method = correction_method,
 			batch_group_by = batch_group_by,
 			output_loom = output_loom,
-			output_parquet = output_parquet,
 			select_hvf_flavor = select_hvf_flavor,
 			select_hvf_ngenes = select_hvf_ngenes,
 			no_select_hvf = no_select_hvf,
@@ -310,6 +310,22 @@ workflow cumulus_subcluster {
 				zones = zones,
 				memory = memory,
 				disk_space = disk_space,
+				preemptible = preemptible,
+				docker_registry = docker_registry
+		}
+	}
+
+	if (generate_cirro_inputs) {
+		call tasks.run_cumulus_cirro_output as cirro_output {
+			input:
+				input_h5ad = subcluster.output_h5ad,
+				output_directory = output_directory,
+				output_name = output_name,
+				cumulus_version = cumulus_version,
+				zones = zones,
+				memory = memory,
+				disk_space = disk_space,
+				num_cpu = num_cpu,
 				preemptible = preemptible,
 				docker_registry = docker_registry
 		}
