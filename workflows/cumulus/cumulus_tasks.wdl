@@ -94,7 +94,6 @@ task run_cumulus_cluster {
 		String? plot_filtration_figsize
 		Boolean? output_seurat_compatible
 		Boolean? output_loom
-		Boolean? output_parquet
 		Int? min_genes
 		Int? max_genes
 		Int? min_umis
@@ -299,10 +298,6 @@ task run_cumulus_cluster {
 			call_args.extend(['--net-fle-out-basis', '~{net_fle_out_basis}'])
 		print(' '.join(call_args))
 		check_call(call_args)
-		if '~{output_parquet}' is 'true':
-			call_args = ['pegasus', 'parquet', '~{output_name}.h5ad', '~{output_name}', '-p', '~{num_cpu}']
-			print(' '.join(call_args))
-			check_call(call_args)
 
 		import glob
 		dest = '~{output_directory}' + '/' + '~{output_name}' + '/'
@@ -316,8 +311,6 @@ task run_cumulus_cluster {
 			files.extend(glob.glob('~{output_name}.filt.*.pdf'))
 		if '~{output_loom}' is 'true':
 			files.append('~{output_name}.loom')
-		if '~{output_parquet}' is 'true':
-			files.append('~{output_name}.parquet')
 		for file in files:
 			# call_args = ['cp', file, dest]
 			call_args = ['gsutil', '-m', 'cp', file, dest]
@@ -332,7 +325,6 @@ task run_cumulus_cluster {
 		Array[File] output_filt_xlsx = glob("~{output_name}.filt.xlsx")
 		Array[File] output_filt_plot = glob("~{output_name}.filt.*.pdf")
 		Array[File] output_loom_file = glob("~{output_name}.loom")
-		Array[File] output_parquet_file = glob("~{output_name}.parquet")
 		File output_log = "~{output_name}.log"
 		File monitoringLog = "monitoring.log"
 	}
@@ -342,6 +334,46 @@ task run_cumulus_cluster {
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
+		disks: "local-disk ~{disk_space} HDD"
+		cpu: num_cpu
+		preemptible: preemptible
+	}
+}
+
+task run_cumulus_cirro_output {
+	input {
+		File input_h5ad
+		String output_directory
+		String output_name
+		String docker_registry
+		String cumulus_version
+		String zones
+		String memory
+		Int disk_space
+		Int num_cpu
+		Int preemptible
+	}
+
+	command {
+		set -e
+		export TMPDIR=/tmp
+		monitor_script.sh > monitoring.log &
+
+		python /software/prepare_data.py --out ~{output_name}.cirro ~{input_h5ad}
+		gsutil -m cp -r ~{output_name}.cirro ~{output_directory}/~{output_name}/
+		# mkdir -p ~{output_directory}/~{output_name}
+		# cp -r ~{output_name}.cirro ~{output_directory}/~{output_name}/
+	}
+
+	output {
+		String output_cirro_folder = "~{output_directory}/~{output_name}/~{output_name}.cirro"
+		File monitoringLog = "monitoring.log"
+	}
+
+	runtime {
+		docker: "~{docker_registry}/cumulus:~{cumulus_version}"
+		zones: zones
+		memory: memory
 		disks: "local-disk ~{disk_space} HDD"
 		cpu: num_cpu
 		preemptible: preemptible
@@ -621,7 +653,6 @@ task run_cumulus_subcluster {
 		String? correction_method
 		String? batch_group_by
 		Boolean? output_loom
-		Boolean? output_parquet
 		String? select_hvf_flavor
 		Int? select_hvf_ngenes
 		Boolean? no_select_hvf
@@ -779,18 +810,12 @@ task run_cumulus_subcluster {
 			call_args.extend(['--net-fle-out-basis', '~{net_fle_out_basis}'])
 		print(' '.join(call_args))
 		check_call(call_args)
-		if '~{output_parquet}' is 'true':
-			call_args = ['pegasus', 'parquet', '~{output_name}.h5ad', '~{output_name}', '-p', '~{num_cpu}']
-			print(' '.join(call_args))
-			check_call(call_args)
 
 		dest = '~{output_directory}' + '/' + '~{output_name}' + '/'
 		# check_call(['mkdir', '-p', dest])
 		files = ['~{output_name}.h5ad', '~{output_name}.log']
 		if '~{output_loom}' is 'true':
 			files.append('~{output_name}.loom')
-		if '~{output_parquet}' is 'true':
-			files.append('~{output_name}.parquet')
 		for file in files:
 			# call_args = ['cp', file, dest]
 			call_args = ['gsutil', 'cp', file, dest]
@@ -803,7 +828,6 @@ task run_cumulus_subcluster {
 		File output_h5ad = "~{output_name}.h5ad"
 		File output_log = "~{output_name}.log"
 		Array[File] output_loom_file = glob("~{output_name}.loom")
-		Array[File] output_parquet_file = glob("~{output_name}.parquet")
 		File monitoringLog = "monitoring.log"
 	}
 

@@ -47,19 +47,22 @@ RUN pip3 install setuptools==46.1.3 --no-cache-dir && \
     pip3 install harmony-pytorch==0.1.3 --no-cache-dir && \
     pip3 install bokeh==2.0.0 --no-cache-dir && \
     pip3 install scplot==0.0.16 --no-cache-dir && \
-    pip3 install pegasuspy==0.17.1 --no-cache-dir
+    pip3 install pegasuspy==0.17.1 --no-cache-dir && \
+    pip3 install cirrocumulus==0.0.6.post2 --no-cache-dir
+
+RUN mkdir /software && \
+    cp /usr/local/lib/python3.7/dist-packages/cirrocumulus/prepare_data.py /software/prepare_data.py
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \ 
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
     apt-get update -y && apt-get install -y google-cloud-sdk=290.0.0-0
 
-RUN apt-get -qq -y remove curl gnupg cmake python3-pip && \
+RUN apt-get -qq -y remove curl gnupg cmake && \
     apt-get -qq -y autoremove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log && \
     rm /usr/bin/python && ln -s /usr/bin/python3 /usr/bin/python
 
-RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
 RUN chmod a+rx /software/monitor_script.sh
 
