@@ -1158,9 +1158,6 @@ cumulus_subcluster's outputs
     * - output_loom_file
       - File
       - Generated loom file (output_name.loom)
-    * - output_parquet_file
-      - File
-      - Generated PARQUET file that contains metadata and expression levels for every gene (output_name.parquet)
     * - output_de_h5ad
       - File
       - Generated h5ad-formatted results with DE results updated (output_name.h5ad)
