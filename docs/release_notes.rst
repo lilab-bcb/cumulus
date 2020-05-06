@@ -1,3 +1,10 @@
+Version 0.15.0 `May 6, 2020`
+-------------------------------
+
+* Update all workflows to OpenWDL version 1.0.
+* Cumulus now supports multi-job execution from Terra data table input.
+* Cumulus generates Cirrocumulus input in ``.cirro`` folder, instead of a huge ``.parquet`` file.
+
 Version 0.14.0 `February 28, 2020`
 -----------------------------------
 
