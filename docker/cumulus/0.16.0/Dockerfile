@@ -55,7 +55,7 @@ RUN mkdir /software && \
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \ 
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
-    apt-get update -y && apt-get install -y google-cloud-sdk=290.0.0-0
+    apt-get update -y && apt-get install -y google-cloud-sdk=291.0.0-0
 
 RUN apt-get -qq -y remove curl gnupg cmake && \
     apt-get -qq -y autoremove && \
