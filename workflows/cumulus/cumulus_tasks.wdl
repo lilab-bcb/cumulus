@@ -360,7 +360,7 @@ task run_cumulus_cirro_output {
 		monitor_script.sh > monitoring.log &
 
 		python /software/prepare_data.py --out ~{output_name}.cirro ~{input_h5ad}
-		gsutil -m cp -r ~{output_name}.cirro ~{output_directory}/~{output_name}/
+		gsutil -q -m cp -r ~{output_name}.cirro ~{output_directory}/~{output_name}/
 		# mkdir -p ~{output_directory}/~{output_name}
 		# cp -r ~{output_name}.cirro ~{output_directory}/~{output_name}/
 	}

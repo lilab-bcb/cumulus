@@ -39,10 +39,10 @@ Latest version
       - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/8>`__
       - Generate user-customized genome references for SMART-Seq2 data.
     * - cumulus/cumulus
-      - `21 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/21>`__
+      - `22 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/22>`__
       - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
     * - cumulus/cumulus_subcluster
-      - `14 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_subcluster/14>`__
+      - `15 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_subcluster/15>`__
       - Run subcluster analysis using cumulus
     * - cumulus/cumulus_hashing_cite_seq
       - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_hashing_cite_seq/10>`__
@@ -84,10 +84,10 @@ Stable version - v0.15.0
       - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/8>`__
       - Generate user-customized genome references for SMART-Seq2 data.
     * - cumulus/cumulus
-      - `21 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/21>`__
+      - `22 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/22>`__
       - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
     * - cumulus/cumulus_subcluster
-      - `14 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_subcluster/14>`__
+      - `15 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_subcluster/15>`__
       - Run subcluster analysis using cumulus
     * - cumulus/cumulus_hashing_cite_seq
       - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_hashing_cite_seq/10>`__
