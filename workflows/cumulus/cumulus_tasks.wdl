@@ -219,7 +219,7 @@ task run_cumulus_cluster {
 		if '~{select_hvf_ngenes}' is not '':
 			call_args.extend(['--select-hvf-ngenes', '~{select_hvf_ngenes}'])
 		if '~{nPC}' is not '':
-			call_args.extend(['--nPC', '~{nPC}'])
+			call_args.extend(['--pca-n', '~{nPC}'])
 		if '~{knn_K}' is not '':
 			call_args.extend(['--knn-K', '~{knn_K}'])
 		if '~{knn_full_speed}' is 'true':
@@ -729,7 +729,7 @@ task run_cumulus_subcluster {
 		if '~{random_state}' is not '':
 			call_args.extend(['--random-state', '~{random_state}'])
 		if '~{nPC}' is not '':
-			call_args.extend(['--nPC', '~{nPC}'])
+			call_args.extend(['--pca-n', '~{nPC}'])
 		if '~{knn_K}' is not '':
 			call_args.extend(['--knn-K', '~{knn_K}'])
 		if '~{knn_full_speed}' is 'true':
