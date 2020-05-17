@@ -26,7 +26,7 @@ RUN pip3 install setuptools==46.1.3 --no-cache-dir && \
     pip3 install loompy==3.0.6 --no-cache-dir && \
     pip3 install natsort==7.0.1 --no-cache-dir && \
     pip3 install zarr==2.4.0 --no-cache-dir && \
-    pip3 install pegasusio==0.1.3 --no-cache-dir && \
+    pip3 install pegasusio==0.1.4 --no-cache-dir && \
     pip3 install scrublet==0.2.1 --no-cache-dir
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \ 
