@@ -206,6 +206,10 @@ Sample sheet
 		  - Mouse mm10, cellranger reference 1.2.0, Ensembl v84 gene annotation
 		* - **GRCh38_and_mm10_v1.2.0** or **GRCh38_and_mm10**
 		  - Human and mouse, built from GRCh38 and mm10 cellranger references, Ensembl v84 gene annotations are used
+		* - **GRCh38_and_SARS-COV-2-genome_v3.0.0**
+		  - Human GRCh38 and SARS-COV-2 RNA genome. GRCh38 uses Ensembl v93 gene annotation. SARS-COV-2 RNA genome sequence is downloaded from GenBank (accession: MT325582, strain: MA_0020)
+		* - **GRCh38_and_SARS-COV-2-mrnas_v3.0.0**
+		  - Human GRCh38 and SARS-COV-2 mRNAs. GRCh38 uses Ensembl v93 gene annotation. SARS-COV-2 RNA genome sequence and gene annotations are from GenBank (accession: MT325582, strain: MA_0020). Since Cell Ranger does not allow overlapping gene features, we make ORF1a and ORF1ab as two transcripts of gene ORF1ab; ORF7a and ORF7b as two transcripts of gene ORF7ab
 
 	Pre-built snRNA-seq references are summarized below.
 
