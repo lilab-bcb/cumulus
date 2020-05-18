@@ -11,8 +11,8 @@ Follow the steps below to run **doublet_detection** on Terra_.
 
 1. Create a sample sheet, **count_matrix.csv**, which describes the metadata for each sample count matrix. The sample sheet should at least contain 2 columns --- *Sample* and *Location*. *Sample* refers to sample names and *Location* refers to the location of the channel-specific count matrix in either of
 
-  - 10x format with v2 chemistry. For example, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_gene_bc_matrices_h5.h5``.
-  - 10x format with v3 chemistry. For example, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/filtered_feature_bc_matrices.h5``.
+  - 10x format with v2 chemistry. For example, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_1/raw_gene_bc_matrices_h5.h5``.
+  - 10x format with v3 chemistry. For example, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_2/raw_feature_bc_matrices.h5``.
 
 Example::
 
@@ -61,7 +61,7 @@ You are free to add more columns, but sample ids and URLs to RNA count matrix fi
 
 4. In the input field, specify:
 
-  - ``input_h5_file``: Type ``this.input_h5``, where ``this`` refers to the data table selected, and ``input_h5`` is the column name in this data table for RNA count matrices.
+  - ``input_file``: Type ``this.input_h5``, where ``this`` refers to the data table selected, and ``input_h5`` is the column name in this data table for RNA count matrices.
   - ``output_directory``: Type Google bucket URL for the main output folder. For example, ``gs://fc-e0000000-0000-0000-0000-000000000000/doublet_detection_results``.
   - ``sample_id``: Type ``this.test_sample_id``, where ``test_sample_id`` is the column name in data table for sample IDs.
 
@@ -78,7 +78,7 @@ If you have only one sample for doublet detection, you can directly use its URL 
 
 Import *doublet_detection* workflow to your workspace as described in cases above. In workflow page, select ``Run workflow with inputs defined by file paths``. Then in the input field, specify:
 
-  - ``input_h5_file``: Click the folder button to select the sample's hdf5 file.
+  - ``input_file``: Click the folder button to select the sample's hdf5 file.
   - ``sample_id``: Give a sample name for the result files.
 
 Notice that you should make ``input_sample_sheet`` field empty; otherwise, your job will ignore the above settings, and only use the sample sheet as input data.
