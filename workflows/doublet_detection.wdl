@@ -36,7 +36,7 @@ workflow doublet_detection {
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         # Memory size string
-        String memory = "10G"
+        Int memory = 10
         # Total disk space
         Int disk_space = 10
         # Number of preemptible tries 
@@ -182,7 +182,7 @@ task detect_doublets {
         String docker_registry
         String scrublet_version
         String zones
-        String memory
+        Int memory
         Int disk_space
         Int preemptible
     }
