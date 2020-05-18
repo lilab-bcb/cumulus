@@ -198,6 +198,8 @@ Sample sheet
 		  - Mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation
 		* - **GRCh38_and_mm10_v3.1.0**
 		  - Human (GRCh38) and mouse (mm10), cellranger references 3.1.0, Ensembl v93 gene annotations for both human and mouse
+		* - **hg19_and_mm10_v3.0.0**
+		  - Human (hg19) and mouse (mm10), cellranger reference 3.0.0, Ensembl v93 gene annotations for both human and mouse
 		* - **GRCh38_v1.2.0** or **GRCh38**
 		  - Human GRCh38, cellranger reference 1.2.0, Ensembl v84 gene annotation
 		* - **hg19_v1.2.0** or **hg19**
@@ -219,12 +221,16 @@ Sample sheet
 
 		* - Keyword
 		  - Description
+		* - **GRCh38_premrna_v3.0.0**
+		  - Human, introns included, built from GRCh38 cellranger reference 3.0.0, Ensembl v93 gene annotation, treating annotated transcripts as exons
 		* - **GRCh38_premrna_v1.2.0** or **GRCh38_premrna**
 		  - Human, introns included, built from GRCh38 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcripts as exons
 		* - **mm10_premrna_v1.2.0** or **mm10_premrna**
 		  - Mouse, introns included, built from mm10 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcripts as exons
 		* - **GRCh38_premrna_and_mm10_premrna_v1.2.0** or **GRCh38_premrna_and_mm10_premrna**
 		  - Human and mouse, introns included, built from GRCh38_premrna_v1.2.0 and mm10_premrna_v1.2.0
+		* - **GRCh38_premrna_and_SARS-COV-2-genome_v3.0.0**
+		  - Human, introns included, built from GRCh38_premrna_v3.0.0, and SARS-COV-2 RNA genome. SARS-COV-2 RNA genome sequence is downloaded from GenBank (accession: MT325582, strain: MA_0020)
 
 #. **Index** column.
 

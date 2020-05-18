@@ -39,3 +39,4 @@ GRCh38_vdj	gs://regev-lab/resources/cellranger/refdata-cellranger-vdj-GRCh38-alt
 GRCm38_vdj	gs://regev-lab/resources/cellranger/refdata-cellranger-vdj-GRCm38-alts-ensembl-2.2.0.tar.gz
 GRCh38_and_SARS-COV-2-genome_v3.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38-and-SARS-COV-2-rna-genome-3.0.0.tar.gz
 GRCh38_and_SARS-COV-2-mrnas_v3.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38-and-SARS-COV-2-mrnas-3.0.0.tar.gz
+GRCh38_premrna_and_SARS-COV-2-genome_v3.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38_premrna_and_SARS-COV-2-rna-genome-3.0.0.tar.gz
