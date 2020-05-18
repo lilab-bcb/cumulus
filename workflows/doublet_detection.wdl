@@ -174,7 +174,7 @@ task detect_doublets {
         Int? min_umis
         Int? max_umis
         Float? percent_mito
-        Float? percent_cells
+        Float? gene_percent_cells
         Float? expected_doublet_rate
         Int? random_state
         Int? nPC
@@ -215,8 +215,8 @@ task detect_doublets {
             kwargs['max_umis'] = int('~{max_umis}')
         if '~{percent_mito}' is not '':
             kwargs['percent_mito'] = float('~{percent_mito}')
-        if '~{percent_cells}' is not '':
-            kwargs['percent_cells'] = float('~{percent_cells}')
+        if '~{gene_percent_cells}' is not '':
+            kwargs['gene_percent_cells'] = float('~{gene_percent_cells}')
 
         io.qc_metrics(data, **kwargs)
         io.filter_data(data)
