@@ -43,6 +43,8 @@ workflow doublet_detection {
         Int preemptible = 2
     }
 
+    String output_directory_stripped = sub(output_directory, "/+$", "")
+
     if (defined(input_sample_sheet)) {
         call process_sample_sheet as Config {
             input:
@@ -59,7 +61,7 @@ workflow doublet_detection {
                     input:
                         sample_id = sample_id,
                         input_file = Config.id2rna[sample_id],
-                        output_directory = output_directory,
+                        output_directory = output_directory_stripped,
                         select_singlets = select_singlets,
                         mito_prefix = mito_prefix,
                         min_genes = min_genes,
@@ -87,7 +89,7 @@ workflow doublet_detection {
             input:
                 sample_id = select_first([sample_id]),
                 input_file = select_first([input_file]),
-                output_directory = output_directory,
+                output_directory = output_directory_stripped,
                 select_singlets = select_singlets,
                 mito_prefix = mito_prefix,
                 min_genes = min_genes,
