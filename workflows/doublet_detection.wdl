@@ -7,6 +7,8 @@ workflow doublet_detection {
         String output_directory
         String? sample_id
 
+        # Whether select singlets only or not.
+        Boolean select_singlets = true
         # Prefix for mitochondrial genes. (default: "MT-")
         String? mito_prefix
         # Only keep cells with at least <min_genes> genes. (default: 500)
@@ -58,6 +60,7 @@ workflow doublet_detection {
                         sample_id = sample_id,
                         input_h5_file = Config.id2h5[sample_id],
                         output_directory = output_directory,
+                        select_singlets = select_singlets,
                         mito_prefix = mito_prefix,
                         min_genes = min_genes,
                         max_genes = max_genes,
@@ -85,6 +88,7 @@ workflow doublet_detection {
                 sample_id = select_first([sample_id]),
                 input_h5_file = select_first([input_h5_file]),
                 output_directory = output_directory,
+                select_singlets = select_singlets,
                 mito_prefix = mito_prefix,
                 min_genes = min_genes,
                 max_genes = max_genes,
@@ -161,6 +165,7 @@ task detect_doublets {
         String sample_id
         File input_h5_file
         String output_directory
+        Boolean select_singlets
         String? mito_prefix
         Int? min_genes
         Int? max_genes
@@ -189,6 +194,12 @@ task detect_doublets {
         import pegasusio as io
         import scrublet as scr
 
+        data = io.read_input('~{input_h5_file}')
+
+        if '~{select_singlets}' is 'true':
+            if 'demux_type' in data.obs.columns:
+                data = data[data.obs['demux_type'] == 'singlet', :].copy()
+
         kwargs = dict()
         if '~{mito_prefix}' is not '':
             kwargs['mito_prefix'] = '~{mito_prefix}'
@@ -205,7 +216,6 @@ task detect_doublets {
         if '~{percent_cells}' is not '':
             kwargs['percent_cells'] = float('~{percent_cells}')
 
-        data = io.read_input('~{input_h5_file}')
         io.qc_metrics(data, **kwargs)
         io.filter_data(data)
 
