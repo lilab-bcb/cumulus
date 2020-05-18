@@ -33,12 +33,10 @@ workflow doublet_detection {
         String scrublet_version = "0.2.1"
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-        # Number of cpus per cumulus job
-        Int num_cpu = 8
         # Memory size string
-        String memory = "200G"
+        String memory = "10G"
         # Total disk space
-        Int disk_space = 100
+        Int disk_space = 10
         # Number of preemptible tries 
         Int preemptible = 2
     }
@@ -73,7 +71,6 @@ workflow doublet_detection {
                         docker_registry = docker_registry,
                         scrublet_version = scrublet_version,
                         zones = zones,
-                        num_cpu = num_cpu,
                         memory = memory,
                         disk_space = disk_space,
                         preemptible = preemptible
@@ -101,7 +98,6 @@ workflow doublet_detection {
                 docker_registry = docker_registry,
                 scrublet_version = scrublet_version,
                 zones = zones,
-                num_cpu = num_cpu,
                 memory = memory,
                 disk_space = disk_space,
                 preemptible = preemptible
@@ -179,7 +175,6 @@ task detect_doublets {
         String docker_registry
         String scrublet_version
         String zones
-        Int num_cpu
         String memory
         Int disk_space
         Int preemptible
@@ -250,7 +245,6 @@ task detect_doublets {
         zones: zones
         memory: "~{memory}G"
         disks: "local-disk ~{disk_space} HDD"
-        cpu: num_cpu
         preemptible: preemptible
     }
 }
