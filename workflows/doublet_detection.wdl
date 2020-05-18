@@ -3,7 +3,7 @@ version 1.0
 workflow doublet_detection {
     input {
         File? input_sample_sheet
-        File? input_h5_file
+        File? input_file
         String output_directory
         String? sample_id
 
@@ -21,8 +21,10 @@ workflow doublet_detection {
         Int? max_umis
         # Only keep cells with percent mitochondrial genes less than <percent_mito>% of total counts. (default: 10.0)
         Float? percent_mito
-        # Only assign genes to be robust that are expressed in at least <percent_cells>% of cells. (default: 0.05)
-        Float? percent_cells
+        # Only assign genes to be robust that are expressed in at least <gene_percent_cells>% of cells. (default: 0.05)
+        Float? gene_percent_cells
+        # The expected doublet rate in the experiment. (default: 0.1)
+        Float? expected_doublet_rate
         # Random state for doublet simulation, approximate nearest neighbor search, and PCA/TruncatedSVD. (default: 0)
         Int? random_state
         # Number of principal components used to embed the transcriptomes prior to k-nearest-neighbor graph construction. (default: 30)
@@ -56,7 +58,7 @@ workflow doublet_detection {
                 call detect_doublets as DetectDoubletsScatter {
                     input:
                         sample_id = sample_id,
-                        input_h5_file = Config.id2h5[sample_id],
+                        input_file = Config.id2rna[sample_id],
                         output_directory = output_directory,
                         select_singlets = select_singlets,
                         mito_prefix = mito_prefix,
@@ -65,7 +67,8 @@ workflow doublet_detection {
                         min_umis = min_umis,
                         max_umis = max_umis,
                         percent_mito = percent_mito,
-                        percent_cells = percent_cells,
+                        gene_percent_cells = gene_percent_cells,
+                        expected_doublet_rate = expected_doublet_rate,
                         random_state = random_state,
                         nPC = nPC,
                         docker_registry = docker_registry,
@@ -79,11 +82,11 @@ workflow doublet_detection {
         }
     }
 
-    if (!defined(input_sample_sheet) && defined(input_h5_file)) {
+    if (!defined(input_sample_sheet) && defined(input_file)) {
         call detect_doublets as DetectDoublets {
             input:
                 sample_id = select_first([sample_id]),
-                input_h5_file = select_first([input_h5_file]),
+                input_file = select_first([input_file]),
                 output_directory = output_directory,
                 select_singlets = select_singlets,
                 mito_prefix = mito_prefix,
@@ -92,7 +95,8 @@ workflow doublet_detection {
                 min_umis = min_umis,
                 max_umis = max_umis,
                 percent_mito = percent_mito,
-                percent_cells = percent_cells,
+                gene_percent_cells = gene_percent_cells,
+                expected_doublet_rate = expected_doublet_rate,
                 random_state = random_state,
                 nPC = nPC,
                 docker_registry = docker_registry,
@@ -106,8 +110,10 @@ workflow doublet_detection {
 
 
     output {
-        File? output_scored_zarr = DetectDoublets.output_scored_zarr
-        Array[File]? output_scored_zarr_list = DetectDoubletsScatter.output_scored_zarr
+        File? output_zarr = DetectDoublets.output_zarr
+        File? output_histogram_pdf = DetectDoublets.output_histogram_pdf
+        Array[File]? output_zarr_list = DetectDoubletsScatter.output_zarr
+        Array[File]? output_histogram_pdf_list = DetectDoubletsScatter.output_histogram_pdf
     }
 }
 
@@ -137,16 +143,16 @@ task process_sample_sheet {
             print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &')
             sys.exit(1)
 
-        with open('sample_ids.txt', 'w') as fo_ids, open('id2h5.txt', 'w') as fo_h5s:
+        with open('sample_ids.txt', 'w') as fo_ids, open('id2rna.txt', 'w') as fo_rnas:
             for idx, row in df.iterrows():
                 fo_ids.write(row['Sample'] + '\n')
-                fo_h5s.write(row['Sample'] + '\t' + row['Location'] + '\n')
+                fo_rnas.write(row['Sample'] + '\t' + row['Location'] + '\n')
         CODE
     }
 
     output {
         Array[String] sample_ids = read_lines('sample_ids.txt')
-        Map[String, String] id2h5 = read_map('id2h5.txt')
+        Map[String, String] id2rna = read_map('id2rna.txt')
     }
 
     runtime {
@@ -159,7 +165,7 @@ task process_sample_sheet {
 task detect_doublets {
     input {
         String sample_id
-        File input_h5_file
+        File input_file
         String output_directory
         Boolean select_singlets
         String? mito_prefix
@@ -169,6 +175,7 @@ task detect_doublets {
         Int? max_umis
         Float? percent_mito
         Float? percent_cells
+        Float? expected_doublet_rate
         Int? random_state
         Int? nPC
 
@@ -189,11 +196,11 @@ task detect_doublets {
         import pegasusio as io
         import scrublet as scr
 
-        data = io.read_input('~{input_h5_file}')
+        data = io.read_input('~{input_file}')
 
         if '~{select_singlets}' is 'true':
             if 'demux_type' in data.obs.columns:
-                data = data[data.obs['demux_type'] == 'singlet', :].copy()
+                data._inplace_subset_obs(data.obs['demux_type'] == 'singlet')
 
         kwargs = dict()
         if '~{mito_prefix}' is not '':
@@ -215,6 +222,8 @@ task detect_doublets {
         io.filter_data(data)
 
         kwargs = dict()
+        if '~{expected_doublet_rate}' is not '':
+            kwargs['expected_doublet_rate'] = float('~{expected_doublet_rate}')
         if '~{random_state}' is not '':
             kwargs['random_state'] = int('~{random_state}')
         scrub = scr.Scrublet(data.X, **kwargs)
@@ -224,19 +233,31 @@ task detect_doublets {
             kwargs['nPC'] = int('~{nPC}')
         doublet_scores, predicted_doublets = scrub.scrub_doublets(**kwargs)
 
-        data.obs['doublet_scores'] = doublet_scores
-        io.write_output(data, '~{sample_id}_scored.zarr', zarr_zipstore = True)
+        fig, axs = scrub.plot_histogram()
+        fig.savefig('~{sample_id}.hist.pdf')
+
+        data.obs['scrublet_scores'] = doublet_scores
+
+        scrublet_info = dict()
+        scrublet_info['threshold'] = scrub.threshold_
+        scrublet_info['detected_doublet_rate'] = scrub.detected_doublet_rate_
+        scrublet_info['detectable_doublet_fraction'] = scrub.detectable_doublet_fraction_
+        scrublet_info['overall_doublet_rate'] = scrub.overall_doublet_rate_
+        data.uns['scrublet_stats'] = scrublet_info
+
+        io.write_output(data, '~{sample_id}_dbls.zarr', zarr_zipstore = True)
         CODE
 
         mkdir result
-        cp ~{sample_id}_scored.zarr result
+        cp ~{sample_id}_dbls.zarr ~{sample_id}.hist.pdf result
         gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
         # mkdir -p ~{output_directory}/~{sample_id}
         # cp result/* ~{output_directory}/~{sample_id}
     }
 
     output {
-        File output_scored_zarr = 'result/~{sample_id}_scored.zarr'
+        File output_zarr = 'result/~{sample_id}_dbls.zarr'
+        File output_histogram_pdf = 'result/~{sample_id}.hist.pdf'
         File monitoringLog = "monitoring.log"
     }
 

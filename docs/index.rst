@@ -14,6 +14,7 @@
    smart_seq_2
    drop_seq
    hashing_cite_seq
+   doublet_detection
    cumulus
    demuxlet
    command_line
