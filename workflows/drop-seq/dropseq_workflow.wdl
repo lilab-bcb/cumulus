@@ -1,101 +1,104 @@
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:bcl2fastq/versions/3/plain-WDL/descriptor" as bcl2fastq_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropest/versions/3/plain-WDL/descriptor" as dropest_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_align/versions/4/plain-WDL/descriptor" as dropseq_align_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_count/versions/4/plain-WDL/descriptor" as dropseq_count_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_prepare_fastq/versions/4/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_qc/versions/3/plain-WDL/descriptor" as dropseq_qc_wdl
+version 1.0
+
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:bcl2fastq/versions/4/plain-WDL/descriptor" as bcl2fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropest/versions/4/plain-WDL/descriptor" as dropest_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_align/versions/5/plain-WDL/descriptor" as dropseq_align_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_count/versions/5/plain-WDL/descriptor" as dropseq_count_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_prepare_fastq/versions/5/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_qc/versions/4/plain-WDL/descriptor" as dropseq_qc_wdl
 
 workflow dropseq_workflow {
-    # Either a list of flowcell URLs or a tab separated file with no header with sample_id tab r1 tab r2
-    File input_tsv_file
-    # Output directory, gs URL
-    String output_directory
-    # Output directory, with trailing slashes stripped
-    String output_directory_stripped = sub(output_directory, "/+$", "")
+    input {
+        # Either a list of flowcell URLs or a tab separated file with no header with sample_id tab r1 tab r2
+        File input_tsv_file
+        # Output directory, gs URL
+        String output_directory
+        # Output directory, with trailing slashes stripped
+        String output_directory_stripped = sub(output_directory, "/+$", "")
 
-    Array[Array[String]] input_tsv = read_tsv(input_tsv_file)
-    Boolean run_bcl2fastq = false
-    Boolean run_dropseq_tools = true
-    Boolean run_dropest = false
+        Array[Array[String]] input_tsv = read_tsv(input_tsv_file)
+        Boolean run_bcl2fastq = false
+        Boolean run_dropseq_tools = true
+        Boolean run_dropest = false
 
-    String? star_flags
+        String? star_flags
 
-    # hg19, mm10, hg19_mm10, mmul_8.0.1 or a path to a custom reference JSON file
-    String reference
-    File? acronym_file = "gs://regev-lab/resources/DropSeq/index.json"
-    String bcl2fastq_docker_registry = "gcr.io/broad-cumulus"
-    String bcl2fastq_docker_registry_stripped = sub(bcl2fastq_docker_registry, "/+$", "")
-    String docker_registry = "cumulusprod"
-    # docker_registry with trailing slashes stripped
-    String docker_registry_stripped = sub(docker_registry, "/+$", "")
+        # hg19, mm10, hg19_mm10, mmul_8.0.1 or a path to a custom reference JSON file
+        String reference
+        File? acronym_file = "gs://regev-lab/resources/DropSeq/index.json"
+        String bcl2fastq_docker_registry = "gcr.io/broad-cumulus"
+        String bcl2fastq_docker_registry_stripped = sub(bcl2fastq_docker_registry, "/+$", "")
+        String docker_registry = "cumulusprod"
+        # docker_registry with trailing slashes stripped
+        String docker_registry_stripped = sub(docker_registry, "/+$", "")
 
-    # use ncells value directly instead of estimating from elbow plot
-    Int? drop_seq_tools_force_cells
-    File? cellular_barcode_whitelist
+        # use ncells value directly instead of estimating from elbow plot
+        Int? drop_seq_tools_force_cells
+        File? cellular_barcode_whitelist
 
-    # Minimal number of genes for cells after the merge procedure
-    Int? dropest_genes_min = 100
-    # maximal number of output cells
-    Int? dropest_cells_max
-    #  Threshold for the merge procedure
-    Float dropest_min_merge_fraction  = 0.2
-    # Max edit distance between barcodes.
-    Int? dropest_max_cb_merge_edit_distance = 2
+        # Minimal number of genes for cells after the merge procedure
+        Int? dropest_genes_min = 100
+        # maximal number of output cells
+        Int? dropest_cells_max
+        #  Threshold for the merge procedure
+        Float dropest_min_merge_fraction  = 0.2
+        # Max edit distance between barcodes.
+        Int? dropest_max_cb_merge_edit_distance = 2
 
-    # Max edit distance between UMIs
-    Int? dropest_max_umi_merge_edit_distance = 1
+        # Max edit distance between UMIs
+        Int? dropest_max_umi_merge_edit_distance = 1
 
-    # Minimal number of genes for cells before the merge procedure. Used mostly for optimization.
-    Int? dropest_min_genes_before_merge = 10
+        # Minimal number of genes for cells before the merge procedure. Used mostly for optimization.
+        Int? dropest_min_genes_before_merge = 10
 
-    # use precise merge strategy (can be slow), recommended to use when the list of real barcodes is not available
-    Boolean? dropest_merge_barcodes_precise = true
+        # use precise merge strategy (can be slow), recommended to use when the list of real barcodes is not available
+        Boolean? dropest_merge_barcodes_precise = true
 
-    # save separate count matrices for exons, introns and exon/intron spanning reads
-    Boolean? dropest_velocyto = true
-    # Whether to delete input_bcl_directory
-    Boolean? delete_input_bcl_directory = false
-    # Number of preemptible tries
-    Int? preemptible = 2
+        # save separate count matrices for exons, introns and exon/intron spanning reads
+        Boolean? dropest_velocyto = true
+        # Whether to delete input_bcl_directory
+        Boolean? delete_input_bcl_directory = false
+        # Number of preemptible tries
+        Int? preemptible = 2
 
-    String? umi_base_range="13-20"
-    String? cellular_barcode_base_range = "1-12"
+        String? umi_base_range="13-20"
+        String? cellular_barcode_base_range = "1-12"
 
-    # The sequence to look for at the start of reads for trimming
-    String? trim_sequence = "AAGCAGTGGTATCAACGCAGAGTGAATGGG"
+        # The sequence to look for at the start of reads for trimming
+        String? trim_sequence = "AAGCAGTGGTATCAACGCAGAGTGAATGGG"
 
-    # How many bases at the begining of the sequence must match before trimming occurs
-    Int? trim_num_bases = 5
+        # How many bases at the begining of the sequence must match before trimming occurs
+        Int? trim_num_bases = 5
 
-    Float? prepare_fastq_disk_space_multiplier = 4
-    Float? add_bam_tags_disk_space_multiplier = 25
+        Float? prepare_fastq_disk_space_multiplier = 4
+        Float? add_bam_tags_disk_space_multiplier = 25
 
-    Int? star_cpus
-    # specify memory to override default for genome
-    String? star_memory
+        Int? star_cpus
+        # specify memory to override default for genome
+        String? star_memory
 
-    # extra disk space for STAR
-    Float star_extra_disk_space = 3
-    # multiply size of input bam by this factor
-    Float star_disk_space_multiplier = 4
+        # extra disk space for STAR
+        Float star_extra_disk_space = 3
+        # multiply size of input bam by this factor
+        Float star_disk_space_multiplier = 4
 
-    Int? bcl2fastq_cpu = 64
-    String? bcl2fastq_memory = "57.6G"
-    Int? bcl2fastq_disk_space = 1500
-    Int bcl2fastq_minimum_trimmed_read_length = 10
-    Int bcl2fastq_mask_short_adapter_reads = 10
-    String? dropest_memory = "104G"
-    String? zones = "us-east1-d us-west1-a us-west1-b"
-    String? drop_seq_tools_version = "2.3.0"
-    String? bcl2fastq_version = "2.20.0.422"
-    String? dropseq_report_version = "1.0.0"
-    String? dropest_version = "0.8.6"
-    String? merge_bam_alignment_memory="13G"
-    Int? sort_bam_max_records_in_ram = 2000000
-    String? drop_deq_tools_prep_bam_memory = "3750M"
-    String? drop_deq_tools_dge_memory = "3750M"
-    Array[String]? species # for mixed species
-
+        Int? bcl2fastq_cpu = 64
+        String? bcl2fastq_memory = "57.6G"
+        Int? bcl2fastq_disk_space = 1500
+        Int bcl2fastq_minimum_trimmed_read_length = 10
+        Int bcl2fastq_mask_short_adapter_reads = 10
+        String? dropest_memory = "104G"
+        String? zones = "us-east1-d us-west1-a us-west1-b"
+        String? drop_seq_tools_version = "2.3.0"
+        String? bcl2fastq_version = "2.20.0.422"
+        String? dropseq_report_version = "1.0.0"
+        String? dropest_version = "0.8.6"
+        String? merge_bam_alignment_memory="13G"
+        Int? sort_bam_max_records_in_ram = 2000000
+        String? drop_deq_tools_prep_bam_memory = "3750M"
+        String? drop_deq_tools_dge_memory = "3750M"
+        Array[String]? species # for mixed species
+    }
     if (run_bcl2fastq) {
         scatter (row in input_tsv) {
             call bcl2fastq_wdl.bcl2fastq {
@@ -178,7 +181,7 @@ workflow dropseq_workflow {
                 docker_registry = docker_registry_stripped
         }
 
-        if(run_dropest) {
+        if (run_dropest) {
             call dropest_wdl.dropest as dropest {
                 input:
                     sample_id = row[0],
@@ -201,7 +204,7 @@ workflow dropseq_workflow {
             }
         }
 
-        if(run_dropseq_tools) {
+        if (run_dropseq_tools) {
             call dropseq_count_wdl.dropseq_count as dropseq_count {
                 input:
                     sample_id = row[0],
@@ -295,39 +298,40 @@ workflow dropseq_workflow {
 
 
 task collect_summary {
-    Array[String] sample_id
-    Array[String?] dge_summary
-    Array[Array[String]?] dge_summary_multi_species
-    Array[String?] bead_synthesis_summary
-    Array[String] star_log_final
-    Array[String] adapter_trimming_report
-    Array[String] polyA_trimming_report
-    Array[String] sc_rnaseq_metrics_report
+    input {
+        Array[String] sample_id
+        Array[String?] dge_summary
+        Array[Array[String]?] dge_summary_multi_species
+        Array[String?] bead_synthesis_summary
+        Array[String] star_log_final
+        Array[String] adapter_trimming_report
+        Array[String] polyA_trimming_report
+        Array[String] sc_rnaseq_metrics_report
 
-    String output_directory
-    String zones
-    Int preemptible
-    String version
-    String docker_registry
-
+        String output_directory
+        String zones
+        Int preemptible
+        String version
+        String docker_registry
+    }
     command {
         set -e
 
         python /software/report.py \
-        --sample_id '${sep="," sample_id}' \
-        --dge_summary '${sep="," dge_summary}' \
-        --dge_summary_multi_species '${sep="," dge_summary_multi_species}' \
-        --star_log '${sep="," star_log_final}' \
-        --adapter_trimming_report '${sep="," adapter_trimming_report}' \
-        --polyA_trimming_report '${sep="," polyA_trimming_report}' \
-        --sc_rnaseq_metrics_report '${sep="," sc_rnaseq_metrics_report}' \
-        --bead_synthesis_summary '${sep="," bead_synthesis_summary}'
+        --sample_id '~{sep="," sample_id}' \
+        --dge_summary '~{sep="," dge_summary}' \
+        --dge_summary_multi_species '~{sep="," dge_summary_multi_species}' \
+        --star_log '~{sep="," star_log_final}' \
+        --adapter_trimming_report '~{sep="," adapter_trimming_report}' \
+        --polyA_trimming_report '~{sep="," polyA_trimming_report}' \
+        --sc_rnaseq_metrics_report '~{sep="," sc_rnaseq_metrics_report}' \
+        --bead_synthesis_summary '~{sep="," bead_synthesis_summary}'
 
-        gsutil -q -m cp drop_seq_report.html ${output_directory}/
+        gsutil -q -m cp drop_seq_report.html ~{output_directory}/
     }
 
     output {
-        String report = "${output_directory}/drop_seq_report.html"
+        String report = "~{output_directory}/drop_seq_report.html"
     }
 
     runtime {
@@ -335,31 +339,32 @@ task collect_summary {
         bootDiskSizeGb: 12
         disks: "local-disk 2 HDD"
         memory:"1GB"
-        docker: "${docker_registry}/dropseq_report:${version}"
+        docker: "~{docker_registry}/dropseq_report:~{version}"
         zones: zones
-        preemptible: "${preemptible}"
+        preemptible: "~{preemptible}"
     }
 }
 
 
 
 task generate_count_config {
-    File input_csv_file
-    # array of sample_id tab r1,r1_n r2,r2_n
-    Array[File]? bcl2fastq_sample_sheets
-    String zones
-    Int preemptible
-    File acronym_file
-    String drop_seq_tools_version
-    String reference
-    Int? star_cpus
-    Array[String]? species
-    String? star_memory
-    Boolean is_reference_url = sub(reference, "^gs://.+", "URL") == "URL"
-    File config_file = (if is_reference_url then reference else acronym_file)
-    String docker_registry
-    Float disk_space_multiplier
-
+    input {
+        File input_csv_file
+        # array of sample_id tab r1,r1_n r2,r2_n
+        Array[File]? bcl2fastq_sample_sheets
+        String zones
+        Int preemptible
+        File acronym_file
+        String drop_seq_tools_version
+        String reference
+        Int? star_cpus
+        Array[String]? species
+        String? star_memory
+        Boolean is_reference_url = sub(reference, "^gs://.+", "URL") == "URL"
+        File config_file = (if is_reference_url then reference else acronym_file)
+        String docker_registry
+        Float disk_space_multiplier
+    }
     command {
         set -e
 
@@ -372,15 +377,15 @@ task generate_count_config {
         import pandas as pd
         import os
 
-        disk_space_multiplier = ${disk_space_multiplier}
-        bcl2fastq_sample_sheets = '${sep="," bcl2fastq_sample_sheets}'.split(',')
-        species = '${sep="," species}'.split(',')
+        disk_space_multiplier = ~{disk_space_multiplier}
+        bcl2fastq_sample_sheets = '~{sep="," bcl2fastq_sample_sheets}'.split(',')
+        species = '~{sep="," species}'.split(',')
         if len(species) == 1 and species[0] == '':
             species = []
         bcl2fastq_sample_sheets = list(filter(lambda x: x.strip() != '', bcl2fastq_sample_sheets))
 
         if len(bcl2fastq_sample_sheets) == 0:  # no bcl2fastq run, already a sample sheet with name, r1, r2
-            df = pd.read_csv('${input_csv_file}', header=None, dtype=str, sep=None, engine='python')
+            df = pd.read_csv('~{input_csv_file}', header=None, dtype=str, sep=None, engine='python')
             for c in df.columns:
                 df[c] = df[c].str.strip()
             df = df[[0, 1, 2]]
@@ -417,10 +422,10 @@ task generate_count_config {
             df[3] = np.ceil(1 + disk_space_multiplier * (df[3].astype(float) / 1e9)).astype(int)
             df.to_csv('grouped_sample_sheet.txt', index=True, header=False, sep='\t')
 
-        reference = '${reference}'.strip()
-        with open('${config_file}', 'r') as f:
+        reference = '~{reference}'.strip()
+        with open('~{config_file}', 'r') as f:
             config = json.load(f)
-        if '${is_reference_url}' == 'false':
+        if '~{is_reference_url}' == 'false':
             config = config[reference.lower()]
         with open('star_genome.txt', 'wt') as w1, open('refflat.txt', 'wt') as w2, open('gene_intervals.txt', 'wt') as w3, \
             open('genome_fasta.txt', 'wt') as w4, open('genome_dict.txt', 'wt') as w5, open('star_memory.txt', 'wt') as w6, \
@@ -431,12 +436,12 @@ task generate_count_config {
             w4.write(config['genome_fasta'])
             w5.write(config['genome_dict'])
             memory = config.get('star_memory', '57.6G')
-            star_memory = '${star_memory}'.strip()
+            star_memory = '~{star_memory}'.strip()
             if star_memory != '':
                 memory = star_memory
             w6.write(str(memory))
             cpu = config.get('star_cpus', '64')
-            star_cpus = '${star_cpus}'.strip()
+            star_cpus = '~{star_cpus}'.strip()
             if star_cpus != '':
                 cpu = star_cpus
             w7.write(str(cpu))
@@ -466,8 +471,8 @@ task generate_count_config {
         bootDiskSizeGb: 12
         disks: "local-disk 1 HDD"
         memory:"1GB"
-        docker: "${docker_registry}/dropseq:${drop_seq_tools_version}"
+        docker: "~{docker_registry}/dropseq:~{drop_seq_tools_version}"
         zones: zones
-        preemptible: "${preemptible}"
+        preemptible: "~{preemptible}"
     }
 }
