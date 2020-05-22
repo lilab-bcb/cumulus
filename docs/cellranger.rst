@@ -317,6 +317,10 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  - If delete BCL directories after demux. If false, you should delete this folder yourself so as to not incur storage charges 
 		  - false
 		  - false
+		* - mkfastq_barcode_mismatches
+		  - Number of mismatches allowed in matching barcode indices (bcl2fastq2 default is 1)
+		  - 0
+		  - 
 		* - force_cells
 		  - Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells
 		  - 6000
@@ -518,6 +522,10 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - If delete BCL directories after demux. If false, you should delete this folder yourself so as to not incur storage charges 
 		  - false
 		  - false
+		* - mkfastq_barcode_mismatches
+		  - Number of mismatches allowed in matching barcode indices (bcl2fastq2 default is 1)
+		  - 0
+		  - 
 		* - scaffold_sequence
 		  - Scaffold sequence in sgRNA for Purturb-seq, only used for crispr data type. If it is "", we assume guide barcode starts at position 0 of read 2
 		  - "GTTTAAGAGCTAAGCTGGAA"
@@ -728,6 +736,10 @@ Workflow input
 	  - If delete BCL directories after demux. If false, you should delete this folder yourself so as to not incur storage charges 
 	  - false
 	  - false
+	* - mkfastq_barcode_mismatches
+	  - Number of mismatches allowed in matching barcode indices (bcl2fastq2 default is 1)
+	  - 0
+	  - 
 	* - force_cells
 	  - Force pipeline to use this number of cells, bypassing the cell detection algorithm
 	  - 6000
@@ -959,6 +971,10 @@ For scIR-seq data, ``cellranger_workflow`` takes Illumina outputs as input and r
 	  - If delete BCL directories after demux. If false, you should delete this folder yourself so as to not incur storage charges 
 	  - false
 	  - false
+	* - mkfastq_barcode_mismatches
+	  - Number of mismatches allowed in matching barcode indices (bcl2fastq2 default is 1)
+	  - 0
+	  - 
 	* - force_cells
 	  - Force pipeline to use this number of cells, bypassing the cell detection algorithm
 	  - 6000
