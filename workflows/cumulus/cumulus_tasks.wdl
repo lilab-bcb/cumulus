@@ -410,10 +410,16 @@ task run_cumulus_de_analysis {
 		String docker_registry
 	}
 
+	Boolean is_url = defined(organism) && sub(select_first([organism]), "^.+\\.json", "URL") == "URL"
+
 	command {
 		set -e
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
+
+		if [ ~{is_url} == true ]; then
+			gsutil -q cp ~{organism} markers.json
+		fi
 
 		python <<CODE
 		from subprocess import check_call
@@ -451,7 +457,10 @@ task run_cumulus_de_analysis {
 		if '~{annotate_cluster}' is 'true':
 			call_args = ['pegasus', 'annotate_cluster', '~{output_name}.h5ad', '~{output_name}.anno.txt']
 			if '~{organism}' is not '':
-				call_args.extend(['--marker-file', '~{organism}'])
+				if '~{is_url}' is 'true':
+					call_args.extend(['--marker-file', 'markers.json'])
+				else:
+					call_args.extend(['--marker-file', '~{organism}'])
 			if '~{annotate_de_test}' is not '':
 				call_args.extend(['--de-test', '~{annotate_de_test}'])
 			if '~{alpha}' is not '':
