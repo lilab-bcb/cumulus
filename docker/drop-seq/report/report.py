@@ -250,17 +250,15 @@ if __name__ == "__main__":
     if len(tokens) > 0:
         dge_summary_report(tokens)
     if args.dge_summary_multi_species is not None and args.dge_summary_multi_species != '':
-        import json
-
-        val = args.dge_summary_multi_species.strip()
-        # will be ,,, when empty
-        if val != '' and len(get_arg(val)) > 0:
-            # array of arrays
-            multi_species = json.loads('[' + val + ']')
-            for sample in multi_species:  # all pairs of species
-                for i in range(len(sample)):
-                    for j in range(i):
-                        dge_summary_multi_species_report(sample[i], sample[j])
+        # tsv file where each line is an array of species for one sample
+        with open(args.dge_summary_multi_species, 'rt') as f:
+            for line in f:
+                line = line.strip()
+                if line != '':
+                    sample = line.split('\t')
+                    for i in range(len(sample)):
+                        for j in range(i):
+                            dge_summary_multi_species_report(sample[i], sample[j])
 
     tokens = get_arg(args.star_log)
     if len(tokens) > 0:
