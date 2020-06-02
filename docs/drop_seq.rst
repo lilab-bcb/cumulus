@@ -207,6 +207,10 @@ Please see the description of important inputs below.
 dropseq_workflow Terra Release Notes
 ===================================================
 
+**Version 10**
+
+- Updated workflow to WDL version 1.0
+
 **Version 9**
 
 - Changed input bcl2fastq_docker_registry from optional to required
