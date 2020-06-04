@@ -21,7 +21,7 @@ Latest version
       - `13 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/13>`__
       - Run alternative tools (STARsolo, Optimus, Salmon alevin, or Kallisto BUStools) to generate gene-count matrices from FASTQ files.
     * - cumulus/cellranger_create_reference
-      - `7 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/7>`__
+      - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/8>`__
       - Run Cell Ranger tools to build sc/snRNA-seq references.
     * - cumulus/cellranger_atac_aggr
       - `2 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_aggr/2>`__

@@ -18,7 +18,7 @@ workflow cellranger_create_reference {
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         Int num_cpu = 32
-        Int memory = 32    
+        Int memory = 32
     }
 
     # Output directory, with trailing slashes stripped
@@ -83,7 +83,7 @@ task generate_create_reference_config {
         String cellranger_version
         String docker_registry
         Int preemptible
-        String zones    
+        String zones
     }
 
     command {
@@ -93,17 +93,19 @@ task generate_create_reference_config {
         python <<CODE
         import pandas as pd
 
-        if '~{input_sample_sheet}' is not '':			
-            df = pd.read_csv('~{input_sample_sheet}', header = 0, dtype = str, index_col=False)
+        if '~{input_sample_sheet}' is not '':
+            df = pd.read_csv('~{input_sample_sheet}', header = 0, dtype = str, index_col = False, keep_default_na = False)
             for c in df.columns:
                 df[c] = df[c].str.strip()
+            if 'Attributes' not in df.columns:
+                df['Attributes'] = ''
         else:
             df = pd.DataFrame()
             df['Genome'] = ['~{genome}']
             df['Fasta'] = ['~{input_fasta}']
             df['Genes'] = ['~{input_gtf_file}']
             df['Attributes'] = ['~{attributes}']
-            
+
         with open('genome_names.txt', 'w') as fo1, open('fasta_files.txt', 'w') as fo2, open('filt_gtf_input.tsv', 'w') as fo3:
             new_genome = []
             for index, row in df.iterrows():
@@ -144,7 +146,7 @@ task run_filter_gtf {
         Int disk_space
         String zones
         Int memory
-        Int preemptible    
+        Int preemptible
     }
 
     command {
