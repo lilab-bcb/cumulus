@@ -36,10 +36,10 @@ You are free to add any other columns and these columns will be used in selectin
 
     If you ran **cellranger_workflow** ahead, you should already obtain a template **count_matrix.csv** file that you can modify from **generate_count_config**'s outputs.
 
-#. Upload your sample sheet to the workspace.  
+#. Upload your sample sheet to the workspace.
 
     Example::
-    
+
         gsutil cp /foo/bar/projects/my_count_matrix.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
     where ``/foo/bar/projects/my_count_matrix.csv`` is the path to your sample sheet in local machine, and ``gs://fc-e0000000-0000-0000-0000-000000000000/`` is the location on Google bucket to hold it.
@@ -120,11 +120,11 @@ Cumulus steps:
 
 #. **plot**. This step is optional. In this step, **Cumulus** can generate 6 types of figures based on the **cluster** step results:
 
-    - **composition** plots which are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. 
+    - **composition** plots which are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects.
     - **tsne**, **fitsne**, and **net_tsne**: t-SNE like plots based on different algorithms, respectively. Users can specify cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
     - **umap** and **net_umap**: UMAP like plots based on different algorithms, respectively. Users can specify cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
     - **fle** and **net_fle**: FLE (Force-directed Layout Embedding) like plots based on different algorithms, respectively. Users can specify cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
-    - **diffmap** plots which are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components. 
+    - **diffmap** plots which are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components.
     - If input is CITE-Seq data, there will be **citeseq_fitsne** plots which are FIt-SNE plots based on epitope expression.
 
 #. **cirro_output**. This step is optional. Generate `Cirrocumulus`_ inputs for visualization using `Cirrocumulus`_ .
@@ -153,7 +153,7 @@ global inputs
     * - **input_file**
       - Input CSV sample sheet describing metadata of each 10x channel, or a single input count matrix file
       - "gs://fc-e0000000-0000-0000-0000-000000000000/my_count_matrix.csv"
-      - 
+      -
     * - **output_directory**
       - Google bucket URL of the output directory.
       - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir"
@@ -161,7 +161,7 @@ global inputs
     * - **output_name**
       - This is the name of subdirectory for the current sample; and all output files within the subdirectory will have this string as the common filename prefix.
       - "my_sample"
-      - 
+      -
     * - cumulus_version
       - cumulus version to use. Versions available: 0.15.0, 0.13.0, 0.12.0, 0.11.0, 0.10.0.
       - "0.15.0"
@@ -169,7 +169,7 @@ global inputs
     * - docker_registry
       - Docker registry to use. Options:
 
-        - "cumulusprod" for Docker Hub images; 
+        - "cumulusprod" for Docker Hub images;
 
         - "quay.io/cumulus" for backup images on Red Hat registry.
       - "cumulusprod"
@@ -214,15 +214,15 @@ aggregate_matrices inputs
     * - restrictions
       - Select channels that satisfy all restrictions. Each restriction takes the format of name:value,...,value. Multiple restrictions are separated by ';'
       - "Source:bone_marrow;Platform:NextSeq"
-      - 
+      -
     * - attributes
       - Specify a comma-separated list of outputted attributes. These attributes should be column names in the count_matrix.csv file
       - "Source,Platform,Donor"
-      - 
+      -
     * - default_reference
       - If sample count matrix is in either DGE, mtx, csv, tsv or loom format and there is no Reference column in the csv_file, use default_reference as the reference.
       - "GRCh38"
-      - 
+      -
     * - select_only_singlets
       - If we have demultiplexed data, turning on this option will make cumulus only include barcodes that are predicted as singlets.
       - true
@@ -264,23 +264,23 @@ cluster inputs
       - Default
     * - considered_refs
       - A string contains comma-separated reference(e.g. genome) names. Cumulus will read all groups associated with reference names in the list from the input file. If considered_refs is None, all groups will be considered.
-      - "mm10" 
-      - 
+      - "mm10"
+      -
     * - channel
       - Specify the cell barcode attribute to represent different samples.
-      - "Donor" 
-      - 
+      - "Donor"
+      -
     * - black_list
       - Cell barcode attributes in black list will be poped out. Format is "attr1,attr2,...,attrn".
       - "attr1,attr2,attr3""
-      - 
+      -
     * - min_genes_on_raw
       - If input are raw 10x matrix, which include all barcodes, perform a pre-filtration step to keep the data size small. In the pre-filtration step, only keep cells with at least <min_genes_on_raw> of genes
       - 100
       - 100
     * - cite_seq
-      - | Data are CITE-Seq data. cumulus will perform analyses on RNA count matrix first. 
-        | Then it will attach the ADT matrix to the RNA matrix with all antibody names changing to 'AD-' + antibody_name. 
+      - | Data are CITE-Seq data. cumulus will perform analyses on RNA count matrix first.
+        | Then it will attach the ADT matrix to the RNA matrix with all antibody names changing to 'AD-' + antibody_name.
         | Lastly, it will embed the antibody expression using FIt-SNE (the basis used for plotting is 'citeseq_fitsne')
       - false
       - false
@@ -293,13 +293,13 @@ cluster inputs
       - false
       - false
     * - remap_singlets
-      - | For demultiplexed data, user can remap singlet names using assignment in String in this input. This string assignment takes the format "new_name_i:old_name_1,old_name_2;new_name_ii:old_name_3;...". 
-        | For example, if we hashed 5 libraries from 3 samples: sample1_lib1, sample1_lib2; sample2_lib1, sample2_lib2; sample3, we can remap them to 3 samples using this string: ``"sample1:sample1_lib1,sample1_lib2;sample2:sample2_lib1,sample2_lib2"``. 
+      - | For demultiplexed data, user can remap singlet names using assignment in String in this input. This string assignment takes the format "new_name_i:old_name_1,old_name_2;new_name_ii:old_name_3;...".
+        | For example, if we hashed 5 libraries from 3 samples: sample1_lib1, sample1_lib2; sample2_lib1, sample2_lib2; sample3, we can remap them to 3 samples using this string: ``"sample1:sample1_lib1,sample1_lib2;sample2:sample2_lib1,sample2_lib2"``.
         | In this way, the new singlet names will be in metadata field with key ``assignment``, while the old names are kept in metadata with key ``assignment.orig``.
       - "Group1:CB1,CB2;Group2:CB3,CB4,CB5"
       -
     * - subset_singlets
-      - | For demultiplexed data, user can use this input to choose a subset of singlets based on their names. This string takes the format "name1,name2,...". 
+      - | For demultiplexed data, user can use this input to choose a subset of singlets based on their names. This string takes the format "name1,name2,...".
         | Note that if ``remap_singlets`` is specified, subsetting happens after remapping, i.e. you should use the new singlet names for choosing subset.
       - "Group2,CB6,CB7"
       -
@@ -356,7 +356,7 @@ cluster inputs
       - 1e5
       - 1e5
     * - select_hvf_flavor
-      - Highly variable feature selection method. Options: 
+      - Highly variable feature selection method. Options:
 
         - "pegasus": New selection method proposed in Pegasus, the analysis module of Cumulus workflow.
         - "Seurat": Conventional selection method used by Seurat and SCANPY.
@@ -382,15 +382,15 @@ cluster inputs
       - "harmony"
       - "harmony"
     * - batch_group_by
-      - | Batch correction assumes the differences in gene expression between channels are due to batch effects. 
-        | However, in many cases, we know that channels can be partitioned into several groups and each group is biologically different from others. 
-        | In this case, we will only perform batch correction for channels within each group. This option defines the groups. 
+      - | Batch correction assumes the differences in gene expression between channels are due to batch effects.
+        | However, in many cases, we know that channels can be partitioned into several groups and each group is biologically different from others.
+        | In this case, we will only perform batch correction for channels within each group. This option defines the groups.
         | If <expression> is None, we assume all channels are from one group. Otherwise, groups are defined according to <expression>.
         | <expression> takes the form of either ‘attr’, or ‘attr1+attr2+…+attrn’, or ‘attr=value11,…,value1n_1;value21,…,value2n_2;…;valuem1,…,valuemn_m’.
         | In the first form, ‘attr’ should be an existing sample attribute, and groups are defined by ‘attr’.
         | In the second form, ‘attr1’,…,’attrn’ are n existing sample attributes and groups are defined by the Cartesian product of these n attributes.
-        | In the last form, there will be m + 1 groups. 
-        | A cell belongs to group i (i > 0) if and only if its sample attribute ‘attr’ has a value among valuei1,…,valuein_i. 
+        | In the last form, there will be m + 1 groups.
+        | A cell belongs to group i (i > 0) if and only if its sample attribute ‘attr’ has a value among valuei1,…,valuein_i.
         | A cell belongs to group 0 if it does not belong to any other groups
       - "Donor"
       - None
@@ -622,7 +622,7 @@ cluster outputs
         | The log-normalized expression matrix is stored in ``ds`` with gene-by-cell shape. ``ds[:, :]`` returns the matrix in dense format; ``ds.layers[''].sparse()`` returns it as a Scipy COOrdinate sparse matrix.
         | The ``ca`` field contains cell related attributes as row attributes, including clustering results and cell embedding coordinates.
         | For example, ``ds.ca['obs_names']`` records cell barcodes; ``ds.ca['Channel']`` records the channel each cell comes from;
-        | ``ds.ca['louvain_labels']``, ``ds.ca['leiden_labels']``, ``ds.ca['spectral_louvain_labels']``, and ``ds.ca['spectral_leiden_labels']`` record each cell's cluster labels using different clustering algorithms; 
+        | ``ds.ca['louvain_labels']``, ``ds.ca['leiden_labels']``, ``ds.ca['spectral_louvain_labels']``, and ``ds.ca['spectral_leiden_labels']`` record each cell's cluster labels using different clustering algorithms;
         | ``ds.ca['X_pca']`` records PCA coordinates, ``ds.ca['X_tsne']`` records t-SNE coordinates,
         | ``ds.ca['X_umap']`` records UMAP coordinates, ``ds.ca['X_diffmap']`` records diffusion map coordinates,
         | ``ds.ca['X_diffmap_pca']`` records the first 3 PCs by projecting the diffusion components using PCA,
@@ -653,7 +653,7 @@ de_analysis inputs
     * - cluster_labels
       - Specify the cluster label used for DE analysis
       - "louvain_labels"
-      - "louvain_labels" 
+      - "louvain_labels"
     * - alpha
       - Control false discovery rate at <alpha>
       - 0.05
@@ -685,7 +685,7 @@ de_analysis inputs
     * - min_gain
       - Only report genes with a feature importance score (in gain) of at least <gain>
       - 1.0
-      - 1.0 
+      - 1.0
     * - annotate_cluster
       - If also annotate cell types for clusters based on DE results
       - false
@@ -695,7 +695,7 @@ de_analysis inputs
       - "t"
       - "t"
     * - organism
-      - Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain" or a Google bucket link to a JSON file describing the markers
+      - Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain", "human_lung", or a Google bucket link to a JSON file describing the markers
       - "mouse_brain"
       - "human_immune"
     * - minimum_report_score
@@ -749,9 +749,9 @@ The top level of the JSON file is an object with two name/value pairs:
         - **markers**: List of gene-marker describing objects, each of which has 2 name/value pairs:
 
             - **genes**: List of positive and negative gene markers (e.g. ``["Rbfox3+", "Flt1-"]``).
-            - **weight**: A real number between ``0.0`` and ``1.0`` to describe how much we trust the markers in **genes**. 
-        
-        All markers in **genes** share the weight evenly. For instance, if we have 4 markers and the weight is 0.1, each marker has a weight of ``0.1 / 4 = 0.025``. 
+            - **weight**: A real number between ``0.0`` and ``1.0`` to describe how much we trust the markers in **genes**.
+
+        All markers in **genes** share the weight evenly. For instance, if we have 4 markers and the weight is 0.1, each marker has a weight of ``0.1 / 4 = 0.025``.
 
         The weights from all gene-marker describing objects of the same cell type should sum up to 1.0.
 
@@ -793,35 +793,35 @@ Inference Algorithm
 
 We have already calculated the up-regulated and down-regulated genes for each cluster in the differential expression analysis step.
 
-First, load gene markers for each cell type from the JSON file specified, and exclude marker genes, along with their associated weights, that are not expressed in the data. 
+First, load gene markers for each cell type from the JSON file specified, and exclude marker genes, along with their associated weights, that are not expressed in the data.
 
-Then scan each cluster to determine its putative cell types. For each cluster and putative cell type, we calculate a score between ``0`` and ``1``, which describes how likely cells from the cluster are of this cell type. The higher the score is, the more likely cells are from the cell type. 
+Then scan each cluster to determine its putative cell types. For each cluster and putative cell type, we calculate a score between ``0`` and ``1``, which describes how likely cells from the cluster are of this cell type. The higher the score is, the more likely cells are from the cell type.
 
 To calculate the score, each marker is initialized with a maximum impact value (which is ``2``). Then do case analysis as follows:
 
     - For a positive marker:
 
-        - If it is not up-regulated, its impact value is set to ``0``. 
+        - If it is not up-regulated, its impact value is set to ``0``.
 
         - Otherwise, if it is up-regulated:
 
-            - If it additionally has a fold change in percentage of cells expressing this marker (within cluster vs. out of cluster) no less than ``1.5``, it has an impact value of ``2`` and is recorded as a **strong supporting marker**. 
+            - If it additionally has a fold change in percentage of cells expressing this marker (within cluster vs. out of cluster) no less than ``1.5``, it has an impact value of ``2`` and is recorded as a **strong supporting marker**.
 
-            - If its fold change (``fc``) is less than ``1.5``, this marker has an impact value of ``1 + (fc - 1) / 0.5`` and is recorded as a **weak supporting marker**. 
+            - If its fold change (``fc``) is less than ``1.5``, this marker has an impact value of ``1 + (fc - 1) / 0.5`` and is recorded as a **weak supporting marker**.
 
-    - For a negative marker: 
+    - For a negative marker:
 
-        - If it is up-regulated, its impact value is set to ``0``. 
+        - If it is up-regulated, its impact value is set to ``0``.
 
-        - If it is neither up-regulated nor down-regulated, its impact value is set to ``1``. 
+        - If it is neither up-regulated nor down-regulated, its impact value is set to ``1``.
 
-        - Otherwise, if it is down-regulated: 
+        - Otherwise, if it is down-regulated:
 
-            - If it additionally has ``1 / fc`` (where ``fc`` is its fold change) no less than ``1.5``, it has an impact value of ``2`` and is recorded as a **strong supporting marker**. 
+            - If it additionally has ``1 / fc`` (where ``fc`` is its fold change) no less than ``1.5``, it has an impact value of ``2`` and is recorded as a **strong supporting marker**.
 
-            - If ``1 / fc`` is less than ``1.5``, it has an impact value of ``1 + (1 / fc - 1) / 0.5`` and is recorded as a **weak supporting marker**. 
+            - If ``1 / fc`` is less than ``1.5``, it has an impact value of ``1 + (1 / fc - 1) / 0.5`` and is recorded as a **weak supporting marker**.
 
-The score is calculated as the weighted sum of impact values weighted over the sum of weights multiplied by 2 from all expressed markers. If the score is larger than 0.5 and the cell type has cell subtypes, each cell subtype will also be evaluated. 
+The score is calculated as the weighted sum of impact values weighted over the sum of weights multiplied by 2 from all expressed markers. If the score is larger than 0.5 and the cell type has cell subtypes, each cell subtype will also be evaluated.
 
 Output annotation file
 **********************
@@ -839,7 +839,7 @@ For each cluster, putative cell types with scores larger than ``minimum_report_s
 plot
 ^^^^
 
-The h5ad file contains a default cell attribute ``Channel``, which records which channel each that single cell comes from. If the input is a CSV format sample sheet, ``Channel`` attribute matches the ``Sample`` column in the sample sheet. Otherwise, it's specified in ``channel`` field of the cluster inputs. 
+The h5ad file contains a default cell attribute ``Channel``, which records which channel each that single cell comes from. If the input is a CSV format sample sheet, ``Channel`` attribute matches the ``Sample`` column in the sample sheet. Otherwise, it's specified in ``channel`` field of the cluster inputs.
 
 Other cell attributes used in plot must be added via ``attributes`` field in the ``aggregate_matrices`` inputs.
 
@@ -857,54 +857,54 @@ plot inputs
       - Default
     * - plot_composition
       - | Takes the format of "label:attr,label:attr,...,label:attr".
-        | If non-empty, generate composition plot for each "label:attr" pair. 
+        | If non-empty, generate composition plot for each "label:attr" pair.
         | "label" refers to cluster labels and "attr" refers to sample conditions
       - "louvain_labels:Donor"
       - None
     * - plot_fitsne
-      - | Takes the format of "attr,attr,...,attr". 
+      - | Takes the format of "attr,attr,...,attr".
         | If non-empty, plot attr colored FIt-SNEs side by side
       - "louvain_labels,Donor"
       - None
     * - plot_tsne
-      - | Takes the format of "attr,attr,...,attr". 
+      - | Takes the format of "attr,attr,...,attr".
         | If non-empty, plot attr colored t-SNEs side by side
       - "louvain_labels,Channel"
       - None
     * - plot_umap
-      - | Takes the format of "attr,attr,...,attr". 
+      - | Takes the format of "attr,attr,...,attr".
         | If non-empty, plot attr colored UMAP side by side
       - "louvain_labels,Donor"
       - None
     * - plot_fle
-      - | Takes the format of "attr,attr,...,attr". 
+      - | Takes the format of "attr,attr,...,attr".
         | If non-empty, plot attr colored FLE (force-directed layout embedding) side by side
       - "louvain_labels,Donor"
       - None
     * - plot_diffmap
       - | Takes the format of "attr,attr,...,attr".
-        | If non-empty, generate attr colored 3D interactive plot. 
+        | If non-empty, generate attr colored 3D interactive plot.
         | The 3 coordinates are the first 3 PCs of all diffusion components
       - "louvain_labels,Donor"
       - None
     * - plot_citeseq_fitsne
       - | plot cells based on FIt-SNE coordinates estimated from antibody expressions.
-        | Takes the format of "attr,attr,...,attr". 
+        | Takes the format of "attr,attr,...,attr".
         | If non-empty, plot attr colored FIt-SNEs side by side
       - "louvain_labels,Donor"
       - None
     * - plot_net_tsne
-      - | Takes the format of "attr,attr,...,attr". 
+      - | Takes the format of "attr,attr,...,attr".
         | If non-empty, plot attr colored t-SNEs side by side based on net t-SNE result.
       - "leiden_labels,Channel"
       - None
     * - plot_net_umap
-      - | Takes the format of "attr,attr,...,attr". 
+      - | Takes the format of "attr,attr,...,attr".
         | If non-empty, plot attr colored UMAP side by side based on net UMAP result.
       - "leiden_labels,Donor"
       - None
     * - plot_net_fle
-      - | Takes the format of "attr,attr,...,attr". 
+      - | Takes the format of "attr,attr,...,attr".
         | If non-empty, plot attr colored FLE (force-directed layout embedding) side by side
         | based on net FLE result.
       - "leiden_labels,Donor"
@@ -1015,9 +1015,9 @@ scp_output outputs
 Run CITE-Seq analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-To run CITE-Seq analysis, turn on ``cite_seq`` option in cluster inputs of cumulus workflow. 
+To run CITE-Seq analysis, turn on ``cite_seq`` option in cluster inputs of cumulus workflow.
 
-An embedding of epitope expressions via FIt-SNE is available at basis ``X_citeseq_fitsne``. 
+An embedding of epitope expressions via FIt-SNE is available at basis ``X_citeseq_fitsne``.
 
 To plot this epitope embedding, specify attributes to plot in ``plot_citeseq_fitsne`` field of cluster inputs.
 
@@ -1051,7 +1051,7 @@ cumulus_subcluster steps:
 
 #. **plot** (optional). In this step, **cumulus_subcluster** can generate the following 5 types of figures based on the **subcluster** step results:
 
-    - **composition** plots which are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects. 
+    - **composition** plots which are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects.
 
     - **tsne**, **fitsne**, and **net_tsne**: t-SNE like plots based on different algorithms, respectively. Users can specify different cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
 
@@ -1079,18 +1079,18 @@ Note that we will make the required inputs/outputs bold and all other inputs/out
     * - **input_h5ad**
       - Google bucket URL of input h5ad file containing *cumulus* results
       - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir/my_results.h5ad"
-      - 
+      -
     * - **output_name**
       - This is the prefix for all output files. It should contain the Google bucket URL, subdirectory name and output name prefix
       - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir/my_results_sub"
-      - 
+      -
     * - **subset_selections**
       - | Specify which cells will be included in the subcluster analysis.
-        | This field contains one or more <subset_selection> strings separated by ';'. 
-        | Each <subset_selection> string takes the format of 'attr:value,…,value', which means select cells with attr in the values. 
+        | This field contains one or more <subset_selection> strings separated by ';'.
+        | Each <subset_selection> string takes the format of 'attr:value,…,value', which means select cells with attr in the values.
         | If multiple <subset_selection> strings are specified, the subset of cells selected is the intersection of these strings
       - "louvain_labels:3,6" or "louvain_labels:3,6;Donor:1,2"
-      - 
+      -
     * - calculate_pseudotime
       - Calculate diffusion-based pseudotimes based on <roots>. <roots> should be a comma-separated list of cell barcodes
       - "sample_1-ACCCGGGTTT-1,sample_1-TCCCGGGAAA-2"
@@ -1115,7 +1115,7 @@ Note that we will make the required inputs/outputs bold and all other inputs/out
 .. role:: red-bold
 
 For other **cumulus_subcluster** inputs, please refer to `cumulus cluster inputs list`_ for details. Notice that some inputs (as listed below) in **cumulus cluster** inputs list are :red-bold:`DISABLED` for **cumulus_subcluster**:
-    
+
     - cite_seq
     - cite_seq_capping
     - output_filtration_results
@@ -1148,7 +1148,7 @@ cumulus_subcluster's outputs
       - Description
     * - **output_h5ad**
       - File
-      - | h5ad-formatted HDF5 file containing all results (output_name.h5ad). 
+      - | h5ad-formatted HDF5 file containing all results (output_name.h5ad).
         | If ``perform_de_analysis`` is on, this file should be the same as *output_de_h5ad*.
         | To load this file in Python, it's similar as in `cumulus cluster outputs <./cumulus.html#cluster-outputs>`_ section.
         | Besides, for subcluster results, there is a new cell attributes in ``data.obs['pseudo_time']``, which records the inferred pseudotime for each cell.
@@ -1194,7 +1194,7 @@ After loading, Pegasus manipulate the data matrix in `anndata`_ structure.
 
 ------------------------------------
 
-Load Cumulus results into Seurat  
+Load Cumulus results into Seurat
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 `Seurat <https://satijalab.org/seurat/>`__ is a single-cell data analysis package written in R.
@@ -1213,10 +1213,10 @@ Execute the R code below to load the h5ad result into Seurat (working with both 
     test_ad <- ad$read_h5ad("output_name.seurat.h5ad")
     result <- convert_h5ad_to_seurat(test_ad)
 
-The resulting Seurat object ``result`` has three data slots: 
+The resulting Seurat object ``result`` has three data slots:
 
-    - **raw.data** records filtered raw count matrix. 
-    - **data** records filtered and log-normalized expression matrix. 
+    - **raw.data** records filtered raw count matrix.
+    - **data** records filtered and log-normalized expression matrix.
     - **scale.data** records variable-gene-selected, standardized expression matrix that are ready to perform PCA.
 
 
