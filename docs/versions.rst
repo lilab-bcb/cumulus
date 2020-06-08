@@ -18,7 +18,7 @@ Latest version
       - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/10>`__
       - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
     * - cumulus/count
-      - `13 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/13>`__
+      - `14 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/14>`__
       - Run alternative tools (STARsolo, Optimus, Salmon alevin, or Kallisto BUStools) to generate gene-count matrices from FASTQ files.
     * - cumulus/cellranger_create_reference
       - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/8>`__
