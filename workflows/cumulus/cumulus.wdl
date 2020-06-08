@@ -24,7 +24,7 @@ workflow cumulus {
 		String memory = "200G"
 		# Total disk space
 		Int disk_space = 100
-		# Number of preemptible tries 
+		# Number of preemptible tries
 		Int preemptible = 2
 
 
@@ -53,14 +53,14 @@ workflow cumulus {
 		String? black_list
 		# If input are raw 10x matrix, which include all barcodes, perform a pre-filtration step to keep the data size small. In the pre-filtration step, only keep cells with at least <number> of genes. [default: 100]
 		Int? min_genes_on_raw
-		# If input data are CITE-Seq data
-		Boolean? cite_seq
 		# Remap singlet names using <remap_string>, where <remap_string> takes the format "new_name_i:old_name_1,old_name_2;new_name_ii:old_name_3;...". For example, if we hashed 5 libraries from 3 samples sample1_lib1, sample1_lib2, sample2_lib1, sample2_lib2 and sample3, we can remap them to 3 samples using this string: "sample1:sample1_lib1,sample1_lib2;sample2:sample2_lib1,sample2_lib2". After that, original singlet names will be kept in metadate field with key name 'assignment.orig'.
 		String? remap_singlets
 		# If select singlets, only select singlets in the <subset_string>, which takes the format "name1,name2,...". Note that if --remap-singlets is specified, subsetting happens after remapping. For example, we can only select singlets from sampe 1 and 3 using "sample1,sample3".
 		String? subset_singlets
-		# For CITE-Seq surface protein expression, make all cells with expression > <percentile> to the value at <percentile> to smooth outlier. Set <percentile> to 100.0 to turn this option off. [default: 99.99]
-		Float? cite_seq_capping
+		# Focus analysis on Unimodal data with <keys>. <keys> is a comma-separated list of keys. If None, the self._selected will be the focused one.
+		String? focus
+		# Append Unimodal data <key> to any <keys> in --focus.
+		String? append
 		# If write cell and gene filtration results as a spreadsheet. [default: true]
 		Boolean? output_filtration_results = true
 		# If plot filtration results as PDF files. [default: true]
@@ -68,20 +68,20 @@ workflow cumulus {
 		# Figure size for filtration plots. <figsize> is a comma-separated list of two numbers, the width and height of the figure (e.g. 6,4).
 		String? plot_filtration_figsize
 		# Output seurat-compatible h5ad file. Caution: File size might be large, do not turn this option on for large data sets. [default: false]
-		Boolean? output_seurat_compatible
+		Boolean? output_h5ad
 		# If output loom-formatted file [default: false]
 		Boolean? output_loom
 		# Only keep cells with at least <number> of genes. [default: 500]
 		Int? min_genes
 		# Only keep cells with less than <number> of genes. [default: 6000]
 		Int? max_genes
-		# Only keep cells with at least <number> of UMIs. [default: 100]
+		# Only keep cells with at least <number> of UMIs. [default: None]
 		Int? min_umis
-		# Only keep cells with less than <number> of UMIs. [default: 600000]	
+		# Only keep cells with less than <number> of UMIs. [default: None]
 		Int? max_umis
-		# Prefix for mitochondrial genes. [default: MT-]
+		# Prefix for mitochondrial genes. [default: GRCh38:MT-; mm10:mt-]
 		String? mito_prefix
-		# Only keep cells with mitochondrial percent less than <percent>%. [default: 10]
+		# Only keep cells with mitochondrial percent less than <percent>%. [default: 20]
 		Float? percent_mito
 		# Only use genes that are expressed in at <percent>% of cells to select variable genes. [default: 0.05]
 		Float? gene_percent_cells
@@ -275,11 +275,11 @@ workflow cumulus {
 		}
 	}
 
-	
+
 
 	call tasks.run_cumulus_cluster as cluster {
 		input:
-			input_file = if is_sample_sheet then select_first([aggregate_matrices.output_h5sc]) else input_file,
+			input_file = if is_sample_sheet then select_first([aggregate_matrices.output_zarr]) else input_file,
 			output_directory = output_directory_stripped,
 			output_name = output_name,
 			considered_refs = considered_refs,
@@ -289,12 +289,12 @@ workflow cumulus {
 			select_singlets = if is_sample_sheet then false else select_only_singlets,
 			remap_singlets = remap_singlets,
 			subset_singlets = subset_singlets,
-			cite_seq = cite_seq,
-			cite_seq_capping = cite_seq_capping,
+			focus = focus,
+			append = append,
 			output_filtration_results = output_filtration_results,
 			plot_filtration_results = plot_filtration_results,
 			plot_filtration_figsize = plot_filtration_figsize,
-			output_seurat_compatible = output_seurat_compatible,
+			output_h5ad = output_h5ad,
 			output_loom = output_loom,
 			min_genes = min_genes,
 			max_genes = max_genes,
@@ -351,7 +351,7 @@ workflow cumulus {
 			run_net_fle = run_net_fle,
 			net_fle_out_basis = net_fle_out_basis,
 			cumulus_version = cumulus_version,
-			zones = zones,			
+			zones = zones,
 			num_cpu = num_cpu,
 			memory = memory,
 			disk_space = disk_space,
@@ -362,7 +362,7 @@ workflow cumulus {
 	if (perform_de_analysis) {
 		call tasks.run_cumulus_de_analysis as de_analysis {
 			input:
-				input_h5ad = cluster.output_h5ad,
+				input_h5ad = cluster.output_zarr,
 				output_directory = output_directory_stripped,
 				output_name = output_name,
 				labels = cluster_labels,
@@ -380,7 +380,7 @@ workflow cumulus {
 				organism = organism,
 				minimum_report_score = minimum_report_score,
 				cumulus_version = cumulus_version,
-				zones = zones,				
+				zones = zones,
 				num_cpu = num_cpu,
 				memory = memory,
 				disk_space = disk_space,
@@ -392,7 +392,7 @@ workflow cumulus {
 	if (defined(plot_composition) || defined(plot_tsne) || defined(plot_fitsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_diffmap) || defined(plot_citeseq_fitsne) || defined(plot_net_tsne) || defined(plot_net_umap) || defined(plot_net_fle)) {
 		call tasks.run_cumulus_plot as plot {
 			input:
-				input_h5ad = cluster.output_h5ad,
+				input_zarr = cluster.output_zarr,
 				output_directory = output_directory_stripped,
 				output_name = output_name,
 				plot_composition = plot_composition,
@@ -417,7 +417,7 @@ workflow cumulus {
 	if (generate_cirro_inputs) {
 		call tasks.run_cumulus_cirro_output as cirro_output {
 			input:
-				input_h5ad = cluster.output_h5ad,
+				input_h5ad = cluster.output_zarr,
 				output_directory = output_directory_stripped,
 				output_name = output_name,
 				cumulus_version = cumulus_version,
@@ -433,7 +433,7 @@ workflow cumulus {
 	if (generate_scp_outputs) {
 		call tasks.run_cumulus_scp_output as scp_output {
 			input:
-				input_h5ad = cluster.output_h5ad,
+				input_h5ad = cluster.output_zarr,
 				output_directory = output_directory_stripped,
 				output_name = output_name,
 				output_dense = output_dense,
@@ -442,19 +442,19 @@ workflow cumulus {
 				memory = memory,
 				disk_space = disk_space,
 				preemptible = preemptible,
-				docker_registry = docker_registry				
+				docker_registry = docker_registry
 		}
 	}
-	
+
 	output {
-		File? output_h5sc = aggregate_matrices.output_h5sc
-		File output_h5ad = cluster.output_h5ad
+		File? output_aggr_zarr = aggregate_matrices.output_zarr
+		File output_zarr = cluster.output_zarr
 		File output_cluster_log = cluster.output_log
-		Array[File] output_seurat_h5ad = cluster.output_seurat_h5ad
+		Array[File] output_h5ad = cluster.output_h5ad
 		Array[File] output_filt_xlsx = cluster.output_filt_xlsx
 		Array[File] output_filt_plot = cluster.output_filt_plot
 		Array[File] output_loom_file = cluster.output_loom_file
-		File? output_de_h5ad = de_analysis.output_de_h5ad
+		#File? output_de_h5ad = de_analysis.output_de_h5ad
 		File? output_de_xlsx =  de_analysis.output_de_xlsx
 		Array[File]? output_markers_xlsx =  de_analysis.output_markers_xlsx
 		Array[File]? output_anno_file =  de_analysis.output_anno_file
