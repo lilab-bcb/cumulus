@@ -27,6 +27,7 @@ RUN pip3 install setuptools==46.1.3 --no-cache-dir && \
     pip3 install scikit-learn==0.22.2.post1 --no-cache-dir && \
     pip3 install h5py==2.10.0 --no-cache-dir && \
     pip3 install fitsne==1.1.1 --no-cache-dir && \
+    pip3 install importlib-metadata==1.6.0 --no-cache-dir && \
     pip3 install joblib==0.14.1 --no-cache-dir && \
     pip3 install python-igraph==0.7.1.post6 --no-cache-dir && \
     pip3 install leidenalg==0.7.0 --no-cache-dir && \
@@ -50,10 +51,11 @@ RUN pip3 install setuptools==46.1.3 --no-cache-dir && \
     pip3 install harmony-pytorch==0.1.3 --no-cache-dir && \
     pip3 install bokeh==2.0.0 --no-cache-dir && \
     pip3 install scplot==0.0.16 --no-cache-dir && \
-    pip3 install pegasuspy==0.17.1 --no-cache-dir && \
     pip3 install cirrocumulus==1.0.0 --no-cache-dir && \
     pip3 install annoy==1.16.3 --no-cache-dir && \
-    pip3 install scrublet==0.2.1 --no-cache-dir
+    pip3 install scrublet==0.2.1 --no-cache-dir && \
+    pip3 install pegasusio==0.2.0 --no-cache-dir && \
+    pip3 install pegasuspy==0.18.0rc1 --no-cache-dir
 
 RUN mkdir /software && \
     cp /usr/local/lib/python3.7/dist-packages/cirrocumulus/prepare_data.py /software/prepare_data.py
