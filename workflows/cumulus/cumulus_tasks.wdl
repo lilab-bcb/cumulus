@@ -80,10 +80,9 @@ task run_cumulus_cluster {
 		String memory
 		Int disk_space
 		Int preemptible
-		String? considered_refs
 		String? channel
 		String? black_list
-		Int? min_genes_on_raw
+		Int? min_genes_before_filtration
 		Boolean? select_singlets
 		String? remap_singlets
 		String? subset_singlets
@@ -161,14 +160,12 @@ task run_cumulus_cluster {
 		from subprocess import check_call
 
 		call_args = ['pegasus', 'cluster', '~{input_file}', '~{output_name}', '-p', '~{num_cpu}']
-		if '~{considered_refs}' is not '':
-			call_args.extend(['--considered-refs', '~{considered_refs}'])
 		if '~{channel}' is not '':
 			call_args.extend(['--channel', '~{channel}'])
 		if '~{black_list}' is not '':
 			call_args.extend(['--black-list', '~{black_list}'])
-		if '~{min_genes_on_raw}' is not '':
-			call_args.extend(['--min-genes-on-raw', '~{min_genes_on_raw}'])
+		if '~{min_genes_before_filtration}' is not '':
+			call_args.extend(['--min-genes-before-filtration', '~{min_genes_before_filtration}'])
 		if '~{select_singlets}' is 'true':
 			call_args.append('--select-singlets')
 		if '~{remap_singlets}' is not '':
@@ -491,8 +488,8 @@ task run_cumulus_de_analysis {
 	output {
 		File output_de_h5ad = "~{output_name}.h5ad"
 		File output_de_xlsx = "~{output_name}.de.xlsx"
-		File? output_markers_xlsx = "~{output_name}.markers.xlsx"
-		File? output_anno_file = "~{output_name}.anno.txt"
+		Array[File] output_markers_xlsx = glob("~{output_name}.markers.xlsx")
+		Array[File] output_anno_file = glob("~{output_name}.anno.txt")
 		File monitoringLog = "monitoring.log"
 	}
 

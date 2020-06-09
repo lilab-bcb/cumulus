@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/15/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/18/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
@@ -45,14 +45,12 @@ workflow cumulus {
 
 		# for cluster
 
-		# A string contains comma-separated reference(e.g. genome) names. pegasus will read all groups associated with reference names in the list from the input file. If considered_refs is None, all groups will be considered.
-		String? considered_refs
 		# Specify the cell barcode attribute to represent different samples.
 		String? channel
 		# Specify cell barcode attributes to be popped out.
 		String? black_list
 		# If input are raw 10x matrix, which include all barcodes, perform a pre-filtration step to keep the data size small. In the pre-filtration step, only keep cells with at least <number> of genes. [default: 100]
-		Int? min_genes_on_raw
+		Int? min_genes_before_filtration
 		# Remap singlet names using <remap_string>, where <remap_string> takes the format "new_name_i:old_name_1,old_name_2;new_name_ii:old_name_3;...". For example, if we hashed 5 libraries from 3 samples sample1_lib1, sample1_lib2, sample2_lib1, sample2_lib2 and sample3, we can remap them to 3 samples using this string: "sample1:sample1_lib1,sample1_lib2;sample2:sample2_lib1,sample2_lib2". After that, original singlet names will be kept in metadate field with key name 'assignment.orig'.
 		String? remap_singlets
 		# If select singlets, only select singlets in the <subset_string>, which takes the format "name1,name2,...". Note that if --remap-singlets is specified, subsetting happens after remapping. For example, we can only select singlets from sampe 1 and 3 using "sample1,sample3".
@@ -284,10 +282,9 @@ workflow cumulus {
 			input_file = if is_sample_sheet then select_first([aggregate_matrices.output_zarr]) else input_file,
 			output_directory = output_directory_stripped,
 			output_name = output_name,
-			considered_refs = considered_refs,
 			channel = channel,
 			black_list = black_list,
-			min_genes_on_raw = min_genes_on_raw,
+			min_genes_before_filtration = min_genes_before_filtration,
 			select_singlets = if is_sample_sheet then false else select_only_singlets,
 			remap_singlets = remap_singlets,
 			subset_singlets = subset_singlets,
@@ -468,8 +465,8 @@ workflow cumulus {
 		Array[File] output_loom_file = cluster.output_loom_file
 		Array[File?]? output_de_h5ad = de_analysis.output_de_h5ad
 		Array[File?]? output_de_xlsx =  de_analysis.output_de_xlsx
-		Array[File?]? output_markers_xlsx =  de_analysis.output_markers_xlsx
-		Array[File?]? output_anno_file =  de_analysis.output_anno_file
+		Array[Array[File]?]? output_markers_xlsx =  de_analysis.output_markers_xlsx
+		Array[Array[File]?]? output_anno_file =  de_analysis.output_anno_file
 		Array[Array[File]?]? output_pdfs = plot.output_pdfs
 		Array[Array[File]?]? output_htmls = plot.output_htmls
 		Array[String?]? output_cirro_folder = cirro_output.output_cirro_folder
