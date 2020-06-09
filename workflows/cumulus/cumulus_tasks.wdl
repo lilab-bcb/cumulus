@@ -109,6 +109,7 @@ task run_cumulus_cluster {
 		String? correction_method
 		String? batch_group_by
 		Int? random_state
+		File? gene_signature_file
 		Int? nPC
 		Int? knn_K
 		Boolean? knn_full_speed
@@ -148,7 +149,6 @@ task run_cumulus_cluster {
 		String? net_umap_out_basis
 		Boolean? run_net_fle
 		String? net_fle_out_basis
-		File? signature_tsv
 		String docker_registry
 	}
 
@@ -213,6 +213,8 @@ task run_cumulus_cluster {
 			call_args.extend(['--counts-per-cell-after', '~{counts_per_cell_after}'])
 		if '~{random_state}' is not '':
 			call_args.extend(['--random-state', '~{random_state}'])
+		if '~{gene_signature_file}' is not '':
+			call_args.extend(['--calc-signature-scores', '~{gene_signature_file}'])
 		if '~{no_select_hvf}' is 'true':
 			call_args.append('--no-select-hvf')
 		if '~{select_hvf_flavor}' is not '':
@@ -299,21 +301,6 @@ task run_cumulus_cluster {
 			call_args.extend(['--net-fle-out-basis', '~{net_fle_out_basis}'])
 		print(' '.join(call_args))
 		check_call(call_args)
-
-		if '~{signature_tsv}' is not '':
-			import pegasusio as io
-			import pegasus as pg
-			data = io.read_input('~{output_name}.zarr.zip')
-			sig_dict = dict()
-			with open('~{signature_tsv}', 'r') as fp:
-				line = fp.readline()
-				while line:
-					sig_list = line.strip().split('\t')
-					sig_dict[sig_list[0]] = sig_list[2:]
-					line = fp.readline()
-			pg.calc_signature_score(data, sig_dict)
-			io.write_output(data, '~{output_name}.zarr.zip')
-
 
 		import glob
 		dest = '~{output_directory}' + '/' + '~{output_name}' + '/'

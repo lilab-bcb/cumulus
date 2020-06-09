@@ -101,6 +101,8 @@ workflow cumulus {
 		String? batch_group_by
 		# Random number generator seed. [default: 0]
 		Int? random_state
+		# Calculate signature scores for gene sets in <GMT_file>.
+		File? calc_signature_scores
 		# Number of PCs. [default: 50]
 		Int? nPC
 		# Number of neighbors used for constructing affinity matrix. [default: 100]
@@ -179,8 +181,6 @@ workflow cumulus {
 		Boolean? run_net_fle
 		# Output basis for net-FLE. [default: net_fle]
 		String? net_fle_out_basis
-		# A tsv file containing gene dictionary to calculate signature scores.
-		File? signature_tsv
 
 
 		# for de_analysis and annotate_cluster
@@ -313,6 +313,7 @@ workflow cumulus {
 			correction_method = correction_method,
 			batch_group_by = batch_group_by,
 			random_state = random_state,
+			gene_signature_file = calc_signature_scores,
 			nPC = nPC,
 			knn_K = knn_K,
 			knn_full_speed = knn_full_speed,
@@ -352,7 +353,6 @@ workflow cumulus {
 			net_umap_out_basis = net_umap_out_basis,
 			run_net_fle = run_net_fle,
 			net_fle_out_basis = net_fle_out_basis,
-			signature_tsv = signature_tsv,
 			cumulus_version = cumulus_version,
 			zones = zones,
 			num_cpu = num_cpu,
