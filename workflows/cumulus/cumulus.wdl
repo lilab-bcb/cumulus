@@ -362,92 +362,101 @@ workflow cumulus {
 			docker_registry = docker_registry
 	}
 
-	if (perform_de_analysis) {
-		call tasks.run_cumulus_de_analysis as de_analysis {
-			input:
-				input_h5ad = cluster.output_zarr,
-				output_directory = output_directory_stripped,
-				output_name = output_name,
-				labels = cluster_labels,
-				alpha = alpha,
-				t_test = t_test,
-				fisher = fisher,
-				mwu = mwu,
-				auc = auc,
-				find_markers_lightgbm = find_markers_lightgbm,
-				remove_ribo = remove_ribo,
-				min_gain = min_gain,
-				random_state = random_state,
-				annotate_cluster = annotate_cluster,
-				annotate_de_test = annotate_de_test,
-				organism = organism,
-				minimum_report_score = minimum_report_score,
-				cumulus_version = cumulus_version,
-				zones = zones,
-				num_cpu = num_cpu,
-				memory = memory,
-				disk_space = disk_space,
-				preemptible = preemptible,
-				docker_registry = docker_registry
+	if (length(cluster.output_h5ad) > 0) {
+		scatter (focus_h5ad in cluster.output_h5ad) {
+			String focus_prefix = basename(focus_h5ad, ".h5ad")
+
+			if (perform_de_analysis) {
+				call tasks.run_cumulus_de_analysis as de_analysis {
+					input:
+						input_h5ad = focus_h5ad,
+						output_directory = output_directory_stripped,
+						output_name = focus_prefix,
+						labels = cluster_labels,
+						alpha = alpha,
+						t_test = t_test,
+						fisher = fisher,
+						mwu = mwu,
+						auc = auc,
+						find_markers_lightgbm = find_markers_lightgbm,
+						remove_ribo = remove_ribo,
+						min_gain = min_gain,
+						random_state = random_state,
+						annotate_cluster = annotate_cluster,
+						annotate_de_test = annotate_de_test,
+						organism = organism,
+						minimum_report_score = minimum_report_score,
+						cumulus_version = cumulus_version,
+						zones = zones,
+						num_cpu = num_cpu,
+						memory = memory,
+						disk_space = disk_space,
+						preemptible = preemptible,
+						docker_registry = docker_registry
+				}
+			}
+
+			Boolean do_plot = defined(plot_composition) || defined(plot_tsne) || defined(plot_fitsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_diffmap) || defined(plot_citeseq_fitsne) || defined(plot_net_tsne) || defined(plot_net_umap) || defined(plot_net_fle)
+
+			if (do_plot) {
+				call tasks.run_cumulus_plot as plot {
+					input:
+						input_h5ad = focus_h5ad,
+						output_directory = output_directory_stripped,
+						output_name = focus_prefix,
+						plot_composition = plot_composition,
+						plot_tsne = plot_tsne,
+						plot_fitsne = plot_fitsne,
+						plot_umap = plot_umap,
+						plot_fle = plot_fle,
+						plot_diffmap = plot_diffmap,
+						plot_citeseq_fitsne = plot_citeseq_fitsne,
+						plot_net_tsne = plot_net_tsne,
+						plot_net_umap = plot_net_umap,
+						plot_net_fle = plot_net_fle,
+						cumulus_version = cumulus_version,
+						zones = zones,
+						memory = memory,
+						disk_space = disk_space,
+						preemptible = preemptible,
+						docker_registry = docker_registry
+				}
+			}
+
+			if (generate_cirro_inputs) {
+				call tasks.run_cumulus_cirro_output as cirro_output {
+					input:
+						input_h5ad = focus_h5ad,
+						output_directory = output_directory_stripped,
+						output_name = focus_prefix,
+						cumulus_version = cumulus_version,
+						zones = zones,
+						memory = memory,
+						disk_space = disk_space,
+						num_cpu = num_cpu,
+						preemptible = preemptible,
+						docker_registry = docker_registry
+				}
+			}
+
+			if (generate_scp_outputs) {
+				call tasks.run_cumulus_scp_output as scp_output {
+					input:
+						input_h5ad = focus_h5ad,
+						output_directory = output_directory_stripped,
+						output_name = focus_prefix,
+						output_dense = output_dense,
+						cumulus_version = cumulus_version,
+						zones = zones,
+						memory = memory,
+						disk_space = disk_space,
+						preemptible = preemptible,
+						docker_registry = docker_registry
+				}
+			}
 		}
 	}
 
-	if (defined(plot_composition) || defined(plot_tsne) || defined(plot_fitsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_diffmap) || defined(plot_citeseq_fitsne) || defined(plot_net_tsne) || defined(plot_net_umap) || defined(plot_net_fle)) {
-		call tasks.run_cumulus_plot as plot {
-			input:
-				input_zarr = cluster.output_zarr,
-				output_directory = output_directory_stripped,
-				output_name = output_name,
-				plot_composition = plot_composition,
-				plot_tsne = plot_tsne,
-				plot_fitsne = plot_fitsne,
-				plot_umap = plot_umap,
-				plot_fle = plot_fle,
-				plot_diffmap = plot_diffmap,
-				plot_citeseq_fitsne = plot_citeseq_fitsne,
-				plot_net_tsne = plot_net_tsne,
-				plot_net_umap = plot_net_umap,
-				plot_net_fle = plot_net_fle,
-				cumulus_version = cumulus_version,
-				zones = zones,
-				memory = memory,
-				disk_space = disk_space,
-				preemptible = preemptible,
-				docker_registry = docker_registry
-		}
-	}
-
-	if (generate_cirro_inputs) {
-		call tasks.run_cumulus_cirro_output as cirro_output {
-			input:
-				input_h5ad = cluster.output_zarr,
-				output_directory = output_directory_stripped,
-				output_name = output_name,
-				cumulus_version = cumulus_version,
-				zones = zones,
-				memory = memory,
-				disk_space = disk_space,
-				num_cpu = num_cpu,
-				preemptible = preemptible,
-				docker_registry = docker_registry
-		}
-	}
-
-	if (generate_scp_outputs) {
-		call tasks.run_cumulus_scp_output as scp_output {
-			input:
-				input_h5ad = cluster.output_zarr,
-				output_directory = output_directory_stripped,
-				output_name = output_name,
-				output_dense = output_dense,
-				cumulus_version = cumulus_version,
-				zones = zones,
-				memory = memory,
-				disk_space = disk_space,
-				preemptible = preemptible,
-				docker_registry = docker_registry
-		}
-	}
 
 	output {
 		File? output_aggr_zarr = aggregate_matrices.output_zarr
@@ -457,13 +466,13 @@ workflow cumulus {
 		Array[File] output_filt_xlsx = cluster.output_filt_xlsx
 		Array[File] output_filt_plot = cluster.output_filt_plot
 		Array[File] output_loom_file = cluster.output_loom_file
-		#File? output_de_h5ad = de_analysis.output_de_h5ad
-		File? output_de_xlsx =  de_analysis.output_de_xlsx
-		Array[File]? output_markers_xlsx =  de_analysis.output_markers_xlsx
-		Array[File]? output_anno_file =  de_analysis.output_anno_file
-		Array[File]? output_pdfs = plot.output_pdfs
-		Array[File]? output_htmls = plot.output_htmls
-		String? output_cirro_folder = cirro_output.output_cirro_folder
-		Array[File]? output_scp_files= scp_output.output_scp_files
+		Array[File?]? output_de_h5ad = de_analysis.output_de_h5ad
+		Array[File?]? output_de_xlsx =  de_analysis.output_de_xlsx
+		Array[File?]? output_markers_xlsx =  de_analysis.output_markers_xlsx
+		Array[File?]? output_anno_file =  de_analysis.output_anno_file
+		Array[Array[File]?]? output_pdfs = plot.output_pdfs
+		Array[Array[File]?]? output_htmls = plot.output_htmls
+		Array[String?]? output_cirro_folder = cirro_output.output_cirro_folder
+		Array[Array[File]?]? output_scp_files= scp_output.output_scp_files
 	}
 }

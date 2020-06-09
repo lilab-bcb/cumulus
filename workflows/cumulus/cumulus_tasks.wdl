@@ -504,8 +504,8 @@ task run_cumulus_de_analysis {
 	output {
 		File output_de_h5ad = "~{output_name}.h5ad"
 		File output_de_xlsx = "~{output_name}.de.xlsx"
-		Array[File] output_markers_xlsx = glob("~{output_name}.markers.xlsx")
-		Array[File] output_anno_file = glob("~{output_name}.anno.txt")
+		File? output_markers_xlsx = "~{output_name}.markers.xlsx"
+		File? output_anno_file = "~{output_name}.anno.txt"
 		File monitoringLog = "monitoring.log"
 	}
 
@@ -522,7 +522,7 @@ task run_cumulus_de_analysis {
 
 task run_cumulus_plot {
 	input {
-		File input_zarr
+		File input_h5ad
 		String output_directory
 		String output_name
 		String cumulus_version
@@ -553,45 +553,45 @@ task run_cumulus_plot {
 			pairs = '~{plot_composition}'.split(',')
 			for pair in pairs:
 				lab, attr = pair.split(':')
-				call_args = ['pegasus', 'plot', 'composition', '--cluster-labels', lab, '--attribute', attr, '--style', 'normalized', '--not-stacked', '~{input_zarr}', '~{output_name}.' + lab + '.' + attr + '.composition.pdf']
+				call_args = ['pegasus', 'plot', 'composition', '--cluster-labels', lab, '--attribute', attr, '--style', 'normalized', '--not-stacked', '~{input_h5ad}', '~{output_name}.' + lab + '.' + attr + '.composition.pdf']
 				print(' '.join(call_args))
 				check_call(call_args)
 		if '~{plot_tsne}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter',  '--basis', 'tsne', '--attributes', '~{plot_tsne}', '~{input_zarr}', '~{output_name}.tsne.pdf']
+			call_args = ['pegasus', 'plot', 'scatter',  '--basis', 'tsne', '--attributes', '~{plot_tsne}', '~{input_h5ad}', '~{output_name}.tsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_fitsne}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'fitsne', '--attributes', '~{plot_fitsne}', '~{input_zarr}', '~{output_name}.fitsne.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'fitsne', '--attributes', '~{plot_fitsne}', '~{input_h5ad}', '~{output_name}.fitsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_umap}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'umap', '--attributes', '~{plot_umap}', '~{input_zarr}', '~{output_name}.umap.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'umap', '--attributes', '~{plot_umap}', '~{input_h5ad}', '~{output_name}.umap.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_fle}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'fle', '--attributes', '~{plot_fle}', '~{input_zarr}', '~{output_name}.fle.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'fle', '--attributes', '~{plot_fle}', '~{input_h5ad}', '~{output_name}.fle.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_diffmap}' is not '':
 			attrs = '~{plot_diffmap}'.split(',')
 			for attr in attrs:
-				call_args = ['pegasus', 'iplot', '--attribute', attr, 'diffmap_pca', '~{input_zarr}', '~{output_name}.' + attr + '.diffmap_pca.html']
+				call_args = ['pegasus', 'iplot', '--attribute', attr, 'diffmap_pca', '~{input_h5ad}', '~{output_name}.' + attr + '.diffmap_pca.html']
 				print(' '.join(call_args))
 				check_call(call_args)
 		if '~{plot_citeseq_fitsne}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'citeseq_fitsne', '--attributes', '~{plot_citeseq_fitsne}', '~{input_zarr}', '~{output_name}.citeseq.fitsne.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'citeseq_fitsne', '--attributes', '~{plot_citeseq_fitsne}', '~{input_h5ad}', '~{output_name}.citeseq.fitsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_net_tsne}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_tsne', '--attributes', '~{plot_net_tsne}', '~{input_zarr}', '~{output_name}.net.tsne.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_tsne', '--attributes', '~{plot_net_tsne}', '~{input_h5ad}', '~{output_name}.net.tsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_net_umap}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_umap', '--attributes', '~{plot_net_umap}', '~{input_zarr}', '~{output_name}.net.umap.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_umap', '--attributes', '~{plot_net_umap}', '~{input_h5ad}', '~{output_name}.net.umap.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_net_fle}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_fle', '--attributes', '~{plot_net_fle}', '~{input_zarr}', '~{output_name}.net.fle.pdf']
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_fle', '--attributes', '~{plot_net_fle}', '~{input_h5ad}', '~{output_name}.net.fle.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 
