@@ -262,6 +262,14 @@ cluster inputs
       - Description
       - Example
       - Default
+    * - focus
+      - Focus analysis on Unimodal data with <keys>. <keys> is a comma-separated list of keys. If None, the ``self._selected`` will be the focused one.
+      - "citeseq,tcr,bcr"
+      -
+    * - append
+      - Append Unimodal data <key> to any <keys> in *focus*.
+      -
+      -
     * - channel
       - Specify the cell barcode attribute to represent different samples.
       - "Donor"
@@ -303,8 +311,8 @@ cluster inputs
       -
     * - output_h5ad
       - Generate Seurat-compatible h5ad file. Caution: File size might be large, do not turn this option on for large data sets.
-      - false
-      - false
+      - true
+      - true
     * - output_loom
       - If generate loom-formatted file
       - false
