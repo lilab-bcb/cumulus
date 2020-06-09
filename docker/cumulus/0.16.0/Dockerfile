@@ -39,7 +39,6 @@ RUN pip3 install setuptools==46.1.3 --no-cache-dir && \
     pip3 install numba==0.49.0 --no-cache-dir && \
     pip3 install scikit-misc==0.1.1 --no-cache-dir && \
     pip3 install statsmodels==0.11.1 --no-cache-dir && \
-    pip3 install tables==3.6.1 --no-cache-dir && \
     pip3 install zarr==2.4.0 --no-cache-dir && \
     pip3 install anndata==0.7.1 --no-cache-dir && \
     pip3 install hnswlib==0.3.4 --no-cache-dir && \
@@ -51,11 +50,11 @@ RUN pip3 install setuptools==46.1.3 --no-cache-dir && \
     pip3 install harmony-pytorch==0.1.3 --no-cache-dir && \
     pip3 install bokeh==2.0.0 --no-cache-dir && \
     pip3 install scplot==0.0.16 --no-cache-dir && \
-    pip3 install cirrocumulus==1.0.0 --no-cache-dir && \
+    pip3 install cirrocumulus==1.1.0 --no-cache-dir && \
     pip3 install annoy==1.16.3 --no-cache-dir && \
     pip3 install scrublet==0.2.1 --no-cache-dir && \
-    pip3 install pegasusio==0.2.0 --no-cache-dir && \
-    pip3 install pegasuspy==0.18.0rc1 --no-cache-dir
+    pip3 install pegasusio==0.2.1 --no-cache-dir && \
+    pip3 install pegasuspy==0.18.0rc2 --no-cache-dir
 
 RUN mkdir /software && \
     cp /usr/local/lib/python3.7/dist-packages/cirrocumulus/prepare_data.py /software/prepare_data.py
