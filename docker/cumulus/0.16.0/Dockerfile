@@ -25,6 +25,7 @@ RUN pip3 install setuptools==46.1.3 --no-cache-dir && \
     pip3 install pybind11==2.4.3 --no-cache-dir && \
     pip3 install scikit-image==0.16.2 --no-cache-dir && \
     pip3 install scikit-learn==0.22.2.post1 --no-cache-dir && \
+    pip3 install tables==3.6.1 --no-cache-dir && \
     pip3 install h5py==2.10.0 --no-cache-dir && \
     pip3 install fitsne==1.1.1 --no-cache-dir && \
     pip3 install importlib-metadata==1.6.0 --no-cache-dir && \
