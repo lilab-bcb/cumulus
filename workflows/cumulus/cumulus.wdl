@@ -179,6 +179,8 @@ workflow cumulus {
 		Boolean? run_net_fle
 		# Output basis for net-FLE. [default: net_fle]
 		String? net_fle_out_basis
+		# A tsv file containing gene dictionary to calculate signature scores.
+		File? signature_tsv
 
 
 		# for de_analysis and annotate_cluster
@@ -350,6 +352,7 @@ workflow cumulus {
 			net_umap_out_basis = net_umap_out_basis,
 			run_net_fle = run_net_fle,
 			net_fle_out_basis = net_fle_out_basis,
+			signature_tsv = signature_tsv,
 			cumulus_version = cumulus_version,
 			zones = zones,
 			num_cpu = num_cpu,
