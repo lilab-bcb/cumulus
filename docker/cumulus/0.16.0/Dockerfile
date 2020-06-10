@@ -17,7 +17,8 @@ RUN mkdir -p /usr/share/man/man1 && \
         python3-dev \
         python3-pip
 
-RUN pip3 install setuptools==46.1.3 --no-cache-dir && \
+RUN pip3 install --upgrade pip --no-cache-dir && \
+    pip3 install setuptools==47.1.1 --no-cache-dir && \
     pip3 install numpy==1.18.5 --no-cache-dir && \
     pip3 install pandas==1.0.4 --no-cache-dir && \
     pip3 install scipy==1.4.1 --no-cache-dir && \
