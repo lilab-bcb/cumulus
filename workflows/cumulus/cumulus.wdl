@@ -148,9 +148,9 @@ workflow cumulus {
 		# tSNE’s perplexity parameter. [default: 30]
 		Float? tsne_perplexity
 		# Run FItSNE for visualization.
-		Boolean run_fitsne = true
+		Boolean run_fitsne
 		# Run umap for visualization.
-		Boolean? run_umap
+		Boolean? run_umap = true
 		# Run umap on diffusion components. [default: 15]
 		Int? umap_K
 		# Umap parameter. [default: 0.5]
