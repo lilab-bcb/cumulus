@@ -15,7 +15,7 @@ Developing version
       - Snapshot
       - Function
     * - cumulus/cumulus
-      - `25 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/25>`__
+      - `26 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/26>`__
       - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
 
 Latest version
