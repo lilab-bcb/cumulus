@@ -66,7 +66,7 @@ workflow cumulus {
 		# Figure size for filtration plots. <figsize> is a comma-separated list of two numbers, the width and height of the figure (e.g. 6,4).
 		String? plot_filtration_figsize
 		# Output seurat-compatible h5ad file. Caution: File size might be large, do not turn this option on for large data sets. [default: false]
-		Boolean? output_h5ad
+		Boolean? output_h5ad = true
 		# If output loom-formatted file [default: false]
 		Boolean? output_loom
 		# Only keep cells with at least <number> of genes. [default: 500]
@@ -367,7 +367,7 @@ workflow cumulus {
 				call tasks.run_cumulus_de_analysis as de_analysis {
 					input:
 						input_h5ad = focus_h5ad,
-						output_directory = output_directory_stripped,
+						output_directory = output_directory_stripped + '/' + output_name,
 						output_name = focus_prefix,
 						labels = cluster_labels,
 						alpha = alpha,
@@ -399,7 +399,7 @@ workflow cumulus {
 				call tasks.run_cumulus_plot as plot {
 					input:
 						input_h5ad = focus_h5ad,
-						output_directory = output_directory_stripped,
+						output_directory = output_directory_stripped + '/' + output_name,
 						output_name = focus_prefix,
 						plot_composition = plot_composition,
 						plot_tsne = plot_tsne,
@@ -424,7 +424,7 @@ workflow cumulus {
 				call tasks.run_cumulus_cirro_output as cirro_output {
 					input:
 						input_h5ad = focus_h5ad,
-						output_directory = output_directory_stripped,
+						output_directory = output_directory_stripped + '/' + output_name,
 						output_name = focus_prefix,
 						cumulus_version = cumulus_version,
 						zones = zones,
@@ -440,7 +440,7 @@ workflow cumulus {
 				call tasks.run_cumulus_scp_output as scp_output {
 					input:
 						input_h5ad = focus_h5ad,
-						output_directory = output_directory_stripped,
+						output_directory = output_directory_stripped + '/' + output_name,
 						output_name = focus_prefix,
 						output_dense = output_dense,
 						cumulus_version = cumulus_version,

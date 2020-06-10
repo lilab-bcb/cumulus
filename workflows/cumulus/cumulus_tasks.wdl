@@ -360,13 +360,13 @@ task run_cumulus_cirro_output {
 		monitor_script.sh > monitoring.log &
 
 		python /software/prepare_data.py --out ~{output_name}.cirro ~{input_h5ad}
-		gsutil -q -m cp -r ~{output_name}.cirro ~{output_directory}/~{output_name}/
-		# mkdir -p ~{output_directory}/~{output_name}
-		# cp -r ~{output_name}.cirro ~{output_directory}/~{output_name}/
+		gsutil -q -m cp -r ~{output_name}.cirro ~{output_directory}/
+		# mkdir -p ~{output_directory}/
+		# cp -r ~{output_name}.cirro ~{output_directory}/
 	}
 
 	output {
-		String output_cirro_folder = "~{output_directory}/~{output_name}/~{output_name}.cirro"
+		String output_cirro_folder = "~{output_directory}/~{output_name}.cirro"
 		File monitoringLog = "monitoring.log"
 	}
 
@@ -470,7 +470,7 @@ task run_cumulus_de_analysis {
 			print(' '.join(call_args))
 			check_call(call_args)
 
-		dest = '~{output_directory}' + '/' + '~{output_name}' + '/'
+		dest = '~{output_directory}' + '/'
 		# check_call(['mkdir', '-p', dest])
 		files = ['~{output_name}.h5ad', '~{output_name}.de.xlsx']
 		if '~{find_markers_lightgbm}' is 'true':
@@ -580,7 +580,7 @@ task run_cumulus_plot {
 			check_call(call_args)
 
 		import glob
-		dest = '~{output_directory}' + '/' + '~{output_name}' + '/'
+		dest = '~{output_directory}' + '/'
 		# check_call(['mkdir', '-p', dest])
 		files = glob.glob('*.pdf')
 		files.extend(glob.glob('*.html'))
@@ -627,8 +627,8 @@ task run_cumulus_scp_output {
 		set -e
 		export TMPDIR=/tmp
 		pegasus scp_output ~{true='--dense' false='' output_dense} ~{input_h5ad} ~{output_name}
-		# mkdir -p ~{output_directory}/~{output_name} ; cp ~{output_name}.scp.* ~{output_directory}/~{output_name}
-		gsutil -m cp ~{output_name}.scp.* ~{output_directory}/~{output_name}/
+		# mkdir -p ~{output_directory} ; cp ~{output_name}.scp.* ~{output_directory}/
+		gsutil -m cp ~{output_name}.scp.* ~{output_directory}/
 	}
 
 	output {
