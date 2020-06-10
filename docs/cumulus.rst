@@ -264,11 +264,11 @@ cluster inputs
       - Default
     * - focus
       - Focus analysis on Unimodal data with <keys>. <keys> is a comma-separated list of keys. If None, the ``self._selected`` will be the focused one.
-      - "citeseq,tcr,bcr"
+      - "GRCh38-rna"
       -
     * - append
       - Append Unimodal data <key> to any <keys> in *focus*.
-      -
+      - "SARSCoV2-rna"
       -
     * - channel
       - Specify the cell barcode attribute to represent different samples.
@@ -310,7 +310,7 @@ cluster inputs
       - 6,4
       -
     * - output_h5ad
-      - Generate Seurat-compatible h5ad file. Caution: File size might be large, do not turn this option on for large data sets.
+      - Generate Seurat-compatible h5ad file.
       - true
       - true
     * - output_loom
@@ -396,7 +396,7 @@ cluster inputs
       - 0
     * - calc_signature_scores
       - Google bucket URL of GMT_ format file used for calculating signature scores.
-      - "gs:////fc-e0000000-0000-0000-0000-000000000000/cell_cycle_sig.gmt"
+      - "gs://fc-e0000000-0000-0000-0000-000000000000/cell_cycle_sig.gmt"
       -
     * - nPC
       - Number of principal components
