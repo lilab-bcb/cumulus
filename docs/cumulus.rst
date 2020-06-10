@@ -492,12 +492,12 @@ cluster inputs
       - 30
     * - run_fitsne
       - Run FIt-SNE for visualization
-      - true
-      - true
+      - false
+      - false
     * - run_umap
       - Run UMAP for visualization
-      - false
-      - false
+      - true
+      - true
     * - umap_K
       - K neighbors for UMAP.
       - 15

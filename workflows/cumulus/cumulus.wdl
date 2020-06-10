@@ -37,7 +37,7 @@ workflow cumulus {
 		# If sample count matrix is in either DGE, mtx, csv, tsv or loom format and there is no Reference column in the csv_file, use default_reference as the reference.
 		String? default_reference
 		# If we have demultiplexed data, turning on this option will make cumulus only include barcodes that are predicted as singlets
-		Boolean? select_only_singlets = false
+		Boolean select_only_singlets = false
 		# Only keep barcodes with at least this number of expressed genes
 		Int minimum_number_of_genes = 100
 		# If inputs are dropseq data
@@ -60,13 +60,13 @@ workflow cumulus {
 		# Append Unimodal data <key> to any <keys> in --focus.
 		String? append
 		# If write cell and gene filtration results as a spreadsheet. [default: true]
-		Boolean? output_filtration_results = true
+		Boolean output_filtration_results = true
 		# If plot filtration results as PDF files. [default: true]
-		Boolean? plot_filtration_results = true
+		Boolean plot_filtration_results = true
 		# Figure size for filtration plots. <figsize> is a comma-separated list of two numbers, the width and height of the figure (e.g. 6,4).
 		String? plot_filtration_figsize
 		# Output seurat-compatible h5ad file. Caution: File size might be large, do not turn this option on for large data sets. [default: false]
-		Boolean? output_h5ad = true
+		Boolean output_h5ad = true
 		# If output loom-formatted file [default: false]
 		Boolean? output_loom
 		# Only keep cells with at least <number> of genes. [default: 500]
@@ -148,9 +148,9 @@ workflow cumulus {
 		# tSNE’s perplexity parameter. [default: 30]
 		Float? tsne_perplexity
 		# Run FItSNE for visualization.
-		Boolean run_fitsne = true
+		Boolean? run_fitsne
 		# Run umap for visualization.
-		Boolean? run_umap
+		Boolean run_umap = true
 		# Run umap on diffusion components. [default: 15]
 		Int? umap_K
 		# Umap parameter. [default: 0.5]
