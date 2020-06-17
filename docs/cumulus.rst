@@ -882,18 +882,6 @@ plot inputs
         | If non-empty, plot attr colored FLE (force-directed layout embedding) side by side
       - "louvain_labels,Donor"
       - None
-    * - plot_diffmap
-      - | Takes the format of "attr,attr,...,attr".
-        | If non-empty, generate attr colored 3D interactive plot.
-        | The 3 coordinates are the first 3 PCs of all diffusion components
-      - "louvain_labels,Donor"
-      - None
-    * - plot_citeseq_fitsne
-      - | plot cells based on FIt-SNE coordinates estimated from antibody expressions.
-        | Takes the format of "attr,attr,...,attr".
-        | If non-empty, plot attr colored FIt-SNEs side by side
-      - "louvain_labels,Donor"
-      - None
     * - plot_net_tsne
       - | Takes the format of "attr,attr,...,attr".
         | If non-empty, plot attr colored t-SNEs side by side based on net t-SNE result.

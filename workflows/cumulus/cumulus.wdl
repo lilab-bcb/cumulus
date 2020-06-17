@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/19/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/20/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
@@ -227,10 +227,6 @@ workflow cumulus {
 		String? plot_umap
 		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FLEs side by side.
 		String? plot_fle
-		# Takes the format of "attr,attr,...,attr". If non-empty, generate attr colored 3D interactive plot. The 3 coordinates are the first 3 PCs of all diffusion components.
-		String? plot_diffmap
-		# Plot cells based on FIt-SNE coordinates estimated from antibody expressions. Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FIt-SNEs side by side.
-		String? plot_citeseq_fitsne
 		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored tSNEs side by side based on net tSNE result.
 		String? plot_net_tsne
 		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored UMAPs side by side based on net UMAP result.
@@ -393,7 +389,7 @@ workflow cumulus {
 				}
 			}
 
-			Boolean do_plot = defined(plot_composition) || defined(plot_tsne) || defined(plot_fitsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_diffmap) || defined(plot_citeseq_fitsne) || defined(plot_net_tsne) || defined(plot_net_umap) || defined(plot_net_fle)
+			Boolean do_plot = defined(plot_composition) || defined(plot_tsne) || defined(plot_fitsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_net_tsne) || defined(plot_net_umap) || defined(plot_net_fle)
 
 			if (do_plot) {
 				call tasks.run_cumulus_plot as plot {
@@ -406,8 +402,6 @@ workflow cumulus {
 						plot_fitsne = plot_fitsne,
 						plot_umap = plot_umap,
 						plot_fle = plot_fle,
-						plot_diffmap = plot_diffmap,
-						plot_citeseq_fitsne = plot_citeseq_fitsne,
 						plot_net_tsne = plot_net_tsne,
 						plot_net_umap = plot_net_umap,
 						plot_net_fle = plot_net_fle,

@@ -519,8 +519,6 @@ task run_cumulus_plot {
 		String? plot_fitsne
 		String? plot_umap
 		String? plot_fle
-		String? plot_diffmap
-		String? plot_citeseq_fitsne
 		String? plot_net_tsne
 		String? plot_net_umap
 		String? plot_net_fle
@@ -554,16 +552,6 @@ task run_cumulus_plot {
 			check_call(call_args)
 		if '~{plot_fle}' is not '':
 			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'fle', '--attributes', '~{plot_fle}', '~{input_h5ad}', '~{output_name}.fle.pdf']
-			print(' '.join(call_args))
-			check_call(call_args)
-		if '~{plot_diffmap}' is not '':
-			attrs = '~{plot_diffmap}'.split(',')
-			for attr in attrs:
-				call_args = ['pegasus', 'iplot', '--attribute', attr, 'diffmap_pca', '~{input_h5ad}', '~{output_name}.' + attr + '.diffmap_pca.html']
-				print(' '.join(call_args))
-				check_call(call_args)
-		if '~{plot_citeseq_fitsne}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'citeseq_fitsne', '--attributes', '~{plot_citeseq_fitsne}', '~{input_h5ad}', '~{output_name}.citeseq.fitsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_net_tsne}' is not '':
