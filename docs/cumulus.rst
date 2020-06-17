@@ -163,9 +163,9 @@ global inputs
       - "my_sample"
       -
     * - cumulus_version
-      - cumulus version to use. Versions available: 0.16.0, 0.15.0, 0.13.0, 0.12.0, 0.11.0, 0.10.0.
-      - "0.16.0"
-      - "0.16.0"
+      - cumulus version to use. Versions available: 1.0.0, 0.16.0, 0.15.0, 0.13.0, 0.12.0, 0.11.0, 0.10.0.
+      - "1.0.0"
+      - "1.0.0"
     * - docker_registry
       - Docker registry to use. Options:
 

@@ -12,8 +12,8 @@ workflow cumulus {
 		# Results name prefix and subdirectory name.
 		String output_name
 
-		# cumulus version, default to "0.16.0"
-		String cumulus_version = "0.16.0"
+		# cumulus version, default to "1.0.0"
+		String cumulus_version = "1.0.0"
 		# Docker registry to use
 		String docker_registry = "cumulusprod"
 		# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
