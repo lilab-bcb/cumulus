@@ -535,7 +535,7 @@ task run_cumulus_plot {
 			pairs = '~{plot_composition}'.split(',')
 			for pair in pairs:
 				lab, attr = pair.split(':')
-				call_args = ['pegasus', 'plot', 'composition', '--cluster-labels', lab, '--attribute', attr, '--style', 'normalized', '--not-stacked', '~{input_h5ad}', '~{output_name}.' + lab + '.' + attr + '.composition.pdf']
+				call_args = ['pegasus', 'plot', 'composition', '--xattr', lab, '--yattr', attr, '--style', 'normalized', '~{input_h5ad}', '~{output_name}.' + lab + '.' + attr + '.composition.pdf']
 				print(' '.join(call_args))
 				check_call(call_args)
 		if '~{plot_tsne}' is not '':
