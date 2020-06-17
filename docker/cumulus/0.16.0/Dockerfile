@@ -55,8 +55,8 @@ RUN pip3 install --upgrade pip --no-cache-dir && \
     pip3 install cirrocumulus==1.1.0 --no-cache-dir && \
     pip3 install annoy==1.16.3 --no-cache-dir && \
     pip3 install scrublet==0.2.1 --no-cache-dir && \
-    pip3 install pegasusio==0.2.2b1 --no-cache-dir && \
-    pip3 install pegasuspy==0.18.0b1 --no-cache-dir
+    pip3 install pegasusio==0.2.2 --no-cache-dir && \
+    pip3 install pegasuspy==0.18.0b2 --no-cache-dir
 
 RUN mkdir /software && \
     cp /usr/local/lib/python3.7/dist-packages/cirrocumulus/prepare_data.py /software/prepare_data.py
