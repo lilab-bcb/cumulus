@@ -1,11 +1,11 @@
-Topic Modelling
+Topic modeling
 --------------------
 
 Prepare input data
 ~~~~~~~~~~~~~~~~~~~
 
 
-Follow the steps below to run **topic_modelling** on Terra_.
+Follow the steps below to run **topic_modeling** on Terra_.
 
 1. Prepare your count matrix. **Cumulus** currently supports the following formats:
 - anndata (h5ad);
@@ -23,13 +23,13 @@ Follow the steps below to run **topic_modelling** on Terra_.
     where ``/foo/bar/projects/dataset.h5ad`` is the path to your dataset on your local machine, and
     ``gs://fc-e0000000-0000-0000-0000-000000000000/`` is the Google bucket destination.
 
-3. Import *topic_modelling* workflow to your workspace.
+3. Import *topic_modeling* workflow to your workspace.
 
-    See the Terra documentation for `adding a workflow`_. The *cumulus* workflow is under ``Broad Methods Repository`` with name "**cumulus/topic_modelling**".
+    See the Terra documentation for `adding a workflow`_. The *cumulus* workflow is under ``Broad Methods Repository`` with name "**cumulus/topic_modeling**".
 
-    Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *topic_modelling* workflow in the drop-down menu.
+    Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *topic_modeling* workflow in the drop-down menu.
 
-4. In your workspace, open ``topic_modelling`` in ``WORKFLOWS`` tab. Select ``Run workflow with inputs defined by file paths`` as below
+4. In your workspace, open ``topic_modeling`` in ``WORKFLOWS`` tab. Select ``Run workflow with inputs defined by file paths`` as below
 
     .. image:: images/single_workflow.png
 
@@ -39,7 +39,7 @@ Follow the steps below to run **topic_modelling** on Terra_.
 Workflow input
 ~~~~~~~~~~~~~~~~
 
-Inputs for the *topic_modelling* workflow are described below. Required inputs are in bold.
+Inputs for the *topic_modeling* workflow are described below. Required inputs are in bold.
 
 .. list-table::
     :widths: 5 20 10 5

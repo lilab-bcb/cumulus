@@ -1,6 +1,6 @@
 version 1.0
 
-workflow topic_modelling {
+workflow topic_modeling {
   input {
     Int preemptible = 2
     String prefix_exclude = 'mt-,Rpl,Rps'
@@ -13,10 +13,10 @@ workflow topic_modelling {
     Float disk_space_multiplier = 2
     Int num_cpu = 4
     String memory = "6G"
-    String docker = "cumulusprod/topic_modelling:3.8.3"
+    String docker = "cumulusprod/topic_modeling:3.8.3"
   }
 
-    call topic_modelling_prepare {
+    call topic_modeling_prepare {
           input:
                 preemptible = preemptible,
                 prefix_exclude = prefix_exclude,
@@ -28,14 +28,14 @@ workflow topic_modelling {
     }
 
   scatter(topic in number_of_topics) {
-    call topic_modelling_gensim {
+    call topic_modeling_gensim {
         input:
               preemptible = preemptible,
               disk_space_multiplier = disk_space_multiplier,
               extra_disk_space = extra_disk_space,
-              corpus=topic_modelling_prepare.corpus,
-              dictionary=topic_modelling_prepare.dictionary,
-              cell_ids=topic_modelling_prepare.cell_ids,
+              corpus=topic_modeling_prepare.corpus,
+              dictionary=topic_modeling_prepare.dictionary,
+              cell_ids=topic_modeling_prepare.cell_ids,
               number_of_topics = topic,
               random_number_seed = random_number_seed,
               num_cpu = num_cpu,
@@ -48,20 +48,20 @@ workflow topic_modelling {
         input:
              preemptible = preemptible,
              docker = docker,
-             stats = topic_modelling_gensim.stats
+             stats = topic_modeling_gensim.stats
       }
   }
 
   output {
         File? coherence_plot = plot_stats.coherence_plot
         File? perplexity_plot = plot_stats.perplexity_plot
-        File corpus = topic_modelling_prepare.corpus
-        File dictionary = topic_modelling_prepare.dictionary
-        Array[File] stats = topic_modelling_gensim.stats
-        Array[File] model = topic_modelling_gensim.model
-        Array[File] cell_scores = topic_modelling_gensim.cell_scores
-        Array[File] feature_topics = topic_modelling_gensim.feature_topics
-        Array[File] report = topic_modelling_gensim.report
+        File corpus = topic_modeling_prepare.corpus
+        File dictionary = topic_modeling_prepare.dictionary
+        Array[File] stats = topic_modeling_gensim.stats
+        Array[File] model = topic_modeling_gensim.model
+        Array[File] cell_scores = topic_modeling_gensim.cell_scores
+        Array[File] feature_topics = topic_modeling_gensim.feature_topics
+        Array[File] report = topic_modeling_gensim.report
   }
 }
 
@@ -100,7 +100,7 @@ task plot_stats {
 
 }
 
-task topic_modelling_prepare {
+task topic_modeling_prepare {
   input {
         Int preemptible
         Int extra_disk_space
@@ -145,7 +145,7 @@ task topic_modelling_prepare {
 
 }
 
-task topic_modelling_gensim {
+task topic_modeling_gensim {
   input {
         Int preemptible
         Int extra_disk_space
