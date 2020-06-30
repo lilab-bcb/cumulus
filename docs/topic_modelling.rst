@@ -39,7 +39,7 @@ Follow the steps below to run **topic_modelling** on Terra_.
 Workflow input
 ~~~~~~~~~~~~~~~~
 
-Below are inputs for *topic_modelling* workflow. Required inputs are in bold.
+Inputs for the *topic_modelling* workflow are described below. Required inputs are in bold.
 
 .. list-table::
     :widths: 5 20 10 5
@@ -74,7 +74,7 @@ Below are inputs for *topic_modelling* workflow. Required inputs are in bold.
       - 0
       - 0
 
-----------------------
+
 
 Workflow output
 ~~~~~~~~~~~~~~~~
