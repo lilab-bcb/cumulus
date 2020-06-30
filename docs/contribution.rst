@@ -11,6 +11,15 @@ We welcome contributions to our repositories that make up the Cumulus ecosystem:
 - altocumulus_
 - cirrocumulus_
 
+
+
+In addition to the Cumulus team, we would like to sincerely thank the following contributors:
+
+.. csv-table::
+	:header: "Name", "Note"
+
+	"Kirk Gosik", "Assistance with topic modeling workflow"
+
 .. _pegasus: https://github.com/klarman-cell-observatory/pegasus
 .. _pegasusio: https://github.com/klarman-cell-observatory/pegasusio
 .. _demuxEM: https://github.com/klarman-cell-observatory/demuxEM
