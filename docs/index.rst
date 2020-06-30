@@ -17,6 +17,7 @@
    doublet_detection
    cumulus
    demuxlet
+   topic_modelling
    command_line
    examples/index
    contribution
