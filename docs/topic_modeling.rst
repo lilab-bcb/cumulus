@@ -7,11 +7,7 @@ Prepare input data
 
 Follow the steps below to run **topic_modeling** on Terra_.
 
-1. Prepare your count matrix. **Cumulus** currently supports the following formats:
-- anndata (h5ad);
-- 10x genomics v2/v3 format (hdf5);
-- Drop-seq dge format;
-- csv (no HCA DCP format), tsv or loom formats.
+1. Prepare your count matrix. **Cumulus** currently supports the following formats:  ‘zarr’, ‘h5ad’, ‘loom’, ‘10x’, ‘mtx’, ‘csv’, ‘tsv’ and ‘fcs’ (for flow/mass cytometry data) formats
 
 
 2. Upload your count matrix to the workspace.
