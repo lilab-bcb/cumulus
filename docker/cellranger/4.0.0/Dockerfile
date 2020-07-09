@@ -25,5 +25,5 @@ RUN apt-get -qq -y remove alien curl gnupg python3-pip unzip && \
     rm /usr/bin/python && ln -s /usr/bin/python3 /usr/bin/python
 
 RUN chmod a+rx /software/monitor_script.sh
-ENV PATH=/software:/software/cellranger-3.1.0:$PATH
+ENV PATH=/software:/software/cellranger-4.0.0:$PATH
 ENV TMPDIR=/tmp
