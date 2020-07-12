@@ -18,7 +18,7 @@ Developing version
       - `29 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/29>`__
       - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
     * - cumulus/demultiplexing
-      - `12 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/12`_
+      - `13 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/13`_
       - Run tools (demuxEM, souporcell, or demuxlet) for cell-hashing/nucleus-hashing/genetic-pooling analysis.
 
 Latest version

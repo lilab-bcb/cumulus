@@ -165,6 +165,7 @@ task generate_demux_config {
 
         python <<CODE
         import re, sys
+        import numpy as np
         import pandas as pd
 
         df = pd.read_csv('~{input_sample_sheet}', header = 0, dtype = str, index_col = False)
@@ -178,9 +179,9 @@ task generate_demux_config {
 
         tag_key = 'TagFile' if 'TagFile' in df.columns else 'ADT'
         assert tag_key in ['TagFile', 'ADT']
-            
+
         with open('hashing_ids.txt', 'w') as fo_hashing, open('pooling_ids.txt', 'w') as fo_pooling, open('id2rna.txt', 'w') as fo_rnas, open('id2tag.txt', 'w') as fo_tags, open('id2genotype.txt', 'w') as fo_genotypes:
-            
+
             for idx, row in df.iterrows():
                 if row['TYPE'] == 'genetic-pooling':
                     fo_pooling.write(row['OUTNAME'] + '\n')
@@ -191,7 +192,7 @@ task generate_demux_config {
                 fo_rnas.write(row['OUTNAME'] + '\t' + row['RNA'] + '\n')
                 fo_tags.write(row['OUTNAME'] + '\t' + row[tag_key] + '\n')
 
-                if 'Genotype' in df.columns:
+                if 'Genotype' in df.columns and (not np.isnan(row['Genotype'])):
                     fo_genotypes.write(row['OUTNAME'] + '\t' + row['Genotype'] + '\n')
                 else:
                     fo_genotypes.write(row['OUTNAME'] + '\tnull\n')
