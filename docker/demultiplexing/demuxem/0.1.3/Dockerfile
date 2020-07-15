@@ -26,7 +26,7 @@ RUN pip3 install --upgrade pip --no-cache-dir && \
     pip3 install seaborn==0.10.1 --no-cache-dir && \
     pip3 install anndata==0.7.4 --no-cache-dir && \
     pip3 install zarr==2.4.0 --no-cache-dir && \
-    pip3 install importlib-metadata=1.7.0 --no-cache-dir && \
+    pip3 install importlib-metadata==1.7.0 --no-cache-dir && \
     pip3 install pegasusio==0.2.3 --no-cache-dir && \
     pip3 install demuxEM==0.1.3 --no-cache-dir
 
@@ -38,7 +38,7 @@ RUN apt-get -qq -y remove curl gnupg && \
     apt-get -qq -y autoremove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log && \
-    rm /usr/bin/python && ln -s /usr/bin/python3 /usr/bin/python
+    ln -s /usr/bin/python3 /usr/bin/python
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
