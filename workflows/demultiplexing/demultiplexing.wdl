@@ -21,7 +21,7 @@ workflow demultiplexing {
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 
         # For demuxEM
-        # The Dirichlet prior concentration parameter (alpha) on samples. An alpha value < 1.0 will make the prior sparse.
+        # The Dirichlet prior concentration parameter (alpha) on samples. An alpha value < 1.0 will make the prior sparse. [default: 0.0]
         Float? demuxEM_alpha_on_samples
         # Only demultiplex cells/nuclei with at least <demuxEM_min_num_umis> of UMIs. [default: 100]
         Int? demuxEM_min_num_umis
@@ -33,7 +33,7 @@ workflow demultiplexing {
         Boolean demuxEM_generate_diagnostic_plots = true
         # Generate violin plots using gender-specific genes (e.g. Xist). <demuxEM_generate_gender_plot> is a comma-separated list of gene names.
         String? demuxEM_generate_gender_plot
-        String demuxEM_version = "0.1.1"
+        String demuxEM_version = "0.1.3"
         Int demuxEM_num_cpu = 8
         Int demuxEM_disk_space = 20
         Int demuxEM_memory = 10
@@ -78,8 +78,8 @@ workflow demultiplexing {
                 input:
                     sample_id = hashing_id,
                     output_directory = output_directory_stripped,
-                    input_rna = Config.id2rna[hashing_id],
-                    input_adt_csv = Config.id2tag[hashing_id],
+                    input_rna_h5 = Config.id2rna[hashing_id],
+                    input_hto_csv = Config.id2tag[hashing_id],
                     genome = genome,
                     alpha_on_samples = demuxEM_alpha_on_samples,
                     min_num_genes = min_num_genes,
