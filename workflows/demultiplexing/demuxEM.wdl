@@ -117,7 +117,7 @@ task run_demuxEM {
         CODE
 
         mkdir result
-        cp ~{sample_id}_demux.zarr ~{sample_id}.out.demuxEM.zarr ~{sample_id}.*.pdf result
+        cp ~{sample_id}_demux.zarr.zip ~{sample_id}.out.demuxEM.zarr.zip ~{sample_id}.*.pdf result
         gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
         # mkdir -p ~{output_directory}/~{sample_id}
         # cp result/* ~{output_directory}/~{sample_id}
@@ -125,7 +125,7 @@ task run_demuxEM {
 
     output {
         String output_folder = "~{output_directory}/~{sample_id}"
-        File output_zarr = "result/~{sample_id}.out.demuxEM.zarr"
+        File output_zarr = "result/~{sample_id}_demux.zarr.zip"
         File monitoringLog = "monitoring.log"
     }
 

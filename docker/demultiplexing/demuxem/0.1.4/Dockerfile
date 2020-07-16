@@ -28,7 +28,7 @@ RUN pip3 install --upgrade pip --no-cache-dir && \
     pip3 install zarr==2.4.0 --no-cache-dir && \
     pip3 install importlib-metadata==1.7.0 --no-cache-dir && \
     pip3 install pegasusio==0.2.3 --no-cache-dir && \
-    pip3 install demuxEM==0.1.3 --no-cache-dir
+    pip3 install demuxEM==0.1.4 --no-cache-dir
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
