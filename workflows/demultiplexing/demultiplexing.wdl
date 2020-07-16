@@ -42,7 +42,7 @@ workflow demultiplexing {
         Int souporcell_num_clusters = 1
         Boolean souporcell_de_novo_mode = true
         String souporcell_rename_donors = ""
-        String souporcell_version = "2020.03"
+        String souporcell_version = "2020.06"
         Int souporcell_num_cpu = 32
         Int souporcell_disk_space = 500
         Int souporcell_memory = 120
