@@ -12,7 +12,7 @@ workflow souporcell {
         Int min_num_genes
         Int num_clusters
         String donor_rename = ''
-        String souporcell_version = "2020.03"
+        String souporcell_version = "2020.06"
         String docker_registry = "cumulusprod"
         Int num_cpu = 32
         Int disk_space = 500
@@ -100,7 +100,7 @@ task run_souporcell {
             souporcell_call_args.extend(['--known_genotypes', 'ref_genotypes.vcf'])
 
             assert '~{donor_rename}' is not ''
-            
+
             name_list = '~{donor_rename}'.split(',')
             souporcell_call_args.extend(['--known_genotypes_sample_names'] + name_list)
 
@@ -114,8 +114,8 @@ task run_souporcell {
 
         if '~{donor_rename}' is not '':
             match_call_args.extend(['--donor-names', '~{donor_rename}'])
-            
-        match_call_args.extend(['result/cluster_genotypes.vcf', 'result/clusters.tsv', '~{input_rna}', 'result/~{sample_id}_demux.zarr'])
+
+        match_call_args.extend(['result/cluster_genotypes.vcf', 'result/clusters.tsv', '~{input_rna}', 'result/~{sample_id}_demux.zarr.zip'])
 
         print(' '.join(match_call_args))
 
@@ -125,7 +125,7 @@ task run_souporcell {
 
         mkdir buffer
         cp match_donors.log buffer
-        cp result/~{sample_id}_demux.zarr buffer
+        cp result/~{sample_id}_demux.zarr.zip buffer
         cp result/clusters.tsv buffer
         cp result/cluster_genotypes.vcf buffer
         gsutil -q -m rsync -r buffer ~{output_directory}/~{sample_id}
@@ -135,7 +135,7 @@ task run_souporcell {
 
     output {
         String output_folder = "~{output_directory}/~{sample_id}"
-        File output_zarr = "buffer/~{sample_id}_demux.zarr"
+        File output_zarr = "buffer/~{sample_id}_demux.zarr.zip"
         File monitoringLog = "monitoring.log"
     }
 
