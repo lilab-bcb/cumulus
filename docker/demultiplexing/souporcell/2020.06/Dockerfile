@@ -41,7 +41,7 @@ RUN cd /opt && \
     wget https://github.com/wheaton5/souporcell/archive/b2aa4cd5c1d4f1cc5b2c396699b89a8c7c7ee028.zip -O souporcell.zip && \
     unzip souporcell.zip && \
     rm souporcell.zip && \
-    mv souporcell-eeddcde5892c5cbf8aba2149f0e77756f830a5ae souporcell && \
+    mv souporcell-b2aa4cd5c1d4f1cc5b2c396699b89a8c7c7ee028 souporcell && \
     cd souporcell/troublet && \
     cargo build --release && \
     cd /opt/souporcell/souporcell && \
@@ -50,17 +50,17 @@ RUN cd /opt && \
 ENV PATH=/opt/souporcell:/opt/souporcell/troublet/target/release:$PATH
 
 RUN conda install -y python==3.6.10 && \
-    pip install numpy==1.18.2 && \
-    pip install pandas==1.0.3 && \
-    pip install scipy==1.4.1 && \
-    pip install pysam==0.15.4 && \
+    pip install numpy==1.19.0 && \
+    pip install pandas==1.0.5 && \
+    pip install scipy==1.5.1 && \
+    pip install pysam==0.16.0.1 && \
     pip install pyvcf==0.6.8 && \
-    pip install pystan==2.17.1.0 && \
-    pip install pyfaidx==0.5.8 && \
-    pip install anndata==0.7.1 && \
+    pip install pystan==2.19.1.1 && \
+    pip install pyfaidx==0.5.9 && \
+    pip install anndata==0.7.4 && \
     pip install zarr==2.4.0 && \
     pip install networkx==2.4 && \
-    pip install pegasusio==0.1.3
+    pip install pegasusio==0.2.3
 
 RUN cd /opt && \
     wget -O htslib.tar.bz2 https://github.com/samtools/htslib/releases/download/1.9/htslib-1.9.tar.bz2 && \
