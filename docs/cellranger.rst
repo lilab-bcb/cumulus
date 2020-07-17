@@ -190,6 +190,12 @@ Sample sheet
 
 		* - Keyword
 		  - Description
+		* - **GRCh38-2020-A**
+		  - Human GRCh38 (GENCODE v32/Ensembl 98)
+		* - **mm10-2020-A**
+		  - Mouse mm10 (GENCODE vM23/Ensembl 98)
+		* - **GRCh38_and_mm10-2020-A**
+		  - Human GRCh38 (GENCODE v32/Ensembl 98) and mouse mm10 (GENCODE vM23/Ensembl 98)
 		* - **GRCh38_v3.0.0**
 		  - Human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation
 		* - **hg19_v3.0.0**
@@ -332,7 +338,7 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  - false
 		  - false
 		* - cellranger_version
-		  - cellranger version, could be 3.1.0, 3.0.2, or 2.2.0
+		  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, or 2.2.0
 		  - "3.1.0"
 		  - "3.1.0"
 		* - docker_registry
@@ -537,7 +543,7 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - 0.1
 		  - 0.1
 		* - cellranger_version
-		  - cellranger version, could be 3.1.0, 3.0.2, 2.2.0
+		  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, 2.2.0
 		  - "3.1.0"
 		  - "3.1.0"
 		* - cumulus_feature_barcoding_version
@@ -982,7 +988,7 @@ For scIR-seq data, ``cellranger_workflow`` takes Illumina outputs as input and r
 	  - false
 	  - false
 	* - cellranger_version
-	  - cellranger version, could be 3.1.0, 3.0.2, 2.2.0
+	  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, 2.2.0
 	  - "3.1.0"
 	  - "3.1.0"
 	* - docker_registry
@@ -1155,7 +1161,7 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be 3.1.0, 3.0.2, or 2.2.0
+		  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, or 2.2.0
 		  - "3.1.0"
 		  - "3.1.0"
 		* - docker_registry
@@ -1345,7 +1351,7 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be 3.1.0, 3.0.2, or 2.2.0
+		  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, or 2.2.0
 		  - "3.1.0"
 		  - "3.1.0"
 		* - docker_registry
