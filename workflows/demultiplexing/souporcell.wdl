@@ -124,10 +124,7 @@ task run_souporcell {
         CODE
 
         mkdir buffer
-        cp match_donors.log buffer
-        cp result/~{sample_id}_demux.zarr.zip buffer
-        cp result/clusters.tsv buffer
-        cp result/cluster_genotypes.vcf buffer
+        cp match_donors.log result/~{sample_id}_demux.zarr.zip result/clusters.tsv result/cluster_genotypes.vcf buffer
         gsutil -q -m rsync -r buffer ~{output_directory}/~{sample_id}
         # mkdir -p ~{output_directory}/~{sample_id}
         # cp -r buffer/* ~{output_directory}/~{sample_id}

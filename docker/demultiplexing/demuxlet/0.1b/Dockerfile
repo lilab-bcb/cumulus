@@ -14,9 +14,20 @@ RUN conda install -c anaconda pandas==1.0.5
 
 RUN conda install -c bioconda popscle
 
-RUN pip install Cython==0.29.21 && \
+RUN pip install --upgrade pip && \
+    pip install Cython==0.29.21 && \
+    pip install importlib-metadata==1.7.0 && \
+    pip install docopt==0.6.2 && \
+    pip install loompy==3.0.6 && \
+    pip install anndata==0.7.4 && \
+    pip install scipy==1.5.1 && \
+    pip install zarr==2.4.0 && \
+    pip install natsort==7.0.1 && \
+    pip install h5py==2.10.0 && \
+    pip install numba==0.50.1 && \
+    pip install numcodecs==0.6.4 && \
     pip install argparse==1.4.0 && \
-    pip install pegasusio==0.1.3
+    pip install pegasusio==0.2.3
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/demultiplexing/souporcell/extract_barcodes_from_rna.py /software
