@@ -49,7 +49,8 @@ RUN pip3 -V && \
     pip3 install bokeh==2.1.1 && \
     pip3 install scplot==0.0.16 && \
     pip3 install importlib-metadata==1.7.0 && \
-    pip3 install pegasuspy==0.17.2
+    pip3 install pegasuspy==0.17.2 && \
+    pip3 install cirrocumulus==1.1.0.post3
 
 ENV USER jupyter-user
 USER $USER
