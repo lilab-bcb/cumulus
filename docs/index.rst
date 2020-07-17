@@ -16,7 +16,6 @@
    demultiplexing
    doublet_detection
    cumulus
-   demuxlet
    topic_modeling
    command_line
    examples/index
