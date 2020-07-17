@@ -17,9 +17,6 @@ Developing version
     * - cumulus/cumulus
       - `29 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/29>`__
       - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
-    * - cumulus/demultiplexing
-      - `13 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/13`_
-      - Run tools (demuxEM, souporcell, or demuxlet) for cell-hashing/nucleus-hashing/genetic-pooling analysis.
 
 Latest version
 ^^^^^^^^^^^^^^
@@ -35,8 +32,11 @@ Latest version
       - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/10>`__
       - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
     * - cumulus/count
-      - `13 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/13>`__
+      - `14 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/14>`__
       - Run alternative tools (STARsolo, Optimus, Salmon alevin, or Kallisto BUStools) to generate gene-count matrices from FASTQ files.
+    * - cumulus/demultiplexing
+      - `14 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/14>`_
+      - Run tools (demuxEM, souporcell, or demuxlet) for cell-hashing/nucleus-hashing/genetic-pooling analysis.
     * - cumulus/cellranger_create_reference
       - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/8>`__
       - Run Cell Ranger tools to build sc/snRNA-seq references.
@@ -80,10 +80,10 @@ Stable version - v0.15.0
       - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/10>`__
       - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
     * - cumulus/count
-      - `13 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/13>`__
+      - `14 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/14>`__
       - Run alternative tools (STARsolo, Optimus, Salmon alevin, or Kallisto BUStools) to generate gene-count matrices from FASTQ files.
     * - cumulus/cellranger_create_reference
-      - `7 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/7>`__
+      - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/8>`__
       - Run Cell Ranger tools to build sc/snRNA-seq references.
     * - cumulus/cellranger_atac_aggr
       - `2 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_aggr/2>`__
@@ -101,7 +101,7 @@ Stable version - v0.15.0
       - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/8>`__
       - Generate user-customized genome references for SMART-Seq2 data.
     * - cumulus/cumulus
-      - `23 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/23>`__
+      - `24 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/24>`__
       - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
     * - cumulus/cumulus_subcluster
       - `16 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_subcluster/16>`__

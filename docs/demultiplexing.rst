@@ -3,7 +3,7 @@ Demultiplex genetic-pooling/cell-hashing/nucleus-hashing sc/snRNA-Seq data
 
 This ``demultiplexing`` workflow generates gene-count matrices from cell-hashing/nucleus-hashing/genetic-pooling data by demultiplexing.
 
-demuxEM is used for analyzing cell-hashing/nucleus-hashing data, while souporcell and demuxlet are for genetic-pooling data.
+In the workflow, ``demuxEM`` is used for analyzing cell-hashing/nucleus-hashing data, while ``souporcell`` and ``demuxlet`` are for genetic-pooling data.
 
 Prepare input data and import workflow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -11,7 +11,7 @@ Prepare input data and import workflow
 1. Run ``cellranger_workflow``
 ++++++++++++++++++++++++++++++++
 
-	To demultiplex, you'll need raw gene count and hashtag matrices for cell-hashing/nucleus-hashing data; raw gene count matrices and genome BAM files for genetic-pooling data. You can generate these data by running the ``cellranger_workflow``.
+	To demultiplex, you'll need raw gene count and hashtag matrices for cell-hashing/nucleus-hashing data, or raw gene count matrices and genome BAM files for genetic-pooling data. You can generate these data by running the ``cellranger_workflow``.
 
 	Please refer to the `cellranger_workflow tutorial`_ for details.
 
@@ -50,9 +50,9 @@ Import *demultiplexing* workflow to your workspace.
 		* - Genotype
 		  - Google bucket url to the reference genotypes in ``vcf.gz`` format. This column is **not required** in the following cases:
 
-		  	- *TYPE* is ``cell-hashing`` or ``nucleus-hashing``;
+		  	- When *TYPE* is ``cell-hashing`` or ``nucleus-hashing``;
 
-		  	- *TYPE* is ``genetic-pooling``, *demultiplexing_algorithm* input is ``souporcell``, user wish to run in *de novo* mode without reference genotypes, and don't need to rename cluster names by information from a known genotype vcf file.
+		  	- When *TYPE* is ``genetic-pooling``, *demultiplexing_algorithm* input is ``souporcell``, and user wish to run in *de novo* mode without reference genotypes, and don't need to rename cluster names by information from a known genotype vcf file.
 
 
 	Example::
@@ -65,11 +65,11 @@ Import *demultiplexing* workflow to your workspace.
 
 	**3.2 Upload your sample sheet to the workspace bucket:**
 
-	Use gsutil_ (you already have it if you've installed Google cloud SDK) in your unix terminal to upload your sample sheet to workspace bucket.
+	Use gsutil_ (you already have it if you've installed Google Cloud SDK) in your unix terminal to upload your sample sheet to workspace bucket.
 
 	Example::
 
-			gsutil cp /foo/bar/projects/sample_sheet_demux.tsv gs://fc-e0000000-0000-0000-0000-000000000000/
+			gsutil cp /foo/bar/projects/sample_sheet_demux.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
 ---------------
 
@@ -173,9 +173,9 @@ demuxEM inputs
 	  - "XIST"
 	  -
 	* - demuxEM_version
-	  - demuxEM version to use. Currently only support "0.1.1".
-	  - "0.1.1"
-	  - "0.1.1"
+	  - demuxEM version to use. Currently only support "0.1.4".
+	  - "0.1.4"
+	  - "0.1.4"
 	* - demuxEM_num_cpu
 	  - demuxEM parameter. Number of CPUs to request for demuxEM per pair.
 	  - 8
@@ -202,9 +202,9 @@ souporcell inputs
 	  - Example
 	  - Default
 	* - souporcell_version
-	  - souporcell version to use. Currently only support "2020.03".
-	  - "2020.03"
-	  - "2020.03"
+	  - souporcell version to use. Available versions: "2020.06", "2020.03".
+	  - "2020.06"
+	  - "2020.06"
 	* - souporcell_de_novo_mode
 	  - | souporcell parameter.
 	    | If ``true``, run souporcell in de novo mode without reference genotypes; and if a reference genotype vcf file is provided in the sample sheet, use it **only** for matching the cluster labels computed by souporcell.
@@ -288,14 +288,14 @@ In the output subfolder of each cell-hashing/nuclei-hashing RNA-hashtag data pai
 
 	* - Name
 	  - Description
-	* - output_name_demux.zarr
+	* - output_name_demux.zarr.zip
 	  - Demultiplexed RNA count matrix in zarr format. Please refer to section `load demultiplexing results into Python and R`_ for its structure.
-	* - output_name.out.demuxEM.zarr
+	* - output_name.out.demuxEM.zarr.zip
 	  - | RNA expression matrix with demultiplexed sample identities in zarr format.
-	    | To load this file into Python, you need to first install `Pegasusio`_ on your local machine. Then use ``import pegasusio as io; data = io.read_input("output_name.out.demuxEM.zarr")`` in Python environment.
-	    | It contains 2 UnimodalData objects: one with key ``hashing`` is the hashtag count matrix, the other one with genome name key is the demultiplexed RNA count matrix.
-	    | To load the hashtag count matrix, type ``hash_data = data.get_data('hashing')``. The count matrix is ``hash_data.X``; cell barcode attributes are stored in ``hash_data.obs``; sample names are in ``hash_data.var_names``. Moreover, the estimated background probability regarding hashtags is in ``hash_data.uns['background_probs']``.
-	    | To load the RNA matrix, type ``rna_data = data.get_data('<genome>')``, where ``<genome>`` is the genome name of the data. It only contains cells which have estimated sample assignments. The count matrix is ``rna_data.X``. Cell barcode attributes are stored in ``rna_data.obs``: ``rna_data.obs['demux_type']`` stores the estimated droplet types (singlet/doublet/unknown) of cells; ``rna_data.obs['assignment']`` stores the estimated hashtag(s) that each cell belongs to. Moreover, for cell-hashing/nucleus-hashing data, you can find estimated sample fractions (sample1, sample2, ..., samplen, background) for each droplet in ``rna_data.obsm['raw_probs']``.
+	    | To load this file into Python, you need to first install `Pegasusio`_ on your local machine. Then use ``import pegasusio as io; data = io.read_input("output_name.out.demuxEM.zarr.zip")`` in Python environment.
+	    | It contains 2 UnimodalData objects: one with key name suffix ``-hashing`` is the hashtag count matrix, the other one with key name suffix ``-rna`` is the demultiplexed RNA count matrix.
+	    | To load the hashtag count matrix, type ``hash_data = data.get_data('<genome>-hashing')``, where ``<genome>`` is the genome name of the data. The count matrix is ``hash_data.X``; cell barcode attributes are stored in ``hash_data.obs``; sample names are in ``hash_data.var_names``. Moreover, the estimated background probability regarding hashtags is in ``hash_data.uns['background_probs']``.
+	    | To load the RNA matrix, type ``rna_data = data.get_data('<genome>-rna')``, where ``<genome>`` is the genome name of the data. It only contains cells which have estimated sample assignments. The count matrix is ``rna_data.X``. Cell barcode attributes are stored in ``rna_data.obs``: ``rna_data.obs['demux_type']`` stores the estimated droplet types (singlet/doublet/unknown) of cells; ``rna_data.obs['assignment']`` stores the estimated hashtag(s) that each cell belongs to. Moreover, for cell-hashing/nucleus-hashing data, you can find estimated sample fractions (sample1, sample2, ..., samplen, background) for each droplet in ``rna_data.obsm['raw_probs']``.
 	* - output_name.ambient_hashtag.hist.png
 	  - Optional output. A histogram plot depicting hashtag distributions of empty droplets and non-empty droplets.
 	* - output_name.background_probabilities.bar.png
@@ -315,7 +315,7 @@ In the output subfolder of each genetic-pooling RNA-hashtag data pair generated 
 
 	* - Name
 	  - Description
-	* - output_name_demux.zarr
+	* - output_name_demux.zarr.zip
 	  - Demultiplexed RNA count matrix in zarr format. Please refer to section `load demultiplexing results into Python and R`_ for its structure.
 	* - clusters.tsv
 	  - Inferred droplet type and cluster assignment for each cell barcode.
@@ -332,7 +332,7 @@ In the output subfolder of each genetic-pooling RNA-hashtag data pair generated 
 
 	* - Name
 	  - Description
-	* - output_name_demux.zarr
+	* - output_name_demux.zarr.zip
 	  - Demultiplexed RNA count matrix in zarr format. Please refer to section `load demultiplexing results into Python and R`_ for its structure.
 	* - output_name.best
 	  - Inferred droplet type and cluster assignment for each cell barcode.
@@ -345,7 +345,7 @@ Load demultiplexing results into Python and R
 To load demultiplexed RNA count matrix into Python, you need to install Python package `pegasusio <https://pypi.org/project/pegasusio/>`_ first. Then follow the codes below::
 
 	import pegasusio as io
-	data = io.read_input('output_name_demux.zarr')
+	data = io.read_input('output_name_demux.zarr.zip')
 
 Once you load the data object, you can find estimated droplet types (singlet/doublet/unknown) in ``data.obs['demux_type']``. Notices that there are cell barcodes with no sample associated, and therefore have no droplet type.
 
@@ -357,7 +357,7 @@ To load the results into R, you need to install R package ``reticulate`` in addi
 
 	library(reticulate)
 	ad <- import("pegasusio", convert = FALSE)
-	data <- ad$read_input("output_name_demux.zarr")
+	data <- ad$read_input("output_name_demux.zarr.zip")
 
 Results are in ``data$obs['demux_type']``, ``data$obs['assignment']``, and similarly as above, for cell-hashing/nucleus-hashing data, you'll find an additional field ``data$obs['assignment.dedup']`` for deduplicated sample assignment in the case that one sample name can correspond to multiple feature barcodes.
 

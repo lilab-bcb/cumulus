@@ -21,7 +21,7 @@ workflow count {
         String output_directory
 
         # Count
-        Boolean run_count = true 
+        Boolean run_count = true
         String count_tool = "StarSolo"
 
         String docker_registry = "cumulusprod"
@@ -57,7 +57,7 @@ workflow count {
             zones = zones,
             preemptible = preemptible
     }
-    
+
     File ref_index_file = "gs://regev-lab/resources/count_tools/ref_index.tsv"
     # File ref_index_file = "ref_index.tsv"
     Map[String, String] ref_index2gsurl = read_map(ref_index_file)
@@ -66,7 +66,7 @@ workflow count {
     if (Config.sample_ids[0] != '') {
         scatter (sample_id in Config.sample_ids) {
             Boolean do_merge = if Config.merge_flags[sample_id] == 'true' then true else false
-        
+
             if (do_merge) {
                 call mfs.run_merge_fastqs as MergeFastqs {
                     input:
@@ -162,13 +162,13 @@ workflow count {
                 }
             }
 
-            
+
         }
     }
 
     output {
         String output_folder = output_directory
-    }    
+    }
 }
 
 task generate_count_config {
@@ -212,7 +212,7 @@ task generate_count_config {
                     read_item['read'] = "merged"
                     data_no_merge[row['Sample']] = read_item
                 else:
-                    dir_name = input_dir_list[0]
+                    dir_name = input_dir_list[0] if input_dir_list[0][-1] != '/' else input_dir_list[0][:-1]
                     with open(row['Sample'] + "_tmp.txt", 'w') as tmp_fout:
                         check_call(['gsutil', 'ls', dir_name], stdout = tmp_fout)
                         # check_call(['ls', dir_name], stdout = tmp_fout)

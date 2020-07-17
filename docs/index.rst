@@ -13,10 +13,10 @@
    count
    smart_seq_2
    drop_seq
-   hashing_cite_seq
+   demultiplexing
    doublet_detection
    cumulus
-   demuxlet
+   topic_modeling
    command_line
    examples/index
    contribution
