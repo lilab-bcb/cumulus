@@ -428,6 +428,16 @@ Prepare feature barcode files
 
 	The above file describes a cell hashing application with 4 samples.
 
+	If cell hashing and CITE-seq data share a same sample index, you should concatenate hashing and CITE-seq barcodes together and add a third column indicating the feature type. 
+	See below for an example::
+
+		TTCCTGCCATTACTA,sample_1,hashing
+		CCGTACCTCATTGTT,sample_2,hashing
+		GGTAGATGTCCTCAG,sample_3,hashing
+		TGGTGTCATTCTTGA,sample_4,hashing
+		CTCATTGTAACTCCT,CD3,citeseq
+		GCGCAACTTGATGAT,CD8,citeseq
+
 	Then upload it to your google bucket::
 
 		gsutil antibody_index.csv gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index.csv
@@ -632,6 +642,8 @@ In addition, For each antibody tag or crispr tag sample, a folder with the sampl
 ``sample_id.csv`` is the feature count matrix. It has the following format. The first line describes the column names: ``Antibody/CRISPR,cell_barcode_1,cell_barcode_2,...,cell_barcode_n``. The following lines describe UMI counts for each feature barcode, with the following format: ``feature_name,umi_count_1,umi_count_2,...,umi_count_n``.
 
 ``sample_id.stat.csv.gz`` stores the gzipped sufficient statistics. It has the following format. The first line describes the column names: ``Barcode,UMI,Feature,Count``. The following lines describe the read counts for every barcode-umi-feature combination.
+
+If the feature barcode file has a third column, there will be two files for each feature type in the third column. For example, if ``hashing`` presents, ``sample_id.hashing.csv`` and ``sample_id.hashing.stat.csv.gz`` will be generated.
 
 If data type is ``crispr``, three additional files, ``sample_id.umi_count.pdf``, ``sample_id.filt.csv`` and ``sample_id.filt.stat.csv.gz``, are generated.
 
