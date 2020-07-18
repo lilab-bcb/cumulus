@@ -1,4 +1,4 @@
-FROM debian:stretch-slim
+FROM debian:buster-slim
 SHELL ["/bin/bash", "-c"]
 
 ADD https://github.com/klarman-cell-observatory/cumulus_feature_barcoding/archive/0.3.0.tar.gz /software/
