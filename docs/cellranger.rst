@@ -339,8 +339,8 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  - false
 		* - cellranger_version
 		  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, or 2.2.0
-		  - "3.1.0"
-		  - "3.1.0"
+		  - "4.0.0"
+		  - "4.0.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -428,7 +428,7 @@ Prepare feature barcode files
 
 	The above file describes a cell hashing application with 4 samples.
 
-	If cell hashing and CITE-seq data share a same sample index, you should concatenate hashing and CITE-seq barcodes together and add a third column indicating the feature type. 
+	If cell hashing and CITE-seq data share a same sample index, you should concatenate hashing and CITE-seq barcodes together and add a third column indicating the feature type.
 	See below for an example::
 
 		TTCCTGCCATTACTA,sample_1,hashing
@@ -554,12 +554,12 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - 0.1
 		* - cellranger_version
 		  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, 2.2.0
-		  - "3.1.0"
-		  - "3.1.0"
+		  - "4.0.0"
+		  - "4.0.0"
 		* - cumulus_feature_barcoding_version
-		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.2.0.
-		  - "0.2.0"
-		  - "0.2.0"
+		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.3.0, 0.2.0.
+		  - "0.3.0"
+		  - "0.3.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -761,9 +761,9 @@ Workflow input
 	  - 6000
 	  -
 	* - cellranger_atac_version
-	  - cellranger-atac version, currently only 1.1.0
-	  - "1.1.0"
-	  - "1.1.0"
+	  - cellranger-atac version. Available options: 1.2.0, 1.1.0
+	  - "1.2.0"
+	  - "1.2.0"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
@@ -874,7 +874,7 @@ To aggregate multiple scATAC-Seq samples, follow the instructions below:
 	  - "lsa"
 	* - cellranger_atac_version
 	  - Cell Ranger ATAC version to use.
-	    Options: ``1.2.0``.
+	    Options: ``1.2.0``, ``1.1.0``.
 	  - "1.2.0"
 	  - "1.2.0"
 	* - zones
@@ -1005,8 +1005,8 @@ For scIR-seq data, ``cellranger_workflow`` takes Illumina outputs as input and r
 	  - false
 	* - cellranger_version
 	  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, 2.2.0
-	  - "3.1.0"
-	  - "3.1.0"
+	  - "4.0.0"
+	  - "4.0.0"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
@@ -1178,8 +1178,8 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  -
 		* - cellranger_version
 		  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, or 2.2.0
-		  - "3.1.0"
-		  - "3.1.0"
+		  - "4.0.0"
+		  - "4.0.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -1270,9 +1270,9 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 		  - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_atac_reference"
 		  -
 		* - cellranger_atac_version
-		  - cellranger-atac version, could be 1.1.0
-		  - "1.1.0"
-		  - "1.1.0"
+		  - cellranger-atac version, could be: 1.2.0, 1.1.0
+		  - "1.2.0"
+		  - "1.2.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -1368,8 +1368,8 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  -
 		* - cellranger_version
 		  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, or 2.2.0
-		  - "3.1.0"
-		  - "3.1.0"
+		  - "4.0.0"
+		  - "4.0.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 

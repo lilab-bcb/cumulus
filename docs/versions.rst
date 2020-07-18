@@ -38,7 +38,7 @@ Latest version
       - `14 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/14>`_
       - Run tools (demuxEM, souporcell, or demuxlet) for cell-hashing/nucleus-hashing/genetic-pooling analysis.
     * - cumulus/cellranger_create_reference
-      - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/8>`__
+      - `9 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/9>`__
       - Run Cell Ranger tools to build sc/snRNA-seq references.
     * - cumulus/cellranger_atac_aggr
       - `2 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_aggr/2>`__
@@ -47,7 +47,7 @@ Latest version
       - `2 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_create_reference/2>`__
       - Run Cell Ranger tools to build scATAC-seq references.
     * - cumulus/cellranger_vdj_create_reference
-      - `2 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_vdj_create_reference/2>`__
+      - `3 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_vdj_create_reference/3>`__
       - Run Cell Ranger tools to build single-cell immune profiling references.
     * - cumulus/smartseq2
       - `7 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2/7>`__
