@@ -360,13 +360,13 @@ task run_cumulus_cirro_output {
 		monitor_script.sh > monitoring.log &
 
 		python /software/prepare_data.py --out ~{output_name}.cirro ~{input_h5ad}
-		gsutil -q -m cp -r ~{output_name}.cirro ~{output_directory}/~{output_name}/
-		# mkdir -p ~{output_directory}/~{output_name}
-		# cp -r ~{output_name}.cirro ~{output_directory}/~{output_name}/
+		gsutil -q -m cp -r ~{output_name}.cirro ~{output_directory}/
+		# mkdir -p ~{output_directory}/
+		# cp -r ~{output_name}.cirro ~{output_directory}/
 	}
 
 	output {
-		String output_cirro_folder = "~{output_directory}/~{output_name}/~{output_name}.cirro"
+		String output_cirro_folder = "~{output_directory}/~{output_name}.cirro"
 		File monitoringLog = "monitoring.log"
 	}
 
@@ -470,7 +470,7 @@ task run_cumulus_de_analysis {
 			print(' '.join(call_args))
 			check_call(call_args)
 
-		dest = '~{output_directory}' + '/' + '~{output_name}' + '/'
+		dest = '~{output_directory}' + '/'
 		# check_call(['mkdir', '-p', dest])
 		files = ['~{output_name}.h5ad', '~{output_name}.de.xlsx']
 		if '~{find_markers_lightgbm}' is 'true':
@@ -519,8 +519,6 @@ task run_cumulus_plot {
 		String? plot_fitsne
 		String? plot_umap
 		String? plot_fle
-		String? plot_diffmap
-		String? plot_citeseq_fitsne
 		String? plot_net_tsne
 		String? plot_net_umap
 		String? plot_net_fle
@@ -537,7 +535,7 @@ task run_cumulus_plot {
 			pairs = '~{plot_composition}'.split(',')
 			for pair in pairs:
 				lab, attr = pair.split(':')
-				call_args = ['pegasus', 'plot', 'composition', '--cluster-labels', lab, '--attribute', attr, '--style', 'normalized', '--not-stacked', '~{input_h5ad}', '~{output_name}.' + lab + '.' + attr + '.composition.pdf']
+				call_args = ['pegasus', 'plot', 'composition', '--xattr', lab, '--yattr', attr, '--style', 'normalized', '~{input_h5ad}', '~{output_name}.' + lab + '.' + attr + '.composition.pdf']
 				print(' '.join(call_args))
 				check_call(call_args)
 		if '~{plot_tsne}' is not '':
@@ -556,16 +554,6 @@ task run_cumulus_plot {
 			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'fle', '--attributes', '~{plot_fle}', '~{input_h5ad}', '~{output_name}.fle.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
-		if '~{plot_diffmap}' is not '':
-			attrs = '~{plot_diffmap}'.split(',')
-			for attr in attrs:
-				call_args = ['pegasus', 'iplot', '--attribute', attr, 'diffmap_pca', '~{input_h5ad}', '~{output_name}.' + attr + '.diffmap_pca.html']
-				print(' '.join(call_args))
-				check_call(call_args)
-		if '~{plot_citeseq_fitsne}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'citeseq_fitsne', '--attributes', '~{plot_citeseq_fitsne}', '~{input_h5ad}', '~{output_name}.citeseq.fitsne.pdf']
-			print(' '.join(call_args))
-			check_call(call_args)
 		if '~{plot_net_tsne}' is not '':
 			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_tsne', '--attributes', '~{plot_net_tsne}', '~{input_h5ad}', '~{output_name}.net.tsne.pdf']
 			print(' '.join(call_args))
@@ -580,7 +568,7 @@ task run_cumulus_plot {
 			check_call(call_args)
 
 		import glob
-		dest = '~{output_directory}' + '/' + '~{output_name}' + '/'
+		dest = '~{output_directory}' + '/'
 		# check_call(['mkdir', '-p', dest])
 		files = glob.glob('*.pdf')
 		files.extend(glob.glob('*.html'))
@@ -627,8 +615,8 @@ task run_cumulus_scp_output {
 		set -e
 		export TMPDIR=/tmp
 		pegasus scp_output ~{true='--dense' false='' output_dense} ~{input_h5ad} ~{output_name}
-		# mkdir -p ~{output_directory}/~{output_name} ; cp ~{output_name}.scp.* ~{output_directory}/~{output_name}
-		gsutil -m cp ~{output_name}.scp.* ~{output_directory}/~{output_name}/
+		# mkdir -p ~{output_directory} ; cp ~{output_name}.scp.* ~{output_directory}/
+		gsutil -m cp ~{output_name}.scp.* ~{output_directory}/
 	}
 
 	output {

@@ -114,7 +114,7 @@ task demuxlet_task {
         check_call(call_args)
         CODE
 
-        python /software/generate_zarr.py result/~{sample_id}.best ~{input_rna} result/~{sample_id}_demux.zarr
+        python /software/generate_zarr.py result/~{sample_id}.best ~{input_rna} result/~{sample_id}_demux.zarr.zip
 
         gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
         # mkdir -p ~{output_directory}/~{sample_id}
@@ -123,7 +123,7 @@ task demuxlet_task {
 
     output {
         String output_folder = "~{output_directory}/~{sample_id}"
-        File output_zarr  = "result/~{sample_id}_demux.zarr"
+        File output_zarr  = "result/~{sample_id}_demux.zarr.zip"
         File monitoringLog = "monitoring.log"
     }
 
@@ -137,4 +137,3 @@ task demuxlet_task {
         preemptible: preemptible
     }
 }
-

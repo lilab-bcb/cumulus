@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/18/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/21/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
@@ -12,8 +12,8 @@ workflow cumulus {
 		# Results name prefix and subdirectory name.
 		String output_name
 
-		# cumulus version, default to "0.16.0"
-		String cumulus_version = "0.16.0"
+		# cumulus version, default to "1.0.0"
+		String cumulus_version = "1.0.0"
 		# Docker registry to use
 		String docker_registry = "cumulusprod"
 		# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
@@ -37,7 +37,7 @@ workflow cumulus {
 		# If sample count matrix is in either DGE, mtx, csv, tsv or loom format and there is no Reference column in the csv_file, use default_reference as the reference.
 		String? default_reference
 		# If we have demultiplexed data, turning on this option will make cumulus only include barcodes that are predicted as singlets
-		Boolean? select_only_singlets = false
+		Boolean select_only_singlets = false
 		# Only keep barcodes with at least this number of expressed genes
 		Int minimum_number_of_genes = 100
 		# If inputs are dropseq data
@@ -60,13 +60,13 @@ workflow cumulus {
 		# Append Unimodal data <key> to any <keys> in --focus.
 		String? append
 		# If write cell and gene filtration results as a spreadsheet. [default: true]
-		Boolean? output_filtration_results = true
+		Boolean output_filtration_results = true
 		# If plot filtration results as PDF files. [default: true]
-		Boolean? plot_filtration_results = true
+		Boolean plot_filtration_results = true
 		# Figure size for filtration plots. <figsize> is a comma-separated list of two numbers, the width and height of the figure (e.g. 6,4).
 		String? plot_filtration_figsize
 		# Output seurat-compatible h5ad file. Caution: File size might be large, do not turn this option on for large data sets. [default: false]
-		Boolean? output_h5ad
+		Boolean output_h5ad = true
 		# If output loom-formatted file [default: false]
 		Boolean? output_loom
 		# Only keep cells with at least <number> of genes. [default: 500]
@@ -148,9 +148,9 @@ workflow cumulus {
 		# tSNE’s perplexity parameter. [default: 30]
 		Float? tsne_perplexity
 		# Run FItSNE for visualization.
-		Boolean run_fitsne = true
+		Boolean? run_fitsne
 		# Run umap for visualization.
-		Boolean? run_umap
+		Boolean run_umap = true
 		# Run umap on diffusion components. [default: 15]
 		Int? umap_K
 		# Umap parameter. [default: 0.5]
@@ -227,10 +227,6 @@ workflow cumulus {
 		String? plot_umap
 		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FLEs side by side.
 		String? plot_fle
-		# Takes the format of "attr,attr,...,attr". If non-empty, generate attr colored 3D interactive plot. The 3 coordinates are the first 3 PCs of all diffusion components.
-		String? plot_diffmap
-		# Plot cells based on FIt-SNE coordinates estimated from antibody expressions. Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FIt-SNEs side by side.
-		String? plot_citeseq_fitsne
 		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored tSNEs side by side based on net tSNE result.
 		String? plot_net_tsne
 		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored UMAPs side by side based on net UMAP result.
@@ -367,7 +363,7 @@ workflow cumulus {
 				call tasks.run_cumulus_de_analysis as de_analysis {
 					input:
 						input_h5ad = focus_h5ad,
-						output_directory = output_directory_stripped,
+						output_directory = output_directory_stripped + '/' + output_name,
 						output_name = focus_prefix,
 						labels = cluster_labels,
 						alpha = alpha,
@@ -393,21 +389,19 @@ workflow cumulus {
 				}
 			}
 
-			Boolean do_plot = defined(plot_composition) || defined(plot_tsne) || defined(plot_fitsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_diffmap) || defined(plot_citeseq_fitsne) || defined(plot_net_tsne) || defined(plot_net_umap) || defined(plot_net_fle)
+			Boolean do_plot = defined(plot_composition) || defined(plot_tsne) || defined(plot_fitsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_net_tsne) || defined(plot_net_umap) || defined(plot_net_fle)
 
 			if (do_plot) {
 				call tasks.run_cumulus_plot as plot {
 					input:
 						input_h5ad = focus_h5ad,
-						output_directory = output_directory_stripped,
+						output_directory = output_directory_stripped + '/' + output_name,
 						output_name = focus_prefix,
 						plot_composition = plot_composition,
 						plot_tsne = plot_tsne,
 						plot_fitsne = plot_fitsne,
 						plot_umap = plot_umap,
 						plot_fle = plot_fle,
-						plot_diffmap = plot_diffmap,
-						plot_citeseq_fitsne = plot_citeseq_fitsne,
 						plot_net_tsne = plot_net_tsne,
 						plot_net_umap = plot_net_umap,
 						plot_net_fle = plot_net_fle,
@@ -424,7 +418,7 @@ workflow cumulus {
 				call tasks.run_cumulus_cirro_output as cirro_output {
 					input:
 						input_h5ad = focus_h5ad,
-						output_directory = output_directory_stripped,
+						output_directory = output_directory_stripped + '/' + output_name,
 						output_name = focus_prefix,
 						cumulus_version = cumulus_version,
 						zones = zones,
@@ -440,7 +434,7 @@ workflow cumulus {
 				call tasks.run_cumulus_scp_output as scp_output {
 					input:
 						input_h5ad = focus_h5ad,
-						output_directory = output_directory_stripped,
+						output_directory = output_directory_stripped + '/' + output_name,
 						output_name = focus_prefix,
 						output_dense = output_dense,
 						cumulus_version = cumulus_version,
