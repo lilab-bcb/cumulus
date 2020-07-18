@@ -189,7 +189,7 @@ workflow cumulus {
 		String? cluster_labels
 		# Control false discovery rate at <alpha>. [default: 0.05]
 		Float? alpha
-		# Calculate area under ROC (AUROC) and area under Precision-Recall (AUPR).
+		# Calculate area under ROC (AUROC).
 		Boolean auc = true
 		# Calculate Welch's t-test.
 		Boolean t_test = true
@@ -207,7 +207,7 @@ workflow cumulus {
 
 		# If also annotate cell types for clusters based on DE results.
 		Boolean? annotate_cluster
-		# Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain" or a JSON file describing the markers. [default: human_immune]
+		# Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain", "human_lung" or a JSON file describing the markers. [default: human_immune]
 		String? organism
 		# DE test to use to infer cell types, could be either "t", "fisher", or "mwu". [default: t]
 		String? annotate_de_test
