@@ -58,12 +58,12 @@ workflow cellranger_workflow {
         String? atac_dim_reduce
 
 
-        # 3.1.0, 3.0.2, 2.2.0 
-        String cellranger_version = "3.1.0"
+        # 4.0.0, 3.1.0, 3.0.2, 2.2.0
+        String cellranger_version = "4.0.0"
         # 1.2.0, 1.1.0
         String cellranger_atac_version = "1.2.0"
-        # cumulus_feature_barcoding version, default to "0.2.0"
-        String cumulus_feature_barcoding_version = "0.2.0"
+        # 0.3.0, 0.2.0
+        String cumulus_feature_barcoding_version = "0.3.0"
         # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
         String docker_registry = "cumulusprod"
         # cellranger/cellranger-atac mkfastq registry, default to gcr.io/broad-cumulus
@@ -85,14 +85,14 @@ workflow cellranger_workflow {
         # Optional disk space for mkfastq.
         Int mkfastq_disk_space = 1500
         # Optional disk space needed for cell ranger count.
-        Int count_disk_space = 500    
+        Int count_disk_space = 500
         # Optional disk space needed for cell ranger vdj.
-        Int vdj_disk_space = 500    
+        Int vdj_disk_space = 500
         # Optional disk space needed for cumulus_adt
         Int feature_disk_space = 100
         # Optional disk space needed for cellranger-atac count
         Int atac_disk_space = 500
-        # Number of preemptible tries 
+        # Number of preemptible tries
         Int preemptible = 2
     }
 
@@ -150,7 +150,7 @@ workflow cellranger_workflow {
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible
                 }
-            }        
+            }
         }
     }
 
@@ -199,7 +199,7 @@ workflow cellranger_workflow {
                     zones = zones,
                     preemptible = preemptible,
                     docker_registry = docker_registry_stripped
-            }        
+            }
         }
 
         if (generate_count_config.sample_vdj_ids[0] != '') {
@@ -230,7 +230,7 @@ workflow cellranger_workflow {
                     zones = zones,
                     preemptible = preemptible,
                     docker_registry = docker_registry_stripped
-            }        
+            }
         }
 
         if (generate_count_config.sample_feature_ids[0] != '') {
@@ -243,7 +243,7 @@ workflow cellranger_workflow {
                         chemistry = generate_count_config.sample2chemistry[sample_id],
                         data_type = generate_count_config.sample2datatype[sample_id],
                         feature_barcode_file = generate_count_config.sample2fbf[sample_id],
-                        scaffold_sequence = scaffold_sequence, 
+                        scaffold_sequence = scaffold_sequence,
                         max_mismatch = max_mismatch,
                         min_read_ratio = min_read_ratio,
                         cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
@@ -253,7 +253,7 @@ workflow cellranger_workflow {
                         preemptible = preemptible,
                         docker_registry = docker_registry_stripped
                 }
-            }        
+            }
         }
 
         if (generate_count_config.sample_atac_ids[0] != '') {
@@ -284,7 +284,7 @@ workflow cellranger_workflow {
                     zones = zones,
                     preemptible = preemptible,
                     docker_registry = docker_registry_stripped
-            }        
+            }
         }
     }
 
@@ -311,7 +311,7 @@ task generate_bcl_csv {
         import os
         import re
         import sys
-        import pandas as pd 
+        import pandas as pd
         from subprocess import check_call
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype=str, index_col=False)
@@ -406,7 +406,7 @@ task generate_count_config {
 
             for sample_id in df['Sample'].unique():
                 df_local = df.loc[df['Sample'] == sample_id]
-                
+
                 data_type = 'rna'
                 if 'DataType' in df_local.columns:
                     assert df_local['DataType'].unique().size == 1
@@ -426,7 +426,7 @@ task generate_count_config {
 
                 dirs = df_local['Flowcell'].map(lambda x: x if len(rid2fdir) == 0 else rid2fdir[os.path.basename(x)]).values
                 fo2.write(sample_id + '\t' + ','.join(dirs) + '\n')
-                
+
                 if data_type == 'rna' or data_type == 'vdj' or data_type == 'atac':
                     assert df_local['Reference'].unique().size == 1
                     reference = df_local['Reference'].iat[0]
