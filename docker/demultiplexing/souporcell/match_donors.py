@@ -7,7 +7,7 @@ import numpy as np
 import pandas as pd
 from natsort import natsorted
 
-import pegasusio
+import pegasusio as io
 
 
 
@@ -15,7 +15,7 @@ parser = argparse.ArgumentParser(description='Match souporcell results with dono
 parser.add_argument('cluster_genotypes', metavar = 'cluster_genotypes.vcf', help = 'Genotypes detected by freebayes from RNA-seq reads.')
 parser.add_argument('demux_res', metavar = 'clusters.tsv', help = 'Souporcell demultiplexing results.')
 parser.add_argument('raw_mat', metavar = 'raw_feature_bc_matrix.h5', help = 'Raw gene count matrix in 10x format.')
-parser.add_argument('out_file', metavar = 'output_result.zarr', help = 'Output zarr file.')
+parser.add_argument('out_file', metavar = 'output_result.zarr.zip', help = 'Output zarr file.')
 parser.add_argument('--ref-genotypes', metavar = 'reference_genotypes.vcf.gz', dest = 'ref_genotypes', help = 'Reference genotypes called from exome or genome sequencing data.')
 parser.add_argument('--donor-names', dest = 'ref_names', help = 'A comma-separated list containing donor names that are used to replace the ones in reference_genotypes.vcf.gz. Must match the order in the .vcf.gz file.')
 args = parser.parse_args()
@@ -85,7 +85,7 @@ def parse_reference_vcf(reference_vcf: str, snp2geno: dict, sample_names: List[s
 				cnt += 1
 				if cnt % 100000 == 0:
 					print("Parsed {0} variants, matched {1} variants.".format(cnt, nbingo))
-	
+
 	print("\n{0} variants are parsed and {1} SNPs are matched.".format(cnt, nbingo))
 
 	return ref_names, mmat
@@ -146,7 +146,7 @@ def translate_donor_name(inp_str: str, matching: dict) -> str:
 	res_str = []
 	for donor_id in inp_str.split('/'):
 		res_str.append(matching[donor_id][5:])
-	return ','.join(res_str) 
+	return ','.join(res_str)
 
 def write_output(assignment_file: str, input_mat_file: str, output_zarr_file: str, matching: dict) -> None:
 	df = pd.read_csv(assignment_file, sep = '\t', header = 0, index_col = 0)
@@ -167,7 +167,7 @@ def write_output(assignment_file: str, input_mat_file: str, output_zarr_file: st
 		print("  Reference donor {}: {}".format(donor, singlet_counts[donor]))
 	print()
 
-	data = pegasusio.read_input(input_mat_file)
+	data = io.read_input(input_mat_file)
 	data.obs['demux_type'] = ''
 	data.obs['assignment'] = ''
 
@@ -177,7 +177,7 @@ def write_output(assignment_file: str, input_mat_file: str, output_zarr_file: st
 	data.obs.loc[idx, 'demux_type'] = ndf['status'].values
 	data.obs.loc[idx, 'assignment'] = ndf['assignment'].values
 
-	pegasusio.write_output(data, output_zarr_file, zarr_zipstore = True)
+	io.write_output(data, output_zarr_file)
 
 def set_matching_no_reference(sample_numbers: List[str], ref_names: List[str]) -> dict:
 	assert len(sample_numbers) == len(ref_names)
@@ -187,7 +187,7 @@ def set_matching_no_reference(sample_numbers: List[str], ref_names: List[str]) -
 		matching[sample_number] = ref_name
 		matching[ref_name] = sample_number
 
-	return matching 
+	return matching
 
 sample_names, snp2geno = parse_denovo_vcf(args.cluster_genotypes)
 if args.ref_genotypes is not None:

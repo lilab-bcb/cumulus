@@ -47,13 +47,25 @@ Or use the following commdands for MacOS installation::
 
 When the installation is done, type ``alto -h`` in terminal to see if you can see the help information.
 
+Set up Google Cloud Account
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+Install `Google Cloud SDK <https://cloud.google.com/cloud-sdk>`_ on your local machine.
+
+Then type the following command in your terminal
+
+.. code-block:: bash
+
+    gcloud auth application-default login
+
+and follow the pop-up instructions to set up your Google cloud account.
 
 Run Terra workflows via ``alto run``
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **alto run** runs a Terra method. Features:
 
-- Uploads local files/directories in your inputs to a Google Cloud bucket updates the file paths to point to the Google Cloud bucket. 
+- Uploads local files/directories in your inputs to a Google Cloud bucket updates the file paths to point to the Google Cloud bucket.
 
    Your sample sheet can point to local file paths. In this case, ``alto run`` will take care of uploading directories smartly (e.g. only upload necessary files in BCL folders) and modifying the sample sheet to point to a Google Cloud bucket.
 
@@ -74,16 +86,16 @@ Required options are in bold.
       - Description
     * - | **-m <METHOD>**
         | **\\-\\-method <METHOD>**
-      - | Specify a Terra workflow *<METHOD>* to use. 
+      - | Specify a Terra workflow *<METHOD>* to use.
         | *<METHOD>* is of format *Namespace/Name* (e.g. ``cumulus/cellranger_workflow``).
         | A snapshot version number can optionally be specified (e.g. ``cumulus/cellranger_workflow/4``); otherwise the latest snapshot of the method is used.
     * - | **-w <WORKSPACE>**
         | **\\-\\-workspace <WORKSPACE>**
-      - | Specify which Terra workspace *<WORKSPACE>* to use. 
+      - | Specify which Terra workspace *<WORKSPACE>* to use.
         | *<WORKSPACE>* is also of format *Namespace/Name* (e.g. ``foo/bar``). The workspace will be created if it does not exist.
     * - | **-i <WDL_INPUTS>**
         | **\\-\\-inputs <WDL_INPUTS>**
-      - | Specify the WDL input JSON file to use. 
+      - | Specify the WDL input JSON file to use.
         | It can be a local file, a JSON string, or a Google bucket URL directing to a remote JSON file.
     * - | \\-\\-bucket-folder <folder>
       - | Store inputs to <folder> under workspace's google bucket.

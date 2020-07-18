@@ -39,3 +39,6 @@ GRCh38_vdj	gs://regev-lab/resources/cellranger/refdata-cellranger-vdj-GRCh38-alt
 GRCm38_vdj	gs://regev-lab/resources/cellranger/refdata-cellranger-vdj-GRCm38-alts-ensembl-2.2.0.tar.gz
 GRCh38_and_SARSCoV2	gs://regev-lab/resources/cellranger/GRCh38_and_SARSCoV2.tar.gz
 GRCh38_premrna_and_SARSCoV2	gs://regev-lab/resources/cellranger/GRCh38premrna_and_SARSCoV2.tar.gz
+GRCh38-2020-A	gs://regev-lab/resources/cellranger/refdata-gex-GRCh38-2020-A.tar.gz
+mm10-2020-A	gs://regev-lab/resources/cellranger/refdata-gex-mm10-2020-A.tar.gz
+GRCh38_and_mm10-2020-A	gs://regev-lab/resources/cellranger/refdata-gex-GRCh38-and-mm10-2020-A.tar.gz

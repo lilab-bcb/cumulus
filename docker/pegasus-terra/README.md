@@ -6,7 +6,7 @@ Pegasus is a Python package for analyzing transcriptomes of large-scale single-c
 
 |Image Version|Docker Image URL|Release Date|
 |---|---|---|
-|0.17.1|cumulusprod/pegasus-terra:0.17.1|2020/04/28|
+|0.17|cumulusprod/pegasus-terra:0.17|2020/04/28|
 
 ## Image Content
 
@@ -18,13 +18,13 @@ Besides the basic environment in terra-jupyter-base image, we also add the follo
 * [scPlot](https://github.com/klarman-cell-observatory/scPlot): Interactive single-cell plotting library used by Pegasus.
 * [Harmony-Pytorch](https://github.com/lilab-bcb/harmony-pytorch) and its dependency [PyTorch](https://pytorch.org/): Python version of Harmony algorithm on single-cell sequencing data integration.
 
-To see a complete list of image content, please see its [Dockerfile](https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/pegasus-terra/0.17.0/Dockerfile).
+To see a complete list of image content, please see its [Dockerfile](https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/pegasus-terra/0.17/Dockerfile).
 
 ## Use Pegasus on Terra
 
 To use this docker image on Terra Notebook, please refer to [this instruction](https://pegasus.readthedocs.io/en/latest/terra_notebook.html).
 
-Tutorials on using Pegasus for interactive data analysis is [here](https://pegasus.readthedocs.io/en/latest/tutorials.html).
+Tutorials on using Pegasus for interactive data analysis is [here](https://pegasus.readthedocs.io/en/0.x/tutorials.html).
 
 ## Selecting Prior Versions of This Image
 
