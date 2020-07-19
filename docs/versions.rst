@@ -29,7 +29,7 @@ Latest version
       - Snapshot
       - Function
     * - cumulus/cellranger_workflow
-      - `11 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/11>`__
+      - `12 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/12>`__
       - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
     * - cumulus/count
       - `14 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/14>`__
