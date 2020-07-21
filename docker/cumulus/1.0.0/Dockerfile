@@ -32,7 +32,6 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install pybind11==2.5.0 --no-cache-dir && \
     python -m pip install scikit-image==0.17.2 --no-cache-dir && \
     python -m pip install scikit-learn==0.23.1 --no-cache-dir && \
-    python -m pip install tables==3.6.1 --no-cache-dir && \
     python -m pip install h5py==2.10.0 --no-cache-dir && \
     python -m pip install fitsne==1.1.1 --no-cache-dir && \
     python -m pip install importlib-metadata==1.7.0 --no-cache-dir && \
@@ -61,8 +60,8 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install cirrocumulus==1.1.0.post3 --no-cache-dir && \
     python -m pip install annoy==1.16.3 --no-cache-dir && \
     python -m pip install scrublet==0.2.1 --no-cache-dir && \
-    python -m pip install pegasusio==0.2.3 --no-cache-dir && \
-    python -m pip install pegasuspy==0.18.0b2 --no-cache-dir
+    python -m pip install pegasusio==0.2.4 --no-cache-dir && \
+    python -m pip install pegasuspy==1.0.0rc1 --no-cache-dir
 
 RUN mkdir /software && \
     cp /usr/local/lib/python3.7/dist-packages/cirrocumulus/prepare_data.py /software/prepare_data.py
