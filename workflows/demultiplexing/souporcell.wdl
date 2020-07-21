@@ -94,8 +94,12 @@ task run_souporcell {
         souporcell_call_args = ['souporcell_pipeline.py', '-i', '~{input_bam}', '-b', 'result/~{sample_id}.barcodes.tsv', '-f', 'genome_ref/fasta/genome.fa', '-t', '~{num_cpu}', '-o', 'result', '-k', '~{num_clusters}']
 
         if '~{ref_genotypes}' is not '' and '~{de_novo_mode}' is 'false':
-            with open('ref_genotypes.vcf', 'w') as fout:
-                check_call(['gunzip', '-k', '~{ref_genotypes}', '-c'], stdout = fout)
+            file_ext = '~{ref_genotypes}'.split('.')[-1]
+            if file_ext == '.gz':
+                with open('ref_genotypes.vcf', 'w') as fout:
+                    check_call(['gunzip', '-k', '~{ref_genotypes}', '-c'], stdout = fout)
+            else:
+                check_call(['mv', '~{ref_genotypes}', 'ref_genotypes.vcf'])
 
             souporcell_call_args.extend(['--known_genotypes', 'ref_genotypes.vcf'])
 
