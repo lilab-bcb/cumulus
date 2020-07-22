@@ -165,7 +165,6 @@ task generate_demux_config {
 
         python <<CODE
         import re, sys
-        import numpy as np
         import pandas as pd
 
         df = pd.read_csv('~{input_sample_sheet}', header = 0, dtype = str, index_col = False)
@@ -192,7 +191,7 @@ task generate_demux_config {
                 fo_rnas.write(row['OUTNAME'] + '\t' + row['RNA'] + '\n')
                 fo_tags.write(row['OUTNAME'] + '\t' + row[tag_key] + '\n')
 
-                if 'Genotype' in df.columns and (not np.isnan(row['Genotype'])):
+                if 'Genotype' in df.columns and (not pd.isnull(row['Genotype'])):
                     fo_genotypes.write(row['OUTNAME'] + '\t' + row['Genotype'] + '\n')
                 else:
                     fo_genotypes.write(row['OUTNAME'] + '\tnull\n')
