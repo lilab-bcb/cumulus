@@ -200,7 +200,7 @@ task run_rsem {
 
 		mkdir -p rsem_ref
 		tar xf ~{reference} -C rsem_ref --strip-components 1
-		REFERENCE_NAME="~(basename `ls rsem_ref/*.grp` .grp)"
+		REFERENCE_NAME="$(basename `ls rsem_ref/*.grp` .grp)"
 		rsem-calculate-expression --~{aligner} ~{true="--output-genome-bam" false="" output_genome_bam} ~{true="--star-gzipped-read-file" false="" star_gzipped_read_file} ~{true="--paired-end" false="" defined(read2)} -p ~{num_cpu} --append-names --time ~{read1} ~{default="" read2} rsem_ref/$REFERENCE_NAME ~{sample_name}
 	}
 
