@@ -1,7 +1,7 @@
 version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/3/plain-WDL/descriptor" as dem
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/7/plain-WDL/descriptor" as soc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/8/plain-WDL/descriptor" as soc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/4/plain-WDL/descriptor" as dmx
 
 #import "demuxEM.wdl" as dem
@@ -165,7 +165,6 @@ task generate_demux_config {
 
         python <<CODE
         import re, sys
-        import numpy as np
         import pandas as pd
 
         df = pd.read_csv('~{input_sample_sheet}', header = 0, dtype = str, index_col = False)
@@ -192,7 +191,7 @@ task generate_demux_config {
                 fo_rnas.write(row['OUTNAME'] + '\t' + row['RNA'] + '\n')
                 fo_tags.write(row['OUTNAME'] + '\t' + row[tag_key] + '\n')
 
-                if 'Genotype' in df.columns and (not np.isnan(row['Genotype'])):
+                if 'Genotype' in df.columns and (not pd.isnull(row['Genotype'])):
                     fo_genotypes.write(row['OUTNAME'] + '\t' + row['Genotype'] + '\n')
                 else:
                     fo_genotypes.write(row['OUTNAME'] + '\tnull\n')
