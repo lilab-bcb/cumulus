@@ -178,15 +178,15 @@ task generate_demux_config {
             sys.exit(1)
 
         tag_key = 'TagFile' if 'TagFile' in df.columns else 'ADT'
-        assert tag_key in ['TagFile', 'ADT']
 
         with open('hashing_ids.txt', 'w') as fo_hashing, open('pooling_ids.txt', 'w') as fo_pooling, open('id2rna.txt', 'w') as fo_rnas, open('id2tag.txt', 'w') as fo_tags, open('id2genotype.txt', 'w') as fo_genotypes:
 
             for idx, row in df.iterrows():
-                if row['TYPE'] == 'genetic-pooling':
+                if row['TYPE'] in ['genetic-pooling', 'genetic_pooling']:
                     fo_pooling.write(row['OUTNAME'] + '\n')
                 else:
-                    assert row['TYPE'] in ['cell-hashing', 'nucleus-hashing']
+                    if row['TYPE'] not in ['cell-hashing', 'nucleus-hashing', 'cell_hashing', 'nucleus_hashing']:
+                        print(f"Warning: demultiplexing type {row['Type']} is neither cell-hashing nor nucleus-hashing. But we still assume hashing data and use DemuxEM for demultiplexing!")
                     fo_hashing.write(row['OUTNAME'] + '\n')
 
                 fo_rnas.write(row['OUTNAME'] + '\t' + row['RNA'] + '\n')
