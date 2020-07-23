@@ -3,7 +3,7 @@ SHELL ["/bin/bash", "-c"]
 
 RUN mkdir -p /usr/share/man/man1 && \
     apt-get -qq update && \
-    apt-get -qq -y install --no-install-recommends \ 
+    apt-get -qq -y install --no-install-recommends \
         build-essential \
         automake \
         zlib1g-dev \
@@ -15,7 +15,7 @@ RUN mkdir -p /usr/share/man/man1 && \
         curl \
         python3 \
         python3-dev \
-        python3-pip 
+        python3-pip
 
 RUN pip3 install setuptools==46.1.3 --no-cache-dir && \
     pip3 install numpy==1.18.2 --no-cache-dir && \
@@ -53,7 +53,7 @@ RUN pip3 install setuptools==46.1.3 --no-cache-dir && \
 RUN mkdir /software && \
     cp /usr/local/lib/python3.7/dist-packages/cirrocumulus/prepare_data.py /software/prepare_data.py
 
-RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \ 
+RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
     apt-get update -y && apt-get install -y google-cloud-sdk=291.0.0-0
 

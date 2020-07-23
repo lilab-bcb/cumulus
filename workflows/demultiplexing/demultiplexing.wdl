@@ -1,8 +1,8 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/2/plain-WDL/descriptor" as dem
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/6/plain-WDL/descriptor" as soc
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/3/plain-WDL/descriptor" as dmx
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/3/plain-WDL/descriptor" as dem
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/8/plain-WDL/descriptor" as soc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/4/plain-WDL/descriptor" as dmx
 
 #import "demuxEM.wdl" as dem
 #import "souporcell.wdl" as soc
@@ -21,7 +21,7 @@ workflow demultiplexing {
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 
         # For demuxEM
-        # The Dirichlet prior concentration parameter (alpha) on samples. An alpha value < 1.0 will make the prior sparse.
+        # The Dirichlet prior concentration parameter (alpha) on samples. An alpha value < 1.0 will make the prior sparse. [default: 0.0]
         Float? demuxEM_alpha_on_samples
         # Only demultiplex cells/nuclei with at least <demuxEM_min_num_umis> of UMIs. [default: 100]
         Int? demuxEM_min_num_umis
@@ -33,7 +33,7 @@ workflow demultiplexing {
         Boolean demuxEM_generate_diagnostic_plots = true
         # Generate violin plots using gender-specific genes (e.g. Xist). <demuxEM_generate_gender_plot> is a comma-separated list of gene names.
         String? demuxEM_generate_gender_plot
-        String demuxEM_version = "0.1.1"
+        String demuxEM_version = "0.1.4"
         Int demuxEM_num_cpu = 8
         Int demuxEM_disk_space = 20
         Int demuxEM_memory = 10
@@ -42,7 +42,7 @@ workflow demultiplexing {
         Int souporcell_num_clusters = 1
         Boolean souporcell_de_novo_mode = true
         String souporcell_rename_donors = ""
-        String souporcell_version = "2020.03"
+        String souporcell_version = "2020.06"
         Int souporcell_num_cpu = 32
         Int souporcell_disk_space = 500
         Int souporcell_memory = 120
@@ -78,8 +78,8 @@ workflow demultiplexing {
                 input:
                     sample_id = hashing_id,
                     output_directory = output_directory_stripped,
-                    input_rna = Config.id2rna[hashing_id],
-                    input_adt_csv = Config.id2tag[hashing_id],
+                    input_rna_h5 = Config.id2rna[hashing_id],
+                    input_hto_csv = Config.id2tag[hashing_id],
                     genome = genome,
                     alpha_on_samples = demuxEM_alpha_on_samples,
                     min_num_genes = min_num_genes,
@@ -178,9 +178,9 @@ task generate_demux_config {
 
         tag_key = 'TagFile' if 'TagFile' in df.columns else 'ADT'
         assert tag_key in ['TagFile', 'ADT']
-            
+
         with open('hashing_ids.txt', 'w') as fo_hashing, open('pooling_ids.txt', 'w') as fo_pooling, open('id2rna.txt', 'w') as fo_rnas, open('id2tag.txt', 'w') as fo_tags, open('id2genotype.txt', 'w') as fo_genotypes:
-            
+
             for idx, row in df.iterrows():
                 if row['TYPE'] == 'genetic-pooling':
                     fo_pooling.write(row['OUTNAME'] + '\n')
@@ -191,7 +191,7 @@ task generate_demux_config {
                 fo_rnas.write(row['OUTNAME'] + '\t' + row['RNA'] + '\n')
                 fo_tags.write(row['OUTNAME'] + '\t' + row[tag_key] + '\n')
 
-                if 'Genotype' in df.columns:
+                if 'Genotype' in df.columns and (not pd.isnull(row['Genotype'])):
                     fo_genotypes.write(row['OUTNAME'] + '\t' + row['Genotype'] + '\n')
                 else:
                     fo_genotypes.write(row['OUTNAME'] + '\tnull\n')

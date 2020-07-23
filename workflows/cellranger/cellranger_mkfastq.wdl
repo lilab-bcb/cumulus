@@ -21,7 +21,7 @@ workflow cellranger_mkfastq {
 		String memory = "120G"
 		# Disk space in GB
 		Int disk_space = 1500
-		# Number of preemptible tries 
+		# Number of preemptible tries
 		Int preemptible = 2
 
 		# Which docker registry to use
@@ -87,7 +87,7 @@ task run_cellranger_mkfastq {
 		import pandas as pd
 		import subprocess
 		barcode_mismatches = '~{barcode_mismatches}'
-		mkfastq_args = ['cellranger', 'mkfastq', '--id=results', '--run=~{run_id}', '--csv=~{input_csv_file}', '--jobmode=local', '--ignore-dual-index', '--qc']
+		mkfastq_args = ['cellranger', 'mkfastq', '--id=results', '--run=~{run_id}', '--csv=~{input_csv_file}', '--jobmode=local', '--qc']
 		if barcode_mismatches != '':
 			mkfastq_args += ['--barcode-mismatches', barcode_mismatches]
 		p = subprocess.run(mkfastq_args)
