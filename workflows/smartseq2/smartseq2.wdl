@@ -1,7 +1,8 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:smartseq2_per_plate/versions/5/plain-WDL/descriptor" as ss2pp
-# import "smartseq2_per_plate.wdl" as ss2pp
+
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:smartseq2_per_plate/versions/6/plain-WDL/descriptor" as ss2pp
+#import "smartseq2_per_plate.wdl" as ss2pp
 
 workflow smartseq2 {
 	input {
@@ -14,6 +15,10 @@ workflow smartseq2 {
 		# Align reads with 'aligner': hisat2-hca, star, bowtie2 (default: hisat2-hca)
 		String aligner = "hisat2-hca"
 
+		# Convert transcript BAM file into genome BAM file
+		Boolean output_genome_bam = false
+		# TPM-normalized counts reflect both the relative expression levels and the cell sequencing depth.
+		Boolean normalize_tpm_by_sequencing_depth = true
 		# smartseq2 version, default to "1.1.0"
 		String smartseq2_version = "1.1.0"
 		# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
@@ -53,6 +58,8 @@ workflow smartseq2 {
 				output_directory = output_directory_stripped,
 				reference = reference,
 				aligner = aligner,
+				normalize_tpm_by_sequencing_depth = normalize_tpm_by_sequencing_depth,
+				output_genome_bam = output_genome_bam,
 				smartseq2_version = smartseq2_version,
 				zones = zones,
 				num_cpu = num_cpu,
@@ -65,18 +72,20 @@ workflow smartseq2 {
 	}
 
 	output {
-        Array[Array[File]] rsem_gene = smartseq2_per_plate.rsem_gene
-        Array[Array[File]] rsem_isoform = smartseq2_per_plate.rsem_isoform
-        Array[Array[File]] rsem_trans_bam = smartseq2_per_plate.rsem_trans_bam
-        Array[Array[File]] rsem_time = smartseq2_per_plate.rsem_time
-        Array[Array[File]] aligner_log = smartseq2_per_plate.aligner_log
-        Array[Array[File]] rsem_cnt =smartseq2_per_plate.rsem_cnt
-        Array[Array[File]] rsem_model = smartseq2_per_plate.rsem_model
-        Array[Array[File]] rsem_theta = smartseq2_per_plate.rsem_theta
 
-        Array[String] output_count_matrix = smartseq2_per_plate.output_count_matrix
-        Array[String] output_qc_report = smartseq2_per_plate.output_qc_report
-    }
+		Array[Array[File]] rsem_gene = smartseq2_per_plate.rsem_gene
+		Array[Array[File]] rsem_isoform = smartseq2_per_plate.rsem_isoform
+		Array[Array[File]] rsem_trans_bam = smartseq2_per_plate.rsem_trans_bam
+		Array[Array[File]] rsem_time = smartseq2_per_plate.rsem_time
+		Array[Array[File]] aligner_log = smartseq2_per_plate.aligner_log
+		Array[Array[File]] rsem_cnt =smartseq2_per_plate.rsem_cnt
+		Array[Array[File]] rsem_model = smartseq2_per_plate.rsem_model
+		Array[Array[File]] rsem_theta = smartseq2_per_plate.rsem_theta
+		Array[Array[Array[File]]] rsem_genome_bam = smartseq2_per_plate.rsem_genome_bam
+
+		Array[String] output_count_matrix = smartseq2_per_plate.output_count_matrix
+		Array[String] output_qc_report = smartseq2_per_plate.output_qc_report
+	}
 }
 
 task parse_input_csv {
