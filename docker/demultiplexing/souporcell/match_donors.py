@@ -16,7 +16,7 @@ parser.add_argument('cluster_genotypes', metavar = 'cluster_genotypes.vcf', help
 parser.add_argument('demux_res', metavar = 'clusters.tsv', help = 'Souporcell demultiplexing results.')
 parser.add_argument('raw_mat', metavar = 'raw_feature_bc_matrix.h5', help = 'Raw gene count matrix in 10x format.')
 parser.add_argument('out_file', metavar = 'output_result.zarr.zip', help = 'Output zarr file.')
-parser.add_argument('--ref-genotypes', metavar = 'reference_genotypes.vcf.gz', dest = 'ref_genotypes', help = 'Reference genotypes called from exome or genome sequencing data.')
+parser.add_argument('--ref-genotypes', metavar = 'reference_genotypes.vcf.gz or reference_genotypes.vcf', dest = 'ref_genotypes', help = 'Reference genotypes called from exome or genome sequencing data.')
 parser.add_argument('--donor-names', dest = 'ref_names', help = 'A comma-separated list containing donor names that are used to replace the ones in reference_genotypes.vcf.gz. Must match the order in the .vcf.gz file.')
 args = parser.parse_args()
 
@@ -63,28 +63,35 @@ def parse_reference_vcf(reference_vcf: str, snp2geno: dict, sample_names: List[s
 	ref_names = None
 	mmat = None # mmat: matching matrix
 
-	import gzip
-	with gzip.open(reference_vcf, 'rt') as fin:
-		for line in fin:
-			if line.startswith('##'):
-				continue
-			if line.startswith('#'):
-				fields = line.strip()[1:].split('\t')
-				assert check_colnames(fields)
-				ref_names = fields[9:]
-				mmat = np.zeros((len(ref_names), nsample), dtype = int)
-			else:
-				fields = line.strip().split('\t')
-				snp = SNP(fields[0], fields[1], fields[3], fields[4])
-				d_geno = snp2geno.get(snp, None)
-				if d_geno is not None:
-					assert fields[8].startswith('GT')
-					r_geno = [x.split(':')[0] for x in fields[9:]]
-					calc_matching(d_geno, r_geno, mmat)
-					nbingo += 1
-				cnt += 1
-				if cnt % 100000 == 0:
-					print("Parsed {0} variants, matched {1} variants.".format(cnt, nbingo))
+	file_ext = reference_vcf.split('.')[-1]
+	if file_ext == 'gz':
+		import gzip
+		fin = gzip.open(reference_vcf, 'rt')
+	else:
+		fin = open(reference_vcf, 'rt')
+
+	for line in fin:
+		if line.startswith('##'):
+			continue
+		if line.startswith('#'):
+			fields = line.strip()[1:].split('\t')
+			assert check_colnames(fields)
+			ref_names = fields[9:]
+			mmat = np.zeros((len(ref_names), nsample), dtype = int)
+		else:
+			fields = line.strip().split('\t')
+			snp = SNP(fields[0], fields[1], fields[3], fields[4])
+			d_geno = snp2geno.get(snp, None)
+			if d_geno is not None:
+				assert fields[8].startswith('GT')
+				r_geno = [x.split(':')[0] for x in fields[9:]]
+				calc_matching(d_geno, r_geno, mmat)
+				nbingo += 1
+			cnt += 1
+			if cnt % 100000 == 0:
+				print("Parsed {0} variants, matched {1} variants.".format(cnt, nbingo))
+
+	fin.close()
 
 	print("\n{0} variants are parsed and {1} SNPs are matched.".format(cnt, nbingo))
 
