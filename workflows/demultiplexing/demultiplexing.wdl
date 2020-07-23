@@ -1,7 +1,7 @@
 version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/3/plain-WDL/descriptor" as dem
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/8/plain-WDL/descriptor" as soc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/9/plain-WDL/descriptor" as soc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/4/plain-WDL/descriptor" as dmx
 
 #import "demuxEM.wdl" as dem
@@ -185,7 +185,7 @@ task generate_demux_config {
                     fo_pooling.write(row['OUTNAME'] + '\n')
                 else:
                     if row['TYPE'] not in ['cell-hashing', 'nucleus-hashing', 'cell_hashing', 'nucleus_hashing']:
-                        print(f"Warning: demultiplexing type {row['Type']} is neither cell-hashing nor nucleus-hashing. But we still assume hashing data and use DemuxEM for demultiplexing!")
+                        print("Warning: demultiplexing type " + row['TYPE'] + " is neither cell-hashing nor nucleus-hashing. But we still assume hashing data and use DemuxEM for demultiplexing!")
                     fo_hashing.write(row['OUTNAME'] + '\n')
 
                 fo_rnas.write(row['OUTNAME'] + '\t' + row['RNA'] + '\n')
