@@ -128,7 +128,10 @@ task run_generate_count_matrix_ADTs {
 		check_call(call_args)
 		CODE
 
-		filter_chimeric_reads ~{data_type} ~{feature_barcodes} ~{sample_id}.stat.csv.gz ~{min_read_ratio} ~{sample_id}
+		if [ -f ~{sample_id}.stat.csv.gz ]
+		then
+			filter_chimeric_reads ~{data_type} ~{feature_barcodes} ~{sample_id}.stat.csv.gz ~{min_read_ratio} ~{sample_id}
+		fi
 
 		gsutil -m cp ~{sample_id}.*csv* ~{output_directory}/~{sample_id}/
 		# mkdir -p ~{output_directory}/~{sample_id}

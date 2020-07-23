@@ -4,19 +4,29 @@ workflow demuxEM {
     input {
         String sample_id
         String output_directory
-        String input_rna
-        String input_adt_csv
+        # Input raw RNA expression matrix in 10x hdf5 format.
+        String input_rna_h5
+        # Input HTO (antibody tag) count matrix in CSV format.
+        String input_hto_csv
+        # Reference genome name. If not provided, we will infer it from the expression matrix file.
         String genome
+        # Only demultiplex cells/nuclei with at least <number> of expressed genes. [default: 100]
         Int min_num_genes
+        # The Dirichlet prior concentration parameter (alpha) on samples. An alpha value < 1.0 will make the prior sparse. [default: 0.0]
         Float? alpha_on_samples
+        # Only demultiplex cells/nuclei with at least <number> of UMIs. [default: 100]
         Int? min_num_umis
+        # Any cell/nucleus with less than <count> hashtags from the signal will be marked as unknown. [default: 10.0]
         Float? min_signal_hashtag
+        # The random seed used in the KMeans algorithm to separate empty ADT droplets from others. [default: 0]
         Int? random_state
+        # Generate a series of diagnostic plots, including the background/signal between HTO counts, estimated background probabilities, HTO distributions of cells and non-cells etc.
         Boolean generate_diagnostic_plots
+        # Generate violin plots using gender-specific genes (e.g. Xist). <gene> is a comma-separated list of gene names.
         String? generate_gender_plot
 
         String docker_registry = "cumulusprod"
-        String demuxEM_version = "0.1.1"
+        String demuxEM_version = "0.1.4"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         Int num_cpu = 8
         Int memory = 10
@@ -28,8 +38,8 @@ workflow demuxEM {
         input:
             sample_id = sample_id,
             output_directory = output_directory,
-            input_rna = input_rna,
-            input_adt_csv = input_adt_csv,
+            input_rna_h5 = input_rna_h5,
+            input_hto_csv = input_hto_csv,
             genome = genome,
             alpha_on_samples = alpha_on_samples,
             min_num_genes = min_num_genes,
@@ -58,8 +68,8 @@ task run_demuxEM {
     input {
         String sample_id
         String output_directory
-        File input_rna
-        File input_adt_csv
+        File input_rna_h5
+        File input_hto_csv
         String genome
         Int min_num_genes
         Float? alpha_on_samples
@@ -85,11 +95,11 @@ task run_demuxEM {
 
         python <<CODE
         from subprocess import check_call
-        call_args = ['demuxEM', '~{input_rna}', '~{input_adt_csv}', '~{sample_id}', '-p', '~{num_cpu}']
+        call_args = ['demuxEM', '~{input_rna_h5}', '~{input_hto_csv}', '~{sample_id}', '-p', '~{num_cpu}']
         if '~{genome}' is not '':
             call_args.extend(['--genome', '~{genome}'])
         if '~{alpha_on_samples}' is not '':
-            call_args.extend(['--alpha_on_samples', '~{alpha_on_samples}'])
+            call_args.extend(['--alpha-on-samples', '~{alpha_on_samples}'])
         if '~{min_num_genes}' is not '':
             call_args.extend(['--min-num-genes', '~{min_num_genes}'])
         if '~{min_num_umis}' is not '':
@@ -107,7 +117,7 @@ task run_demuxEM {
         CODE
 
         mkdir result
-        cp ~{sample_id}_demux.zarr ~{sample_id}.out.demuxEM.zarr ~{sample_id}.*.pdf result
+        cp ~{sample_id}_demux.zarr.zip ~{sample_id}.out.demuxEM.zarr.zip ~{sample_id}.*.pdf result
         gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
         # mkdir -p ~{output_directory}/~{sample_id}
         # cp result/* ~{output_directory}/~{sample_id}
@@ -115,7 +125,7 @@ task run_demuxEM {
 
     output {
         String output_folder = "~{output_directory}/~{sample_id}"
-        File output_zarr = "result/~{sample_id}_demux.zarr"
+        File output_zarr = "result/~{sample_id}_demux.zarr.zip"
         File monitoringLog = "monitoring.log"
     }
 
