@@ -4,20 +4,6 @@ Latest and stable versions on Terra_
 Cumulus is a fast growing project. As a result, we frequently update WDL snapshot versions on Terra_.
 See below for latest and stable WDL versions you can use.
 
-Developing version
-^^^^^^^^^^^^^^^^^^^
-
-.. list-table::
-    :widths: 15 5 30
-    :header-rows: 1
-
-    * - WDL
-      - Snapshot
-      - Function
-    * - cumulus/cumulus
-      - `29 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/29>`__
-      - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
-
 Latest version
 ^^^^^^^^^^^^^^
 
@@ -56,7 +42,7 @@ Latest version
       - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/8>`__
       - Generate user-customized genome references for SMART-Seq2 data.
     * - cumulus/cumulus
-      - `24 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/24>`__
+      - `29 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/29>`__
       - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
     * - cumulus/cumulus_subcluster
       - `16 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_subcluster/16>`__
