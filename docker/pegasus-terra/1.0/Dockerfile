@@ -51,7 +51,7 @@ RUN pip3 -V && \
     python3 -m pip install zarr==2.4.0 && \
     python3 -m pip install pegasusio==0.2.4 && \
     python3 -m pip install pegasuspy==1.0.0rc1 && \
-    python3 -m pip install cirrocumulus==1.1.0.post3
+    python3 -m pip install cirrocumulus==1.1.1
 
 ENV USER jupyter-user
 USER $USER
