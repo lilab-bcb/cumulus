@@ -57,7 +57,7 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install harmony-pytorch==0.1.3 --no-cache-dir && \
     python -m pip install bokeh==2.1.1 --no-cache-dir && \
     python -m pip install scplot==0.0.16 --no-cache-dir && \
-    python -m pip install cirrocumulus==1.1.0.post3 --no-cache-dir && \
+    python -m pip install cirrocumulus==1.1.1 --no-cache-dir && \
     python -m pip install annoy==1.16.3 --no-cache-dir && \
     python -m pip install scrublet==0.2.1 --no-cache-dir && \
     python -m pip install pegasusio==0.2.4 --no-cache-dir && \

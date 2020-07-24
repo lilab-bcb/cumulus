@@ -11,10 +11,12 @@ workflow smartseq2_per_plate {
 
 		# GRCh38, GRCm38 or a URL to a tar.gz file
 		String reference
-		
+
+		Boolean output_genome_bam = false
 		# Align reads with 'aligner': hisat2-hca, star, bowtie2 (default hisat2-hca)
 		String aligner = "hisat2-hca"
-
+		# TPM-normalized counts reflect both the relative expression levels and the cell sequencing depth.
+		Boolean normalize_tpm_by_sequencing_depth = true
 		# smartseq2 version
 		String smartseq2_version = "1.1.0"
 		# Google cloud zones, default to "us-central1-b", which is consistent with Cromwell's genomics.default-zones attribute
@@ -24,24 +26,24 @@ workflow smartseq2_per_plate {
 		# Memory string
 		String memory = "3.6G"
 		# factor to multiply size of R1 and R2 by
-	    Float disk_space_multiplier = 11
+		Float disk_space_multiplier = 11
 		# Disk space for count matrix generation task
-	    Int generate_count_matrix_disk_space = 10
+		Int generate_count_matrix_disk_space = 10
 		# Number of preemptible tries 
 		Int preemptible = 2
 		# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-	    String docker_registry = "cumulusprod"
+		String docker_registry = "cumulusprod"
 	}
 
 
-    File acronym_file = "gs://regev-lab/resources/smartseq2/index.tsv"
-    # File acronym_file = "smartseq2_index.tsv"
-    Map[String, String] acronym2gsurl = read_map(acronym_file)
-    # If reference is a url
-    Boolean is_url = sub(reference, "^.+\\.(tgz|gz)$", "URL") == "URL"
+	File acronym_file = "gs://regev-lab/resources/smartseq2/index.tsv"
+	# File acronym_file = "smartseq2_index.tsv"
+	 Map[String, String] acronym2gsurl = read_map(acronym_file)
+	# If reference is a url
+	Boolean is_url = sub(reference, "^.+\\.(tgz|gz)$", "URL") == "URL"
 
-    String key = reference + "_" + aligner
-    File reference_file = (if is_url then reference else acronym2gsurl[key])
+	String key = reference + "_" + aligner
+	File reference_file = (if is_url then reference else acronym2gsurl[key])
 
 
 	call parse_sample_sheet {
@@ -63,6 +65,7 @@ workflow smartseq2_per_plate {
 					read2 = parse_sample_sheet.read2_list[i],
 					sample_name = parse_sample_sheet.cell_ids[i],
 					aligner = aligner,
+					output_genome_bam = output_genome_bam,
 					smartseq2_version = smartseq2_version,
 					zones = zones,
 					num_cpu = num_cpu,
@@ -83,6 +86,7 @@ workflow smartseq2_per_plate {
 					read1 = parse_sample_sheet.read1_list[i],
 					sample_name = parse_sample_sheet.cell_ids[i],
 					aligner = aligner,
+					output_genome_bam = output_genome_bam,
 					smartseq2_version = smartseq2_version,
 					zones = zones,
 					num_cpu = num_cpu,
@@ -100,6 +104,7 @@ workflow smartseq2_per_plate {
 			count_results = select_first([run_rsem_pe.rsem_cnt, run_rsem_se.rsem_cnt]),
 			output_directory = output_directory,
 			plate_name = plate_name,
+			normalize_tpm_by_sequencing_depth = normalize_tpm_by_sequencing_depth,
 			smartseq2_version = smartseq2_version,
 			zones = zones,
 			memory = memory,
@@ -109,14 +114,15 @@ workflow smartseq2_per_plate {
 	}
 
 	output {
-	    Array[File] rsem_gene = select_first([run_rsem_pe.rsem_gene, run_rsem_se.rsem_gene])
-        Array[File] rsem_isoform = select_first([run_rsem_pe.rsem_isoform, run_rsem_se.rsem_isoform])
-        Array[File] rsem_trans_bam = select_first([run_rsem_pe.rsem_trans_bam, run_rsem_se.rsem_trans_bam])
-        Array[File] rsem_time = select_first([run_rsem_pe.rsem_time, run_rsem_se.rsem_time])
-        Array[File] aligner_log = select_first([run_rsem_pe.aligner_log, run_rsem_se.aligner_log])
-        Array[File] rsem_cnt = select_first([run_rsem_pe.rsem_cnt, run_rsem_se.rsem_cnt])
-        Array[File] rsem_model = select_first([run_rsem_pe.rsem_model, run_rsem_se.rsem_model])
-        Array[File] rsem_theta = select_first([run_rsem_pe.rsem_theta, run_rsem_se.rsem_theta])
+		Array[File] rsem_gene = select_first([run_rsem_pe.rsem_gene, run_rsem_se.rsem_gene])
+		Array[Array[File]] rsem_genome_bam  = select_first([run_rsem_pe.rsem_genome_bam, run_rsem_se.rsem_genome_bam])
+		Array[File] rsem_isoform = select_first([run_rsem_pe.rsem_isoform, run_rsem_se.rsem_isoform])
+		Array[File] rsem_trans_bam = select_first([run_rsem_pe.rsem_trans_bam, run_rsem_se.rsem_trans_bam])
+		Array[File] rsem_time = select_first([run_rsem_pe.rsem_time, run_rsem_se.rsem_time])
+		Array[File] aligner_log = select_first([run_rsem_pe.aligner_log, run_rsem_se.aligner_log])
+		Array[File] rsem_cnt = select_first([run_rsem_pe.rsem_cnt, run_rsem_se.rsem_cnt])
+		Array[File] rsem_model = select_first([run_rsem_pe.rsem_model, run_rsem_se.rsem_model])
+		Array[File] rsem_theta = select_first([run_rsem_pe.rsem_theta, run_rsem_se.rsem_theta])
 		String output_count_matrix = generate_count_matrix.output_count_matrix
 		String output_qc_report = generate_count_matrix.output_qc_report
 	}
@@ -172,6 +178,7 @@ task run_rsem {
 		File reference
 		File read1
 		File? read2
+		Boolean output_genome_bam
 		String sample_name
 		String aligner
 		String smartseq2_version
@@ -184,16 +191,17 @@ task run_rsem {
 	}
 
 	Boolean is_star = aligner == "star"
+	Boolean is_gzipped = sub(read1, "^.+\\.(gz)$", "GZ") == "GZ"
+	Boolean star_gzipped_read_file = is_star && is_gzipped
 
 	command {
 		set -e
 		export TMPDIR=/tmp
 
 		mkdir -p rsem_ref
-		tar xf ${reference} -C rsem_ref --strip-components 1
+		tar xf ~{reference} -C rsem_ref --strip-components 1
 		REFERENCE_NAME="$(basename `ls rsem_ref/*.grp` .grp)"
-		echo $REFERENCE_NAME
-		rsem-calculate-expression --~{aligner} ~{true="--star-gzipped-read-file" false="" is_star} ~{true="--paired-end" false="" defined(read2)} -p ~{num_cpu} --append-names --time ~{read1} ~{default="" read2} rsem_ref/$REFERENCE_NAME ~{sample_name}
+		rsem-calculate-expression --~{aligner} ~{true="--output-genome-bam" false="" output_genome_bam} ~{true="--star-gzipped-read-file" false="" star_gzipped_read_file} ~{true="--paired-end" false="" defined(read2)} -p ~{num_cpu} --append-names --time ~{read1} ~{default="" read2} rsem_ref/$REFERENCE_NAME ~{sample_name}
 	}
 
 	output {
@@ -205,6 +213,7 @@ task run_rsem {
 		File rsem_cnt = "~{sample_name}.stat/~{sample_name}.cnt"
 		File rsem_model = "~{sample_name}.stat/~{sample_name}.model"
 		File rsem_theta = "~{sample_name}.stat/~{sample_name}.theta"
+		Array[File] rsem_genome_bam = glob("~{sample_name}.genome.bam")
 	}
 
 	runtime {
@@ -229,7 +238,8 @@ task generate_count_matrix {
 		String memory
 		Int disk_space
 		Int preemptible
-		String docker_registry	
+		String docker_registry
+		Boolean normalize_tpm_by_sequencing_depth
 	}
 
 	String output_name = output_directory + "/" + plate_name
@@ -245,16 +255,20 @@ task generate_count_matrix {
 		gene_names = None
 		barcodes = []
 		cntmat = []
+		normalize_tpm_by_sequencing_depth = ~{true="True" false="False" normalize_tpm_by_sequencing_depth}
 		for result_file in "~{sep=',' gene_results}".split(','):
 			barcodes.append(os.path.basename(result_file)[:-len('.genes.results')])
 			df = pd.read_table(result_file, header = 0, index_col = 0)
 			if gene_names is None:
 				gene_names = np.array(['_'.join(x.split('_')[1:]) for x in df.index])
-			tot_counts = df['expected_count'].sum()
-			counts = df['TPM'].values / 10.0 # convert TPMs into TP100Ks
-			denom = counts.sum()
-			if denom > 0:
-				counts = (counts / denom * tot_counts + 0.5).astype(int)
+			if normalize_tpm_by_sequencing_depth == "True":
+				tot_counts = df['expected_count'].sum()
+				counts = df['TPM'].values / 10.0 # convert TPMs into TP100Ks
+				denom = counts.sum()
+				if denom > 0:
+					counts = (counts / denom * tot_counts + 0.5).astype(int)
+			else:
+				counts = df['TPM'].values
 			cntmat.append(counts)
 		df_idx = pd.Index(gene_names, name = 'GENE')
 		df_out = pd.DataFrame(data = np.stack(cntmat, axis = 1), index = df_idx, columns = barcodes)
