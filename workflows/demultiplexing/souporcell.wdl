@@ -33,11 +33,11 @@ workflow souporcell {
             input_bam = input_bam,
             genome = genome_url,
             ref_genotypes = ref_genotypes,
+            donor_rename = donor_rename,
             de_novo_mode = de_novo_mode,
             min_num_genes = min_num_genes,
             num_clusters = num_clusters,
-            donor_rename = donor_rename,
-            souporcell_version = souporcell_version,
+            version = souporcell_version,
             docker_registry = docker_registry,
             num_cpu = num_cpu,
             disk_space = disk_space,
@@ -46,10 +46,25 @@ workflow souporcell {
             zones = zones
     }
 
+    call match_donors {
+        input:
+            sample_id = sample_id,
+            output_directory = output_directory,
+            input_rna = input_rna,
+            souporcell_cluster_tsv = run_souporcell.souporcell_cluster_tsv,
+            souporcell_genotypes_vcf = run_souporcell.souporcell_genotypes_vcf,
+            ref_genotypes = ref_genotypes,
+            donor_rename = donor_rename,
+            docker_registry = docker_registry,
+            version = souporcell_version,
+            zones = zones,
+            preemptible = preemptible
+    }
+
     output {
-        String output_folder = "~{output_directory}"
-        File output_zarr = run_souporcell.output_zarr
-        File monitoringLog = run_souporcell.monitoringLog
+        String output_folder = match_donors.output_folder
+        File output_zarr = match_donors.output_zarr
+        Array[File] monitoringLog = [run_souporcell.monitoringLog, match_donors.monitoringLog]
     }
 
 }
@@ -62,11 +77,11 @@ task run_souporcell {
         File input_bam
         File genome
         File? ref_genotypes
+        String? donor_rename
         Boolean de_novo_mode
         Int min_num_genes
         Int num_clusters
-        String donor_rename
-        String souporcell_version
+        String version
 
         String docker_registry
         Int num_cpu
@@ -111,41 +126,86 @@ task run_souporcell {
         print(' '.join(souporcell_call_args))
         check_call(souporcell_call_args)
 
-        match_call_args = ['python', '/opt/match_donors.py']
-
-        if '~{ref_genotypes}' is not '':
-            match_call_args.extend(['--ref-genotypes', '~{ref_genotypes}'])
-
-        if '~{donor_rename}' is not '':
-            match_call_args.extend(['--donor-names', '~{donor_rename}'])
-
-        match_call_args.extend(['result/cluster_genotypes.vcf', 'result/clusters.tsv', '~{input_rna}', 'result/~{sample_id}_demux.zarr.zip'])
-
-        print(' '.join(match_call_args))
-
-        with open('match_donors.log', 'w') as fout:
-            check_call(match_call_args, stdout = fout)
         CODE
-
-        mkdir buffer
-        cp match_donors.log result/~{sample_id}_demux.zarr.zip result/clusters.tsv result/cluster_genotypes.vcf buffer
-        gsutil -q -m rsync -r buffer ~{output_directory}/~{sample_id}
-        # mkdir -p ~{output_directory}/~{sample_id}
-        # cp -r buffer/* ~{output_directory}/~{sample_id}
     }
 
     output {
-        String output_folder = "~{output_directory}/~{sample_id}"
-        File output_zarr = "buffer/~{sample_id}_demux.zarr.zip"
+        File souporcell_cluster_tsv = "result/clusters.tsv"
+        File souporcell_genotypes_vcf = "result/cluster_genotypes.vcf"
         File monitoringLog = "monitoring.log"
     }
 
     runtime {
-        docker: "~{docker_registry}/souporcell:~{souporcell_version}"
+        docker: "~{docker_registry}/souporcell:~{version}"
         zones: zones
         memory: "~{memory}G"
         disks: "local-disk ~{disk_space} HDD"
         cpu: "~{num_cpu}"
+        preemptible: "~{preemptible}"
+    }
+}
+
+task match_donors {
+    input {
+        String sample_id
+        String output_directory
+        File input_rna
+        File souporcell_cluster_tsv
+        File souporcell_genotypes_vcf
+        File? ref_genotypes
+        String? donor_rename
+
+        String docker_registry
+        String version
+        String zones
+        Int preemptible
+    }
+
+    Float file_size = ceil(size([input_rna, souporcell_cluster_tsv, souporcell_genotypes_vcf], "GB"))
+
+    command {
+        set -e
+        export TMPDIR=/tmp
+        monitor_script.sh > monitoring.log &
+
+        python <<CODE
+        from subprocess import check_call
+
+        call_args = ['python', '/opt/match_donors.py']
+
+        if '~{ref_genotypes}' is not '':
+            call_args.extend(['--ref-genotypes', '~{ref_genotypes}'])
+
+        if '~{donor_rename}' is not '':
+            call_args.extend(['--donor-names', '~{donor_rename}'])
+
+        call_args.extend(['~{souporcell_genotypes_vcf}', '~{souporcell_cluster_tsv}', '~{input_rna}', '~{sample_id}_demux.zarr.zip'])
+
+        print(' '.join(call_args))
+
+        with open('match_donors.log', 'w') as fout:
+            check_call(call_args, stdout = fout)
+
+        CODE
+
+        mkdir result
+        mv match_donors.log ~{sample_id}_demux.zarr.zip ~{souporcell_cluster_tsv} ~{souporcell_genotypes_vcf} result/
+        gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
+        # mkdir -p ~{output_directory}/~{sample_id}
+        # cp -r result/* ~{output_directory}/~{sample_id}
+    }
+
+    output {
+        String output_folder = "~{output_directory}/~{sample_id}"
+        File output_zarr = "result/~{sample_id}_demux.zarr.zip"
+        File monitoringLog = "monitoring.log"
+    }
+
+    runtime {
+        docker: "~{docker_registry}/souporcell:~{version}"
+        zones: zones
+        memory: file_size * 3 + "G"
+        disks: "local-disk " + file_size * 5 + " HDD"
         preemptible: "~{preemptible}"
     }
 }
