@@ -1,9 +1,10 @@
 # Changelog of Pegasus-Terra Docker Image
 
-## 1.0 - 2020/07/21
+## 1.0 - 2020/07/21 (Latest update on 2020/07/27)
 
 * Image based on [terra-jupyter-base](https://github.com/DataBiosphere/terra-docker/tree/master/terra-jupyter-base) image version 0.0.11 at ``us.gcr.io/broad-dsp-gcr-public/terra-jupyter-base:0.0.11``.
-* Install Pegasus 1.0.0rc1. See [here](https://pegasus.readthedocs.io/en/dev) for new features.
+* Install Pegasus 1.0.0rc2. See [here](https://pegasus.readthedocs.io/en/latest) for new features.
+* Install Cirrocumulus and ngrok for interactive data visualization on Terra workspace.
 * Update dependency packages.
 
 Image URL: ``cumulusprod/pegasus-terra:1.0``
