@@ -121,6 +121,14 @@ Please see the description of inputs below. Note that required inputs are shown 
       - Which aligner to use for read alignment. Options are "hisat2-hca", "star" and "bowtie"
       - "star"
       - "hisat2-hca"
+    * - output_genome_bam
+      - Whether to output bam file with alignments mapped to genomic coordinates and annotated with their posterior probabilities.
+      - false
+      - false
+    * - normalize_tpm_by_sequencing_depth
+      - Whether to normalize TPM values by sequencing depth.
+      - true
+      - true
     * - smartseq2_version
       - SMART-Seq2 version to use. Versions available: 1.1.0.
       - "1.1.0"
@@ -188,6 +196,9 @@ Outputs:
     * - rsem_trans_bam
       - Array[Array[File]]
       - A 2D array of RSEM transcriptomic BAM files.
+    * - rsem_genome_bam
+      - Array[Array[File]]
+      - A 2D array of RSEM genomic BAM files if ``output_genome_bam`` is ``true``.
     * - rsem_time
       - Array[Array[File]]
       - A 2D array of RSEM execution time log files.
