@@ -60,7 +60,7 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install cirrocumulus==1.1.1 --no-cache-dir && \
     python -m pip install annoy==1.16.3 --no-cache-dir && \
     python -m pip install scrublet==0.2.1 --no-cache-dir && \
-    python -m pip install pegasusio==0.2.4 --no-cache-dir && \
+    python -m pip install pegasusio==0.2.4.post1 --no-cache-dir && \
     python -m pip install pegasuspy==1.0.0rc1 --no-cache-dir
 
 RUN mkdir /software && \
