@@ -4,7 +4,7 @@ Extract gene-count matrices from plated-based SMART-Seq2 data
 Run SMART-Seq2 Workflow
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-Follow the steps below to extract gene-count matrices from SMART-Seq2 data on Terra_. This WDL aligns reads using *Bowtie 2* and estimates expression levels using *RSEM*.
+Follow the steps below to extract gene-count matrices from SMART-Seq2 data on Terra_. This WDL aligns reads using *STAR*, *HISAT2*, or *Bowtie 2* and estimates expression levels using *RSEM*.
 
 #. Copy your sequencing output to your workspace bucket using gsutil_ in your unix terminal.
 
