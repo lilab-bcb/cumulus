@@ -54,7 +54,7 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install MulticoreTSNE-modified==0.1 --no-cache-dir && \
     python -m pip install umap-learn==0.4.6 --no-cache-dir && \
     python -m pip install torch==1.5.1 --no-cache-dir && \
-    python -m pip install harmony-pytorch==0.1.3 --no-cache-dir && \
+    python -m pip install harmony-pytorch==0.1.4 --no-cache-dir && \
     python -m pip install bokeh==2.1.1 --no-cache-dir && \
     python -m pip install scplot==0.0.16 --no-cache-dir && \
     python -m pip install cirrocumulus==1.1.1 --no-cache-dir && \
