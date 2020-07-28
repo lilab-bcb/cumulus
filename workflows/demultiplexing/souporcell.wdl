@@ -58,6 +58,8 @@ workflow souporcell {
             docker_registry = docker_registry,
             version = souporcell_version,
             zones = zones,
+            memory = memory,
+            disk_space = disk_space,
             preemptible = preemptible
     }
 
@@ -158,10 +160,12 @@ task match_donors {
         String docker_registry
         String version
         String zones
+        Int memory
+        Int disk_space
         Int preemptible
     }
 
-    Float file_size = ceil(size([input_rna, souporcell_cluster_tsv, souporcell_genotypes_vcf], "GB"))
+    Float file_size = size([input_rna, souporcell_cluster_tsv, souporcell_genotypes_vcf], "GB")
 
     command {
         set -e
@@ -204,8 +208,8 @@ task match_donors {
     runtime {
         docker: "~{docker_registry}/souporcell:~{version}"
         zones: zones
-        memory: file_size * 3 + "G"
-        disks: "local-disk " + file_size * 5 + " HDD"
+        memory: "~{memory}G"
+        disks: "local-disk ~{disk_space} HDD"
         preemptible: "~{preemptible}"
     }
 }
