@@ -155,16 +155,23 @@ def translate_donor_name(inp_str: str, matching: dict) -> str:
 		res_str.append(matching[donor_id][5:])
 	return ','.join(res_str)
 
+def gen_summary_of_status(df):
+	type_counts = df['status'].value_counts()
+	for type in ['singlet', 'doublet', 'unknown']:
+		if type not in type_counts.index:
+			type_counts[type] = 0
+	return type_counts
+
 def write_output(assignment_file: str, input_mat_file: str, output_zarr_file: str, matching: dict) -> None:
 	df = pd.read_csv(assignment_file, sep = '\t', header = 0, index_col = 0)
 	df.index = pd.Index([x[:-2] for x in df.index])
 	f = np.vectorize(translate_donor_name)
-	df['assignment'] = f(df['assignment'].values, matching)
+	df['assignment'] = f(df['assignment'].astype('str').values, matching)
 	idx = df['status'].values == 'unassigned'
 	df.loc[idx, 'status'] = 'unknown'
 	df.loc[idx, 'assignment'] = ''
 
-	type_counts = df['status'].value_counts()
+	type_counts = gen_summary_of_status(df)
 	print("\nSinglets = {}, doublets = {}, unknown = {}.".format(type_counts['singlet'], type_counts['doublet'], type_counts['unknown']))
 
 	idx = df['status'] == 'singlet'
