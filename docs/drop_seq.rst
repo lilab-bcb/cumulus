@@ -207,6 +207,10 @@ Please see the description of important inputs below.
 dropseq_workflow Terra Release Notes
 ===================================================
 
+**Version 11**
+
+- Added fastq_to_sam_memory and trim_bam_memory workflow inputs
+
 **Version 10**
 
 - Updated workflow to WDL version 1.0
