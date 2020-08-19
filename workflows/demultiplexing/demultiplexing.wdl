@@ -1,7 +1,7 @@
 version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/3/plain-WDL/descriptor" as dem
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/9/plain-WDL/descriptor" as soc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/11/plain-WDL/descriptor" as soc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/4/plain-WDL/descriptor" as dmx
 
 #import "demuxEM.wdl" as dem

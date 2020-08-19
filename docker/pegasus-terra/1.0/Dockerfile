@@ -47,8 +47,8 @@ RUN pip3 -V && \
     pip3 install umap-learn==0.4.6 && \
     pip3 install importlib-metadata==1.7.0 && \
     pip3 install zarr==2.4.0 && \
-    pip3 install pegasusio==0.2.4 && \
-    pip3 install pegasuspy==1.0.0rc2 && \
+    pip3 install pegasusio==0.2.4.post1 && \
+    pip3 install pegasuspy==1.0.0rc3 && \
     pip3 install cirrocumulus==1.1.1
 
 RUN wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip && \
