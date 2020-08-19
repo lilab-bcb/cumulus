@@ -4,6 +4,8 @@ version 1.0
 workflow dropseq_prepare_fastq {
   input {
     Int disk_space
+    String fastq_to_sam_memory
+    String trim_bam_memory
     Int preemptible = 2
     String umi_base_range
     String docker_registry
@@ -33,7 +35,7 @@ workflow dropseq_prepare_fastq {
   }
   call FastqToSam {
     input:
-      memory = "1500M",
+      memory = fastq_to_sam_memory,
       cpu = 1,
       r1 = r1,
       r2 = r2,
@@ -47,7 +49,7 @@ workflow dropseq_prepare_fastq {
   }
   call TrimBam {
     input:
-      memory = "1000M",
+      memory = trim_bam_memory,
       cpu = 1,
       unmapped_bam = FilterBam.bam,
       disk_space = disk_space,
@@ -158,7 +160,7 @@ task TagBam {
       set -e
 
         
-        mkfifo pipe1
+      mkfifo pipe1
 
       java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar TagBamWithReadSequenceExtended VALIDATION_STRINGENCY=SILENT \
       INPUT=~{unmapped_bam} \
@@ -214,6 +216,7 @@ task FastqToSam {
     String fastq_suffix = if is_gz then ".gz" else ""
 
 
+
   output {
     String bam = "${output_directory}/${sample_id}_unmapped.bam"
   }
@@ -221,8 +224,6 @@ task FastqToSam {
 
       set -o pipefail
       set -e
-
-        
 
       python <<CODE
       import os
@@ -240,8 +241,11 @@ task FastqToSam {
          # rename to fastq files to  S_R1_###.fastq.gz or S_R1_###.fastq
       CODE
 
+      command_mem_mb=$(cat /proc/meminfo | grep MemAvailable | awk 'BEGIN { FS=" " } ; { print int($2) }')
+      command_mem_mb=$(($command_mem_mb-200))
+      command_mem_mb=$command_mem_mb"m"
 
-      java -Dsamjdk.compression_level=6 -Xmx3000m -jar /software/picard.jar FastqToSam \
+      java -Dsamjdk.compression_level=6 -Xmx$command_mem_mb -jar /software/picard.jar FastqToSam \
       OUTPUT="~{sample_id}_unmapped.bam" \
       USE_SEQUENTIAL_FASTQS=true \
       FASTQ=S_R1_001.fastq~{fastq_suffix} \
@@ -279,8 +283,8 @@ task TrimBam {
     String docker_registry
   }
 
-
   output {
+
     String bam = "${output_directory}/${sample_id}_trimmed.bam"
     String adapter_trimming_report = "${output_directory}/${sample_id}_adapter_trimming_report.txt"
     String polyA_trimming_report = "${output_directory}/${sample_id}_polyA_trimming_report.txt"
@@ -289,18 +293,20 @@ task TrimBam {
 
         set -o pipefail
         set -e
-
         
         mkfifo pipe1
+        command_mem_mb=$(cat /proc/meminfo | grep MemAvailable | awk 'BEGIN { FS=" " } ; { print int($2) }')
+        command_mem_mb=$(($command_mem_mb-200))
+        command_mem_mb=$command_mem_mb"m"
 
-        java -Dsamjdk.compression_level=1 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar TrimStartingSequence VALIDATION_STRINGENCY=SILENT \
+        java -Dsamjdk.compression_level=1 -Xmx$command_mem_mb -jar /software/Drop-seq_tools/jar/dropseq.jar TrimStartingSequence VALIDATION_STRINGENCY=SILENT \
               INPUT=~{unmapped_bam} \
               OUTPUT=pipe1 \
               OUTPUT_SUMMARY="~{sample_id}_adapter_trimming_report.txt" \
               SEQUENCE=~{trim_sequence} \
               MISMATCHES=0 \
               NUM_BASES=~{trim_num_bases} | \
-              java -Dsamjdk.compression_level=2 -Xmx3000m -jar /software/Drop-seq_tools/jar/dropseq.jar PolyATrimmer VALIDATION_STRINGENCY=SILENT \
+              java -Dsamjdk.compression_level=2 -Xmx$command_mem_mb -jar /software/Drop-seq_tools/jar/dropseq.jar PolyATrimmer VALIDATION_STRINGENCY=SILENT \
               INPUT=pipe1 \
               OUTPUT="~{sample_id}_trimmed.bam" \
               OUTPUT_SUMMARY="~{sample_id}_polyA_trimming_report.txt" \

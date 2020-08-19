@@ -4,7 +4,7 @@ import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:bcl2fastq/versions/5/pl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropest/versions/4/plain-WDL/descriptor"as dropest_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_align/versions/5/plain-WDL/descriptor" as dropseq_align_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_count/versions/5/plain-WDL/descriptor" as dropseq_count_wdl
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_prepare_fastq/versions/5/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_prepare_fastq/versions/6/plain-WDL/descriptor" as dropseq_prepare_fastq_wdl
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_qc/versions/4/plain-WDL/descriptor" as dropseq_qc_wdl
 
 
@@ -17,6 +17,8 @@ import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:dropseq_qc/versions/4/p
 
 workflow dropseq_workflow {
   input {
+    String fastq_to_sam_memory = "1800M"
+    String trim_bam_memory = "1200M"
     Float prepare_fastq_disk_space_multiplier = 4
     String drop_deq_tools_dge_memory = "3750M"
     Int sort_bam_max_records_in_ram = 2000000
@@ -173,6 +175,8 @@ workflow dropseq_workflow {
         umi_base_range = umi_base_range,
         r2 = row[2],
         disk_space = row[3],
+        fastq_to_sam_memory = fastq_to_sam_memory,
+        trim_bam_memory = trim_bam_memory,
         preemptible = preemptible,
         cellular_barcode_base_range = cellular_barcode_base_range,
         r1 = row[1],
