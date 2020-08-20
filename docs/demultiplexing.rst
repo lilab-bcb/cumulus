@@ -212,9 +212,10 @@ souporcell inputs
 	  - true
 	  - true
 	* - souporcell_num_clusters
-	  - souporcell parameter. Number of expected clusters when doing clustering.
-	  - 1
-	  - 1
+	  - | souporcell parameter. Number of expected clusters when doing clustering. 
+	    | **This needs to be set when running souporcell.**
+	  - 8
+	  -
 	* - souporcell_rename_donors
 	  - | souporcell parameter. A comma-separated list of donor names for renaming clusters achieved by souporcell.
 	    | By default, the resulting donors are *Donor1*, *Donor2*, ...

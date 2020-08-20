@@ -263,11 +263,15 @@ cluster inputs
       - Example
       - Default
     * - focus
-      - Focus analysis on Unimodal data with <keys>. <keys> is a comma-separated list of keys. If None, the ``self._selected`` will be the focused one.
+      - | Focus analysis on Unimodal data with <keys>. <keys> is a comma-separated list of keys. If None, the ``self._selected`` will be the focused one.
+        | Focus key consists of two parts: reference genome name, and data type, connected with a hyphen marker "``-``".
+        | Reference genome name depends on the reference you used when running Cellranger workflow. See `here <./cellranger.html#sample-sheet>`_ for reference list.
       - "GRCh38-rna"
       -
     * - append
-      - Append Unimodal data <key> to any <keys> in *focus*.
+      - | Append Unimodal data <key> to any <keys> in *focus*.
+        | Similarly as focus keys, append key also consists of two parts: reference genome name, and data type, connected with a hyphen marker "``-``".
+        | See `here <./cellranger.html#sample-sheet>`_ for reference genome list.
       - "SARSCoV2-rna"
       -
     * - channel
