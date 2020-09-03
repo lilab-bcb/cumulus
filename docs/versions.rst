@@ -21,7 +21,7 @@ Latest version
       - `14 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/14>`__
       - Run alternative tools (STARsolo, Optimus, Salmon alevin, or Kallisto BUStools) to generate gene-count matrices from FASTQ files.
     * - cumulus/demultiplexing
-      - `17 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/17>`_
+      - `19 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/19>`_
       - Run tools (demuxEM, souporcell, or demuxlet) for cell-hashing/nucleus-hashing/genetic-pooling analysis.
     * - cumulus/cellranger_create_reference
       - `9 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/9>`__
