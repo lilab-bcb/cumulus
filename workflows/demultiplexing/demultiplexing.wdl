@@ -2,8 +2,7 @@ version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/3/plain-WDL/descriptor" as dem
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/11/plain-WDL/descriptor" as soc
-#import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/1/plain-WDL/descriptor" as dmx
-import "https://api.firecloud.org/ga4gh/v1/tools/jgould:popscle/versions/4/plain-WDL/descriptor" as dmx
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/1/plain-WDL/descriptor" as dmx
 #import "demuxEM.wdl" as dem
 #import "souporcell.wdl" as soc
 #import "popscle.wdl" as dmx
