@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/21/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/22/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
@@ -189,14 +189,10 @@ workflow cumulus {
 		String? cluster_labels
 		# Control false discovery rate at <alpha>. [default: 0.05]
 		Float? alpha
-		# Calculate area under ROC (AUROC).
-		Boolean auc = true
 		# Calculate Welch's t-test.
 		Boolean t_test = true
 		# Calculate Fisher’s exact test.
 		Boolean fisher = true
-		# Calculate Mann-Whitney U test.
-		Boolean? mwu
 
 		# If also detect markers using LightGBM
 		Boolean? find_markers_lightgbm
@@ -209,7 +205,7 @@ workflow cumulus {
 		Boolean? annotate_cluster
 		# Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain", "human_lung" or a JSON file describing the markers. [default: human_immune]
 		String? organism
-		# DE test to use to infer cell types, could be either "t", "fisher", or "mwu". [default: t]
+		# DE test to use to infer cell types, could be either "mwu", "t", or "fisher". [default: mwu]
 		String? annotate_de_test
 		# Minimum cell type score to report a potential cell type. [default: 0.5]
 		Float? minimum_report_score
@@ -369,8 +365,6 @@ workflow cumulus {
 						alpha = alpha,
 						t_test = t_test,
 						fisher = fisher,
-						mwu = mwu,
-						auc = auc,
 						find_markers_lightgbm = find_markers_lightgbm,
 						remove_ribo = remove_ribo,
 						min_gain = min_gain,

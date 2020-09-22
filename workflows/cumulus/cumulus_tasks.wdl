@@ -28,7 +28,7 @@ task run_cumulus_aggregate_matrices {
 		python <<CODE
 		from subprocess import check_call
 
-		call_args = ['pegasusio', 'aggregate_matrix', '~{input_count_matrix_csv}', '~{output_name}.aggr']
+		call_args = ['pegasus', 'aggregate_matrix', '~{input_count_matrix_csv}', '~{output_name}.aggr']
 		if '~{restrictions}' is not '':
 			ress = '~{restrictions}'.split(';')
 			for res in ress:
@@ -392,10 +392,8 @@ task run_cumulus_de_analysis {
 		Int disk_space
 		Int preemptible
 		String? labels
-		Boolean? auc
 		Boolean? t_test
 		Boolean? fisher
-		Boolean? mwu
 		Float? alpha
 
 		Boolean? annotate_cluster
@@ -428,18 +426,16 @@ task run_cumulus_de_analysis {
 		print(' '.join(call_args))
 		check_call(call_args)
 		call_args = ['pegasus', 'de_analysis', '~{output_name}.h5ad', '~{output_name}.de.xlsx', '-p', '~{num_cpu}']
-		if '~{labels}' is not '':
+		if '~{labels}' is '':
+			call_args.extend(['--labels', 'louvain_labels'])
+		else:
 			call_args.extend(['--labels', '~{labels}'])
 		if '~{alpha}' is not '':
 			call_args.extend(['--alpha', '~{alpha}'])
-		if '~{auc}' is 'true':
-			call_args.append('--auc')
 		if '~{t_test}' is 'true':
 			call_args.append('--t')
 		if '~{fisher}' is 'true':
 			call_args.append('--fisher')
-		if '~{mwu}' is 'true':
-			call_args.append('--mwu')
 		print(' '.join(call_args))
 		check_call(call_args)
 		if '~{find_markers_lightgbm}' is 'true':
@@ -535,7 +531,7 @@ task run_cumulus_plot {
 			pairs = '~{plot_composition}'.split(',')
 			for pair in pairs:
 				lab, attr = pair.split(':')
-				call_args = ['pegasus', 'plot', 'composition', '--xattr', lab, '--yattr', attr, '--style', 'normalized', '~{input_h5ad}', '~{output_name}.' + lab + '.' + attr + '.composition.pdf']
+				call_args = ['pegasus', 'plot', 'compo', '--groupby', lab, '--condition', attr, '--style', 'normalized', '~{input_h5ad}', '~{output_name}.' + lab + '.' + attr + '.composition.pdf']
 				print(' '.join(call_args))
 				check_call(call_args)
 		if '~{plot_tsne}' is not '':
