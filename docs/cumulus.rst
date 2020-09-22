@@ -652,7 +652,7 @@ de_analysis inputs
       - Example
       - Default
     * - perform_de_analysis
-      - If perform differential expression (DE) analysis
+      - Whether perform differential expression (DE) analysis. If performing, by default calculate AUROC scores and Mann-Whitney U test.
       - true
       - true
     * - cluster_labels
@@ -663,10 +663,6 @@ de_analysis inputs
       - Control false discovery rate at <alpha>
       - 0.05
       - 0.05
-    * - auc
-      - Calculate area under ROC (AUROC)
-      - true
-      - true
     * - fisher
       - Calculate Fisher’s exact test
       - true
@@ -675,10 +671,6 @@ de_analysis inputs
       - Calculate Welch's t-test.
       - true
       - true
-    * - mwu
-      - Calculate Mann-Whitney U test
-      - false
-      - false
     * - find_markers_lightgbm
       - If also detect markers using LightGBM
       - false
@@ -696,9 +688,9 @@ de_analysis inputs
       - false
       - false
     * - annotate_de_test
-      - Differential Expression test to use for inference on cell types. Options: "t", "fisher", or "mwu"
-      - "t"
-      - "t"
+      - Differential Expression test to use for inference on cell types. Options: "mwu", "t", or "fisher"
+      - "mwu"
+      - "mwu"
     * - organism
       - Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain", "human_lung", or a Google bucket link to a JSON file describing the markers
       - "mouse_brain"
@@ -728,7 +720,7 @@ de_analysis outputs
     * - output_de_xlsx
       - Array[File]
       - | List of spreadsheets reporting DE results (output_name.focus_key.de.xlsx), in which each file is associated with a focus of the input data.
-        | Each cluster has two tabs: one for up-regulated genes for this cluster, one for down-regulated ones. In each tab, genes are ranked by AUROC and WAD scores.
+        | Each cluster has two tabs: one for up-regulated genes for this cluster, one for down-regulated ones. In each tab, genes are ranked by AUROC scores.
         | Genes which are not significant in terms of q-values in any of the DE test are not included (at false discovery rate specified in **alpha** field of `de_analysis inputs <./cumulus.html#de-analysis-inputs>`_).
     * - output_markers_xlsx
       - Array[File]
