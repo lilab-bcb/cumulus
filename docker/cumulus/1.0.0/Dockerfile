@@ -19,7 +19,7 @@ RUN mkdir -p /usr/share/man/man1 && \
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
-    apt-get update -y && apt-get install -y google-cloud-sdk=310.0.0-0
+    apt-get update -y && apt-get install -y google-cloud-sdk=311.0.0-0
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
@@ -63,7 +63,7 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install scrublet==0.2.1 --no-cache-dir && \
     python -m pip install pegasusio==0.2.5.post2 --no-cache-dir && \
     python -m pip install demuxEM==0.1.5 --no-cache-dir && \
-    python -m pip install pegasuspy==1.0.0rc7 --no-cache-dir
+    python -m pip install pegasuspy==1.0.0 --no-cache-dir
 
 RUN mkdir /software && \
     cp /usr/local/lib/python3.7/dist-packages/cirrocumulus/prepare_data.py /software/prepare_data.py

@@ -6,7 +6,7 @@ Pegasus is a Python package for analyzing transcriptomes of large-scale single-c
 
 |Image Version|Docker Image URL|Release Date|Last Modified|
 |---|---|---|---|
-|1.0|cumulusprod/pegasus-terra:1.0|2020/07/21|2020/07/27|
+|1.0|cumulusprod/pegasus-terra:1.0|2020/07/21|2020/09/22|
 
 ## Image Content
 
@@ -22,9 +22,9 @@ To see a complete list of image content, please see its [Dockerfile](https://raw
 
 ## Use Pegasus on Terra
 
-To use this docker image on Terra Notebook, please refer to [this instruction](https://pegasus.readthedocs.io/en/latest/terra_notebook.html).
+To use this docker image on Terra Notebook, please refer to [this instruction](https://pegasus.readthedocs.io/en/stable/terra_notebook.html).
 
-Tutorials on using Pegasus for interactive data analysis is [here](https://pegasus.readthedocs.io/en/dev/tutorials.html).
+Tutorials on using Pegasus for interactive data analysis is [here](https://pegasus.readthedocs.io/en/stable/tutorials.html).
 
 ## Selecting Prior Versions of This Image
 
