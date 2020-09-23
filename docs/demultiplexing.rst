@@ -173,9 +173,9 @@ demuxEM inputs
 	  - "XIST"
 	  -
 	* - demuxEM_version
-	  - demuxEM version to use. Currently only support "0.1.4".
-	  - "0.1.4"
-	  - "0.1.4"
+	  - demuxEM version to use. Currently only support "0.1.5".
+	  - "0.1.5"
+	  - "0.1.5"
 	* - demuxEM_num_cpu
 	  - demuxEM parameter. Number of CPUs to request for demuxEM per pair.
 	  - 8
@@ -202,9 +202,9 @@ souporcell inputs
 	  - Example
 	  - Default
 	* - souporcell_version
-	  - souporcell version to use. Available versions: "2020.06", "2020.03".
-	  - "2020.06"
-	  - "2020.06"
+	  - souporcell version to use. Available versions: "2020.07", "2020.03".
+	  - "2020.07"
+	  - "2020.07"
 	* - souporcell_de_novo_mode
 	  - | souporcell parameter.
 	    | If ``true``, run souporcell in de novo mode without reference genotypes; and if a reference genotype vcf file is provided in the sample sheet, use it **only** for matching the cluster labels computed by souporcell.
@@ -212,7 +212,7 @@ souporcell inputs
 	  - true
 	  - true
 	* - souporcell_num_clusters
-	  - | souporcell parameter. Number of expected clusters when doing clustering. 
+	  - | souporcell parameter. Number of expected clusters when doing clustering.
 	    | **This needs to be set when running souporcell.**
 	  - 8
 	  -
