@@ -108,7 +108,7 @@ task run_cumulus_cluster {
 		String? correction_method
 		String? batch_group_by
 		Int? random_state
-		File? gene_signature_file
+		String? gene_signature_set
 		Int? nPC
 		Int? knn_K
 		Boolean? knn_full_speed
@@ -151,10 +151,16 @@ task run_cumulus_cluster {
 		String docker_registry
 	}
 
+	Boolean is_url = defined(gene_signature_set) && sub(select_first([gene_signature_set]), "^gs://.+", "URL") == "URL"
+
 	command {
 		set -e
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
+
+		if [ ~{is_url} == true ]; then
+			gsutil -q cp ~{gene_signature_set} gene_signature.gmt
+		fi
 
 		python <<CODE
 		from subprocess import check_call
@@ -210,8 +216,11 @@ task run_cumulus_cluster {
 			call_args.extend(['--counts-per-cell-after', '~{counts_per_cell_after}'])
 		if '~{random_state}' is not '':
 			call_args.extend(['--random-state', '~{random_state}'])
-		if '~{gene_signature_file}' is not '':
-			call_args.extend(['--calc-signature-scores', '~{gene_signature_file}'])
+		if '~{gene_signature_set}' is not '':
+			if '~{is_url}' is 'true':
+				call_args.extend(['--calc-signature-scores', 'gene_signature.gmt'])
+			else:
+				call_args.extend(['--calc-signature-scores', '~{gene_signature_set}'])
 		if '~{no_select_hvf}' is 'true':
 			call_args.append('--no-select-hvf')
 		if '~{select_hvf_flavor}' is not '':
