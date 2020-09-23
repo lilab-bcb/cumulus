@@ -1,4 +1,4 @@
-Version 1.0.0 `TBD`
+Version 1.0.0 `September 23, 2020`
 ------------------------------------
 
 * Add *demultiplexing* workflow for cell-hashing/nucleus-hashing/genetic-pooling analysis.

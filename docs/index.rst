@@ -14,7 +14,6 @@
    smart_seq_2
    drop_seq
    demultiplexing
-   doublet_detection
    cumulus
    topic_modeling
    command_line
