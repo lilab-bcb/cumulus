@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/22/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/23/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
@@ -302,7 +302,7 @@ workflow cumulus {
 			correction_method = correction_method,
 			batch_group_by = batch_group_by,
 			random_state = random_state,
-			gene_signature_file = calc_signature_scores,
+			gene_signature_set = calc_signature_scores,
 			nPC = nPC,
 			knn_K = knn_K,
 			knn_full_speed = knn_full_speed,
