@@ -379,6 +379,7 @@ cluster inputs
 
         - "harmony": Harmony algorithm (Korsunsky et al. Nature Methods 2019).
         - "L/S": Location/Scale adjustment algorithm (Li and Wong. The analysis of Gene Expression Data, 2003).
+        - "scanorama": Scanorama algorithm (Hie et al. Nature Biotechnology 2019).
       - "harmony"
       - "harmony"
     * - batch_group_by
@@ -399,8 +400,11 @@ cluster inputs
       - 0
       - 0
     * - calc_signature_scores
-      - Google bucket URL of GMT_ format file used for calculating signature scores.
-      - "gs://fc-e0000000-0000-0000-0000-000000000000/cell_cycle_sig.gmt"
+      - Gene set for calculating signature scores. It can be either of the following forms:
+
+        - String chosen from: "cell_cycle_human", "cell_cycle_mouse", "gender_human", "gender_mouse", "mitochondrial_genes_human", "mitochondrial_genes_mouse", "robosomal_genes_human", and "robosomal_genes_mouse".
+        - Google bucket URL of a GMT_ format file. For example: "gs://fc-e0000000-0000-0000-0000-000000000000/cell_cycle_sig.gmt".
+      - "cell_cycle_human"
       -
     * - nPC
       - Number of principal components

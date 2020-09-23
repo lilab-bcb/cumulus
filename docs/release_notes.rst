@@ -8,7 +8,9 @@ Version 1.0.0 `TBD`
     * Support focus analysis on Unimodal data, and appending other Unimodal data to it. (``focus`` and ``append`` inputs in *cluster* step).
     * Quality-Control: Change ``percent_mito`` default from ``10.0`` to ``20.0``; by default remove bounds on UMIs (``min_umis`` and ``max_umis`` inputs in *cluster* step).
     * Quality-Control: Automatically figure out name prefix of mitochondrial genes for ``GRCh38`` and ``mm10`` genome reference data.
+    * Support signature / gene module score calculation. (``calc_signature_scores`` input in *cluster* step)
     * Add *Scanorama* method to batch correction. (``correction_method`` input in *cluster* step).
+    * Calculate UMAP embedding by default, instead of FIt-SNE.
     * Differential Expression (DE) analysis: remove inputs ``mwu`` and ``auc`` as they are calculated by default. And cell-type annotation uses MWU test result by default.
 * Remove *cumulus_subcluster* workflow.
 
