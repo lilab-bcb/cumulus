@@ -100,7 +100,7 @@ workflow cumulus {
 		# Random number generator seed. [default: 0]
 		Int? random_state
 		# Calculate signature scores for gene sets in <GMT_file>.
-		File? calc_signature_scores
+		String? calc_signature_scores
 		# Number of PCs. [default: 50]
 		Int? nPC
 		# Number of neighbors used for constructing affinity matrix. [default: 100]
