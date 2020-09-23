@@ -1,3 +1,17 @@
+Version 1.0.0 `TBD`
+------------------------------------
+
+* Add *demultiplexing* workflow for cell-hashing/nucleus-hashing/genetic-pooling analysis.
+* Add support on CellRanger version ``4.0.0``.
+* Update *cumulus* workflow with Pegasus version ``1.0.0``:
+    * Use ``zarr`` file format to handle data, which has a better I/O performance in general.
+    * Support focus analysis on Unimodal data, and appending other Unimodal data to it. (``focus`` and ``append`` inputs in *cluster* step).
+    * Quality-Control: Change ``percent_mito`` default from ``10.0`` to ``20.0``; by default remove bounds on UMIs (``min_umis`` and ``max_umis`` inputs in *cluster* step).
+    * Quality-Control: Automatically figure out name prefix of mitochondrial genes for ``GRCh38`` and ``mm10`` genome reference data.
+    * Add *Scanorama* method to batch correction. (``correction_method`` input in *cluster* step).
+    * Differential Expression (DE) analysis: remove inputs ``mwu`` and ``auc`` as they are calculated by default. And cell-type annotation uses MWU test result by default.
+* Remove *cumulus_subcluster* workflow.
+
 Version 0.15.0 `May 6, 2020`
 -------------------------------
 
@@ -78,4 +92,3 @@ Version 0.1.0 `July 27, 2018`
 -----------------------------
 
 * KCO tools released!
-

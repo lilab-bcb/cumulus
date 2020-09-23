@@ -4,8 +4,8 @@ Latest and stable versions on Terra_
 Cumulus is a fast growing project. As a result, we frequently update WDL snapshot versions on Terra_.
 See below for latest and stable WDL versions you can use.
 
-Latest version
-^^^^^^^^^^^^^^
+Stable version - v1.0.0
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table::
     :widths: 15 5 30
@@ -44,9 +44,6 @@ Latest version
     * - cumulus/cumulus
       - `30 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/30>`__
       - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
-    * - cumulus/cumulus_subcluster
-      - `16 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_subcluster/16>`__
-      - Run subcluster analysis using cumulus
     * - cumulus/cumulus_hashing_cite_seq
       - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_hashing_cite_seq/10>`__
       - Run cumulus for cell-hashing/nucleus-hashing/CITE-Seq analysis
