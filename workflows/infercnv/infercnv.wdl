@@ -6,7 +6,6 @@ workflow InferCNV {
         String sample_id
         String output_directory
         File gene_ordering_csv
-        File sample_annotation_csv
         String protocol = "tenX"
         Boolean cluster_by_groups = true
         Boolean HMM = false
