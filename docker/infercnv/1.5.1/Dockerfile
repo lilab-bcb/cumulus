@@ -30,8 +30,7 @@ RUN apt-get -qq -y remove gnupg curl && \
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
-ADD gen_raw_count.py /software
-ADD gen_anno.py /software
+ADD preprocess.py /software
 ADD run_inferCNV.R /software
 ADD calc_cnv_metrics.R /software
 ADD insert_cnv_scores.py /software
