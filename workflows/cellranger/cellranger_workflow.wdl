@@ -42,6 +42,13 @@ workflow cellranger_workflow {
 
         # Do not align reads to reference V(D)J sequences before de novo assembly. Default: false
         Boolean vdj_denovo = false
+        
+        # Force the analysis to be carried out for a particular chain type. The accepted values are:
+        #   "auto" for autodetection based on TR vs IG representation (default),
+        #   "TR" for T cell receptors,
+        #   "IG" for B cell receptors,
+        # Use this in rare cases when automatic chain detection fails.
+        String vdj_chain = "auto"
 
         # For extracting ADT count
 
@@ -212,6 +219,7 @@ workflow cellranger_workflow {
                         genome = generate_count_config.sample2genome[sample_id],
                         force_cells = force_cells,
                         denovo = vdj_denovo,
+                        chain = vdj_chain,
                         cellranger_version = cellranger_version,
                         zones = zones,
                         num_cpu = num_cpu,
