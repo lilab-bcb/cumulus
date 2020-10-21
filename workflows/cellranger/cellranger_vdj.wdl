@@ -16,6 +16,13 @@ workflow cellranger_vdj {
 		Int? force_cells
 		# Do not align reads to reference V(D)J sequences before de novo assembly. Default: false
 		Boolean denovo = false
+		
+		# Force the analysis to be carried out for a particular chain type. The accepted values are:
+		#   "auto" for autodetection based on TR vs IG representation (default),
+		#   "TR" for T cell receptors,
+		#   "IG" for B cell receptors,
+		# Use this in rare cases when automatic chain detection fails.
+		String chain = "auto"
 
 		# cellranger version
 		String cellranger_version
@@ -50,6 +57,7 @@ workflow cellranger_vdj {
 			genome_file = genome_file,
 			force_cells = force_cells,
 			denovo = denovo,
+			chain = chain,
 			cellranger_version = cellranger_version,
 			zones = zones,
 			num_cpu = num_cpu,
@@ -75,6 +83,7 @@ task run_cellranger_vdj {
 		File genome_file
 		Int? force_cells
 		Boolean denovo
+		String chain
 		String cellranger_version
 		String zones
 		Int num_cpu
@@ -107,7 +116,7 @@ task run_cellranger_vdj {
 			check_call(call_args)
 			fastqs.append('~{sample_id}_' + str(i))
 
-		call_args = ['cellranger', 'vdj', '--id=results', '--reference=ref_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local']
+		call_args = ['cellranger', 'vdj', '--chain=~{chain}', '--id=results', '--reference=ref_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local']
 		if '~{force_cells}' is not '':
 			call_args.append('--force-cells=~{force_cells}')
 		if '~{denovo}' is not 'false':
