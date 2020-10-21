@@ -4,7 +4,7 @@ import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/v
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq/versions/3/plain-WDL/descriptor" as cram
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/5/plain-WDL/descriptor" as crc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/4/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/5/plain-WDL/descriptor" as crv
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/6/plain-WDL/descriptor" as crv
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/6/plain-WDL/descriptor" as ca
 
 workflow cellranger_workflow {
@@ -42,9 +42,9 @@ workflow cellranger_workflow {
 
         # Do not align reads to reference V(D)J sequences before de novo assembly. Default: false
         Boolean vdj_denovo = false
-        
+
         # Force the analysis to be carried out for a particular chain type. The accepted values are:
-        #   "auto" for autodetection based on TR vs IG representation (default),
+        #   "auto" for auto detection based on TR vs IG representation (default),
         #   "TR" for T cell receptors,
         #   "IG" for B cell receptors,
         # Use this in rare cases when automatic chain detection fails.
