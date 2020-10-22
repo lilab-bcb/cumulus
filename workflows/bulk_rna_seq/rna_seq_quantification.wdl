@@ -1,6 +1,6 @@
 version 1.0
 
-workflow bulk_rna_seq {
+workflow rna_seq_quantification {
     input {
         Array[File] read1
         Array[File] read2
