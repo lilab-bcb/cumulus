@@ -1,6 +1,6 @@
 version 1.0
 
-workflow rna_seq_quantification {
+workflow bulk_rna_seq {
     input {
         Array[File] read1
         Array[File] read2
@@ -46,7 +46,7 @@ workflow rna_seq_quantification {
         File rsem_trans_bam = run_rsem.rsem_trans_bam
         File rsem_time = run_rsem.rsem_time
         File aligner_log = run_rsem.aligner_log
-        File rsem_tpm = run_rsem.rsem_tpm
+        File rsem_cnt = run_rsem.rsem_cnt
         File rsem_model = run_rsem.rsem_model
         File rsem_theta = run_rsem.rsem_theta
         Array[File] rsem_genome_bam = run_rsem.rsem_genome_bam
