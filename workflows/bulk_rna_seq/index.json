@@ -1,8 +1,0 @@
-{
-  "GRCh38-2020-A": {
-    "star_genome": "gs://regev-lab/resources/bulk_rna_seq/GRCh38-2020-A_star.tar.gz"
-  },
-  "mm10-2020-A": {
-    "star_genome": "gs://regev-lab/resources/bulk_rna_seq/mm10-2020-A_star.tar.gz"
-  }
-}
