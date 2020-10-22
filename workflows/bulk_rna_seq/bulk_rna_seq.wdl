@@ -13,9 +13,8 @@ workflow bulk_rna_seq {
         # factor to multiply size of R1 and R2 by
         Float disk_space_multiplier = 4
         Float extra_disk_space = 2
-        Int aggregate_extra_disk_space = 1
         Int preemptible = 2
-        String rsem_docker = "cumulusprod/bulk_rna_seq:1.0.0"
+        String docker = "cumulusprod/smartseq2:1.1.0"
     }
 
     File acronym_file = "gs://regev-lab/resources/smartseq2/index.tsv"
@@ -38,7 +37,7 @@ workflow bulk_rna_seq {
             memory = memory,
             disk_space_multiplier = disk_space_multiplier,
             preemptible = preemptible,
-            docker = rsem_docker
+            docker = docker
     }
 
     output {
