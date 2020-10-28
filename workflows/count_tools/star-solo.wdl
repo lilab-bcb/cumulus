@@ -25,6 +25,10 @@ workflow starsolo {
     Map[String, String] wl_index2gsurl = read_map(wl_index_file)
     String whitelist_url = wl_index2gsurl[chemistry]
 
+    if (whitelist_url != 'null') {
+        File whitelist = whitelist_url
+    }
+
 
     call run_star_solo {
         input:
@@ -36,7 +40,7 @@ workflow starsolo {
             num_cpu = num_cpu,
             star_version = star_version,
             genome = genome_url,
-            whitelist = whitelist_url,
+            whitelist = whitelist,
             output_directory = output_directory,
             docker_registry = docker_registry,
             disk_space = disk_space,
@@ -61,7 +65,7 @@ task run_star_solo {
         String chemistry
         Int num_cpu
         File genome
-        File whitelist
+        File? whitelist
         String output_directory
         String docker_registry
         String star_version
@@ -70,7 +74,7 @@ task run_star_solo {
         Int memory
         Int preemptible
     }
-    
+
 
     command {
         set -e
@@ -82,14 +86,16 @@ task run_star_solo {
         rm "~{genome}"
 
         mkdir result
-        
+
         python <<CODE
         import os
         from subprocess import check_call
 
-        call_args = ['STAR', '--soloType', '~{solo_type}', '--soloCBwhitelist', '~{whitelist}', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}', '--outSAMtype', 'BAM', 'Unsorted', '--outSAMheaderHD', '\\@HD', 'VN:1.4', 'SO:unsorted']
-        if '~{chemistry}' is 'tenX_v3':
-            call_args.extend(['--soloUMIlen', '12'])
+        call_args = ['STAR', '--soloType', '~{solo_type}', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}', '--outSAMtype', 'BAM', 'Unsorted', '--outSAMheaderHD', '\\@HD', 'VN:1.4', 'SO:unsorted']
+        if '~{chemistry}' in ['tenX_v3', 'tenX_v2']:
+            call_args.extend(['--soloCBwhitelist', '~{whitelist}'])
+            if '~{chemistry}' is 'tenX_v3':
+                call_args.extend(['--soloUMIlen', '12'])
 
         file_ext = os.path.splitext('~{r1_fastq}')[-1]
         if file_ext == '.gz':
