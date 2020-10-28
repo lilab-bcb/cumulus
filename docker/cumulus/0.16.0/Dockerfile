@@ -48,7 +48,6 @@ RUN pip3 install setuptools==46.1.3 --no-cache-dir && \
     pip3 install bokeh==2.0.0 --no-cache-dir && \
     pip3 install scplot==0.0.16 --no-cache-dir && \
     pip3 install pegasuspy==0.17.1 --no-cache-dir && \
-    pip3 install pegasusio==0.2.2 --no-cache-dir && \
     pip3 install cirrocumulus==1.0.0 --no-cache-dir
 
 RUN mkdir /software && \
