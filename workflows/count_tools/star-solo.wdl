@@ -25,6 +25,10 @@ workflow starsolo {
     Map[String, String] wl_index2gsurl = read_map(wl_index_file)
     String whitelist_url = wl_index2gsurl[chemistry]
 
+    if (whitelist_url != 'null') {
+        File whitelist = whitelist_url
+    }
+
 
     call run_star_solo {
         input:
@@ -36,7 +40,7 @@ workflow starsolo {
             num_cpu = num_cpu,
             star_version = star_version,
             genome = genome_url,
-            whitelist = whitelist_url,
+            whitelist = whitelist,
             output_directory = output_directory,
             docker_registry = docker_registry,
             disk_space = disk_space,
