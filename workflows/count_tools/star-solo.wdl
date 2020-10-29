@@ -96,6 +96,8 @@ task run_star_solo {
             call_args.extend(['--soloCBwhitelist', '~{whitelist}'])
             if '~{chemistry}' is 'tenX_v3':
                 call_args.extend(['--soloUMIlen', '12'])
+        elif '~{chemistry}' is 'dropseq':
+            call_args.extend(['--soloCBwhitelist', 'None'])
 
         file_ext = os.path.splitext('~{r1_fastq}')[-1]
         if file_ext == '.gz':
