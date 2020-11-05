@@ -181,19 +181,16 @@ task run_star_solo {
         r2_list = '~{r2_fastqs}'.split(',')
         assert len(r1_list) == len(r2_list)
 
+        def rename_fastq(in_file, out_file):
+            call_args = ['gsutil', '-q', '-m', 'cp', in_file, out_file]
+            # call_args = ['cp', in_file, out_file]
+            print(' '.join(call_args))
+            check_call(call_args)
+
         for i in range(len(r1_list)):
             file_ext = '.fastq.gz' if os.path.splitext(r1_list[i])[-1] == '.gz' else '.fastq'
-            call_args = ['gsutil', '-q', '-m', 'cp', r1_list[i], 'R1_' + str(i) + file_ext]
-            # call_args = ['cp', r1_list[i], 'R1_' + str(i) + file_ext]
-            print(' '.join(call_args))
-            check_call(call_args)
-
-            file_ext = '.fastq.gz' if os.path.splitext(r2_list[i])[-1] == '.gz' else '.fastq'
-            call_args = ['gsutil', '-q', '-m', 'cp', r2_list[i], 'R2_' + str(i) + file_ext]
-            # call_args = ['cp', r2_list[i], 'R2_' + str(i) + file_ext]
-            print(' '.join(call_args))
-            check_call(call_args)
-
+            rename_fastq(r1_list[i], 'R1_'+str(i)+file_ext)
+            rename_fastq(r2_list[i], 'R2_'+str(i)+file_ext)
 
         call_args = ['STAR', '--soloType', 'CB_UMI_Simple', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}', '--outSAMtype', 'BAM', 'Unsorted', '--outSAMheaderHD', '\\@HD', 'VN:1.4', 'SO:unsorted']
 
