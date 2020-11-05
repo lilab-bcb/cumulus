@@ -22,7 +22,7 @@ workflow starsolo {
     String genome_url = ref_index2gsurl[genome]
 
     File wl_index_file = "gs://regev-lab/resources/count_tools/whitelist_index.tsv"
-    # File wl_index_file = "../count_tools/whitelist_index.tsv"
+    # File wl_index_file = "whitelist_index.tsv"
     Map[String, String] wl_index2gsurl = read_map(wl_index_file)
     String whitelist_url = wl_index2gsurl[chemistry]
 
@@ -107,6 +107,7 @@ task generate_count_config {
                     directory = re.sub('/+$', '', directory)
 
                     call_args = ['gsutil', 'ls', directory]
+                    # call_args = ['ls', directory]
                     with open('list_dir.txt', 'w') as tmp_fo:
                         check_call(call_args, stdout=tmp_fo)
 
@@ -118,6 +119,8 @@ task generate_count_config {
                     r2_files = [f for f in f_list if re.match('.*_R2_.*.fastq.gz', f)]
                     r1_files.sort()
                     r2_files.sort()
+                    # r1_files = list(map(lambda s: directory+'/'+s, r1_files))
+                    # r2_files = list(map(lambda s: directory+'/'+s, r2_files))
 
                     r1_list.extend(r1_files)
                     r2_list.extend(r2_files)
@@ -181,11 +184,13 @@ task run_star_solo {
         for i in range(len(r1_list)):
             file_ext = '.fastq.gz' if os.path.splitext(r1_list[i])[-1] == '.gz' else '.fastq'
             call_args = ['gsutil', '-q', '-m', 'cp', r1_list[i], 'R1_' + str(i) + file_ext]
+            # call_args = ['cp', r1_list[i], 'R1_' + str(i) + file_ext]
             print(' '.join(call_args))
             check_call(call_args)
 
             file_ext = '.fastq.gz' if os.path.splitext(r2_list[i])[-1] == '.gz' else '.fastq'
             call_args = ['gsutil', '-q', '-m', 'cp', r2_list[i], 'R2_' + str(i) + file_ext]
+            # call_args = ['cp', r2_list[i], 'R2_' + str(i) + file_ext]
             print(' '.join(call_args))
             check_call(call_args)
 
