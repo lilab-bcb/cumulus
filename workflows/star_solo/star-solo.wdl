@@ -19,7 +19,7 @@ workflow starsolo {
     File ref_index_file = "gs://regev-lab/resources/count_tools/ref_index.tsv"
     # File ref_index_file = "ref_index.tsv"
     Map[String, String] ref_index2gsurl = read_map(ref_index_file)
-    String genome_url = ref_index2gsurl[genome]
+    String genome_url = ref_index2gsurl[genome] + '/starsolo.tar.gz'
 
     File wl_index_file = "gs://regev-lab/resources/count_tools/whitelist_index.tsv"
     # File wl_index_file = "whitelist_index.tsv"
