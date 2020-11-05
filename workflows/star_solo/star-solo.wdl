@@ -204,7 +204,7 @@ task run_star_solo {
         elif '~{chemistry}' in ['SeqWell', 'DropSeq']:
             call_args.extend(['--soloCBwhitelist', 'None', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8'])
 
-        if file_ext == '.gz':
+        if file_ext == '.fastq.gz':
             call_args.extend(['--readFilesCommand', 'zcat'])
 
         def set_up_readfiles(prefix, n_files, f_ext):
