@@ -1,7 +1,7 @@
 Run STARsolo to generate gene-count matrices from FASTQ files
 ----------------------------------------------------------------------
 
-This ``count`` workflow generates gene-count matrices from 10X FASTQ data using alternative methods other than Cell Ranger.
+This ``star_solo`` workflow generates gene-count matrices from FASTQ data using STARsolo.
 
 Prepare input data and import workflow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
