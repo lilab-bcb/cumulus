@@ -10,6 +10,7 @@
    versions
    cellranger
    bcl2fastq
+   starsolo
    count
    smart_seq_2
    drop_seq
