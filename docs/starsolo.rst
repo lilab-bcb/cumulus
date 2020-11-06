@@ -44,11 +44,11 @@ Prepare input data and import workflow
 		* - Column
 		  - Description
 		* - **Sample**
-		  - Contains sample names. Each sample or 10x channel should have a unique sample name.
+		  - Contains sample names. Each sample or 10X channel should have a unique sample name.
 		* - **Flowcells**
 		  - Indicates the Google bucket URLs of folder(s) holding FASTQ files of this sample.
 
-	For 10x data, the sample sheet supports sequencing the same 10x channel across multiple flowcells. If a sample is sequenced across multiple flowcells, simply list all of its flowcells in a comma-seperated way. In the following example, we have 2 samples sequenced in two flowcells.
+	For 10X data, the sample sheet supports sequencing the same 10X channel across multiple flowcells. If a sample is sequenced across multiple flowcells, simply list all of its flowcells in a comma-seperated way. In the following example, we have 2 samples sequenced in two flowcells.
 
 	Example::
 
@@ -99,7 +99,7 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	  - "GRCh38"
 	  -
 	* - **chemistry**
-	  - 10X genomics' chemistry name. Current support: "tenX_v3" (for V3 chemistry), "tenX_v2" (for V2 chemistry), "DropSeq", and "SeqWell".
+	  - Chemistry name. Available options: "tenX_v3" (for 10X V3 chemistry), "tenX_v2" (for 10X V2 chemistry), "DropSeq", and "SeqWell".
 	  - "tenX_v3"
 	  -
 	* - **output_directory**
@@ -107,7 +107,7 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/count_result"
 	  -
 	* - docker_registry
-	  - Docker registry to use. Notice that docker image for Bustools is seperate.
+	  - Docker registry to use:
 
 	  	- "quay.io/cumulus" for docker images on Red Hat registry;
 
@@ -119,23 +119,19 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	  - "us-east1-d us-west1-a us-west1-b"
 	  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 	* - num_cpu
-	  - | Number of CPUs to request for count per channel.
-	    | Notice that when use Optimus for count, this input only affects steps of copying files. Optimus uses CPUs due to its own strategy.
+	  - Number of CPUs to request for count per sample.
 	  - 32
 	  - 32
 	* - disk_space
-	  - | Disk space in GB needed for count per channel.
-	    | Notice that when use Optimus for count, this input only affects steps of copying files. Optimus uses disk space due to its own strategy.
+	  - Disk space in GB needed for count per sample.
 	  - 500
 	  - 500
 	* - memory
-	  - | Memory size in GB needed for count per channel.
-	    | Notice that when use Optimus for count, this input only affects steps of copying files. Optimus uses memory size due to its own strategy.
+	  - Memory size in GB needed for count per sample.
 	  - 120
 	  - 120
 	* - preemptible
-	  - | Number of maximum preemptible tries allowed.
-	    | Notice that when use Optimus for count, this input only affects steps of copying files. Optimus uses preemptible tries due to its own strategy.
+	  - Number of maximum preemptible tries allowed.
 	  - 2
 	  - 2
 	* - star_version
