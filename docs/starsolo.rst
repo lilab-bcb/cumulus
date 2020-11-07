@@ -135,7 +135,7 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	  - 2
 	  - 2
 	* - star_version
-	  - STAR version to use. Currently support: "2.7.3a" and "2.7.6a".
+	  - STAR version to use. Currently only support ``2.7.6a``.
 	  - "2.7.6a"
 	  - "2.7.6a"
 	* - config_version
