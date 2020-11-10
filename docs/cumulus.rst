@@ -34,7 +34,7 @@ You are free to add any other columns and these columns will be used in selectin
         sample_3,pbmc,NextSeq,1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_3/raw_feature_bc_matrices.h5
         sample_4,pbmc,NextSeq,2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_4/raw_feature_bc_matrices.h5
 
-    If you ran **cellranger_workflow** ahead, you should already obtain a template **count_matrix.csv** file that you can modify from **generate_count_config**'s outputs.
+    If you ran **cellranger_workflow** previously, you should already have a template **count_matrix.csv** file that you can modify from **generate_count_config**'s outputs.
 
 #. Upload your sample sheet to the workspace.
 
