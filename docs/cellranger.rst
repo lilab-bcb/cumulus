@@ -156,7 +156,7 @@ Sometimes, users might want to perform demultiplexing locally and only run the c
 
 #. Copy your FASTQ files to the workspace using gsutil_ in your unix terminal.
 
-	You should upload folders of FASTQ files. The uploaded folder (for one flowcell) should contain one subfolder for each sample belong to the this flowcell. **In addition, the subfolder name and the sample name in your sample sheet MUST be the same.** Each subfolder contains FASTQ files for that sample.
+	You should upload folders of FASTQ files. The uploaded folder (for one flowcell) should contain one subfolder for each sample belong to the this flowcell. **In addition, the subfolder name and the sample name in your sample sheet MUST be the same.** Each subfolder contains FASTQ files for that sample. Please note that if your FASTQ file are downloaded from the Sequence Read Archive (SRA) from NCBI, you must rename your FASTQs to follow the bcl2fastq `file naming conventions`_.
 
 	Example::
 
@@ -1439,3 +1439,4 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 .. _10x build Cell Ranger compatible pre-mRNA Reference Package: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/advanced/references#premrna
 .. _Carly Ziegler: http://shaleklab.com/author/carly/
 .. _[Kim et al. Cell 2020]: https://www.sciencedirect.com/science/article/pii/S0092867420304062
+.. _`file naming conventions`: https://kb.10xgenomics.com/hc/en-us/articles/115003802691-How-do-I-prepare-Sequence-Read-Archive-SRA-data-from-NCBI-for-Cell-Ranger-
