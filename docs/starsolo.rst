@@ -95,8 +95,13 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.tsv"
 	  -
 	* - **genome**
-	  - Genome reference name. Current support: GRCh38, mm10.
-	  - "GRCh38"
+	  - Genome reference. It can be either of the following two formats:
+
+		- String. Pre-built genome reference. Currently support: ``GRCh38``, ``mm10``.
+
+		- Google bucket URL of a custom reference, must be a ``.tar.gz`` file.
+	  - | "GRCh38",
+	    | or "gs://user-bucket/starsolo.tar.gz"
 	  -
 	* - **chemistry**
 	  - Chemistry name. Available options: "tenX_v3" (for 10X V3 chemistry), "tenX_v2" (for 10X V2 chemistry), "DropSeq", and "SeqWell".
