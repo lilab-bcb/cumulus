@@ -163,17 +163,17 @@ global inputs
       - "my_sample"
       -
     * - cumulus_version
-      - cumulus version to use. Versions available: 1.0.0, 0.16.0, 0.15.0, 0.13.0, 0.12.0, 0.11.0, 0.10.0.
-      - "1.0.0"
-      - "1.0.0"
+      - cumulus version to use. Versions available: 1.1.0, 1.0.0, 0.16.0, 0.15.0, 0.13.0, 0.12.0, 0.11.0, 0.10.0.
+      - "1.1.0"
+      - "1.1.0"
     * - docker_registry
       - Docker registry to use. Options:
 
-        - "cumulusprod" for Docker Hub images;
+        - "quay.io/cumulus" for images on Red Hat registry;
 
-        - "quay.io/cumulus" for backup images on Red Hat registry.
-      - "cumulusprod"
-      - "cumulusprod"
+        - "cumulusprod" for backup images on Docker Hub.
+      - "quay.io/cumulus"
+      - "quay.io/cumulus"
     * - zones
       - Google cloud zones to consider for execution.
       - "us-east1-d us-west1-a us-west1-b"
