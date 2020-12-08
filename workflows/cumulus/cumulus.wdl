@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/23/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/24/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
@@ -26,6 +26,8 @@ workflow cumulus {
 		Int disk_space = 100
 		# Number of preemptible tries
 		Int preemptible = 2
+		# If sample count matrix is in either DGE, mtx, csv, tsv or loom format and there is no Reference column in the csv_file, use default_reference as the reference.
+		String? default_reference
 
 
 		# for aggregate_matrices
@@ -34,8 +36,6 @@ workflow cumulus {
 		String? restrictions
 		# Specify a comma-separated list of outputted attributes. These attributes should be column names in the csv file
 		String? attributes
-		# If sample count matrix is in either DGE, mtx, csv, tsv or loom format and there is no Reference column in the csv_file, use default_reference as the reference.
-		String? default_reference
 		# If we have demultiplexed data, turning on this option will make cumulus only include barcodes that are predicted as singlets
 		Boolean select_only_singlets = false
 		# Only keep barcodes with at least this number of expressed genes
@@ -280,6 +280,7 @@ workflow cumulus {
 			select_singlets = if is_sample_sheet then false else select_only_singlets,
 			remap_singlets = remap_singlets,
 			subset_singlets = subset_singlets,
+			genome = default_reference,
 			focus = focus,
 			append = append,
 			output_filtration_results = output_filtration_results,

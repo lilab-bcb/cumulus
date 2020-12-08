@@ -86,6 +86,7 @@ task run_cumulus_cluster {
 		Boolean? select_singlets
 		String? remap_singlets
 		String? subset_singlets
+		String? genome
 		String? focus
 		String? append
 		Boolean? output_filtration_results
@@ -178,6 +179,8 @@ task run_cumulus_cluster {
 			call_args.extend(['--remap-singlets', '~{remap_singlets}'])
 		if '~{subset_singlets}' is not '':
 			call_args.extend(['--subset-singlets', '~{subset_singlets}'])
+		if '~{genome}' is not '':
+			call_args.extend(['--genome', '~{genome}'])
 		if '~{focus}' is not '':
 			call_args.extend(['--focus', '~{focus}'])
 		if '~{append}' is not '':
