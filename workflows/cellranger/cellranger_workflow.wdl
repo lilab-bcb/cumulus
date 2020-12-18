@@ -3,7 +3,7 @@ version 1.0
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/versions/4/plain-WDL/descriptor" as crac
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq/versions/3/plain-WDL/descriptor" as cram
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/5/plain-WDL/descriptor" as crc
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/4/plain-WDL/descriptor" as crm
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/covid/workflows/cellranger/cellranger_mkfastq.wdl" as crm
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/6/plain-WDL/descriptor" as crv
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/6/plain-WDL/descriptor" as ca
 
@@ -124,7 +124,7 @@ workflow cellranger_workflow {
             scatter (run_id in generate_bcl_csv.run_ids) {
                 call crm.cellranger_mkfastq as cellranger_mkfastq {
                     input:
-                        input_bcl_directory = generate_bcl_csv.inpdirs[run_id],
+                        input_bcl_tar_gz = generate_bcl_csv.inpdirs[run_id],
                         input_csv_file = generate_bcl_csv.bcls[run_id],
                         output_directory = output_directory_stripped,
                         delete_input_bcl_directory = delete_input_bcl_directory,
