@@ -321,7 +321,7 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  - If you want to run ``cellranger count``
 		  - true
 		  - true
-		* - delete_input_directory
+		* - delete_input_bcl_directory
 		  - If delete BCL directories after demux. If false, you should delete this folder yourself so as to not incur storage charges
 		  - false
 		  - false
