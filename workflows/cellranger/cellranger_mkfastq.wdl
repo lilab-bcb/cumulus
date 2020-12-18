@@ -2,8 +2,8 @@ version 1.0
 
 workflow cellranger_mkfastq {
 	input {
-		# Input BCL directory, gs url
-		String input_bcl_directory
+		# Input zipped BCL directory, gs url
+		String input_bcl_tar_gz
 		# 3 column CSV file (Lane, Sample, Index)
 		File input_csv_file
 		# CellRanger output directory, gs url
@@ -33,7 +33,7 @@ workflow cellranger_mkfastq {
 
 	call run_cellranger_mkfastq {
 		input:
-			input_bcl_directory = sub(input_bcl_directory, "/+$", ""),
+			input_bcl_tar_gz = input_bcl_tar_gz,
 			input_csv_file = input_csv_file,
 			output_directory = sub(output_directory, "/+$", ""),
 			delete_input_bcl_directory = delete_input_bcl_directory,
@@ -56,7 +56,7 @@ workflow cellranger_mkfastq {
 
 task run_cellranger_mkfastq {
 	input {
-		String input_bcl_directory
+		String input_bcl_tar_gz
 		File input_csv_file
 		String output_directory
 		Boolean delete_input_bcl_directory
@@ -70,14 +70,15 @@ task run_cellranger_mkfastq {
 		Int? barcode_mismatches
 	}
 
-	String run_id = basename(input_bcl_directory)
+	String run_id = basename(input_bcl_tar_gz, '.tar.gz')
 
 	command {
 		set -e
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
-		gsutil -q -m cp -r ~{input_bcl_directory} .
-		# cp -r ~{input_bcl_directory} .
+		gsutil -q -m cp  ~{input_bcl_tar_gz} .
+
+		tar -zxvf ~{input_bcl_tar_gz}
 
 
 		python <<CODE
@@ -131,10 +132,10 @@ task run_cellranger_mkfastq {
 				call_args = ['gsutil', '-q', 'stat', '~{output_directory}/~{run_id}_fastqs/input_samplesheet.csv']
 				print(' '.join(call_args))
 				check_output(call_args)
-				call_args = ['gsutil', '-q', '-m', 'rm', '-r', '~{input_bcl_directory}']
+				call_args = ['gsutil', '-q', '-m', 'rm', '~{input_bcl_tar_gz}']
 				print(' '.join(call_args))
 				check_call(call_args)
-				print('~{input_bcl_directory} is deleted!')
+				print('~{input_bcl_tar_gz} is deleted!')
 			except CalledProcessError:
 				print("Failed to delete BCL directory from Google bucket.")
 		CODE
