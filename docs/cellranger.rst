@@ -85,7 +85,7 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		* - **Flowcell**
 		  -
 		    | Indicates the Google bucket URLs of uploaded BCL folders.
-		    | If starts with FASTQ files, this should be Google bucekt URLs of uploaded FASTQ folders.
+		    | If starts with FASTQ files, this should be Google bucket URLs of uploaded FASTQ folders.
 		    | The FASTQ folders should contain one subfolder for each sample in the flowcell with the sample name as the subfolder name.
 		    | Each subfolder contains FASTQ files for that sample.
 		* - **Lane**
