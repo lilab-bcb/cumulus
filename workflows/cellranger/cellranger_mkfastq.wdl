@@ -76,9 +76,9 @@ task run_cellranger_mkfastq {
 		set -e
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
-		gsutil -q -m cp  ~{input_bcl_tar_gz} .
+		gsutil -q -m cp ~{input_bcl_tar_gz} ~{run_id}.tar.gz
 
-		tar -zxvf ~{input_bcl_tar_gz}
+		tar -zxvf ~{run_id}.tar.gz
 
 
 		python <<CODE
