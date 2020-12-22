@@ -78,8 +78,7 @@ task run_cellranger_mkfastq {
 		monitor_script.sh > monitoring.log &
 		gsutil -q -m cp ~{input_bcl_tar_gz} ~{run_id}.tar.gz
 
-		tar -zxvf ~{run_id}.tar.gz
-
+		tar -zxvf ~{run_id}.tar.gz --strip-components=3
 
 		python <<CODE
 		import os
