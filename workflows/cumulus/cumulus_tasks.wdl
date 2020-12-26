@@ -79,6 +79,7 @@ task run_cumulus_cluster {
 		Int num_cpu
 		String memory
 		Int disk_space
+		String docker_registry
 		Int preemptible
 		String? channel
 		String? black_list
@@ -105,6 +106,7 @@ task run_cumulus_cluster {
 		String? select_hvf_flavor
 		Int? select_hvf_ngenes
 		Boolean? no_select_hvf
+		Boolean? plot_hvf
 		Boolean? correct_batch_effect
 		String? correction_method
 		String? batch_group_by
@@ -132,8 +134,8 @@ task run_cumulus_cluster {
 		Float? spectral_leiden_resolution
 		String? spectral_leiden_class_label
 		Boolean? run_tsne
-		Boolean? run_fitsne
 		Float? tsne_perplexity
+		String? tsne_initialization
 		Boolean? run_umap
 		Int? umap_K
 		Float? umap_min_dist
@@ -143,13 +145,16 @@ task run_cumulus_cluster {
 		Float? fle_target_change_per_node
 		Int? fle_target_steps
 		Float? net_down_sample_fraction
-		Boolean? run_net_tsne
-		String? net_tsne_out_basis
 		Boolean? run_net_umap
 		String? net_umap_out_basis
 		Boolean? run_net_fle
 		String? net_fle_out_basis
-		String docker_registry
+		Boolean? infer_doublets
+		Float? expected_doublet_rate
+		String? doublet_cluster_attribute
+		Boolean? citeseq
+		Boolean? citeseq_umap
+		String? citeseq_umap_exclude
 	}
 
 	Boolean is_url = defined(gene_signature_set) && sub(select_first([gene_signature_set]), "^gs://.+", "URL") == "URL"
@@ -230,6 +235,8 @@ task run_cumulus_cluster {
 			call_args.extend(['--select-hvf-flavor', '~{select_hvf_flavor}'])
 		if '~{select_hvf_ngenes}' is not '':
 			call_args.extend(['--select-hvf-ngenes', '~{select_hvf_ngenes}'])
+		if '~{plot_hvf}' is 'true':
+			call_args.append('--plot-hvf')
 		if '~{nPC}' is not '':
 			call_args.extend(['--pca-n', '~{nPC}'])
 		if '~{knn_K}' is not '':
@@ -274,10 +281,10 @@ task run_cumulus_cluster {
 			call_args.extend(['--spectral-leiden-class-label', '~{spectral_leiden_class_label}'])
 		if '~{run_tsne}' is 'true':
 			call_args.append('--tsne')
-		if '~{run_fitsne}' is 'true':
-			call_args.append('--fitsne')
 		if '~{tsne_perplexity}' is not '':
 			call_args.extend(['--tsne-perplexity', '~{tsne_perplexity}'])
+		if '~{tsne_initialization}' is not '':
+			call_args.extend(['--tsne-initialization', '~{tsne_initialization}'])
 		if '~{run_umap}' is 'true':
 			call_args.append('--umap')
 		if '~{umap_K}' is not '':
@@ -296,10 +303,6 @@ task run_cumulus_cluster {
 			call_args.extend(['--fle-target-steps', '~{fle_target_steps}'])
 		if '~{net_down_sample_fraction}' is not '':
 			call_args.extend(['--net-down-sample-fraction', '~{net_down_sample_fraction}'])
-		if '~{run_net_tsne}' is 'true':
-			call_args.append('--net-tsne')
-		if '~{net_tsne_out_basis}' is not '':
-			call_args.extend(['--net-tsne-out-basis', '~{net_tsne_out_basis}'])
 		if '~{run_net_umap}' is 'true':
 			call_args.append('--net-umap')
 		if '~{net_umap_out_basis}' is not '':
@@ -308,6 +311,18 @@ task run_cumulus_cluster {
 			call_args.append('--net-fle')
 		if '~{net_fle_out_basis}' is not '':
 			call_args.extend(['--net-fle-out-basis', '~{net_fle_out_basis}'])
+		if '~{infer_doublets}' is 'true':
+			call_args.append('--infer-doublets')
+		if '~{expected_doublet_rate}' is not '':
+			call_args.extend(['--expected-doublet-rate', '~{expected_doublet_rate}'])
+		if '~{doublet_cluster_attribute}' is not '':
+			call_args.extend(['--dbl-cluster-attr', '~{doublet_cluster_attribute}'])
+		if '~{citeseq}' is 'true':
+			call_args.append('--citeseq')
+		if '~{citeseq_umap}' is 'true':
+			call_args.append('--citeseq-umap')
+		if '~{citeseq_umap_exclude}' is not '':
+			call_args.extend(['--citeseq-umap-exclude', '~{citeseq_umap_exclude}'])
 		print(' '.join(call_args))
 		check_call(call_args)
 
@@ -315,10 +330,12 @@ task run_cumulus_cluster {
 		dest = '~{output_directory}' + '/' + '~{output_name}' + '/'
 		# check_call(['mkdir', '-p', dest])
 		files = ['~{output_name}.zarr.zip', '~{output_name}.log']
-		if '~{output_h5ad}' is 'true':
+		if ('~{output_h5ad}' is 'true') or ('~{citeseq}' is 'true'):
 			files.extend(glob.glob('~{output_name}.*.h5ad'))
 		if '~{output_filtration_results}' is 'true':
 			files.extend(glob.glob('~{output_name}.*.filt.xlsx'))
+		if ('~{no_select_hvf}' is not 'true') and ('~{plot_hvf}' is 'true'):
+			files.extend(glob.glob('~{output_name}.*.hvf.pdf'))
 		if '~{plot_filtration_results}' is 'true':
 			files.extend(glob.glob('~{output_name}.*.filt.*.pdf'))
 		if '~{output_loom}' is 'true':
@@ -336,6 +353,7 @@ task run_cumulus_cluster {
 		Array[File] output_h5ad = glob("~{output_name}.*.h5ad")
 		Array[File] output_filt_xlsx = glob("~{output_name}.*.filt.xlsx")
 		Array[File] output_filt_plot = glob("~{output_name}.*.filt.*.pdf")
+		Array[File] output_hvf_plot = glob("~{output_name}.*.hvf.pdf")
 		Array[File] output_loom_file = glob("~{output_name}.*.loom")
 		File output_log = "~{output_name}.log"
 		File monitoringLog = "monitoring.log"
@@ -371,7 +389,7 @@ task run_cumulus_cirro_output {
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
 
-		python /software/prepare_data.py --out ~{output_name}.cirro ~{input_h5ad}
+		cirro prepare_data --out ~{output_name}.cirro ~{input_h5ad}
 		gsutil -q -m cp -r ~{output_name}.cirro ~{output_directory}/
 		# mkdir -p ~{output_directory}/
 		# cp -r ~{output_name}.cirro ~{output_directory}/
@@ -524,10 +542,8 @@ task run_cumulus_plot {
 		Int preemptible
 		String? plot_composition
 		String? plot_tsne
-		String? plot_fitsne
 		String? plot_umap
 		String? plot_fle
-		String? plot_net_tsne
 		String? plot_net_umap
 		String? plot_net_fle
 		String docker_registry
@@ -550,20 +566,12 @@ task run_cumulus_plot {
 			call_args = ['pegasus', 'plot', 'scatter',  '--basis', 'tsne', '--attributes', '~{plot_tsne}', '~{input_h5ad}', '~{output_name}.tsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
-		if '~{plot_fitsne}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'fitsne', '--attributes', '~{plot_fitsne}', '~{input_h5ad}', '~{output_name}.fitsne.pdf']
-			print(' '.join(call_args))
-			check_call(call_args)
 		if '~{plot_umap}' is not '':
 			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'umap', '--attributes', '~{plot_umap}', '~{input_h5ad}', '~{output_name}.umap.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_fle}' is not '':
 			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'fle', '--attributes', '~{plot_fle}', '~{input_h5ad}', '~{output_name}.fle.pdf']
-			print(' '.join(call_args))
-			check_call(call_args)
-		if '~{plot_net_tsne}' is not '':
-			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_tsne', '--attributes', '~{plot_net_tsne}', '~{input_h5ad}', '~{output_name}.net.tsne.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 		if '~{plot_net_umap}' is not '':
@@ -638,211 +646,6 @@ task run_cumulus_scp_output {
 		bootDiskSizeGb: 12
 		disks: "local-disk ~{disk_space} HDD"
 		cpu: 1
-		preemptible: preemptible
-	}
-}
-
-task run_cumulus_subcluster {
-	input {
-		File input_h5ad
-		String output_directory
-		String output_name
-		String cumulus_version
-		String zones
-		Int num_cpu
-		String memory
-		Int disk_space
-		Int preemptible
-		String subset_selections
-		Boolean? correct_batch_effect
-		String? correction_method
-		String? batch_group_by
-		Boolean? output_loom
-		String? select_hvf_flavor
-		Int? select_hvf_ngenes
-		Boolean? no_select_hvf
-		Int? random_state
-		Int? nPC
-		Int? knn_K
-		Boolean? knn_full_speed
-		Boolean? run_diffmap
-		Int? diffmap_ndc
-		Int? diffmap_maxt
-		String? calculate_pseudotime
-		Boolean? run_louvain
-		Float? louvain_resolution
-		String? louvain_class_label
-		Boolean? run_leiden
-		Float? leiden_resolution
-		Int? leiden_niter
-		String? leiden_class_label
-		Boolean? run_spectral_louvain
-		String? spectral_louvain_basis
-		Float? spectral_louvain_resolution
-		String? spectral_louvain_class_label
-		Boolean? run_spectral_leiden
-		String? spectral_leiden_basis
-		Float? spectral_leiden_resolution
-		String? spectral_leiden_class_label
-		Boolean? run_tsne
-		Boolean? run_fitsne
-		Float? tsne_perplexity
-		Boolean? run_umap
-		Int? umap_K
-		Float? umap_min_dist
-		Float? umap_spread
-		Boolean? run_fle
-		Int? fle_K
-		Float? fle_target_change_per_node
-		Int? fle_target_steps
-		Float? net_down_sample_fraction
-		Boolean? run_net_tsne
-		String? net_tsne_out_basis
-		Boolean? run_net_umap
-		String? net_umap_out_basis
-		Boolean? run_net_fle
-		String? net_fle_out_basis
-		String docker_registry
-	}
-
-	command {
-		set -e
-		export TMPDIR=/tmp
-		monitor_script.sh > monitoring.log &
-
-		python <<CODE
-		from subprocess import check_call
-		call_args = ['pegasus', 'subcluster', '~{input_h5ad}', '~{output_name}', '-p', '~{num_cpu}']
-		if '~{subset_selections}' is not '':
-			sels = '~{subset_selections}'.split(';')
-			for sel in sels:
-				call_args.extend(['--subset-selection', sel])
-		if '~{correct_batch_effect}' is 'true':
-			call_args.append('--correct-batch-effect')
-			if '~{correction_method}' is not '':
-				call_args.extend(['--correction-method', '~{correction_method}'])
-			if '~{batch_group_by}' is not '':
-				call_args.extend(['--batch-group-by', '~{batch_group_by}'])
-		if '~{output_loom}' is 'true':
-			call_args.append('--output-loom')
-		if '~{select_hvf_flavor}' is not '':
-			call_args.extend(['--select-hvf-flavor', '~{select_hvf_flavor}'])
-		if '~{select_hvf_ngenes}' is not '':
-			call_args.extend(['--select-hvf-ngenes', '~{select_hvf_ngenes}'])
-		if '~{no_select_hvf}' is 'true':
-			call_args.append('--no-select-hvf')
-		if '~{random_state}' is not '':
-			call_args.extend(['--random-state', '~{random_state}'])
-		if '~{nPC}' is not '':
-			call_args.extend(['--pca-n', '~{nPC}'])
-		if '~{knn_K}' is not '':
-			call_args.extend(['--knn-K', '~{knn_K}'])
-		if '~{knn_full_speed}' is 'true':
-			call_args.append('--knn-full-speed')
-		if '~{run_diffmap}' is 'true':
-			call_args.append('--diffmap')
-		if '~{diffmap_ndc}' is not '':
-			call_args.extend(['--diffmap-ndc', '~{diffmap_ndc}'])
-		if '~{diffmap_maxt}' is not '':
-			call_args.extend(['--diffmap-maxt', '~{diffmap_maxt}'])
-		if '~{calculate_pseudotime}' is not '':
-			call_args.extend(['--calculate-pseudotime', '~{calculate_pseudotime}'])
-		if '~{run_louvain}' is 'true':
-			call_args.append('--louvain')
-		if '~{louvain_resolution}' is not '':
-			call_args.extend(['--louvain-resolution', '~{louvain_resolution}'])
-		if '~{louvain_class_label}' is not '':
-			call_args.extend(['--louvain-class-label', '~{louvain_class_label}'])
-		if '~{run_leiden}' is 'true':
-			call_args.append('--leiden')
-		if '~{leiden_resolution}' is not '':
-			call_args.extend(['--leiden-resolution', '~{leiden_resolution}'])
-		if '~{leiden_niter}' is not '':
-			call_args.extend(['--leiden-niter', '~{leiden_niter}'])
-		if '~{leiden_class_label}' is not '':
-			call_args.extend(['--leiden-class-label', '~{leiden_class_label}'])
-		if '~{run_spectral_louvain}' is 'true':
-			call_args.append('--spectral-louvain')
-		if '~{spectral_louvain_basis}' is not '':
-			call_args.extend(['--spectral-louvain-basis', '~{spectral_louvain_basis}'])
-		if '~{spectral_louvain_resolution}' is not '':
-			call_args.extend(['--spectral-louvain-resolution', '~{spectral_louvain_resolution}'])
-		if '~{spectral_louvain_class_label}' is not '':
-			call_args.extend(['--spectral-louvain-class-label', '~{spectral_louvain_class_label}'])
-		if '~{run_spectral_leiden}' is 'true':
-			call_args.append('--spectral-leiden')
-		if '~{spectral_leiden_basis}' is not '':
-			call_args.extend(['--spectral-leiden-basis', '~{spectral_leiden_basis}'])
-		if '~{spectral_leiden_resolution}' is not '':
-			call_args.extend(['--spectral-leiden-resolution', '~{spectral_leiden_resolution}'])
-		if '~{spectral_leiden_class_label}' is not '':
-			call_args.extend(['--spectral-leiden-class-label', '~{spectral_leiden_class_label}'])
-		if '~{run_tsne}' is 'true':
-			call_args.append('--tsne')
-		if '~{run_fitsne}' is 'true':
-			call_args.append('--fitsne')
-		if '~{tsne_perplexity}' is not '':
-			call_args.extend(['--tsne-perplexity', '~{tsne_perplexity}'])
-		if '~{run_umap}' is 'true':
-			call_args.append('--umap')
-		if '~{umap_K}' is not '':
-			call_args.extend(['--umap-K', '~{umap_K}'])
-		if '~{umap_min_dist}' is not '':
-			call_args.extend(['--umap-min-dist', '~{umap_min_dist}'])
-		if '~{umap_spread}' is not '':
-			call_args.extend(['--umap-spread', '~{umap_spread}'])
-		if '~{run_fle}' is 'true':
-			call_args.append('--fle')
-		if '~{fle_K}' is not '':
-			call_args.extend(['--fle-K', '~{fle_K}'])
-		if '~{fle_target_change_per_node}' is not '':
-			call_args.extend(['--fle-target-change-per-node', '~{fle_target_change_per_node}'])
-		if '~{fle_target_steps}' is not '':
-			call_args.extend(['--fle-target-steps', '~{fle_target_steps}'])
-		if '~{net_down_sample_fraction}' is not '':
-			call_args.extend(['--net-down-sample-fraction', '~{net_down_sample_fraction}'])
-		if '~{run_net_tsne}' is 'true':
-			call_args.append('--net-tsne')
-		if '~{net_tsne_out_basis}' is not '':
-			call_args.extend(['--net-tsne-out-basis', '~{net_tsne_out_basis}'])
-		if '~{run_net_umap}' is 'true':
-			call_args.append('--net-umap')
-		if '~{net_umap_out_basis}' is not '':
-			call_args.extend(['--net-umap-out-basis', '~{net_umap_out_basis}'])
-		if '~{run_net_fle}' is 'true':
-			call_args.append('--net-fle')
-		if '~{net_fle_out_basis}' is not '':
-			call_args.extend(['--net-fle-out-basis', '~{net_fle_out_basis}'])
-		print(' '.join(call_args))
-		check_call(call_args)
-
-		dest = '~{output_directory}' + '/' + '~{output_name}' + '/'
-		# check_call(['mkdir', '-p', dest])
-		files = ['~{output_name}.h5ad', '~{output_name}.log']
-		if '~{output_loom}' is 'true':
-			files.append('~{output_name}.loom')
-		for file in files:
-			# call_args = ['cp', file, dest]
-			call_args = ['gsutil', 'cp', file, dest]
-			print(' '.join(call_args))
-			check_call(call_args)
-		CODE
-	}
-
-	output {
-		File output_h5ad = "~{output_name}.h5ad"
-		File output_log = "~{output_name}.log"
-		Array[File] output_loom_file = glob("~{output_name}.loom")
-		File monitoringLog = "monitoring.log"
-	}
-
-	runtime {
-		docker: "~{docker_registry}/cumulus:~{cumulus_version}"
-		zones: zones
-		memory: memory
-		bootDiskSizeGb: 12
-		disks: "local-disk ~{disk_space} HDD"
-		cpu: num_cpu
 		preemptible: preemptible
 	}
 }
