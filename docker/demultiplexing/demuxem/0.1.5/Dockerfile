@@ -21,6 +21,7 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install numpy==1.19.4 --no-cache-dir && \
     python -m pip install scipy==1.5.4 --no-cache-dir && \
     python -m pip install pandas==1.1.5 --no-cache-dir && \
+    python -m pip install scikit-learn==0.23.2 --no-cache-dir && \
     python -m pip install Cython==0.29.21 --no-cache-dir && \
     python -m pip install h5py==3.1.0 --no-cache-dir && \
     python -m pip install joblib==1.0.0 --no-cache-dir && \
