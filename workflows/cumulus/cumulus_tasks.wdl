@@ -546,6 +546,7 @@ task run_cumulus_plot {
 		String? plot_fle
 		String? plot_net_umap
 		String? plot_net_fle
+		String? plot_citeseq_umap
 		String docker_registry
 	}
 
@@ -580,6 +581,10 @@ task run_cumulus_plot {
 			check_call(call_args)
 		if '~{plot_net_fle}' is not '':
 			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_fle', '--attributes', '~{plot_net_fle}', '~{input_h5ad}', '~{output_name}.net.fle.pdf']
+			print(' '.join(call_args))
+			check_call(call_args)
+		if '~{plot_citeseq_umap}' is not '':
+			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'citeseq_umap', '--attributes', '~{plot_citeseq_umap}', '~{input_h5ad}', '~{output_name}.citeseq.umap.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
 

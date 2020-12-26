@@ -235,6 +235,8 @@ workflow cumulus {
 		String? plot_net_umap
 		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FLEs side by side based on net FLE result.
 		String? plot_net_fle
+		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored UMAPs side by side based on CITE-Seq UMAP result.
+		String? plot_citeseq_umap
 
 		# for cirro_output
 		# If generate Cirrocumulus inputs
@@ -409,6 +411,7 @@ workflow cumulus {
 						plot_fle = plot_fle,
 						plot_net_umap = plot_net_umap,
 						plot_net_fle = plot_net_fle,
+						plot_citeseq_umap = plot_citeseq_umap,
 						cumulus_version = cumulus_version,
 						zones = zones,
 						memory = memory,
