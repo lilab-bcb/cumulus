@@ -62,14 +62,12 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install forceatlas2-python==1.1 --no-cache-dir && \
     python -m pip install pegasuspy==1.2.0 --no-cache-dir
 
-RUN mkdir /software && \
-    cp /usr/local/lib/python3.7/dist-packages/cirrocumulus/prepare_data.py /software/prepare_data.py
-
 RUN apt-get -qq -y remove curl gnupg && \
     apt-get -qq -y autoremove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
 
+RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
 RUN chmod a+rx /software/monitor_script.sh
 
