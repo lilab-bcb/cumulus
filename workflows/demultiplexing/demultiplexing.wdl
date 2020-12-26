@@ -1,8 +1,8 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/4/plain-WDL/descriptor" as dem
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/11/plain-WDL/descriptor" as soc
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/4/plain-WDL/descriptor" as dmx
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/5/plain-WDL/descriptor" as dem
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/12/plain-WDL/descriptor" as soc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/5/plain-WDL/descriptor" as dmx
 
 #import "demuxEM.wdl" as dem
 #import "souporcell.wdl" as soc
@@ -16,7 +16,7 @@ workflow demultiplexing {
         String demultiplexing_algorithm = "souporcell"
         Int min_num_genes = 100
 
-        String docker_registry = "cumulusprod"
+        String docker_registry = "quay.io/cumulus"
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 

@@ -21,7 +21,7 @@ workflow demuxlet {
         Int memory = 10
         Int extra_disk_space = 2
         Int preemptible = 2
-        String docker_registry = "cumulusprod"
+        String docker_registry = "quay.io/cumulus"
         String demuxlet_version = "0.1b"
     }
 

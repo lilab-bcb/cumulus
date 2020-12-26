@@ -12,8 +12,8 @@ workflow souporcell {
         Int min_num_genes
         Int num_clusters
         String donor_rename = ''
-        String souporcell_version = "2020.06"
-        String docker_registry = "cumulusprod"
+        String souporcell_version = "2020.07"
+        String docker_registry = "quay.io/cumulus"
         Int num_cpu = 32
         Int disk_space = 500
         Int memory = 120
