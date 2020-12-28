@@ -100,30 +100,35 @@ task generate_count_config {
             for idx, row in df.iterrows():
                 fo1.write(row['Sample'] + '\n')
 
-                input_dir_list = list(map(lambda x: x.strip(), row['Flowcells'].split(',')))
-                r1_list = []
-                r2_list = []
-                for directory in input_dir_list:
-                    directory = re.sub('/+$', '', directory)
+                if 'Flowcells' in df.columns: # Fetch R1 and R2 fastqs automatically.
+                    input_dir_list = list(map(lambda x: x.strip(), row['Flowcells'].split(',')))
+                    r1_list = []
+                    r2_list = []
+                    for directory in input_dir_list:
+                        directory = re.sub('/+$', '', directory)
 
-                    call_args = ['gsutil', 'ls', directory]
-                    # call_args = ['ls', directory]
-                    with open('list_dir.txt', 'w') as tmp_fo:
-                        check_call(call_args, stdout=tmp_fo)
+                        call_args = ['gsutil', 'ls', directory]
+                        # call_args = ['ls', directory]
+                        with open('list_dir.txt', 'w') as tmp_fo:
+                            check_call(call_args, stdout=tmp_fo)
 
-                    with open('list_dir.txt', 'r') as tmp_fin:
-                        f_list = tmp_fin.readlines()
-                        f_list = list(map(lambda s: s.strip(), f_list))
+                        with open('list_dir.txt', 'r') as tmp_fin:
+                            f_list = tmp_fin.readlines()
+                            f_list = list(map(lambda s: s.strip(), f_list))
 
-                    r1_files = [f for f in f_list if re.match('.*_R1_.*.fastq.gz', f)]
-                    r2_files = [f for f in f_list if re.match('.*_R2_.*.fastq.gz', f)]
-                    r1_files.sort()
-                    r2_files.sort()
-                    # r1_files = list(map(lambda s: directory+'/'+s, r1_files))
-                    # r2_files = list(map(lambda s: directory+'/'+s, r2_files))
+                        r1_files = [f for f in f_list if re.match('.*_R1_.*.fastq.gz', f)]
+                        r2_files = [f for f in f_list if re.match('.*_R2_.*.fastq.gz', f)]
+                        r1_files.sort()
+                        r2_files.sort()
+                        # r1_files = list(map(lambda s: directory+'/'+s, r1_files))
+                        # r2_files = list(map(lambda s: directory+'/'+s, r2_files))
 
-                    r1_list.extend(r1_files)
-                    r2_list.extend(r2_files)
+                        r1_list.extend(r1_files)
+                        r2_list.extend(r2_files)
+
+                else:  # R1 and R2 fastqs specified in sample sheet.
+                    r1_list = list(map(lambda s: s.strip(), row['R1'].split(',')))
+                    r2_list = list(map(lambda s: s.strip(), row['R2'].split(',')))
 
                 fo2.write(row['Sample'] + '\t' + ','.join(r1_list) + '\n')
                 fo3.write(row['Sample'] + '\t' + ','.join(r2_list) + '\n')

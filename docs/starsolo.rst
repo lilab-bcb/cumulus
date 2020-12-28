@@ -56,6 +56,14 @@ Prepare input data and import workflow
 		sample_1	gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/sample_1_fastqs,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/sample_1_fastqs
 		sample_2	gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/sample_2_fastqs
 
+	Alternatively, if you want to specify Read 1 and 2 FASTQ files yourself, you should prepare the sample sheet of the following format::
+
+		Sample	R1	R2
+		sample_1	gs://your-bucket/sample_1_L001_R1.fastq.gz,gs://your-bucket/sample_1_L002_R1.fastq.gz	gs://your-bucket/sample_1_L001_R2.fastq.gz,gs://your-bucket/sample_1_L002_R2.fastq.gz
+		sample_2	gs://your-bucket/sample_2_L001_R1.fastq.gz	gs://your-bucket/sample_2_L001_R2.fastq.gz
+
+	where FASTQ files in *R1* and *R2* should be in one-to-one correspondence if the sample has multiple *R1* FASTQ files.
+
 	**3.2 Upload your sample sheet to the workspace bucket:**
 
 	Use gsutil_ (you already have it if you've installed Google cloud SDK) in your unix terminal to upload your sample sheet to workspace bucket.

@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/24/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/25/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
@@ -89,6 +89,8 @@ workflow cumulus {
 		String? select_hvf_flavor
 		# Select top <nfeatures> highly variable features. If <flavor> is 'Seurat' and <nfeatures> is 'None', select HVGs with z-score cutoff at 0.5. [default: 2000]
 		Int? select_hvf_ngenes
+		# Plot highly variable feature selection.
+		Boolean? plot_hvf
 		# Do not select highly variable features. [default: false]
 		Boolean? no_select_hvf
 		# If correct batch effects [default: false]
@@ -99,7 +101,7 @@ workflow cumulus {
 		String? batch_group_by
 		# Random number generator seed. [default: 0]
 		Int? random_state
-		# Calculate signature scores for gene sets in <GMT_file>.
+		# Calculate signature scores for gene sets in <sig_list>. <sig_list> is a comma-separated list of strings. Each string should either be a <GMT_file> or one of 'cell_cycle_human', 'cell_cycle_mouse', 'gender_human', 'gender_mouse', 'mitochondrial_genes_human', 'mitochondrial_genes_mouse', 'ribosomal_genes_human' and 'ribosomal_genes_mouse'
 		String? calc_signature_scores
 		# Number of PCs. [default: 50]
 		Int? nPC
@@ -143,12 +145,12 @@ workflow cumulus {
 		Float? spectral_leiden_resolution
 		# Approximated leiden label name in AnnData. [default: spectral_louvain_labels]
 		String? spectral_leiden_class_label
-		# Run multi-core tSNE for visualization.
+		# Run FIt-SNE package to compute t-SNE embeddings for visualization.
 		Boolean? run_tsne
 		# tSNE’s perplexity parameter. [default: 30]
 		Float? tsne_perplexity
-		# Run FItSNE for visualization.
-		Boolean? run_fitsne
+		# <choice> can be either 'random' or 'pca'. 'random' refers to random initialization. 'pca' refers to PCA initialization as described in (CITE Kobak et al. 2019) [default: pca]
+		String? tsne_initialization
 		# Run umap for visualization.
 		Boolean run_umap = true
 		# Run umap on diffusion components. [default: 15]
@@ -168,10 +170,6 @@ workflow cumulus {
 		# Down sampling fraction for net-related visualization. [default: 0.1]
 		Float? net_down_sample_fraction
 		# Run net tSNE for visualization.
-		Boolean? run_net_tsne
-		# Output basis for net-tSNE. [default: net_tsne]
-		String? net_tsne_out_basis
-		# Run net umap for visualization.
 		Boolean? run_net_umap
 		# Output basis for net-UMAP. [default: net_umap]
 		String? net_umap_out_basis
@@ -179,7 +177,18 @@ workflow cumulus {
 		Boolean? run_net_fle
 		# Output basis for net-FLE. [default: net_fle]
 		String? net_fle_out_basis
-
+		# Infer doublets using the method described in https://github.com/klarman-cell-observatory/pegasus/raw/master/doublet_detection.pdf. Obs attribute 'doublet_score' stores Scrublet-like doublet scores and attribute 'demux_type' stores 'doublet/singlet' assignments.
+		Boolean? infer_doublets
+		# The expected doublet rate per sample. By default, calculate the expected rate based on number of cells from the 10x multiplet rate table.
+		Float? expected_doublet_rate
+		# <attr> refers to a cluster attribute containing cluster labels (e.g. 'louvain_labels'). Doublet clusters will be marked based on <attr> with the following criteria: passing the Fisher's exact test and having >= 50% of cells identified as doublets. By default, the first computed cluster attribute in the list of leiden, louvain, spectral_ledein and spectral_louvain is used.
+		String? doublet_cluster_attribute
+		# Input data contain both RNA and CITE-Seq modalities. This will set --focus to be the RNA modality and --append to be the CITE-Seq modality. In addition, 'ADT-' will be added in front of each antibody name to avoid name conflict with genes in the RNA modality.
+		Boolean? citeseq
+		# For high quality cells kept in the RNA modality, generate a UMAP based on their antibody expression.
+		Boolean? citeseq_umap
+		# <list> is a comma-separated list of antibodies to be excluded from the UMAP calculation (e.g. Mouse-IgG1,Mouse-IgG2a).
+		String? citeseq_umap_exclude
 
 		# for de_analysis and annotate_cluster
 
@@ -217,18 +226,16 @@ workflow cumulus {
 		String? plot_composition
 		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored tSNEs side by side.
 		String? plot_tsne
-		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FItSNEs side by side.
-		String? plot_fitsne
 		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored UMAPs side by side.
 		String? plot_umap
 		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FLEs side by side.
 		String? plot_fle
 		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored tSNEs side by side based on net tSNE result.
-		String? plot_net_tsne
-		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored UMAPs side by side based on net UMAP result.
 		String? plot_net_umap
 		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored FLEs side by side based on net FLE result.
 		String? plot_net_fle
+		# Takes the format of "attr,attr,...,attr". If non-empty, plot attr colored UMAPs side by side based on CITE-Seq UMAP result.
+		String? plot_citeseq_umap
 
 		# for cirro_output
 		# If generate Cirrocumulus inputs
@@ -299,6 +306,7 @@ workflow cumulus {
 			select_hvf_flavor = select_hvf_flavor,
 			select_hvf_ngenes = select_hvf_ngenes,
 			no_select_hvf = no_select_hvf,
+			plot_hvf = plot_hvf,
 			correct_batch_effect = correct_batch_effect,
 			correction_method = correction_method,
 			batch_group_by = batch_group_by,
@@ -327,7 +335,7 @@ workflow cumulus {
 			spectral_leiden_class_label = spectral_leiden_class_label,
 			run_tsne = run_tsne,
 			tsne_perplexity = tsne_perplexity,
-			run_fitsne = run_fitsne,
+			tsne_initialization = tsne_initialization,
 			run_umap = run_umap,
 			umap_K = umap_K,
 			umap_min_dist = umap_min_dist,
@@ -337,12 +345,16 @@ workflow cumulus {
 			fle_target_change_per_node = fle_target_change_per_node,
 			fle_target_steps = fle_target_steps,
 			net_down_sample_fraction = net_down_sample_fraction,
-			run_net_tsne = run_net_tsne,
-			net_tsne_out_basis = net_tsne_out_basis,
 			run_net_umap = run_net_umap,
 			net_umap_out_basis = net_umap_out_basis,
 			run_net_fle = run_net_fle,
 			net_fle_out_basis = net_fle_out_basis,
+			infer_doublets = infer_doublets,
+			expected_doublet_rate = expected_doublet_rate,
+			doublet_cluster_attribute = doublet_cluster_attribute,
+			citeseq = citeseq,
+			citeseq_umap = citeseq_umap,
+			citeseq_umap_exclude = citeseq_umap_exclude,
 			cumulus_version = cumulus_version,
 			zones = zones,
 			num_cpu = num_cpu,
@@ -384,7 +396,7 @@ workflow cumulus {
 				}
 			}
 
-			Boolean do_plot = defined(plot_composition) || defined(plot_tsne) || defined(plot_fitsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_net_tsne) || defined(plot_net_umap) || defined(plot_net_fle)
+			Boolean do_plot = defined(plot_composition) || defined(plot_tsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_net_umap) || defined(plot_net_fle)
 
 			if (do_plot) {
 				call tasks.run_cumulus_plot as plot {
@@ -394,12 +406,11 @@ workflow cumulus {
 						output_name = focus_prefix,
 						plot_composition = plot_composition,
 						plot_tsne = plot_tsne,
-						plot_fitsne = plot_fitsne,
 						plot_umap = plot_umap,
 						plot_fle = plot_fle,
-						plot_net_tsne = plot_net_tsne,
 						plot_net_umap = plot_net_umap,
 						plot_net_fle = plot_net_fle,
+						plot_citeseq_umap = plot_citeseq_umap,
 						cumulus_version = cumulus_version,
 						zones = zones,
 						memory = memory,
@@ -451,6 +462,8 @@ workflow cumulus {
 		Array[File] output_h5ad = cluster.output_h5ad
 		Array[File] output_filt_xlsx = cluster.output_filt_xlsx
 		Array[File] output_filt_plot = cluster.output_filt_plot
+		Array[File] output_hvf_plot = cluster.output_hvf_plot
+		Array[File] output_dbl_plot = cluster.output_dbl_plot
 		Array[File] output_loom_file = cluster.output_loom_file
 		Array[File?]? output_de_h5ad = de_analysis.output_de_h5ad
 		Array[File?]? output_de_xlsx =  de_analysis.output_de_xlsx

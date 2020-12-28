@@ -65,14 +65,14 @@ workflow cellranger_workflow {
         String? atac_dim_reduce
 
 
-        # 4.0.0, 3.1.0, 3.0.2, 2.2.0
+        # 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
         String cellranger_version = "4.0.0"
         # 1.2.0, 1.1.0
         String cellranger_atac_version = "1.2.0"
         # 0.3.0, 0.2.0
         String cumulus_feature_barcoding_version = "0.3.0"
-        # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-        String docker_registry = "cumulusprod"
+        # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
+        String docker_registry = "quay.io/cumulus"
         # cellranger/cellranger-atac mkfastq registry, default to gcr.io/broad-cumulus
         String mkfastq_docker_registry = "gcr.io/broad-cumulus"
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
