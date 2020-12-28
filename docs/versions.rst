@@ -4,7 +4,7 @@ Latest and stable versions on Terra_
 Cumulus is a fast growing project. As a result, we frequently update WDL snapshot versions on Terra_.
 See below for latest and stable WDL versions you can use.
 
-Latest version
+Stable version - v1.1.0
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table::
@@ -15,7 +15,7 @@ Latest version
       - Snapshot
       - Function
     * - cumulus/cellranger_workflow
-      - `13 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/13>`__
+      - `14 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/14>`__
       - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
     * - cumulus/star_solo
       - `2 <https://portal.firecloud.org/?return=terra#methods/cumulus/star_solo/2>`_
@@ -24,7 +24,7 @@ Latest version
       - `16 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/16>`__
       - Run alternative tools (STARsolo, Optimus, Salmon alevin, or Kallisto BUStools) to generate gene-count matrices from FASTQ files.
     * - cumulus/demultiplexing
-      - `20 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/20>`_
+      - `21 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/21>`_
       - Run tools (demuxEM, souporcell, or demuxlet) for cell-hashing/nucleus-hashing/genetic-pooling analysis.
     * - cumulus/cellranger_create_reference
       - `9 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/9>`__
@@ -45,11 +45,8 @@ Latest version
       - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/8>`__
       - Generate user-customized genome references for SMART-Seq2 data.
     * - cumulus/cumulus
-      - `33 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/33>`__
+      - `34 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/34>`__
       - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
-    * - cumulus/cumulus_hashing_cite_seq
-      - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus_hashing_cite_seq/10>`__
-      - Run cumulus for cell-hashing/nucleus-hashing/CITE-Seq analysis
 
 Stable version - v1.0.0
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
