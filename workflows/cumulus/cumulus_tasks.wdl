@@ -338,6 +338,8 @@ task run_cumulus_cluster {
 			files.extend(glob.glob('~{output_name}.*.hvf.pdf'))
 		if '~{plot_filtration_results}' is 'true':
 			files.extend(glob.glob('~{output_name}.*.filt.*.pdf'))
+		if '~{infer_doublets}' is 'true':
+			files.extend(glob.glob('~{output_name}.*.dbl.png'))
 		if '~{output_loom}' is 'true':
 			files.extend(glob.glob('~{output_name}.*.loom'))
 		for file in files:
@@ -354,6 +356,7 @@ task run_cumulus_cluster {
 		Array[File] output_filt_xlsx = glob("~{output_name}.*.filt.xlsx")
 		Array[File] output_filt_plot = glob("~{output_name}.*.filt.*.pdf")
 		Array[File] output_hvf_plot = glob("~{output_name}.*.hvf.pdf")
+		Array[File] output_dbl_plot = glob("~{output_name}.*.dbl.png")
 		Array[File] output_loom_file = glob("~{output_name}.*.loom")
 		File output_log = "~{output_name}.log"
 		File monitoringLog = "monitoring.log"
