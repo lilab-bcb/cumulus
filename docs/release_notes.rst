@@ -1,3 +1,19 @@
+Version 1.1.0 `December 28, 2020`
+----------------------------------
+
+* On *cumulus* workflow:
+    * Add CITE-Seq data analysis back. (See section `Run CITE-Seq analysis <./cumulus.html#run-cite-seq-analysis>`_ for details)
+    * Add doublet detection. (See ``infer_doublets``, ``expected_doublet_rate``, and ``doublet_cluster_attribute`` input fields)
+    * For tSNE visualization, only support FIt-SNE algorithm. (see ``run_tsne`` and ``plot_tsne`` input fields)
+    * Improve efficiency on log-normalization and DE tests.
+    * Support multiple marker JSON files used in cell type annotation. (see ``organism`` input field)
+    * More preset gene sets provided in gene score calculation. (see ``calc_signature_scores`` input field)
+* Add *star_solo* workflow (see `STARsolo section <./starsolo.html>`_ for details):
+    * Use `STARsolo <https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md>`_ to generate count matrices from FASTQ files.
+    * Support chemistry protocols such as 10X-V3, 10X-V2, DropSeq, and SeqWell.
+* Update the example of analyzing hashing and CITE-Seq data (see `Example section <./examples/example_hashing_citeseq.html>`_) with the new workflows.
+* Bug fix.
+
 Version 1.0.0 `September 23, 2020`
 ------------------------------------
 
