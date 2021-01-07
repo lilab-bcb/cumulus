@@ -106,9 +106,10 @@ task run_cellranger_mkfastq {
 			fout.write('~{output_directory}/~{run_id}_fastqs/fastq_path/' + flowcell + '\n')
 		prefix = 'results/outs/fastq_path/' + flowcell + '/'
 		df = pd.read_csv('~{input_csv_file}', header = 0)
-		idx = df['Index'].apply(lambda x: x.find('-') < 0)
-		for sample_id in df[idx]['Sample'].unique():
+		for sample_id in df['Sample'].unique():
 			dir_name = prefix + sample_id
+			if os.path.exists(dir_name):
+				continue
 			call_args = ['mkdir', '-p', dir_name]
 			subprocess.check_call(call_args)
 			files = glob.glob(dir_name + '_S*_L*_*_001.fastq.gz')
