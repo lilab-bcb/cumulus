@@ -65,8 +65,8 @@ workflow cellranger_workflow {
         String? atac_dim_reduce
 
 
-        # 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
-        String cellranger_version = "4.0.0"
+        # 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
+        String cellranger_version = "5.0.1"
         # 1.2.0, 1.1.0
         String cellranger_atac_version = "1.2.0"
         # 0.3.0, 0.2.0
