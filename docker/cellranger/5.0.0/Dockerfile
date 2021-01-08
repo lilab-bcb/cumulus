@@ -17,13 +17,13 @@ ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/do
 ADD cellranger-5.0.0.tar /software
 
 #ADD bcl2fastq2-v2-20-0-linux-x86-64.zip /software/
-#RUN unzip -d /software/ /software/bcl2fastq2-v2-20-0-linux-x86-64.zip && alien -i /software/bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm && rm /software/bcl2fastq2-v2*
+#RUN unzip -d /software/ /software/bcl2fastq2-v2-20-0-linux-x86-64.zip && alien -i /software/bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm && rm -f /software/bcl2fastq2-v2*
 
 RUN apt-get -qq -y remove alien curl gnupg python3-pip unzip && \
     apt-get -qq -y autoremove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log && \
-    rm /usr/bin/python && ln -s /usr/bin/python3 /usr/bin/python
+    rm -f /usr/bin/python && ln -s /usr/bin/python3 /usr/bin/python
 
 RUN chmod a+rx /software/monitor_script.sh
 ENV PATH=/software:/software/cellranger-5.0.0:$PATH
