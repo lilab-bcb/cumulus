@@ -18,6 +18,10 @@ workflow cellranger_count {
 		Int? force_cells
 		# Expected number of recovered cells. Mutually exclusive with force_cells
 		Int? expect_cells
+		# If count reads mapping to intronic regions
+		Boolean include_introns = false
+		# If generate bam outputs
+		Boolean no_bam = false
 		# Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
 		Boolean secondary = false
 
@@ -55,6 +59,8 @@ workflow cellranger_count {
 			chemistry = chemistry,
 			force_cells = force_cells,
 			expect_cells = expect_cells,
+			include_introns = include_introns,
+			no_bam = no_bam,
 			secondary = secondary,
 			cellranger_version = cellranger_version,
 			zones = zones,
@@ -82,6 +88,8 @@ task run_cellranger_count {
 		String chemistry
 		Int? force_cells
 		Int? expect_cells
+		Boolean include_introns
+		Boolean no_bam
 		Boolean secondary
 		String cellranger_version
 		String zones
@@ -115,14 +123,12 @@ task run_cellranger_count {
 			check_call(call_args)
 			fastqs.append('~{sample_id}_' + str(i))
 	
-		call_args = ['cellranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}']
-		if '~{cellranger_version}' != '2.0.2':
-			call_args.append('--chemistry=~{chemistry}')
-			call_args.append('--jobmode=local')
+		call_args = ['cellranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--chemistry=~{chemistry}', '--jobmode=local']
 		if '~{force_cells}' is not '':
 			call_args.append('--force-cells=~{force_cells}')
 		if '~{expect_cells}' is not '':
 			call_args.append('--expect-cells=~{expect_cells}')
+		if ''
 		if '~{secondary}' is not 'true':
 			call_args.append('--nosecondary')
 		print(' '.join(call_args))
