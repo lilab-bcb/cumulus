@@ -14,7 +14,7 @@ RUN pip3 install pandas && \
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
-ADD cellranger-2.2.0.tar.gz /software
+ADD cellranger-5.0.1.tar.gz /software
 
 #ADD bcl2fastq2-v2-20-0-linux-x86-64.zip /software/
 #RUN unzip -d /software/ /software/bcl2fastq2-v2-20-0-linux-x86-64.zip && alien -i /software/bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm && rm -f /software/bcl2fastq2-v2*
@@ -26,5 +26,5 @@ RUN apt-get -qq -y remove alien curl gnupg python3-pip unzip && \
     rm -f /usr/bin/python && ln -s /usr/bin/python3 /usr/bin/python
 
 RUN chmod a+rx /software/monitor_script.sh
-ENV PATH=/software:/software/cellranger-2.2.0:$PATH
+ENV PATH=/software:/software/cellranger-5.0.1:$PATH
 ENV TMPDIR=/tmp
