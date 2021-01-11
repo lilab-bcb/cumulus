@@ -181,4 +181,4 @@ todo_include_todos = True
 # set up function
 
 def setup(app):
-    app.add_stylesheet('my_theme.css')
+    app.add_css_file('my_theme.css')

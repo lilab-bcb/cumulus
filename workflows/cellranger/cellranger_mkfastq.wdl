@@ -11,8 +11,14 @@ workflow cellranger_mkfastq {
 
 		# Whether to delete input bcl directory. If false, you should delete this folder yourself so as to not incur storage charges.
 		Boolean delete_input_bcl_directory = false
+		# Number of allowed mismatches per index
+		Int? barcode_mismatches
+
 		# cellranger version
 		String cellranger_version
+		# Which docker registry to use
+		String docker_registry
+
 		# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 		String zones = "us-central1-b"
 		# Number of cpus per cellranger job
@@ -23,12 +29,6 @@ workflow cellranger_mkfastq {
 		Int disk_space = 1500
 		# Number of preemptible tries
 		Int preemptible = 2
-
-		# Which docker registry to use
-		String docker_registry
-
-		# Number of allowed mismatches per index
-		Int? barcode_mismatches
 	}
 
 	call run_cellranger_mkfastq {
@@ -37,12 +37,12 @@ workflow cellranger_mkfastq {
 			input_csv_file = input_csv_file,
 			output_directory = sub(output_directory, "/+$", ""),
 			delete_input_bcl_directory = delete_input_bcl_directory,
+			barcode_mismatches = barcode_mismatches,
 			cellranger_version = cellranger_version,
-			barcode_mismatches=barcode_mismatches,
+			docker_registry = docker_registry,
 			zones = zones,
 			num_cpu = num_cpu,
 			memory = memory,
-			docker_registry = docker_registry,
 			disk_space = disk_space,
 			preemptible = preemptible
 	}
@@ -60,14 +60,14 @@ task run_cellranger_mkfastq {
 		File input_csv_file
 		String output_directory
 		Boolean delete_input_bcl_directory
+		Int? barcode_mismatches
 		String cellranger_version
-		String zones
 		String docker_registry
+		String zones
 		Int num_cpu
 		String memory
 		Int disk_space
 		Int preemptible
-		Int? barcode_mismatches
 	}
 
 	String run_id = basename(input_bcl_directory)
@@ -79,18 +79,19 @@ task run_cellranger_mkfastq {
 		gsutil -q -m cp -r ~{input_bcl_directory} .
 		# cp -r ~{input_bcl_directory} .
 
-
 		python <<CODE
 		import os
 		import glob
 		import sys
 		import pandas as pd
 		import subprocess
-		barcode_mismatches = '~{barcode_mismatches}'
+
 		mkfastq_args = ['cellranger', 'mkfastq', '--id=results', '--run=~{run_id}', '--csv=~{input_csv_file}', '--jobmode=local', '--qc']
+		barcode_mismatches = '~{barcode_mismatches}'
 		if barcode_mismatches != '':
 			mkfastq_args += ['--barcode-mismatches', barcode_mismatches]
 		p = subprocess.run(mkfastq_args)
+
 		if p.returncode != 0: # ./MAKE_FASTQS_CS/MAKE_FASTQS/BCL2FASTQ_WITH_SAMPLESHEET/fork0/chnk0-u8d92d5526b/_stderr
 			if os.path.exists('results/MAKE_FASTQS_CS/MAKE_FASTQS/BCL2FASTQ_WITH_SAMPLESHEET/fork0/'):
 				output_dirs = os.listdir('results/MAKE_FASTQS_CS/MAKE_FASTQS/BCL2FASTQ_WITH_SAMPLESHEET/fork0/')
@@ -101,9 +102,11 @@ task run_cellranger_mkfastq {
 					for line in error_in:
 						print(line, file=sys.stderr)
 			sys.exit(1)
+
 		with open("output_fastqs_flowcell_directory.txt", "w") as fout:
 			flowcell = [name for name in os.listdir('results/outs/fastq_path') if name != 'Reports' and name != 'Stats' and os.path.isdir('results/outs/fastq_path/' + name)][0]
 			fout.write('~{output_directory}/~{run_id}_fastqs/fastq_path/' + flowcell + '\n')
+
 		prefix = 'results/outs/fastq_path/' + flowcell + '/'
 		df = pd.read_csv('~{input_csv_file}', header = 0)
 		for sample_id in df['Sample'].unique():

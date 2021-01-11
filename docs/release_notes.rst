@@ -1,5 +1,15 @@
+Version 1.2.0 `January X, 2021`
+-------------------------------
+
+* On *cellranger* workflow:
+    * Add support for cellranger version 5.0.0 and 5.0.1
+    * Add support for 10x Visium spatial data using spaceranger version 1.2.1
+    * Add support for targeted gene expression analysis
+    * Add support for --include-introns and --no-bam options for cellranger count
+    * Remove --force-cells option for cellranger vdj as noted in cellranger 5.0.0 release note
+
 Version 1.1.0 `December 28, 2020`
-----------------------------------
+---------------------------------
 
 * On *cumulus* workflow:
     * Add CITE-Seq data analysis back. (See section `Run CITE-Seq analysis <./cumulus.html#run-cite-seq-analysis>`_ for details)
@@ -15,7 +25,7 @@ Version 1.1.0 `December 28, 2020`
 * Bug fix.
 
 Version 1.0.0 `September 23, 2020`
-------------------------------------
+----------------------------------
 
 * Add *demultiplexing* workflow for cell-hashing/nucleus-hashing/genetic-pooling analysis.
 * Add support on CellRanger version ``4.0.0``.
@@ -31,14 +41,14 @@ Version 1.0.0 `September 23, 2020`
 * Remove *cumulus_subcluster* workflow.
 
 Version 0.15.0 `May 6, 2020`
--------------------------------
+----------------------------
 
 * Update all workflows to OpenWDL version 1.0.
 * Cumulus now supports multi-job execution from Terra data table input.
 * Cumulus generates Cirrocumulus input in ``.cirro`` folder, instead of a huge ``.parquet`` file.
 
 Version 0.14.0 `February 28, 2020`
------------------------------------
+----------------------------------
 
 * Added support for gene-count matrices generation using alternative tools (STARsolo, Optimus, Salmon alevin, Kallisto BUStools).
 * Cumulus can process demultiplexed data with remapped singlets names and subset of singlets.
@@ -46,13 +56,13 @@ Version 0.14.0 `February 28, 2020`
 * SMART-Seq2 and Count workflows are in OpenWDL version 1.0.
 
 Version 0.13.0 `February 7, 2020`
------------------------------------
+---------------------------------
 
 * Added support for aggregating scATAC-seq samples.
 * Cumulus now accepts mtx format input.
 
 Version 0.12.0 `December 14, 2019`
------------------------------------
+----------------------------------
 
 * Added support for building references for sc/snRNA-seq, scATAC-seq, single-cell immune profiling, and SMART-Seq2 data.
 

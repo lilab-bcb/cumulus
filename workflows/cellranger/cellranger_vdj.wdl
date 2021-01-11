@@ -12,8 +12,6 @@ workflow cellranger_vdj {
 		# GRCh38_vdj, GRCm38_vdj or a URL to a tar.gz file
 		String genome
 
-		# Force pipeline to use this number of cells, bypassing the cell detection algorithm.
-		Int? force_cells
 		# Do not align reads to reference V(D)J sequences before de novo assembly. Default: false
 		Boolean denovo = false
 		
@@ -55,7 +53,6 @@ workflow cellranger_vdj {
 			input_fastqs_directories = input_fastqs_directories,
 			output_directory = sub(output_directory, "/+$", ""),
 			genome_file = genome_file,
-			force_cells = force_cells,
 			denovo = denovo,
 			chain = chain,
 			cellranger_version = cellranger_version,
@@ -81,7 +78,6 @@ task run_cellranger_vdj {
 		String input_fastqs_directories
 		String output_directory
 		File genome_file
-		Int? force_cells
 		Boolean denovo
 		String chain
 		String cellranger_version
@@ -117,8 +113,6 @@ task run_cellranger_vdj {
 			fastqs.append('~{sample_id}_' + str(i))
 
 		call_args = ['cellranger', 'vdj', '--chain=~{chain}', '--id=results', '--reference=ref_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local']
-		if '~{force_cells}' is not '':
-			call_args.append('--force-cells=~{force_cells}')
 		if '~{denovo}' is not 'false':
 			call_args.append('--denovo')
 		print(' '.join(call_args))
