@@ -4,6 +4,51 @@ Latest and stable versions on Terra_
 Cumulus is a fast growing project. As a result, we frequently update WDL snapshot versions on Terra_.
 See below for latest and stable WDL versions you can use.
 
+Latest version
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. list-table::
+    :widths: 15 5 30
+    :header-rows: 1
+
+    * - WDL
+      - Snapshot
+      - Function
+    * - cumulus/cellranger_workflow
+      - `14 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/14>`__
+      - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
+    * - cumulus/star_solo
+      - `3 <https://portal.firecloud.org/?return=terra#methods/cumulus/star_solo/3>`_
+      - Run STARsolo to generate gene-count matrices fro FASTQ files.
+    * - cumulus/count
+      - `16 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/16>`__
+      - Run alternative tools (STARsolo, Optimus, Salmon alevin, or Kallisto BUStools) to generate gene-count matrices from FASTQ files.
+    * - cumulus/demultiplexing
+      - `21 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/21>`_
+      - Run tools (demuxEM, souporcell, or demuxlet) for cell-hashing/nucleus-hashing/genetic-pooling analysis.
+    * - cumulus/cellranger_create_reference
+      - `9 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/9>`__
+      - Run Cell Ranger tools to build sc/snRNA-seq references.
+    * - cumulus/cellranger_atac_aggr
+      - `2 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_aggr/2>`__
+      - Run Cell Ranger tools to aggregate scATAC-seq samples.
+    * - cumulus/cellranger_atac_create_reference
+      - `2 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_create_reference/2>`__
+      - Run Cell Ranger tools to build scATAC-seq references.
+    * - cumulus/cellranger_vdj_create_reference
+      - `3 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_vdj_create_reference/3>`__
+      - Run Cell Ranger tools to build single-cell immune profiling references.
+    * - cumulus/smartseq2
+      - `7 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2/7>`__
+      - Run HISAT2/STAR/Bowtie2-RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files
+    * - cumulus/smartseq2_create_reference
+      - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/8>`__
+      - Generate user-customized genome references for SMART-Seq2 data.
+    * - cumulus/cumulus
+      - `35 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/34>`__
+      - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
+
+
 Stable version - v1.1.0
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
