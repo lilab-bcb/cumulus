@@ -1,12 +1,14 @@
 Version 1.2.0 `January X, 2021`
 -------------------------------
 
+* Reorganized the sidebar
 * On *cellranger* workflow:
     * Add support for cellranger version 5.0.0 and 5.0.1
     * Add support for 10x Visium spatial data using spaceranger version 1.2.1
     * Add support for targeted gene expression analysis
     * Add support for --include-introns and --no-bam options for cellranger count
     * Remove --force-cells option for cellranger vdj as noted in cellranger 5.0.0 release note
+    * Add GRCh38_vdj_v5.0.0 and GRCm38_vdj_v5.0.0 references
 * Bug fix on *cumulus* workflow.
 
 Version 1.1.0 `December 28, 2020`
