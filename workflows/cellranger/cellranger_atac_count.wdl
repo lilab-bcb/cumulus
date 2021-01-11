@@ -48,7 +48,7 @@ workflow cellranger_atac_count {
 			input_fastqs_directories = input_fastqs_directories,
 			output_directory = sub(output_directory, "/+$", ""),
 			genome_file = genome_file,
-			force_cells=force_cells,
+			force_cells = force_cells,
 			dim_reduce = dim_reduce,
 			cellranger_atac_version = cellranger_atac_version,
 			zones = zones,

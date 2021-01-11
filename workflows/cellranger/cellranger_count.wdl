@@ -30,6 +30,9 @@ workflow cellranger_count {
 
 		# cellranger version
 		String cellranger_version
+		# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
+		String docker_registry
+
 		# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 		String zones = "us-central1-b"
 		# Number of cpus per cellranger job
@@ -40,9 +43,6 @@ workflow cellranger_count {
 		Int disk_space = 500
 		# Number of preemptible tries 
 		Int preemptible = 2
-
-		# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-		String docker_registry
 	}
 
 	File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
@@ -67,12 +67,12 @@ workflow cellranger_count {
 			no_bam = no_bam,
 			secondary = secondary,
 			cellranger_version = cellranger_version,
+			docker_registry = docker_registry,
 			zones = zones,
 			num_cpu = num_cpu,
 			memory = memory,
 			disk_space = disk_space,
-			preemptible = preemptible,
-			docker_registry = docker_registry
+			preemptible = preemptible
 	}
 
 	output {
@@ -97,12 +97,12 @@ task run_cellranger_count {
 		Boolean no_bam
 		Boolean secondary
 		String cellranger_version
+		String docker_registry
 		String zones
 		Int num_cpu
 		String memory
 		Int disk_space
 		Int preemptible
-	    String docker_registry
     }
 
 	command {
