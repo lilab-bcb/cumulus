@@ -718,12 +718,14 @@ de_analysis inputs
       - false
       - false
     * - annotate_de_test
-      - Differential Expression test to use for inference on cell types. Options: "mwu", "t", or "fisher"
+      - Differential Expression test to use for inference on cell types. Options: ``mwu``, ``t``, or ``fisher``
       - "mwu"
       - "mwu"
     * - organism
-      - | Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain", "human_lung", or a Google bucket link to a user-specified JSON file describing the markers.
-      	| Cumulus also support multiple organisms, where each is separated by comma.
+      - Organism, could either of the follow:
+      
+        - Preset markers: ``human_immune``, ``mouse_immune``, ``human_brain``, ``mouse_brain``, ``human_lung``, or a combination of them as a string separated by comma.
+        - User-defined marker file: A Google bucket link to a user-specified JSON file describing the markers. For example: ``gs://fc-e0000000/my_markers.json``.
       - "mouse_immune,mouse_brain"
       - "human_immune"
     * - minimum_report_score

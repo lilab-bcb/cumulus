@@ -487,9 +487,9 @@ task run_cumulus_de_analysis {
 			call_args = ['pegasus', 'annotate_cluster', '~{output_name}.h5ad', '~{output_name}.anno.txt']
 			if '~{organism}' is not '':
 				if '~{is_url}' is 'true':
-					call_args.extend(['--marker-file', 'markers.json'])
+					call_args.extend(['--markers', 'markers.json'])
 				else:
-					call_args.extend(['--marker-file', '~{organism}'])
+					call_args.extend(['--markers', '~{organism}'])
 			if '~{annotate_de_test}' is not '':
 				call_args.extend(['--de-test', '~{annotate_de_test}'])
 			if '~{alpha}' is not '':
