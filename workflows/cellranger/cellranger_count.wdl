@@ -12,6 +12,9 @@ workflow cellranger_count {
 		# GRCh38, hg19, mm10, GRCh38_and_mm10, GRCh38_premrna, mm10_premrna, GRCh38_premrna_and_mm10_premrna or a URL to a tar.gz file
 		String genome
 
+		# Target panel CSV for targeted gene expression analysis
+		File? target_panel
+
 		# chemistry of the channel
 		String chemistry = "auto"
 		# Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells.
@@ -56,6 +59,7 @@ workflow cellranger_count {
 			input_fastqs_directories = input_fastqs_directories,
 			output_directory = sub(output_directory, "/+$", ""),
 			genome_file = genome_file,
+			target_panel = target_panel,
 			chemistry = chemistry,
 			force_cells = force_cells,
 			expect_cells = expect_cells,
@@ -85,6 +89,7 @@ task run_cellranger_count {
 		String input_fastqs_directories
 		String output_directory
 		File genome_file
+		File? target_panel
 		String chemistry
 		Int? force_cells
 		Int? expect_cells
@@ -110,6 +115,7 @@ task run_cellranger_count {
 		python <<CODE
 		import re
 		from subprocess import check_call
+		from packaging import version
 
 		fastqs = []
 		for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
@@ -122,13 +128,21 @@ task run_cellranger_count {
 			print(' '.join(call_args))
 			check_call(call_args)
 			fastqs.append('~{sample_id}_' + str(i))
-	
+		
 		call_args = ['cellranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--chemistry=~{chemistry}', '--jobmode=local']
+		if '~{target_panel}' is not '':
+			assert version.parse('~{cellranger_version}') >= version.parse('4.0.0'):
+			call_args.append('--target-panel=~{target_panel}')
 		if '~{force_cells}' is not '':
 			call_args.append('--force-cells=~{force_cells}')
 		if '~{expect_cells}' is not '':
 			call_args.append('--expect-cells=~{expect_cells}')
-		if ''
+		if '~{include_introns}' is 'true':
+			assert version.parse('~{cellranger_version}') >= version.parse('5.0.0')
+			call_args.append('--include-introns')
+		if '~{no_bam}' is 'true':
+			assert version.parse('~{cellranger_version}') >= version.parse('5.0.0')
+			call_args.append('--no-bam')
 		if '~{secondary}' is not 'true':
 			call_args.append('--nosecondary')
 		print(' '.join(call_args))

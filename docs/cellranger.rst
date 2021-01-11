@@ -98,7 +98,7 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		  - Describes the 10x chemistry used for the sample. This column is optional.
 		* - DataType
 		  -
-			| Describes the data type of the sample --- *rna*, *vdj*, *adt*, or *crispr*.
+			| Describes the data type of the sample --- *rna*, *vdj*, *adt*, *crispr* or *atac*.
 			| **rna** refers to gene expression data (*cellranger count*),
 			| **vdj** refers to V(D)J data (*cellranger vdj*),
 			| **adt** refers to antibody tag data, which can be either CITE-Seq, cell-hashing, or nucleus-hashing,
@@ -107,15 +107,15 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 			| This column is optional and the default data type is *rna*.
 		* - FeatureBarcodeFile
 		  -
-		  	| Google bucket urls pointing to feature barcode files for *adt* and *crispr* data.
-		  	| Features can be either antibody for CITE-Seq, cell-hashing, nucleus-hashing or gRNA for Perburb-seq.
-		  	| This column is optional provided no *adt* or *crispr* data are in the sample sheet.
+		  	| Google bucket urls pointing to feature barcode files for *rna*, *adt* and *crispr* data.
+		  	| Features can be either targeted genes for targeted gene expression analysis, antibody for CITE-Seq, cell-hashing, nucleus-hashing or gRNA for Perburb-seq.
+		  	| This column is only required for targeted gene expression analysis (*rna*), CITE-Seq, cell-hashing, nucleus-hashing (*adt*) and Perturb-seq (*crispr*).
 
 	The sample sheet supports sequencing the same 10x channels across multiple flowcells. If a sample is sequenced across multiple flowcells, simply list it in multiple rows, with one flowcell per row. In the following example, we have 4 samples sequenced in two flowcells.
 
 	Example::
 
-		Sample,Reference,Flowcell,Lane,Index,Chemistry,DataType,FeatureBarcodeFile
+		Sample,Reference,Flowcell,Lane,Index,Chemistry,DataType
 		sample_1,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,threeprime,rna
 		sample_2,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3-4,SI-GA-B8,SC3Pv3,rna
 		sample_3,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,5-6,SI-GA-C8,fiveprime,rna
@@ -242,7 +242,7 @@ Sample sheet
 
 #. **Index** column.
 
-	Put `10x single cell 3' sample index set names`_ (e.g. SI-GA-A12) here.
+	Put `10x single cell RNA-seq sample index set names`_ (e.g. SI-GA-A12) here.
 
 #. *Chemistry* column.
 
@@ -277,20 +277,16 @@ Sample sheet
 
 #. *FetureBarcodeFile* column.
 
-	Leave it blank for scRNA-seq and snRNA-seq.
+	Put target panel CSV file here for targeted expressiond data. Note that if a target panel CSV is present, cell ranger version must be >= 4.0.0.
 
 #. Example::
 
 	Sample,Reference,Flowcell,Lane,Index,Chemistry,DataType,FeatureBarcodeFile
-	sample_1,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,threeprime,rna
-	sample_2,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3-4,SI-GA-B8,SC3Pv3,rna
-	sample_3,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,5-6,SI-GA-C8,fiveprime,rna
-	sample_4,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,7-8,SI-GA-D8,fiveprime,rna
-	sample_1,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,1-2,SI-GA-A8,threeprime,rna
-	sample_2,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,3-4,SI-GA-B8,SC3Pv3,rna
-	sample_3,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,5-6,SI-GA-C8,fiveprime,rna
-	sample_4,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,7-8,SI-GA-D8,fiveprime,rna
-
+	sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,threeprime,rna
+	sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,1-2,SI-GA-A8,threeprime,rna
+	sample_2,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,5-6,SI-GA-C8,fiveprime,rna
+	sample_2,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,5-6,SI-GA-C8,fiveprime,rna
+	sample_3,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3,SI-TT-A1,auto,rna,gs://fc-e0000000-0000-0000-0000-000000000000/immunology_v1.0_GRCh38-2020-A.target_panel.csv
 
 Workflow input
 ++++++++++++++
@@ -337,6 +333,14 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  - Expected number of recovered cells. Mutually exclusive with force_cells
 		  - 3000
 		  -
+		* - include_introns
+		  - Turn this option on to also count reads mapping to intronic regions. With this option, users do not need to use pre-mRNA references. Note that if this option is set, cellranger_version must be >= 5.0.0.
+		  - false
+		  - false
+		* - no_bam
+		  - Turn this option on to disable BAM file generation. This option is only available if cellranger_version >= 5.0.0.
+		  - false
+		  - false
 		* - secondary
 		  - Perform Cell Ranger secondary analysis (dimensionality reduction, clustering, etc.)
 		  - false
@@ -456,7 +460,7 @@ Sample sheet
 
 #. **Index** column.
 
-	The ADT/HTO index can be either Illumina index primer sequence (e.g. ``ATTACTCG``, also known as ``D701``), or `10x single cell 3' sample index set names`_ (e.g. SI-GA-A12).
+	The ADT/HTO index can be either Illumina index primer sequence (e.g. ``ATTACTCG``, also known as ``D701``), or `10x single cell RNA-seq sample index set names`_ (e.g. SI-GA-A12).
 
 	**Note 1**: All ADT/HTO index sequences (including 10x's) should have the same length (8 bases). If one index sequence is shorter (e.g. ATCACG), pad it with P7 sequence (e.g. ATCACGAT).
 
@@ -932,6 +936,10 @@ Sample sheet
 
 		* - Keyword
 		  - Description
+		* - **GRCh38_vdj_v5.0.0**
+		  - Human GRCh38 V(D)J sequences, cellranger reference 5.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
+		* - **GRCm38_vdj_v5.0.0**
+		  - Mouse GRCm38 V(D)J sequences, cellranger reference 5.0.0, annotation built from Ensembl *Mus_musculus.GRCm38.94.gtf*	
 		* - **GRCh38_vdj_v4.0.0**
 		  - Human GRCh38 V(D)J sequences, cellranger reference 4.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
 		* - **GRCm38_vdj_v4.0.0**
@@ -998,10 +1006,6 @@ For scIR-seq data, ``cellranger_workflow`` takes Illumina outputs as input and r
 	* - mkfastq_barcode_mismatches
 	  - Number of mismatches allowed in matching barcode indices (bcl2fastq2 default is 1)
 	  - 0
-	  -
-	* - force_cells
-	  - Force pipeline to use this number of cells, bypassing the cell detection algorithm
-	  - 6000
 	  -
 	* - vdj_denovo
 	  - Do not align reads to reference V(D)J sequences before de novo assembly
@@ -1428,7 +1432,7 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 
 .. _10x genomics v2 cell barcode white list: gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
 .. _10x genomics v3 cell barcode white list: gs://regev-lab/resources/cellranger/3M-february-2018.txt.gz
-.. _10x single cell 3' sample index set names: https://support.10xgenomics.com/single-cell-gene-expression/index/doc/specifications-sample-index-sets-for-single-cell-3
+.. _10x single cell RNA-seq sample index set names: https://support.10xgenomics.com/single-cell-gene-expression/index/doc/specifications-sample-index-sets-for-single-cell-3
 .. _10x single cell ATAC sample index set names: https://support.10xgenomics.com/single-cell-atac/sequencing/doc/specifications-sample-index-sets-for-single-cell-atac
 .. _10x single cell V(D)J sample index set names: https://support.10xgenomics.com/single-cell-vdj/sequencing/doc/specifications-sample-index-sets-for-single-cell-vdj
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil

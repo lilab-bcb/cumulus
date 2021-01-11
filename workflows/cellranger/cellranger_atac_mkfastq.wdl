@@ -10,12 +10,15 @@ workflow cellranger_atac_mkfastq {
 		String output_directory
 
 		# Whether to delete input bcl directory. If false, you should delete this folder yourself so as to not incur storage charges.
-		Boolean delete_input_bcl_directory = true
+		Boolean delete_input_bcl_directory = false
 		# Number of allowed mismatches per index
 		Int? barcode_mismatches
 
-		# 1.2.0 or 1.1.0
-		String cellranger_atac_version = "1.2.0"
+		# cellranger-atac version
+		String cellranger_atac_version
+		# Which docker registry to use
+		String docker_registry
+
 		# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 		String zones = "us-central1-b"
 		# Number of cpus per cellranger-atac job
@@ -26,11 +29,7 @@ workflow cellranger_atac_mkfastq {
 		Int disk_space = 1500
 		# Number of preemptible tries 
 		Int preemptible = 2
-
-		# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-		String docker_registry = "cumulusprod"
 	}
-
 
 	call run_cellranger_atac_mkfastq {
 		input:
@@ -40,10 +39,10 @@ workflow cellranger_atac_mkfastq {
 			delete_input_bcl_directory = delete_input_bcl_directory,
 			barcode_mismatches = barcode_mismatches,
 			cellranger_atac_version = cellranger_atac_version,
+			docker_registry = docker_registry,
 			zones = zones,
 			num_cpu = num_cpu,
 			memory = memory,
-			docker_registry = docker_registry,
 			disk_space = disk_space,
 			preemptible = preemptible
 	}
@@ -61,35 +60,69 @@ task run_cellranger_atac_mkfastq {
 		File input_csv_file
 		String output_directory
 		Boolean delete_input_bcl_directory
+		Int? barcode_mismatches
 		String cellranger_atac_version
-		String zones
 		String docker_registry
+		String zones
 		Int num_cpu
 		String memory
 		Int disk_space
 		Int preemptible
-		Int? barcode_mismatches
 	}
 	
 	String run_id = basename(input_bcl_directory)
 	
-
 	command {
 		set -e
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
 		gsutil -q -m cp -r ~{input_bcl_directory} .
 		# cp -r ~{input_bcl_directory} .
-		cellranger-atac mkfastq --id=results --run=~{run_id} --csv=~{input_csv_file} --jobmode=local --qc ~{"--barcode-mismatches " + barcode_mismatches}
 
 		python <<CODE
 		import os
 		import glob
+		import sys
 		import pandas as pd
-		from subprocess import check_call
+		import subprocess
+
+		mkfastq_args = ['cellranger-atac', 'mkfastq', '--id=results', '--run=~{run_id}', '--csv=~{input_csv_file}', '--jobmode=local', '--qc']
+		barcode_mismatches = '~{barcode_mismatches}'
+		if barcode_mismatches != '':
+			mkfastq_args += ['--barcode-mismatches', barcode_mismatches]
+		p = subprocess.run(mkfastq_args)
+
+		if p.returncode != 0: # ./MAKE_FASTQS_CS/MAKE_FASTQS/BCL2FASTQ_WITH_SAMPLESHEET/fork0/chnk0-u8d92d5526b/_stderr
+			if os.path.exists('results/MAKE_FASTQS_CS/MAKE_FASTQS/BCL2FASTQ_WITH_SAMPLESHEET/fork0/'):
+				output_dirs = os.listdir('results/MAKE_FASTQS_CS/MAKE_FASTQS/BCL2FASTQ_WITH_SAMPLESHEET/fork0/')
+				for output in output_dirs:
+					if output.startswith('chnk0-'):
+						break
+				with open(os.path.join('results/MAKE_FASTQS_CS/MAKE_FASTQS/BCL2FASTQ_WITH_SAMPLESHEET/fork0/', output, '_stderr'), "r") as error_in:
+					for line in error_in:
+						print(line, file=sys.stderr)
+			sys.exit(1)
+
 		with open("output_fastqs_flowcell_directory.txt", "w") as fout:
 			flowcell = [name for name in os.listdir('results/outs/fastq_path') if name != 'Reports' and name != 'Stats' and os.path.isdir('results/outs/fastq_path/' + name)][0]
 			fout.write('~{output_directory}/~{run_id}_fastqs/fastq_path/' + flowcell + '\n')
+		
+		prefix = 'results/outs/fastq_path/' + flowcell + '/'
+		df = pd.read_csv('~{input_csv_file}', header = 0)
+		for sample_id in df['Sample'].unique():
+			dir_name = prefix + sample_id
+			if os.path.exists(dir_name):
+				continue
+			call_args = ['mkdir', '-p', dir_name]
+			subprocess.check_call(call_args)
+			files = glob.glob(dir_name + '_S*_L*_*_001.fastq.gz')
+			if len(files) == 0:
+				print("Warning: cannot extract any reads for sample " + sample_id + "!")
+			else:
+				call_args = ['mv']
+				call_args.extend(files)
+				call_args.append(dir_name);
+				subprocess.check_call(call_args)
 		CODE
 
 		gsutil -q -m rsync -d -r results/outs ~{output_directory}/~{run_id}_fastqs
@@ -107,7 +140,7 @@ task run_cellranger_atac_mkfastq {
 				check_call(call_args)
 				print('~{input_bcl_directory} is deleted!')
 			except CalledProcessError:
-				print("Failed to delete BCL directory.")
+				print("Failed to delete BCL directory from Google bucket.")
 		CODE
 	}
 

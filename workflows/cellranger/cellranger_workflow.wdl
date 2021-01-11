@@ -35,6 +35,10 @@ workflow cellranger_workflow {
 
         # Expected number of recovered cells. Mutually exclusive with force_cells
         Int? expect_cells
+        # If count reads mapping to intronic regions
+        Boolean include_introns = false
+        # If generate bam outputs
+        Boolean no_bam = false
         # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
         Boolean secondary = false
 
@@ -185,6 +189,8 @@ workflow cellranger_workflow {
                         output_directory = output_directory_stripped,
                         genome = generate_count_config.sample2genome[sample_id],
                         chemistry = generate_count_config.sample2chemistry[sample_id],
+                        include_introns = include_introns,
+                        no_bam = no_bam,
                         secondary = secondary,
                         force_cells = force_cells,
                         expect_cells = expect_cells,
@@ -217,7 +223,6 @@ workflow cellranger_workflow {
                         input_fastqs_directories = generate_count_config.sample2dir[sample_id],
                         output_directory = output_directory_stripped,
                         genome = generate_count_config.sample2genome[sample_id],
-                        force_cells = force_cells,
                         denovo = vdj_denovo,
                         chain = vdj_chain,
                         cellranger_version = cellranger_version,
@@ -288,6 +293,42 @@ workflow cellranger_workflow {
                 input:
                     summaries = cellranger_atac_count.output_metrics_summary,
                     sample_ids = cellranger_atac_count.output_count_directory,
+                    cellranger_version = cellranger_version,
+                    zones = zones,
+                    preemptible = preemptible,
+                    docker_registry = docker_registry_stripped
+            }
+        }
+
+        if (generate_count_config.sample_targeted_ids[0] != '') {
+            scatter (sample_id in generate_count_config.sample_targeted_ids) {
+                call crc.cellranger_count as cellranger_count_targeted {
+                    input:
+                        sample_id = sample_id,
+                        input_fastqs_directories = generate_count_config.sample2dir[sample_id],
+                        output_directory = output_directory_stripped,
+                        genome = generate_count_config.sample2genome[sample_id],
+                        target_panel = generate_count_config.sample2fbf[sample_id],
+                        chemistry = generate_count_config.sample2chemistry[sample_id],
+                        include_introns = include_introns,
+                        no_bam = no_bam,
+                        secondary = secondary,
+                        force_cells = force_cells,
+                        expect_cells = expect_cells,
+                        cellranger_version = cellranger_version,
+                        zones = zones,
+                        num_cpu = num_cpu,
+                        memory = memory,
+                        disk_space = count_disk_space,
+                        preemptible = preemptible,
+                        docker_registry = docker_registry_stripped
+                }
+            }
+
+            call collect_summaries as collect_summaries_targeted {
+                input:
+                    summaries = cellranger_count.output_metrics_summary,
+                    sample_ids = cellranger_count.output_count_directory,
                     cellranger_version = cellranger_version,
                     zones = zones,
                     preemptible = preemptible,
@@ -386,6 +427,7 @@ task generate_count_config {
         import re
         import sys
         import pandas as pd
+        from math import isnan
         from subprocess import check_call
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype=str)
@@ -406,7 +448,8 @@ task generate_count_config {
 
         with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2, open('sample2genome.txt', 'w') as fo3, open('sample2chemistry.txt', 'w') as fo4, \
              open('count_matrix.csv', 'w') as fo5, open('sample_vdj_ids.txt', 'w') as fo6, open('sample_feature_ids.txt', 'w') as fo7, \
-             open('sample2datatype.txt', 'w') as fo8, open('sample2fbf.txt', 'w') as fo9, open('sample_atac_ids.txt', 'w') as fo10:
+             open('sample2datatype.txt', 'w') as fo8, open('sample2fbf.txt', 'w') as fo9, open('sample_atac_ids.txt', 'w') as fo10, \
+             open('sample_targeted_ids.txt', 'w') as fo11:
 
             fo5.write('Sample,Location,Bam,BamIndex,Barcodes,Reference,Chemistry\n')
 
@@ -419,6 +462,8 @@ task generate_count_config {
                 if 'DataType' in df_local.columns:
                     assert df_local['DataType'].unique().size == 1
                     data_type = df_local['DataType'].iat[0]
+                if data_type == 'rna' and ('FeatureBarcodeFile' in df_local.columns) and (not isnan(df_local['FeatureBarcodeFile'].iat[0])):
+                    data_type = 'targeted'
 
                 if data_type == 'rna':
                     fo1.write(sample_id + '\n')
@@ -428,6 +473,8 @@ task generate_count_config {
                     fo7.write(sample_id + '\n')
                 elif data_type == 'atac':
                     fo10.write(sample_id + '\n')
+                elif data_type == 'targeted':
+                    fo11.write(sample_id + '\n')
                 else:
                     print('Invalid data type: ' + data_type + '!')
                     assert False
@@ -441,7 +488,7 @@ task generate_count_config {
                     fo3.write(sample_id + '\t' + reference + '\n')
                     n_ref += 1
 
-                if data_type == 'rna' or data_type == 'adt' or data_type == 'crispr':
+                if data_type == 'rna' or data_type == 'adt' or data_type == 'crispr' or data_type == 'targeted':
                     chemistry = 'auto'
                     if 'Chemistry' in df_local.columns:
                         assert df_local['Chemistry'].unique().size == 1
@@ -453,11 +500,11 @@ task generate_count_config {
                     fo4.write(sample_id + '\t' + chemistry + '\n')
                     n_chem += 1
 
-                if data_type == 'adt' or data_type == 'crispr':
-                    assert 'FeatureBarcodeFile' in df_local.columns
+                if data_type == 'adt' or data_type == 'crispr' or data_type == 'targeted':
+                    assert 'FeatureBarcodeFile' in df_local.columns:
                     assert df_local['FeatureBarcodeFile'].unique().size == 1
                     feature_barcode_file = df_local['FeatureBarcodeFile'].iat[0]
-                    assert feature_barcode_file != ''
+                    assert (not isnan(feature_barcode_file)) and (feature_barcode_file != '')
                     fo8.write(sample_id + '\t' + data_type + '\n')
                     fo9.write(sample_id + '\t' + feature_barcode_file + '\n')
                     n_fbf += 1
@@ -466,7 +513,8 @@ task generate_count_config {
                     prefix = '~{output_dir}/' + sample_id
                     bam = prefix + '/possorted_genome_bam.bam'
                     bai = prefix + '/possorted_genome_bam.bam.bai'
-                    if int('~{cellranger_version}'.split('.')[0]) >= 3:
+                    from packaging import version
+                    if version.parse('~{cellranger_version}') >= version.parse('3.0.0'):
                         count_matrix = prefix + '/filtered_feature_bc_matrix.h5'
                         barcodes = prefix + '/filtered_feature_bc_matrix/barcodes.tsv.gz'
                     else:
@@ -499,6 +547,7 @@ task generate_count_config {
         Map[String, String] sample2datatype = read_map('sample2datatype.txt')
         Map[String, String] sample2fbf = read_map('sample2fbf.txt')
         Array[String] sample_atac_ids = read_lines('sample_atac_ids.txt')
+        Array[String] sample_targeted_ids = read_lines('sample_targeted_ids.txt')
     }
 
     runtime {
