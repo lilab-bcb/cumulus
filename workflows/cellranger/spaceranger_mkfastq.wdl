@@ -76,8 +76,8 @@ task run_spaceranger_mkfastq {
 		set -e
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
-		#gsutil -q -m cp -r ~{input_bcl_directory} .
-		cp -r ~{input_bcl_directory} .
+		gsutil -q -m cp -r ~{input_bcl_directory} .
+		# cp -r ~{input_bcl_directory} .
 
 		python <<CODE
 		import os
@@ -125,8 +125,8 @@ task run_spaceranger_mkfastq {
 				subprocess.check_call(call_args)
 		CODE
 
-		#gsutil -q -m rsync -d -r results/outs ~{output_directory}/~{run_id}_fastqs
-		cp -r results/outs ~{output_directory}/~{run_id}_fastqs
+		gsutil -q -m rsync -d -r results/outs ~{output_directory}/~{run_id}_fastqs
+		# cp -r results/outs ~{output_directory}/~{run_id}_fastqs
 
 		python <<CODE
 		from subprocess import check_call, check_output, CalledProcessError
