@@ -117,11 +117,11 @@ global inputs
 	* - docker_registry
 	  - Docker registry to use. Notice that docker image for Bustools is seperate.
 
-	  	- "cumulusprod" for Docker Hub images;
+	  	- "quay.io/cumulus" for images on Red Hat registry;
 
-	  	- "quay.io/cumulus" for backup images on Red Hat registry.
-	  - "cumulusprod"
-	  - "cumulusprod"
+	  	- "cumulusprod" for backup images on Docker Hub.
+	  - "quay.io/cumulus"
+	  - "quay.io/cumulus"
 	* - config_version
 	  - Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Currently only one version is available: "0.1".
 	  - "0.1"

@@ -122,10 +122,10 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	* - docker_registry
 	  - Docker registry to use:
 
-	  	- "quay.io/cumulus" for docker images on Red Hat registry;
+	  	- "quay.io/cumulus" for images on Red Hat registry;
 
 		- "cumulusprod" for backup images on Docker Hub.
-	  -
+	  - "quay.io/cumulus"
 	  - "quay.io/cumulus"
 	* - zones
 	  - Google cloud zones to consider for execution.

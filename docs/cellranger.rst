@@ -352,11 +352,11 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
-		  	- "cumulusprod" for Docker Hub images;
+		  	- "quay.io/cumulus" for images on Red Hat registry;
 
-		  	- "quay.io/cumulus" for backup images on Red Hat registry.
-		  - "cumulusprod"
-		  - "cumulusprod"
+		  	- "cumulusprod" for backup images on Docker Hub.
+		  - "quay.io/cumulus"
+		  - "quay.io/cumulus"
 		* - cellranger_mkfastq_docker_registry
 		  - Docker registry to use for ``cellranger mkfastq``.
 		    Default is the registry to which only Broad users have access.
@@ -571,11 +571,11 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
-		  	- "cumulusprod" for Docker Hub images;
+		  	- "quay.io/cumulus" for images on Red Hat registry;
 
-		  	- "quay.io/cumulus" for backup images on Red Hat registry.
-		  - "cumulusprod"
-		  - "cumulusprod"
+		  	- "cumulusprod" for backup images on Docker Hub.
+		  - "quay.io/cumulus"
+		  - "quay.io/cumulus"
 		* - mkfastq_docker_registry
 		  - Docker registry to use for ``cellranger mkfastq``.
 		    Default is the registry to which only Broad users have access.
@@ -775,11 +775,11 @@ Workflow input
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
-	  	- "cumulusprod" for Docker Hub images;
+	  	- "quay.io/cumulus" for images on Red Hat registry;
 
-	  	- "quay.io/cumulus" for backup images on Red Hat registry.
-	  - "cumulusprod"
-	  - "cumulusprod"
+	  	- "cumulusprod" for backup images on Docker Hub.
+	  - "quay.io/cumulus"
+	  - "quay.io/cumulus"
 	* - zones
 	  - Google cloud zones
 	  - "us-central1-a us-west1-a"
@@ -908,11 +908,11 @@ To aggregate multiple scATAC-Seq samples, follow the instructions below:
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
-	  	- "cumulusprod" for Docker Hub images;
+	  	- "quay.io/cumulus" for images on Red Hat registry;
 
-	  	- "quay.io/cumulus" for backup images on Red Hat registry.
-	  - "cumulusprod"
-	  - "cumulusprod"
+	  	- "cumulusprod" for backup images on Docker Hub.
+	  - "quay.io/cumulus"
+	  - "quay.io/cumulus"
 
 3. Check out the output in ``output_directory/aggr_id`` folder, where ``output_directory`` and ``aggr_id`` are the inputs you set in Step 2.
 
@@ -1028,11 +1028,11 @@ For scIR-seq data, ``cellranger_workflow`` takes Illumina outputs as input and r
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
-	  	- "cumulusprod" for Docker Hub images;
+	  	- "quay.io/cumulus" for images on Red Hat registry;
 
-	  	- "quay.io/cumulus" for backup images on Red Hat registry.
-	  - "cumulusprod"
-	  - "cumulusprod"
+	  	- "cumulusprod" for backup images on Docker Hub.
+	  - "quay.io/cumulus"
+	  - "quay.io/cumulus"
 	* - cellranger_mkfastq_docker_registry
 	  - Docker registry to use for ``cellranger mkfastq``.
 	    Default is the registry to which only Broad users have access.
@@ -1201,11 +1201,11 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
-		  	- "cumulusprod" for Docker Hub images;
+		  	- "quay.io/cumulus" for images on Red Hat registry;
 
-		  	- "quay.io/cumulus" for backup images on Red Hat registry.
-		  - "cumulusprod"
-		  - "cumulusprod"
+		  	- "cumulusprod" for backup images on Docker Hub.
+		  - "quay.io/cumulus"
+		  - "quay.io/cumulus"
 		* - zones
 		  - Google cloud zones
 		  - "us-central1-a us-west1-a"
@@ -1294,11 +1294,11 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
-		  	- "cumulusprod" for Docker Hub images;
+		  	- "quay.io/cumulus" for images on Red Hat registry;
 
-		  	- "quay.io/cumulus" for backup images on Red Hat registry.
-		  - "cumulusprod"
-		  - "cumulusprod"
+		  	- "cumulusprod" for backup images on Docker Hub.
+		  - "quay.io/cumulus"
+		  - "quay.io/cumulus"
 		* - zones
 		  - Google cloud zones
 		  - "us-central1-a us-west1-a"
@@ -1391,11 +1391,11 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
-		  	- "cumulusprod" for Docker Hub images;
+		  	- "quay.io/cumulus" for images on Red Hat registry;
 
-		  	- "quay.io/cumulus" for backup images on Red Hat registry.
-		  - "cumulusprod"
-		  - "cumulusprod"
+		  	- "cumulusprod" for backup images on Docker Hub.
+		  - "quay.io/cumulus"
+		  - "quay.io/cumulus"
 		* - zones
 		  - Google cloud zones
 		  - "us-central1-a us-west1-a"
