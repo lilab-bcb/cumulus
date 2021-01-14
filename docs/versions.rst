@@ -21,7 +21,7 @@ Latest version
       - `3 <https://portal.firecloud.org/?return=terra#methods/cumulus/star_solo/3>`_
       - Run STARsolo to generate gene-count matrices fro FASTQ files.
     * - cumulus/count
-      - `16 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/16>`__
+      - `17 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/16>`__
       - Run alternative tools (STARsolo, Optimus, Salmon alevin, or Kallisto BUStools) to generate gene-count matrices from FASTQ files.
     * - cumulus/demultiplexing
       - `21 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/21>`_

@@ -132,6 +132,10 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	  	- "cumulusprod" for backup images on Docker Hub.
 	  - "quay.io/cumulus"
 	  - "quay.io/cumulus"
+	* - config_version
+	  - Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Currently only one version is available: ``0.1``.
+	  - "0.1"
+	  - "0.1"
 	* - zones
 	  - Google cloud zones to consider for execution.
 	  - "us-east1-d us-west1-a us-west1-b"

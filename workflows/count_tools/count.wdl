@@ -24,7 +24,8 @@ workflow count {
         Boolean run_count = true
         String count_tool = "StarSolo"
 
-        String docker_registry = "cumulusprod"
+        String docker_registry = "quay.io/cumulus"
+        String config_version = "0.1"
         Int num_cpu = 32
         Int disk_space = 500
         Int memory = 120
@@ -54,6 +55,7 @@ workflow count {
         input:
             input_tsv_file = input_tsv_file,
             docker_registry = docker_registry,
+            config_version = config_version,
             zones = zones,
             preemptible = preemptible
     }
@@ -175,6 +177,7 @@ task generate_count_config {
     input {
         File input_tsv_file
         String docker_registry
+        String config_version
         String zones
         Int preemptible
     }
@@ -247,7 +250,7 @@ task generate_count_config {
     }
 
     runtime {
-        docker: "~{docker_registry}/count"
+        docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: "~{preemptible}"
     }
