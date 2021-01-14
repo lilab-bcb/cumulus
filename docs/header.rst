@@ -12,9 +12,9 @@ Cumulus WDL workflows and Dockerfiles
    :target: https://cumulus.readthedocs.io/
 
 
-All of our docker images are publicly available on `Docker Hub`_ and Quay_. Our workflows use Docker Hub as the
-default Docker registry. Users can use Quay as the Docker registry by entering ``quay.io/cumulus/`` for the workflow
-input **"docker_registry"**, or enter a custom registry URL of their own choice.
+All of our docker images are publicly available on Quay_ and `Docker Hub`_. Our workflows use Quay as the
+default Docker registry. Users can use Docker Hub as the Docker registry by entering ``cumulusprod`` for the workflow
+input **"docker_registry"**, or enter a custom registry name of their own choice.
 
 If you use Cumulus in your research, please consider citing:
 

@@ -127,11 +127,11 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	* - docker_registry
 	  - Docker registry to use. Notice that docker image for Bustools is seperate.
 
-	  	- "cumulusprod" for Docker Hub images;
+	  	- "quay.io/cumulus" for images on Red Hat registry;
 
-	  	- "quay.io/cumulus" for backup images on Red Hat registry.
-	  -
-	  - "cumulusprod"
+	  	- "cumulusprod" for backup images on Docker Hub.
+	  - "quay.io/cumulus"
+	  - "quay.io/cumulus"
 	* - zones
 	  - Google cloud zones to consider for execution.
 	  - "us-east1-d us-west1-a us-west1-b"
