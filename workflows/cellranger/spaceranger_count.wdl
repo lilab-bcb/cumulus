@@ -161,7 +161,7 @@ task run_spaceranger_count {
 			sys.exit(1)
 
 		if ('~{area}' is '') or ('~{slide}' is ''):
-			call_args.append('--unknownslide')
+			call_args.append('--unknown-slide')
 		else:
 			call_args.extend(['--area=~{area}', '--slide=~{slide}'])
 			if '~{slidefile}' is not '':
