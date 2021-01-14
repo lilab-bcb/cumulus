@@ -1,11 +1,14 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/versions/4/plain-WDL/descriptor" as crac
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq/versions/3/plain-WDL/descriptor" as cram
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/5/plain-WDL/descriptor" as crc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/4/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/5/plain-WDL/descriptor" as crc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/6/plain-WDL/descriptor" as crv
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/6/plain-WDL/descriptor" as ca
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq/versions/3/plain-WDL/descriptor" as cram
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/versions/4/plain-WDL/descriptor" as crac
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_mkfastq/versions/?/plain-WDL/descriptor" as srm
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_count/versions/?/plain-WDL/descriptor" as src
+
 
 workflow cellranger_workflow {
     input {
@@ -75,6 +78,8 @@ workflow cellranger_workflow {
         String cellranger_atac_version = "1.2.0"
         # 0.3.0, 0.2.0
         String cumulus_feature_barcoding_version = "0.3.0"
+        # 0.1
+        String config_version = "0.1"
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
         # cellranger/cellranger-atac mkfastq registry, default to gcr.io/broad-cumulus
@@ -118,7 +123,7 @@ workflow cellranger_workflow {
             input:
                 input_csv_file = input_csv_file,
                 output_dir = output_directory_stripped,
-                cellranger_version = cellranger_version,
+                config_version = config_version,
                 zones = zones,
                 preemptible = preemptible,
                 docker_registry = docker_registry_stripped
@@ -134,10 +139,10 @@ workflow cellranger_workflow {
                         delete_input_bcl_directory = delete_input_bcl_directory,
                         barcode_mismatches = mkfastq_barcode_mismatches,
                         cellranger_version = cellranger_version,
+                        docker_registry = mkfastq_docker_registry_stripped,
                         zones = zones,
                         num_cpu = num_cpu,
                         memory = memory,
-                        docker_registry = mkfastq_docker_registry_stripped,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible
                 }
@@ -154,10 +159,30 @@ workflow cellranger_workflow {
                         delete_input_bcl_directory = delete_input_bcl_directory,
                         barcode_mismatches = mkfastq_barcode_mismatches,
                         cellranger_atac_version = cellranger_atac_version,
+                        docker_registry = mkfastq_docker_registry_stripped,
                         zones = zones,
                         num_cpu = num_cpu,
                         memory = memory,
+                        disk_space = mkfastq_disk_space,
+                        preemptible = preemptible
+                }
+            }
+        }
+
+        if (generate_bcl_csv.run_ids_spatial[0] != '') {
+            scatter (run_id in generate_bcl_csv.run_ids_spatial) {
+                call srm.spaceranger_mkfastq as spaceranger_mkfastq {
+                    input:
+                        input_bcl_directory = generate_bcl_csv.inpdirs[run_id],
+                        input_csv_file = generate_bcl_csv.bcls[run_id],
+                        output_directory = output_directory_stripped,
+                        delete_input_bcl_directory = delete_input_bcl_directory,
+                        barcode_mismatches = mkfastq_barcode_mismatches,
+                        spaceranger_version = spaceranger_version,
                         docker_registry = mkfastq_docker_registry_stripped,
+                        zones = zones,
+                        num_cpu = num_cpu,
+                        memory = memory,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible
                 }
@@ -174,7 +199,9 @@ workflow cellranger_workflow {
                 fastq_dirs = cellranger_mkfastq.output_fastqs_flowcell_directory,
                 run_ids_atac = generate_bcl_csv.run_ids_atac,
                 fastq_dirs_atac = cellranger_atac_mkfastq.output_fastqs_flowcell_directory,
-                cellranger_version = cellranger_version,
+                run_ids_spatial = generate_bcl_csv.run_ids_spatial,
+                fastq_dirs_spatial = spaceranger_mkfastq.output_fastqs_flowcell_directory,
+                config_version = config_version,
                 zones = zones,
                 preemptible = preemptible,
                 docker_registry = docker_registry_stripped
@@ -346,7 +373,7 @@ task generate_bcl_csv {
     input {
         File input_csv_file
         String output_dir
-        String cellranger_version
+        String config_version
         String zones
         Int preemptible
         String docker_registry
@@ -372,7 +399,7 @@ task generate_bcl_csv {
             print('Sample must contain only alphanumeric characters, hyphens, and underscores.')
             print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &')
             sys.exit(1)
-        with open('run_ids.txt', 'w') as fo1, open('inpdirs.txt', 'w') as fo2, open('bcls.txt', 'w') as fo3, open('run_ids_atac.txt', 'w') as fo4:
+        with open('run_ids.txt', 'w') as fo1, open('inpdirs.txt', 'w') as fo2, open('bcls.txt', 'w') as fo3, open('run_ids_atac.txt', 'w') as fo4, open('run_ids_spatial.txt', 'w') as fo5:
             for input_dir in df['Flowcell'].unique():
                 run_id = os.path.basename(input_dir)
                 bcl_df = df.loc[df['Flowcell'] == input_dir, ['Lane', 'Sample', 'Index']]
@@ -381,8 +408,13 @@ task generate_bcl_csv {
                 # call_args = ['cp', run_id + '_bcl.csv', '~{output_dir}/']
                 print(' '.join(call_args))
                 check_call(call_args)
-                if 'DataType' in df.columns and df.loc[df['Flowcell'] == input_dir, 'DataType'].iat[0] == 'atac':
+                datatype = 'rna'
+                if 'DataType' in df.columns:
+                    datatype = df.loc[df['Flowcell'] == input_dir, 'DataType'].iat[0]
+                if datatype == 'atac':
                     fo4.write(run_id + '\n')
+                elif datatype == 'spatial':
+                    fo5.write(run_id + '\n')
                 else:
                     fo1.write(run_id + '\n')
                 fo2.write(run_id + '\t' + input_dir + '\n')
@@ -393,12 +425,13 @@ task generate_bcl_csv {
     output {
         Array[String] run_ids = read_lines('run_ids.txt')
         Array[String] run_ids_atac = read_lines('run_ids_atac.txt')
+        Array[String] run_ids_spatial = read_lines('run_ids_spatial.txt')
         Map[String, String] inpdirs = read_map('inpdirs.txt')
         Map[String, String] bcls = read_map('bcls.txt')
     }
 
     runtime {
-        docker: "~{docker_registry}/cellranger:~{cellranger_version}"
+        docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: "~{preemptible}"
     }
@@ -412,7 +445,7 @@ task generate_count_config {
         Array[String]? fastq_dirs
         Array[String]? run_ids_atac
         Array[String]? fastq_dirs_atac
-        String cellranger_version
+        String config_version
         String zones
         Int preemptible
         String docker_registry
@@ -551,7 +584,7 @@ task generate_count_config {
     }
 
     runtime {
-        docker: "~{docker_registry}/cellranger:~{cellranger_version}"
+        docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: "~{preemptible}"
     }
