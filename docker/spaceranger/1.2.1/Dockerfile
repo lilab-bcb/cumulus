@@ -9,7 +9,6 @@ RUN apt-get update && \
     apt-get update && apt-get install -y google-cloud-sdk=322.0.0-0
 
 RUN pip3 install pandas && \
-    pip3 install xlsxwriter && \
     pip3 install packaging
 
 RUN mkdir /software

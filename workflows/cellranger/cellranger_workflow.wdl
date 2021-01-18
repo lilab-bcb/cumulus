@@ -6,9 +6,6 @@ import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/6/plain-WDL/descriptor" as ca
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq/versions/3/plain-WDL/descriptor" as cram
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/versions/4/plain-WDL/descriptor" as crac
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_mkfastq/versions/?/plain-WDL/descriptor" as srm
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_count/versions/?/plain-WDL/descriptor" as src
-
 
 workflow cellranger_workflow {
     input {
@@ -17,9 +14,9 @@ workflow cellranger_workflow {
         # Output directory, gs URL
         String output_directory
 
-        # If run cellranger mkfastq
+        # If run mkfastq
         Boolean run_mkfastq = true
-        # If run cellranger count
+        # If run count
         Boolean run_count = true
 
         # for mkfastq
@@ -29,20 +26,17 @@ workflow cellranger_workflow {
         # Number of allowed mismatches per index
         Int? mkfastq_barcode_mismatches
 
-        # common to cellranger count/vdj and cellranger-atac count
+        # For cellranger count
 
-        # Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells.
+        # Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells. This is also a cellranger-atac argument.
         Int? force_cells
-
-        # For count
-
         # Expected number of recovered cells. Mutually exclusive with force_cells
         Int? expect_cells
         # If count reads mapping to intronic regions
         Boolean include_introns = false
-        # If generate bam outputs
+        # If generate bam outputs. This is also a spaceranger argument.
         Boolean no_bam = false
-        # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
+        # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false. This is also a spaceranger argument.
         Boolean secondary = false
 
         # For vdj
@@ -71,22 +65,22 @@ workflow cellranger_workflow {
         # For atac, choose the algorithm for dimensionality reduction prior to clustering and tsne: 'lsa' (default), 'plsa', or 'pca'.
         String? atac_dim_reduce
 
-
         # 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
         String cellranger_version = "5.0.1"
-        # 1.2.0, 1.1.0
-        String cellranger_atac_version = "1.2.0"
         # 0.3.0, 0.2.0
         String cumulus_feature_barcoding_version = "0.3.0"
-        # 0.1
-        String config_version = "0.1"
+        # 1.2.0, 1.1.0
+        String cellranger_atac_version = "1.2.0"
+        # 0.2
+        String config_version = "0.2"
+
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
         # cellranger/cellranger-atac mkfastq registry, default to gcr.io/broad-cumulus
         String mkfastq_docker_registry = "gcr.io/broad-cumulus"
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-        # Number of cpus per cellranger job
+        # Number of cpus per cellranger and spaceranger job
         Int num_cpu = 32
         # Memory string
         String memory = "120G"
@@ -98,6 +92,7 @@ workflow cellranger_workflow {
 
         # Optional memory string for cumulus_adt
         String feature_memory = "32G"
+
         # Optional disk space for mkfastq.
         Int mkfastq_disk_space = 1500
         # Optional disk space needed for cell ranger count.
@@ -108,6 +103,7 @@ workflow cellranger_workflow {
         Int feature_disk_space = 100
         # Optional disk space needed for cellranger-atac count
         Int atac_disk_space = 500
+
         # Number of preemptible tries
         Int preemptible = 2
     }
@@ -122,19 +118,19 @@ workflow cellranger_workflow {
         call generate_bcl_csv {
             input:
                 input_csv_file = input_csv_file,
-                output_dir = output_directory_stripped,
                 config_version = config_version,
                 zones = zones,
                 preemptible = preemptible,
                 docker_registry = docker_registry_stripped
         }
 
-        if (generate_bcl_csv.run_ids[0] != '') {
-            scatter (run_id in generate_bcl_csv.run_ids) {
+        if (length(generate_bcl_csv.bcl_csv_rna) > 0) {
+            scatter (bcl_csv in generate_bcl_csv.bcl_csv_rna) {
+                String rna_key = basename(bcl_csv)
                 call crm.cellranger_mkfastq as cellranger_mkfastq {
                     input:
-                        input_bcl_directory = generate_bcl_csv.inpdirs[run_id],
-                        input_csv_file = generate_bcl_csv.bcls[run_id],
+                        input_bcl_directory = generate_bcl_csv.inpdirs[rna_key],
+                        input_csv_file = bcl_csv,
                         output_directory = output_directory_stripped,
                         delete_input_bcl_directory = delete_input_bcl_directory,
                         barcode_mismatches = mkfastq_barcode_mismatches,
@@ -149,36 +145,17 @@ workflow cellranger_workflow {
             }
         }
 
-        if (generate_bcl_csv.run_ids_atac[0] != '') {
-            scatter (run_id in generate_bcl_csv.run_ids_atac) {
+        if (length(generate_bcl_csv.bcl_csv_atac) > 0) {
+            scatter (bcl_csv in generate_bcl_csv.bcl_csv_atac) {
+                String atac_key = basename(bcl_csv)
                 call cram.cellranger_atac_mkfastq as cellranger_atac_mkfastq {
                     input:
-                        input_bcl_directory = generate_bcl_csv.inpdirs[run_id],
-                        input_csv_file = generate_bcl_csv.bcls[run_id],
+                        input_bcl_directory = generate_bcl_csv.inpdirs[atac_key],
+                        input_csv_file = bcl_csv,
                         output_directory = output_directory_stripped,
                         delete_input_bcl_directory = delete_input_bcl_directory,
                         barcode_mismatches = mkfastq_barcode_mismatches,
                         cellranger_atac_version = cellranger_atac_version,
-                        docker_registry = mkfastq_docker_registry_stripped,
-                        zones = zones,
-                        num_cpu = num_cpu,
-                        memory = memory,
-                        disk_space = mkfastq_disk_space,
-                        preemptible = preemptible
-                }
-            }
-        }
-
-        if (generate_bcl_csv.run_ids_spatial[0] != '') {
-            scatter (run_id in generate_bcl_csv.run_ids_spatial) {
-                call srm.spaceranger_mkfastq as spaceranger_mkfastq {
-                    input:
-                        input_bcl_directory = generate_bcl_csv.inpdirs[run_id],
-                        input_csv_file = generate_bcl_csv.bcls[run_id],
-                        output_directory = output_directory_stripped,
-                        delete_input_bcl_directory = delete_input_bcl_directory,
-                        barcode_mismatches = mkfastq_barcode_mismatches,
-                        spaceranger_version = spaceranger_version,
                         docker_registry = mkfastq_docker_registry_stripped,
                         zones = zones,
                         num_cpu = num_cpu,
@@ -195,12 +172,8 @@ workflow cellranger_workflow {
             input:
                 input_csv_file = input_csv_file,
                 output_dir = output_directory_stripped,
-                run_ids = generate_bcl_csv.run_ids,
                 fastq_dirs = cellranger_mkfastq.output_fastqs_flowcell_directory,
-                run_ids_atac = generate_bcl_csv.run_ids_atac,
                 fastq_dirs_atac = cellranger_atac_mkfastq.output_fastqs_flowcell_directory,
-                run_ids_spatial = generate_bcl_csv.run_ids_spatial,
-                fastq_dirs_spatial = spaceranger_mkfastq.output_fastqs_flowcell_directory,
                 config_version = config_version,
                 zones = zones,
                 preemptible = preemptible,
@@ -215,6 +188,7 @@ workflow cellranger_workflow {
                         input_fastqs_directories = generate_count_config.sample2dir[sample_id],
                         output_directory = output_directory_stripped,
                         genome = generate_count_config.sample2genome[sample_id],
+                        target_panel = generate_count_config.sample2fbf[sample_id],
                         chemistry = generate_count_config.sample2chemistry[sample_id],
                         include_introns = include_introns,
                         no_bam = no_bam,
@@ -235,7 +209,7 @@ workflow cellranger_workflow {
                 input:
                     summaries = cellranger_count.output_metrics_summary,
                     sample_ids = cellranger_count.output_count_directory,
-                    cellranger_version = cellranger_version,
+                    config_version = config_version,
                     zones = zones,
                     preemptible = preemptible,
                     docker_registry = docker_registry_stripped
@@ -266,7 +240,7 @@ workflow cellranger_workflow {
                 input:
                     summaries = cellranger_vdj.output_metrics_summary,
                     sample_ids = cellranger_vdj.output_vdj_directory,
-                    cellranger_version = cellranger_version,
+                    config_version = config_version,
                     zones = zones,
                     preemptible = preemptible,
                     docker_registry = docker_registry_stripped
@@ -320,43 +294,7 @@ workflow cellranger_workflow {
                 input:
                     summaries = cellranger_atac_count.output_metrics_summary,
                     sample_ids = cellranger_atac_count.output_count_directory,
-                    cellranger_version = cellranger_version,
-                    zones = zones,
-                    preemptible = preemptible,
-                    docker_registry = docker_registry_stripped
-            }
-        }
-
-        if (generate_count_config.sample_targeted_ids[0] != '') {
-            scatter (sample_id in generate_count_config.sample_targeted_ids) {
-                call crc.cellranger_count as cellranger_count_targeted {
-                    input:
-                        sample_id = sample_id,
-                        input_fastqs_directories = generate_count_config.sample2dir[sample_id],
-                        output_directory = output_directory_stripped,
-                        genome = generate_count_config.sample2genome[sample_id],
-                        target_panel = generate_count_config.sample2fbf[sample_id],
-                        chemistry = generate_count_config.sample2chemistry[sample_id],
-                        include_introns = include_introns,
-                        no_bam = no_bam,
-                        secondary = secondary,
-                        force_cells = force_cells,
-                        expect_cells = expect_cells,
-                        cellranger_version = cellranger_version,
-                        zones = zones,
-                        num_cpu = num_cpu,
-                        memory = memory,
-                        disk_space = count_disk_space,
-                        preemptible = preemptible,
-                        docker_registry = docker_registry_stripped
-                }
-            }
-
-            call collect_summaries as collect_summaries_targeted {
-                input:
-                    summaries = cellranger_count.output_metrics_summary,
-                    sample_ids = cellranger_count.output_count_directory,
-                    cellranger_version = cellranger_version,
+                    config_version = config_version,
                     zones = zones,
                     preemptible = preemptible,
                     docker_registry = docker_registry_stripped
@@ -372,7 +310,6 @@ workflow cellranger_workflow {
 task generate_bcl_csv {
     input {
         File input_csv_file
-        String output_dir
         String config_version
         String zones
         Int preemptible
@@ -390,44 +327,44 @@ task generate_bcl_csv {
         import pandas as pd
         from subprocess import check_call
 
-        df = pd.read_csv('~{input_csv_file}', header = 0, dtype=str, index_col=False)
+        df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
+
+        if 'DataType' not in df.columns:
+            df['DataType'] = 'rna'
+        else:
+            df.loc[df['DataType'].isna(), 'DataType'] = 'rna'
+
         for c in df.columns:
             df[c] = df[c].str.strip()
-        df['Flowcell'] = df['Flowcell'].map(lambda x: re.sub('/+$', '', x)) # remove trailing slashes
-        regex_pat = re.compile('[^a-zA-Z0-9_-]')
-        if any(df['Sample'].str.contains(regex_pat)):
-            print('Sample must contain only alphanumeric characters, hyphens, and underscores.')
-            print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &')
-            sys.exit(1)
-        with open('run_ids.txt', 'w') as fo1, open('inpdirs.txt', 'w') as fo2, open('bcls.txt', 'w') as fo3, open('run_ids_atac.txt', 'w') as fo4, open('run_ids_spatial.txt', 'w') as fo5:
+
+        for idx, row in df.iterrows():
+            row['Flowcell'] = re.sub('/+$', '', row['Flowcell'])
+            if row['DataType'] not in ['rna', 'vdj', 'adt', 'crispr', 'atac']:
+                print("Unknown DataType " + row['DataType'] + " is detected!", file = sys.stderr)
+                sys.exit(1)
+            if row['DataType'] in ['vdj', 'adt', 'crispr']:
+                row['DataType'] = 'rna'
+            if re.search('[^a-zA-Z0-9_-]', row['Sample']) is not None:
+                print('Sample must contain only alphanumeric characters, hyphens, and underscores.', file = sys.stderr)
+                print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &', file = sys.stderr)
+                sys.exit(1)
+
+        with open('inpdirs.txt', 'w') as fo:
             for input_dir in df['Flowcell'].unique():
                 run_id = os.path.basename(input_dir)
-                bcl_df = df.loc[df['Flowcell'] == input_dir, ['Lane', 'Sample', 'Index']]
-                bcl_df.to_csv(run_id + '_bcl.csv', index = False)
-                call_args = ['gsutil', 'cp', run_id + '_bcl.csv', '~{output_dir}/']
-                # call_args = ['cp', run_id + '_bcl.csv', '~{output_dir}/']
-                print(' '.join(call_args))
-                check_call(call_args)
-                datatype = 'rna'
-                if 'DataType' in df.columns:
-                    datatype = df.loc[df['Flowcell'] == input_dir, 'DataType'].iat[0]
-                if datatype == 'atac':
-                    fo4.write(run_id + '\n')
-                elif datatype == 'spatial':
-                    fo5.write(run_id + '\n')
-                else:
-                    fo1.write(run_id + '\n')
-                fo2.write(run_id + '\t' + input_dir + '\n')
-                fo3.write(run_id + '\t~{output_dir}/' + run_id + '_bcl.csv\n')
+                flowcell_df = df.loc[df['Flowcell'] == input_dir]
+                for datatype in flowcell_df['DataType'].unique():
+                    bcl_df = flowcell_df.loc[flowcell_df['DataType'] == datatype, ['Lane', 'Sample', 'Index']]
+                    bcl_file = run_id + '_' + datatype + '_bcl.csv'
+                    bcl_df.to_csv(bcl_file, index = False)
+                    fo.write(bcl_file + '\t' + input_dir + '\n')
         CODE
     }
 
     output {
-        Array[String] run_ids = read_lines('run_ids.txt')
-        Array[String] run_ids_atac = read_lines('run_ids_atac.txt')
-        Array[String] run_ids_spatial = read_lines('run_ids_spatial.txt')
         Map[String, String] inpdirs = read_map('inpdirs.txt')
-        Map[String, String] bcls = read_map('bcls.txt')
+        Array[File] bcl_csv_rna = glob('*_rna_bcl.csv')
+        Array[File] bcl_csv_atac = glob('*_atac_bcl.csv')
     }
 
     runtime {
@@ -441,9 +378,7 @@ task generate_count_config {
     input {
         File input_csv_file
         String output_dir
-        Array[String]? run_ids
         Array[String]? fastq_dirs
-        Array[String]? run_ids_atac
         Array[String]? fastq_dirs_atac
         String config_version
         String zones
@@ -460,127 +395,136 @@ task generate_count_config {
         import re
         import sys
         import pandas as pd
-        from math import isnan
         from subprocess import check_call
 
-        df = pd.read_csv('~{input_csv_file}', header = 0, dtype=str)
+
+        null_file = 'gs://regev-lab/resources/cellranger/null' # null file
+
+        df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
+
+        if 'DataType' not in df.columns:
+            df['DataType'] = 'rna'
+        else:
+            df.loc[df['DataType'].isna(), 'DataType'] = 'rna'
+
+        if 'Chemistry' not in df.columns:
+            df['Chemistry'] = 'auto'
+        else:
+            df.loc[df['Chemistry'].isna(), 'Chemistry'] = 'auto'
+
         for c in df.columns:
             df[c] = df[c].str.strip()
 
-        df['Flowcell'] = df['Flowcell'].map(lambda x: re.sub('/+$', '', x)) # remove trailing slashes
-        run_ids = '~{sep="," run_ids}'.split(',')
-        fastq_dirs = '~{sep="," fastq_dirs}'.split(',')
+        for idx, row in df.iterrows():
+            row['Flowcell'] = re.sub('/+$', '', row['Flowcell'])
+            if row['DataType'] not in ['rna', 'vdj', 'adt', 'crispr', 'atac']:
+                print("Unknown DataType " + row['DataType'] + " is detected!", file = sys.stderr)
+                sys.exit(1)
+            if re.search('[^a-zA-Z0-9_-]', row['Sample']) is not None:
+                print('Sample must contain only alphanumeric characters, hyphens, and underscores.', file = sys.stderr)
+                print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &', file = sys.stderr)
+                sys.exit(1)
 
-        run_ids.extend('~{sep="," run_ids_atac}'.split(','))
-        fastq_dirs.extend('~{sep="," fastq_dirs_atac}'.split(','))
+        def parse_fastq_dirs(dirs_str):
+            r2f = dict()
+            if dirs_str == '':
+                return r2f
+            dirs = dirs_str.split(',')
+            for dir in dirs:
+                run_id = dir.split('/')[-3].split('_')[0]
+                r2f[run_id] = dir
+            return r2f
 
-        rid2fdir = dict()
-        for run_id, fastq_dir in zip(run_ids, fastq_dirs):
-            if run_id is not '':
-                rid2fdir[run_id] = fastq_dir
+        r2f = parse_fastq_dirs('~{sep="," fastq_dirs}')
+        ar2f = parse_fastq_dirs('~{sep="," fastq_dirs_atac}')
 
-        with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2, open('sample2genome.txt', 'w') as fo3, open('sample2chemistry.txt', 'w') as fo4, \
-             open('count_matrix.csv', 'w') as fo5, open('sample_vdj_ids.txt', 'w') as fo6, open('sample_feature_ids.txt', 'w') as fo7, \
-             open('sample2datatype.txt', 'w') as fo8, open('sample2fbf.txt', 'w') as fo9, open('sample_atac_ids.txt', 'w') as fo10, \
-             open('sample_targeted_ids.txt', 'w') as fo11:
+        with open('sample_ids.txt', 'w') as fo1, open('sample_vdj_ids.txt', 'w') as fo2, open('sample_feature_ids.txt', 'w') as fo3, open('sample_atac_ids.txt', 'w') as fo4, \
+             open('sample2dir.txt', 'w') as foo1, open('sample2datatype.txt', 'w') as foo2, open('sample2genome.txt', 'w') as foo3, \
+             open('sample2chemistry.txt', 'w') as foo4, open('sample2fbf.txt', 'w') as foo5, open('count_matrix.csv', 'w') as foo6:
 
-            fo5.write('Sample,Location,Bam,BamIndex,Barcodes,Reference,Chemistry\n')
-
-            n_ref = n_chem = n_fbf = 0
-
+            n_ref = n_chem = n_fbf = 0 # this mappings can be empty
+            foo6.write('Sample,Location,Bam,BamIndex,Barcodes,Reference,Chemistry\n') # count_matrix.csv
+            datatype2fo = dict([('rna', fo1), ('vdj', fo2), ('adt', fo3), ('crispr', fo3), ('atac', fo4)])
+            datatype2r2f = dict([('rna', r2f), ('vdj', r2f), ('adt', r2f), ('crispr', r2f), ('atac', ar2f)])
             for sample_id in df['Sample'].unique():
                 df_local = df.loc[df['Sample'] == sample_id]
+                if df_local['DataType'].unique().size > 1:
+                    print('Detected multiple DataType values for sample ' + sample_id + '!', file = sys.stderr)
+                    sys.exit(1)
 
-                data_type = 'rna'
-                if 'DataType' in df_local.columns:
-                    assert df_local['DataType'].unique().size == 1
-                    data_type = df_local['DataType'].iat[0]
-                if data_type == 'rna' and ('FeatureBarcodeFile' in df_local.columns) and (not isnan(df_local['FeatureBarcodeFile'].iat[0])):
-                    data_type = 'targeted'
+                datatype = df_local['DataType'].iat[0]
+                datatype2fo[datatype].write(sample_id + '\n')
 
-                if data_type == 'rna':
-                    fo1.write(sample_id + '\n')
-                elif data_type == 'vdj':
-                    fo6.write(sample_id + '\n')
-                elif data_type == 'adt' or data_type == 'crispr':
-                    fo7.write(sample_id + '\n')
-                elif data_type == 'atac':
-                    fo10.write(sample_id + '\n')
-                elif data_type == 'targeted':
-                    fo11.write(sample_id + '\n')
+                rid2fdir = datatype2r2f[datatype]
+                if len(rid2fdir) > 0:
+                    dirs = df_local['Flowcell'].map(lambda x: rid2fdir[os.path.basename(x)]).values # if also run mkfastq
                 else:
-                    print('Invalid data type: ' + data_type + '!')
-                    assert False
+                    dirs = df_local['Flowcell'].values # if start from count step
+                foo1.write(sample_id + '\t' + ','.join(dirs) + '\n')
 
-                dirs = df_local['Flowcell'].map(lambda x: x if len(rid2fdir) == 0 else rid2fdir[os.path.basename(x)]).values
-                fo2.write(sample_id + '\t' + ','.join(dirs) + '\n')
+                foo2.write(sample_id + '\t' + datatype + '\n')
 
-                if data_type == 'rna' or data_type == 'vdj' or data_type == 'atac':
-                    assert df_local['Reference'].unique().size == 1
+                if datatype in ['rna', 'vdj', 'atac']:
+                    if df_local['Reference'].unique().size > 1:
+                        print("Detected multiple references for sample " + sample_id + "!", file = sys.stderr)
+                        sys.exit(1)
                     reference = df_local['Reference'].iat[0]
-                    fo3.write(sample_id + '\t' + reference + '\n')
+                    foo3.write(sample_id + '\t' + reference + '\n')
                     n_ref += 1
 
-                if data_type == 'rna' or data_type == 'adt' or data_type == 'crispr' or data_type == 'targeted':
-                    chemistry = 'auto'
-                    if 'Chemistry' in df_local.columns:
-                        assert df_local['Chemistry'].unique().size == 1
-                        chemistry = df_local['Chemistry'].iat[0]
-                        if str(chemistry) == 'nan':
-                            chemistry = 'auto'
-                    if chemistry == 'auto' and data_type != 'rna':
-                        chemistry = 'SC3Pv3'
-                    fo4.write(sample_id + '\t' + chemistry + '\n')
+                if datatype in ['rna', 'adt', 'crispr']:
+                    if df_local['Chemistry'].unique().size > 1:
+                        print("Detected multiple chemistry strings for sample " + sample_id + "!", file = sys.stderr)
+                        sys.exit(1)
+                    chemistry = df_local['Chemistry'].iat[0]
+                    if chemistry == 'auto' and datatype in ['adt', 'crispr']:
+                        chemistry = 'SC3Pv3' # default is different
+                    foo4.write(sample_id + '\t' + chemistry + '\n')
                     n_chem += 1
-
-                if data_type == 'adt' or data_type == 'crispr' or data_type == 'targeted':
-                    assert 'FeatureBarcodeFile' in df_local.columns:
-                    assert df_local['FeatureBarcodeFile'].unique().size == 1
-                    feature_barcode_file = df_local['FeatureBarcodeFile'].iat[0]
-                    assert (not isnan(feature_barcode_file)) and (feature_barcode_file != '')
-                    fo8.write(sample_id + '\t' + data_type + '\n')
-                    fo9.write(sample_id + '\t' + feature_barcode_file + '\n')
+                
+                if datatype in ['rna', 'adt', 'crispr']:
+                    has_fbf = ('FeatureBarcodeFile' in df_local.columns) and isinstance(df_local['FeatureBarcodeFile'].iat[0], str) and (df_local['FeatureBarcodeFile'].iat[0] != '')
+                    if has_fbf:
+                        if df_local['FeatureBarcodeFile'].unique().size > 1:
+                            print("Detected multiple feature barcode or target panel files for sample " + sample_id + "!", file = sys.stderr)
+                            sys.exit(1)
+                        feature_barcode_file = df_local['FeatureBarcodeFile'].iat[0]
+                    else:
+                        if datatype in ['adt', 'crispr']:
+                            print("Please specify one feature barcode file for sample " + sample_id + "!", file = sys.stderr)
+                            sys.exit(1)
+                        feature_barcode_file = null_file
+                    foo5.write(sample_id + '\t' + feature_barcode_file + '\n')
                     n_fbf += 1
 
-                if data_type == 'rna':
+                if datatype == 'rna':
                     prefix = '~{output_dir}/' + sample_id
                     bam = prefix + '/possorted_genome_bam.bam'
                     bai = prefix + '/possorted_genome_bam.bam.bai'
-                    from packaging import version
-                    if version.parse('~{cellranger_version}') >= version.parse('3.0.0'):
-                        count_matrix = prefix + '/filtered_feature_bc_matrix.h5'
-                        barcodes = prefix + '/filtered_feature_bc_matrix/barcodes.tsv.gz'
-                    else:
-                        count_matrix = prefix + '/filtered_gene_bc_matrices_h5.h5'
-                        barcodes = prefix + '/filtered_gene_bc_matrices/' + os.path.splitext(os.path.basename(reference))[0] + '/barcodes.tsv'
-                    fo5.write(sample_id + ',' + count_matrix + ',' + bam + ',' + bai + ',' + barcodes + ',' + reference + ',' + chemistry + '\n')
+                    count_matrix = prefix + '/filtered_feature_bc_matrix.h5' # assume cellranger version >= 3.0.0
+                    barcodes = prefix + '/filtered_feature_bc_matrix/barcodes.tsv.gz'
+                    foo6.write(sample_id + ',' + count_matrix + ',' + bam + ',' + bai + ',' + barcodes + ',' + reference + ',' + chemistry + '\n')
 
             if n_ref == 0:
-                fo3.write('null\tnull\n')
+                foo3.write('null\tnull\n')
             if n_chem == 0:
-                fo4.write('null\tnull\n')
+                foo4.write('null\tnull\n')
             if n_fbf == 0:
-                fo8.write('null\tnull\n')
-                fo9.write('null\tnull\n')
+                foo5.write('null\tnull\n')
         CODE
-
-        gsutil -m cp count_matrix.csv ~{output_dir}/
-        #mkdir -p ~{output_dir}
-        #cp count_matrix.csv ~{output_dir}/
     }
 
     output {
         Array[String] sample_ids = read_lines('sample_ids.txt')
-        Map[String, String] sample2dir = read_map('sample2dir.txt')
-        Map[String, String] sample2genome = read_map('sample2genome.txt')
-        Map[String, String] sample2chemistry = read_map('sample2chemistry.txt')
-        String count_matrix = "~{output_dir}/count_matrix.csv"
         Array[String] sample_vdj_ids = read_lines('sample_vdj_ids.txt')
         Array[String] sample_feature_ids = read_lines('sample_feature_ids.txt')
-        Map[String, String] sample2datatype = read_map('sample2datatype.txt')
-        Map[String, String] sample2fbf = read_map('sample2fbf.txt')
         Array[String] sample_atac_ids = read_lines('sample_atac_ids.txt')
-        Array[String] sample_targeted_ids = read_lines('sample_targeted_ids.txt')
+        Map[String, String] sample2dir = read_map('sample2dir.txt')
+        Map[String, String] sample2datatype = read_map('sample2datatype.txt')
+        Map[String, String] sample2genome = read_map('sample2genome.txt')
+        Map[String, String] sample2chemistry = read_map('sample2chemistry.txt')
+        Map[String, String] sample2fbf = read_map('sample2fbf.txt')
+        File count_matrix = "count_matrix.csv"
     }
 
     runtime {
@@ -594,7 +538,7 @@ task collect_summaries {
     input {
         Array[File] summaries
         Array[String] sample_ids
-        String cellranger_version
+        String config_version
         String zones
         Int preemptible
         String docker_registry
@@ -627,7 +571,7 @@ task collect_summaries {
     }
 
     runtime {
-        docker: "~{docker_registry}/cellranger:~{cellranger_version}"
+        docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: "~{preemptible}"
     }
