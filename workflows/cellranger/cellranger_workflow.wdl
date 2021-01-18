@@ -11,7 +11,7 @@ import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yimin
 import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/cellranger/cellranger_count.wdl" as crc
 import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/cellranger/cellranger_vdj.wdl" as crv
 import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/cumulus/cumulus_adt.wdl" as ca
-import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/cellranger/cellranger_arc_mkfastq.wdl" as cram
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/cellranger/cellranger_atac_mkfastq.wdl" as cram
 import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/cellranger/cellranger_atac_count.wdl" as crac
 
 workflow cellranger_workflow {
