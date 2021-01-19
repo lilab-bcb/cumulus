@@ -332,7 +332,6 @@ task generate_bcl_csv {
         import re
         import sys
         import pandas as pd
-        from subprocess import check_call
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
 
@@ -402,8 +401,6 @@ task generate_count_config {
         import re
         import sys
         import pandas as pd
-        from subprocess import check_call
-
 
         null_file = 'gs://regev-lab/resources/cellranger/null' # null file
 
@@ -438,7 +435,7 @@ task generate_count_config {
                 return r2f
             dirs = dirs_str.split(',')
             for dir in dirs:
-                run_id = dir.split('/')[-3].split('_')[0]
+                run_id = dir.split('/')[-3].rpartition('_')[0]
                 r2f[run_id] = dir
             return r2f
 
