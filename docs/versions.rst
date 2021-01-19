@@ -16,7 +16,7 @@ Stable version - v1.2.0
       - Function
     * - cumulus/cellranger_workflow
       - `15 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/15>`__
-      - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
+      - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generating count matrix using cellranger count or cellranger-atac count, running cellranger vdj or feature-barcode extraction.
     * - cumulus/spaceranger_workflow
       - `1 <https://portal.firecloud.org/?return=terra#methods/cumulus/spaceranger_workflow/1>`_
       - Run Space Ranger tools to process spatial transcriptomics data, which includes extracting sequence reads using spaceranger mkfastq, and generating count matrix using spaceranger count.
@@ -24,10 +24,10 @@ Stable version - v1.2.0
       - `3 <https://portal.firecloud.org/?return=terra#methods/cumulus/star_solo/3>`_
       - Run STARsolo to generate gene-count matrices fro FASTQ files.
     * - cumulus/count
-      - `17 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/17>`__
+      - `18 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/18>`__
       - Run alternative tools (STARsolo, Optimus, Salmon alevin, or Kallisto BUStools) to generate gene-count matrices from FASTQ files.
     * - cumulus/demultiplexing
-      - `21 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/21>`_
+      - `22 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/22>`_
       - Run tools (demuxEM, souporcell, or demuxlet) for cell-hashing/nucleus-hashing/genetic-pooling analysis.
     * - cumulus/cellranger_create_reference
       - `9 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/9>`__
@@ -43,7 +43,7 @@ Stable version - v1.2.0
       - Run Cell Ranger tools to build single-cell immune profiling references.
     * - cumulus/smartseq2
       - `7 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2/7>`__
-      - Run HISAT2/STAR/Bowtie2-RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files
+      - Run HISAT2/STAR/Bowtie2-RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files.
     * - cumulus/smartseq2_create_reference
       - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/8>`__
       - Generate user-customized genome references for SMART-Seq2 data.

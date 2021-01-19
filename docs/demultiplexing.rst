@@ -123,9 +123,9 @@ global inputs
 	  - "quay.io/cumulus"
 	  - "quay.io/cumulus"
 	* - config_version
-	  - Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Currently only one version is available: "0.1".
-	  - "0.1"
-	  - "0.1"
+	  - Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: ``0.2``, ``0.1``.
+	  - "0.2"
+	  - "0.2"
 	* - zones
 	  - Google cloud zones to consider for execution.
 	  - "us-east1-d us-west1-a us-west1-b"
