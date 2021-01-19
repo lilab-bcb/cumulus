@@ -52,7 +52,7 @@ workflow demultiplexing {
         Int demuxlet_memory = 10
         Int demuxlet_disk_space = 2
 
-        String config_version = "0.1"
+        String config_version = "0.2"
 
     }
 

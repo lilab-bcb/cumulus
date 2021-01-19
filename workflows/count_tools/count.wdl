@@ -25,7 +25,7 @@ workflow count {
         String count_tool = "StarSolo"
 
         String docker_registry = "quay.io/cumulus"
-        String config_version = "0.1"
+        String config_version = "0.2"
         Int num_cpu = 32
         Int disk_space = 500
         Int memory = 120

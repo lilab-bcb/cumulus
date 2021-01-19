@@ -1,7 +1,7 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_mkfastq/versions/?/plain-WDL/descriptor" as srm
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_count/versions/?/plain-WDL/descriptor" as src
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_mkfastq/versions/1/plain-WDL/descriptor" as srm
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_count/versions/1/plain-WDL/descriptor" as src
 
 workflow spaceranger_workflow {
     input {
@@ -216,7 +216,7 @@ task generate_count_config {
         import sys
         import pandas as pd
 
-        null_file = 'gs://regev-lab/resources/spaceranger/null' # null file
+        null_file = 'gs://regev-lab/resources/cellranger/null' # null file
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
 
