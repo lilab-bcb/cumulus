@@ -1,10 +1,7 @@
 version 1.0
 
-#import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_mkfastq/versions/?/plain-WDL/descriptor" as srm
-#import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_count/versions/?/plain-WDL/descriptor" as src
-
-import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/spaceranger/spaceranger_mkfastq.wdl" as srm
-import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/spaceranger/spaceranger_count.wdl" as src
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_mkfastq/versions/1/plain-WDL/descriptor" as srm
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_count/versions/1/plain-WDL/descriptor" as src
 
 workflow spaceranger_workflow {
     input {

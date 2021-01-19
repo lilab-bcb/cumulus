@@ -37,8 +37,8 @@ workflow cumulus_adt {
 		# Number of preemptible tries 
 		Int preemptible = 2
 
-		# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-		String docker_registry = "cumulusprod"
+		# Which docker registry to use: quay.io/cumulus (default), or cumulusprod
+		String docker_registry = "quay.io/cumulus"
 	}
 
 	# cell barcodes white list, from 10x genomics, can be either v2 or v3 chemistry

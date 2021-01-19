@@ -30,8 +30,8 @@ workflow cellranger_atac_count {
         # Number of preemptible tries 
         Int preemptible = 2
 
-        # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-        String docker_registry = "cumulusprod"
+        # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
+        String docker_registry = "quay.io/cumulus"
     }
 
     File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
