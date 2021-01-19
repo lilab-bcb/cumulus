@@ -219,7 +219,7 @@ task generate_count_config {
         import sys
         import pandas as pd
 
-        null_file = 'gs://regev-lab/resources/spaceranger/null' # null file
+        null_file = 'gs://regev-lab/resources/cellranger/null' # null file
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
 
