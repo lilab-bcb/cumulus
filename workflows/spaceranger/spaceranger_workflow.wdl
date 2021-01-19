@@ -8,7 +8,7 @@ import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yimin
 
 workflow spaceranger_workflow {
     input {
-        # 5 - 14 columns (Sample, Reference, Flowcell, Lane, Index, [Image, DarkImage, ColorizedImage, Slide, Area, Slidefile, ReorientImages, LoupeAlignment, TargetPanel])
+        # 5 - 14 columns (Sample, Reference, Flowcell, Lane, Index, [Image, DarkImage, ColorizedImage, Slide, Area, SlideFile, ReorientImages, LoupeAlignment, TargetPanel])
         File input_csv_file
         # Output directory, gs URL
         String output_directory
@@ -233,7 +233,7 @@ task generate_count_config {
                 print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &', file = sys.stderr)
                 sys.exit(1)
 
-        for c in ['Image', 'ColorizedImage', 'Slidefile', 'LoupeAlignment', 'TargetPanel']:
+        for c in ['Image', 'ColorizedImage', 'SlideFile', 'LoupeAlignment', 'TargetPanel']:
             if c not in df.columns:
                 df[c] = null_file
             else:
@@ -269,7 +269,7 @@ task generate_count_config {
             else:
                 dirs = df_local['Flowcell'].values # if start from count step
             out_str = df_local['Sample'].iat[0] + '\t' + ','.join(dirs) + '\t' + df_local['Reference'].iat[0]
-            for c in ['Image', 'DarkImage', 'ColorizedImage', 'Slide', 'Area', 'Slidefile', 'ReorientImages', 'LoupeAlignment', 'TargetPanel']:
+            for c in ['Image', 'DarkImage', 'ColorizedImage', 'Slide', 'Area', 'SlideFile', 'ReorientImages', 'LoupeAlignment', 'TargetPanel']:
                 out_str += '\t' + df_local[c].iat[0]
             print(out_str)
         CODE

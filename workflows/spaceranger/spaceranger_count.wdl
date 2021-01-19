@@ -20,9 +20,9 @@ workflow spaceranger_count {
         String? darkimagestr
         #A color composite of one or more fluorescence image channels saved as a single-page, single-file color .tiff or .jpg.
         File? colorizedimage
-        # Visium slide serial number. Required unless --unknown-slide is passed.
+        # Visium slide serial number. 
         String? slide
-        # Visium capture area identifier. Required unless --unknown-slide is passed. Options for Visium are A1, B1, C1, D1.
+        # Visium capture area identifier. Options for Visium are A1, B1, C1, D1.
         String? area
         # Slide layout file indicating capture spot and fiducial spot positions.
         File? slidefile
