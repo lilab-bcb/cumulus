@@ -105,7 +105,7 @@ task run_cellranger_atac_mkfastq {
 
         with open("output_fastqs_flowcell_directory.txt", "w") as fout:
             flowcell = [name for name in os.listdir('results/outs/fastq_path') if name != 'Reports' and name != 'Stats' and os.path.isdir('results/outs/fastq_path/' + name)][0]
-            fout.write('~{output_directory}/~{run_id}_atac_fastqs/fastq_path/' + flowcell + '\n')
+            fout.write('~{output_directory}/~{run_id}_atacfastqs/fastq_path/' + flowcell + '\n')
         
         prefix = 'results/outs/fastq_path/' + flowcell + '/'
         df = pd.read_csv('~{input_csv_file}', header = 0)
@@ -125,14 +125,14 @@ task run_cellranger_atac_mkfastq {
                 subprocess.check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs ~{output_directory}/~{run_id}_atac_fastqs
-        # cp -r results/outs ~{output_directory}/~{run_id}_atac_fastqs
+        gsutil -q -m rsync -d -r results/outs ~{output_directory}/~{run_id}_atacfastqs
+        # cp -r results/outs ~{output_directory}/~{run_id}_atacfastqs
 
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError
         if '~{delete_input_bcl_directory}' is 'true':
             try:
-                call_args = ['gsutil', '-q', 'stat', '~{output_directory}/~{run_id}_atac_fastqs/input_samplesheet.csv']
+                call_args = ['gsutil', '-q', 'stat', '~{output_directory}/~{run_id}_atacfastqs/input_samplesheet.csv']
                 print(' '.join(call_args))
                 check_output(call_args)
                 call_args = ['gsutil', '-q', '-m', 'rm', '-r', '~{input_bcl_directory}']
@@ -145,7 +145,7 @@ task run_cellranger_atac_mkfastq {
     }
 
     output {
-        String output_fastqs_directory = "~{output_directory}/~{run_id}_atac_fastqs"
+        String output_fastqs_directory = "~{output_directory}/~{run_id}_atacfastqs"
         String output_fastqs_flowcell_directory = read_lines("output_fastqs_flowcell_directory.txt")[0]
         File monitoringLog = "monitoring.log"
     }

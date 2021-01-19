@@ -147,7 +147,7 @@ task run_spaceranger_count {
             fastqs.append('~{sample_id}_' + str(i))
 
         call_args = ['spaceranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local']
-        if '~{target_panel}' is not '':
+        if ('~{target_panel}' is not '') and (os.path.basename('~{target_panel}') is not 'null'):
             call_args.append('--target-panel=~{target_panel}')
 
         ntrue = ('~{image}' is not '') + ('~{sep=";" darkimage}' is not '') + ('~{colorizedimage}' is not '')
