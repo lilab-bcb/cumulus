@@ -1,7 +1,7 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_mkfastq/versions/4/plain-WDL/descriptor" as srm
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_count/versions/5/plain-WDL/descriptor" as src
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_mkfastq/versions/?/plain-WDL/descriptor" as srm
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_count/versions/?/plain-WDL/descriptor" as src
 
 workflow spaceranger_workflow {
     input {
@@ -36,11 +36,11 @@ workflow spaceranger_workflow {
 
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
-        # cellranger/cellranger-atac mkfastq registry, default to gcr.io/broad-cumulus
+        # spaceranger/spaceranger-atac mkfastq registry, default to gcr.io/broad-cumulus
         String mkfastq_docker_registry = "gcr.io/broad-cumulus"
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-        # Number of cpus per cellranger and spaceranger job
+        # Number of cpus per spaceranger and spaceranger job
         Int num_cpu = 32
         # Memory string
         String memory = "120G"
@@ -80,7 +80,7 @@ workflow spaceranger_workflow {
                         output_directory = output_directory_stripped,
                         delete_input_bcl_directory = delete_input_bcl_directory,
                         barcode_mismatches = mkfastq_barcode_mismatches,
-                        cellranger_version = cellranger_version,
+                        spaceranger_version = spaceranger_version,
                         docker_registry = mkfastq_docker_registry_stripped,
                         zones = zones,
                         num_cpu = num_cpu,
@@ -103,45 +103,43 @@ workflow spaceranger_workflow {
                 docker_registry = docker_registry_stripped
         }
 
-        if (generate_count_config.sample_ids[0] != '') {
-            scatter (sample_id in generate_count_config.sample_ids) {
-                call crc.cellranger_count as cellranger_count {
-                    input:
-                        sample_id = sample_id,
-                        input_fastqs_directories = generate_count_config.sample2dir[sample_id],
-                        output_directory = output_directory_stripped,
-                        genome = generate_count_config.sample2genome[sample_id],
-                        target_panel = generate_count_config.sample2fbf[sample_id],
-                        chemistry = generate_count_config.sample2chemistry[sample_id],
-                        include_introns = include_introns,
-                        no_bam = no_bam,
-                        secondary = secondary,
-                        force_cells = force_cells,
-                        expect_cells = expect_cells,
-                        cellranger_version = cellranger_version,
-                        zones = zones,
-                        num_cpu = num_cpu,
-                        memory = memory,
-                        disk_space = count_disk_space,
-                        preemptible = preemptible,
-                        docker_registry = docker_registry_stripped
-                }
-            }
-
-            call collect_summaries {
+        scatter (sample_row in generate_count_config.sample_table) {
+            call src.spaceranger_count as spaceranger_count {
                 input:
-                    summaries = cellranger_count.output_metrics_summary,
-                    sample_ids = cellranger_count.output_count_directory,
-                    config_version = config_version,
+                    sample_id = sample_row[0],
+                    input_fastqs_directories = sample_row[1],
+                    output_directory = output_directory_stripped,
+                    genome = sample_row[2],
+                    image = sample_row[3],
+                    darkimagestr = sample_row[4],
+                    colorizedimage = sample_row[5],
+                    slide = sample_row[6],
+                    area = sample_row[7],
+                    slidefile = sample_row[8],
+                    reorient_images = read_boolean(sample_row[9]),
+                    loupe_alignment = sample_row[10],
+                    target_panel = sample_row[11],
+                    no_bam = no_bam,
+                    secondary = secondary,
+                    spaceranger_version = spaceranger_version,
+                    docker_registry = docker_registry_stripped,
                     zones = zones,
-                    preemptible = preemptible,
-                    docker_registry = docker_registry_stripped
+                    num_cpu = num_cpu,
+                    memory = memory,
+                    disk_space = count_disk_space,
+                    preemptible = preemptible
             }
         }
-    }
 
-    output {
-        String? count_matrix = generate_count_config.count_matrix
+        call collect_summaries {
+            input:
+                summaries = spaceranger_count.output_metrics_summary,
+                sample_ids = spaceranger_count.output_count_directory,
+                config_version = config_version,
+                zones = zones,
+                preemptible = preemptible,
+                docker_registry = docker_registry_stripped
+        }
     }
 }
 
@@ -201,7 +199,6 @@ task generate_bcl_csv {
 task generate_count_config {
     input {
         File input_csv_file
-        String output_dir
         Array[String]? fastq_dirs
         String config_version
         String zones
@@ -219,7 +216,7 @@ task generate_count_config {
         import sys
         import pandas as pd
 
-        null_file = 'gs://regev-lab/resources/cellranger/null' # null file
+        null_file = 'gs://regev-lab/resources/spaceranger/null' # null file
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
 
@@ -256,7 +253,7 @@ task generate_count_config {
                 return r2f
             dirs = dirs_str.split(',')
             for dir in dirs:
-                run_id = dir.split('/')[-3].split('_')[0]
+                run_id = dir.split('/')[-3].rpartition('_')[0]
                 r2f[run_id] = dir
             return r2f
 
@@ -268,7 +265,7 @@ task generate_count_config {
                 dirs = df_local['Flowcell'].map(lambda x: rid2fdir[os.path.basename(x)]).values # if also run mkfastq
             else:
                 dirs = df_local['Flowcell'].values # if start from count step
-            out_str = df_local['Sample'].iat[0] + '\t' + df_local['Reference'].iat[0] + '\t' + ','.join(dirs)
+            out_str = df_local['Sample'].iat[0] + '\t' + ','.join(dirs) + '\t' + df_local['Reference'].iat[0]
             for c in ['Image', 'DarkImage', 'ColorizedImage', 'Slide', 'Area', 'Slidefile', 'ReorientImages', 'LoupeAlignment', 'TargetPanel']:
                 out_str += '\t' + df_local[c].iat[0]
             print(out_str)
