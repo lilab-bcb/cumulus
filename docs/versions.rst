@@ -4,7 +4,7 @@ Latest and stable versions on Terra_
 Cumulus is a fast growing project. As a result, we frequently update WDL snapshot versions on Terra_.
 See below for latest and stable WDL versions you can use.
 
-Latest version
+Stable version - v1.2.0
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table::
@@ -15,8 +15,11 @@ Latest version
       - Snapshot
       - Function
     * - cumulus/cellranger_workflow
-      - `14 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/14>`__
+      - `15 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/15>`__
       - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generate count matrix using cellranger count or cellranger-atac count, run cellranger vdj or feature-barcode extraction
+    * - cumulus/spaceranger_workflow
+      - `1 <https://portal.firecloud.org/?return=terra#methods/cumulus/spaceranger_workflow/1>`_
+      - Run Space Ranger tools to process spatial transcriptomics data, which includes extracting sequence reads using spaceranger mkfastq, and generating count matrix using spaceranger count.
     * - cumulus/star_solo
       - `3 <https://portal.firecloud.org/?return=terra#methods/cumulus/star_solo/3>`_
       - Run STARsolo to generate gene-count matrices fro FASTQ files.

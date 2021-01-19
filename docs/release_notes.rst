@@ -10,7 +10,7 @@ Version 1.2.0 `January 19, 2021`
     * Remove --force-cells option for cellranger vdj as noted in cellranger 5.0.0 release note
     * Add GRCh38_vdj_v5.0.0 and GRCm38_vdj_v5.0.0 references
 * Bug fix on *cumulus* workflow.
-* Reorganize the sidebar.
+* Reorganize the sidebar of Cumulus documentation website.
 
 Version 1.1.0 `December 28, 2020`
 ---------------------------------
