@@ -14,6 +14,7 @@
    :hidden:
 
    cellranger
+   spaceranger
    starsolo
    demultiplexing
    cumulus

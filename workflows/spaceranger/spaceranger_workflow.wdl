@@ -119,7 +119,7 @@ workflow spaceranger_workflow {
                     slide = sample_row[6],
                     area = sample_row[7],
                     slidefile = sample_row[8],
-                    reorient_images = read_boolean(sample_row[9]),
+                    reorient_images = (sample_row[9] == 'true'),
                     loupe_alignment = sample_row[10],
                     target_panel = sample_row[11],
                     no_bam = no_bam,
