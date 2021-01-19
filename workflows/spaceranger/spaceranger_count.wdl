@@ -12,13 +12,12 @@ workflow spaceranger_count {
         # A reference genome name or a URL to a tar.gz file
         String genome
 
-        # Target panel CSV for targeted gene expression analysis
-        File? target_panel
-
         # Brightfield tissue H&E image in .jpg or .tiff format.
         File? image
         # Multi-channel, dark-background fluorescence image as either a single, multi-layer .tiff file, multiple .tiff or .jpg files, or a pre-combined color .tiff or .jpg file.
         Array[File]? darkimage
+        # A semi-colon ';' separated string denoting all dark images. This option is equivalent to darkimage and should only be used by spaceranger_workflow
+        String? darkimagestr
         #A color composite of one or more fluorescence image channels saved as a single-page, single-file color .tiff or .jpg.
         File? colorizedimage
         # Visium slide serial number. Required unless --unknown-slide is passed.
@@ -31,6 +30,9 @@ workflow spaceranger_count {
         Boolean reorient_images = false
         # Alignment file produced by the manual Loupe alignment step. A --image must be supplied in this case.
         File? loupe_alignment
+
+        # Target panel CSV for targeted gene expression analysis
+        File? target_panel
 
         # If generate bam outputs
         Boolean no_bam = false
@@ -68,15 +70,16 @@ workflow spaceranger_count {
             input_fastqs_directories = input_fastqs_directories,
             output_directory = sub(output_directory, "/+$", ""),
             genome_file = genome_file,
-            target_panel = target_panel,
             image = image,
             darkimage = darkimage,
+            darkimagestr = darkimagestr,
             colorizedimage = colorizedimage,
             slide = slide,
             area = area,
             slidefile = slidefile,
             reorient_images = reorient_images,
             loupe_alignment = loupe_alignment,
+            target_panel = target_panel,
             no_bam = no_bam,
             secondary = secondary,
             spaceranger_version = spaceranger_version,
@@ -102,15 +105,16 @@ task run_spaceranger_count {
         String input_fastqs_directories
         String output_directory
         File genome_file
-        File? target_panel
         File? image
         Array[File]? darkimage
+        String? darkimagestr
         File? colorizedimage
         String? slide
         String? area
         File? slidefile
         Boolean reorient_images
         File? loupe_alignment
+        File? target_panel
         Boolean no_bam
         Boolean secondary
         String spaceranger_version
@@ -130,6 +134,7 @@ task run_spaceranger_count {
         tar xf ~{genome_file} -C genome_dir --strip-components 1
 
         python <<CODE
+        import os
         import re
         import sys
         from subprocess import check_call
@@ -147,10 +152,32 @@ task run_spaceranger_count {
             fastqs.append('~{sample_id}_' + str(i))
 
         call_args = ['spaceranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local']
-        if ('~{target_panel}' is not '') and (os.path.basename('~{target_panel}') is not 'null'):
+
+        def not_null(input_file):
+            return (input_file is not '') and (os.path.basename(input_file) != 'null')
+
+        def get_darkimages(darkimage, darkimagestr):
+            darkimages = []
+            if darkimage != '':
+                darkimages = darkimage.split(';')
+            elif darkimagestr != '':
+                for i, file in enumerate(darkimagestr.split(';')):
+                    local_file = '_' + str(i) + '_' + os.path.basename(file)
+                    call_args = ['gsutil', '-q', 'cp', file, local_file]
+                    # call_args = ['cp', file, local_file]
+                    print(' '.join(call_args))
+                    check_call(call_args)
+                    darkimages.append(local_file)
+            return darkimages
+
+        if not_null('~{target_panel}'):
             call_args.append('--target-panel=~{target_panel}')
 
-        ntrue = ('~{image}' is not '') + ('~{sep=";" darkimage}' is not '') + ('~{colorizedimage}' is not '')
+        has_image = not_null('~{image}')
+        darkimages = get_darkimages('~{sep=";" darkimage}', '~{darkimagestr}')
+        has_cimage = not_null('~{colorizedimage}')
+
+        ntrue = has_image + (len(darkimages) > 0) + has_cimage
         if ntrue == 0:
             print("Please set one of the following arguments: image, darkimage or colorizedimage!", file = sys.stderr)
             sys.exit(1)
@@ -158,10 +185,10 @@ task run_spaceranger_count {
             print("Please only set one of the following arguments: image, darkimage or colorizedimage!", file = sys.stderr)
             sys.exit(1)
 
-        if '~{image}' is not '':
+        if has_image:
             call_args.append('--image=~{image}')
-        elif '~{sep=";" darkimage}' is not '':
-            call_args.extend(['--darkimage=' + x for x in '~{sep=";" darkimage}'.split(';')])
+        elif len(darkimages) > 0:
+            call_args.extend(['--darkimage=' + x for x in darkimages])
         else:
             call_args.append('--colorizedimage=~{colorizedimage}')
 
@@ -175,19 +202,18 @@ task run_spaceranger_count {
                 print("Please provide an input for the 'slide' argument!", file = sys.stderr)
                 sys.exit(1)
             call_args.extend(['--area=~{area}', '--slide=~{slide}'])
-            if '~{slidefile}' is not '':
+            if not_null('~{slidefile}'):
                 call_args.append('--slidefile=~{slidefile}')
 
         if '~{reorient_images}' is 'true':
             call_args.append('--reorient_images')
-        if '~{loupe_alignment}' is not '':
-            if '~{image}' is '':
+        if not_null('~{loupe_alignment}'):
+            if not has_image:
                 print("image option must be set if loupe_alignment is set!", file = sys.stderr)
                 sys.exit(1)
             call_args.append('--loupe_alignment=~{loupe_alignment}')
 
         if '~{no_bam}' is 'true':
-            assert version.parse('~{spaceranger_version}') >= version.parse('5.0.0')
             call_args.append('--no-bam')
         if '~{secondary}' is not 'true':
             call_args.append('--nosecondary')
