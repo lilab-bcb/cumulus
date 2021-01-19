@@ -80,7 +80,7 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		* - **Reference**
 		  -
 		  	| Provides the reference genome used by Cell Ranger for each 10x channel.
-		  	| The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as *GRCh38_v3.0.0*.
+		  	| The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as *GRCh38-2020-A*.
 		  	| A full list of available keywords is included in each of the following data type sections (e.g. sc/snRNA-seq) below.
 		* - **Flowcell**
 		  -
@@ -116,14 +116,14 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 	Example::
 
 		Sample,Reference,Flowcell,Lane,Index,Chemistry,DataType
-		sample_1,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,threeprime,rna
-		sample_2,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3-4,SI-GA-B8,SC3Pv3,rna
-		sample_3,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,5-6,SI-GA-C8,fiveprime,rna
-		sample_4,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,7-8,SI-GA-D8,fiveprime,rna
-		sample_1,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,1-2,SI-GA-A8,threeprime,rna
-		sample_2,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,3-4,SI-GA-B8,SC3Pv3,rna
-		sample_3,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,5-6,SI-GA-C8,fiveprime,rna
-		sample_4,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,7-8,SI-GA-D8,fiveprime,rna
+		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,threeprime,rna
+		sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3-4,SI-GA-B8,SC3Pv3,rna
+		sample_3,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,5-6,SI-GA-C8,fiveprime,rna
+		sample_4,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,7-8,SI-GA-D8,fiveprime,rna
+		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,1-2,SI-GA-A8,threeprime,rna
+		sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,3-4,SI-GA-B8,SC3Pv3,rna
+		sample_3,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,5-6,SI-GA-C8,fiveprime,rna
+		sample_4,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,7-8,SI-GA-D8,fiveprime,rna
 
 	**3.2 Upload your sample sheet to the workspace bucket:**
 
@@ -170,7 +170,7 @@ Sometimes, users might want to perform demultiplexing locally and only run the c
 	Example::
 
 		Sample,Reference,Flowcell
-		sample_1,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq
+		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq
 
 #. Set optional input ``run_mkfastq`` to ``false``.
 
@@ -308,7 +308,7 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		* - **output_directory**
 		  - Output directory
 		  - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_output"
-		  - Results are written to $output_directory/$bcl_directory_fastqs/fastq_path/ and will overwrite any existing files at this location.
+		  - Results are written under directory *output_directory* and will overwrite any existing files at this location.
 		* - run_mkfastq
 		  - If you want to run ``cellranger mkfastq``
 		  - true
@@ -349,6 +349,10 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  - cellranger version, could be 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
 		  - "5.0.1"
 		  - "5.0.1"
+		* - config_version
+		  - config docker version used for processing sample sheets, could be 0.2, 0.1
+		  - "0.2"
+		  - "0.2"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
