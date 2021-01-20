@@ -201,7 +201,7 @@ Sample sheet
 		* - **GRCh38_and_mm10-2020-A**
 		  - Human GRCh38 (GENCODE v32/Ensembl 98) and mouse mm10 (GENCODE vM23/Ensembl 98)
 		* - **GRCh38_v3.0.0**
-		  - Human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation
+		  - Human GRCh38, spaceranger reference 3.0.0, Ensembl v93 gene annotation
 		* - **hg19_v3.0.0**
 		  - Human hg19, cellranger reference 3.0.0, Ensembl v87 gene annotation
 		* - **mm10_v3.0.0**
@@ -290,7 +290,7 @@ For spatial data, ``spaceranger_workflow`` takes Illumina outputs and related im
 		  - "0.2"
 		  - "0.2"
 		* - docker_registry
-		  - Docker registry to use for cellranger_workflow. Options:
+		  - Docker registry to use for spaceranger_workflow. Options:
 
 		  	- "quay.io/cumulus" for images on Red Hat registry;
 
@@ -308,11 +308,11 @@ For spatial data, ``spaceranger_workflow`` takes Illumina outputs and related im
 		  - "us-central1-a us-west1-a"
 		  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		* - num_cpu
-		  - Number of cpus to request for one node for cellranger mkfastq and cellranger count
+		  - Number of cpus to request for one node for spaceranger mkfastq and spaceranger count
 		  - 32
 		  - 32
 		* - memory
-		  - Memory size string for cellranger mkfastq and cellranger count
+		  - Memory size string for spaceranger mkfastq and spaceranger count
 		  - "120G"
 		  - "120G"
 		* - mkfastq_disk_space
@@ -320,7 +320,7 @@ For spatial data, ``spaceranger_workflow`` takes Illumina outputs and related im
 		  - 1500
 		  - 1500
 		* - count_disk_space
-		  - Disk space in GB needed for cellranger count
+		  - Disk space in GB needed for spaceranger count
 		  - 500
 		  - 500
 		* - preemptible
