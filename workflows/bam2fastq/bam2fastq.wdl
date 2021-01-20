@@ -57,10 +57,10 @@ task convert_to_fastq {
 
         samtools fastq -n -0 ~{sample_id}_sam.fastq -T on,QX,OQ,CR,CY ~{input_bam}
         python /software/process_fastq.py ~{sample_id}_sam.fastq ~{sample_id}
-        tar -czf ~{sample_id}_R1.fastq.gz ~{sample_id}_R1.fastq
-        tar -czf ~{sample_id}_R2.fastq.gz ~{sample_id}_R2.fastq
+        gzip ~{sample_id}_R1.fastq
+        gzip ~{sample_id}_R2.fastq
 
-        gsutil cp ~{sample_id}_R1.fastq.gz ~{sample_id}_R2.fastq.gz ~{output_directory}/
+        gsutil -q -m cp ~{sample_id}_R1.fastq.gz ~{sample_id}_R2.fastq.gz ~{output_directory}/
     }
 
     output {
