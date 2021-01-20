@@ -4,6 +4,7 @@ Version 1.2.0 `January 19, 2021`
 * Add *spaceranger* workflow:
     * Wrap up spaceranger version 1.2.1
 * On *cellranger* workflow:
+    * Fix workflow WDL to support both single index and dual index
     * Add support for cellranger version 5.0.0 and 5.0.1
     * Add support for targeted gene expression analysis
     * Add support for ``--include-introns`` and ``--no-bam`` options for cellranger count
