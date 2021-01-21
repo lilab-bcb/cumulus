@@ -72,7 +72,7 @@ task convert_to_fastq {
         docker: "~{docker_registry}/samtools:~{samtools_version}"
         zones: zones
         memory: "~{memory}G"
-        disks: "local_disk ~{disk_space} HDD"
+        disks: "local-disk ~{disk_space} HDD"
         cpu: "~{num_cpu}"
         preemptible: "~{preemptible}"
     }
