@@ -55,16 +55,21 @@ task convert_to_fastq {
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
 
+        mkdir -p output
+        samtools view -H ~{input_bam} > bam_header.log
         samtools fastq -n -0 ~{sample_id}_sam.fastq -T on,QX,OQ,CR,CY ~{input_bam}
-        python /software/process_fastq.py ~{sample_id}_sam.fastq ~{sample_id}
-        gzip ~{sample_id}_R1.fastq
-        gzip ~{sample_id}_R2.fastq
+        python /software/process_fastq.py ~{sample_id}_sam.fastq output/~{sample_id} bam_header.log
+        
+        cd output
+        for fastq_file in ./*.fastq; do
+            gzip "$fastq_file"
+        done
 
-        gsutil -q -m cp ~{sample_id}_R1.fastq.gz ~{sample_id}_R2.fastq.gz ~{output_directory}/
+        gsutil -q -m cp ./*.fastq.gz ~{output_directory}/~{sample_id}/
     }
 
     output {
-        Array[String] output_fastqs = ["~{sample_id}_R1.fastq.gz", "~{sample_id}_R2.fastq.gz"]
+        Array[File] output_fastqs = glob("output/*.fastq.gz")
         File monitorLog = "monitoring.log"
     }
 
