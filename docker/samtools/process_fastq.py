@@ -1,7 +1,31 @@
 import sys
 
-def convert_to_10x_fastq(in_file, out_name):
-    with open(in_file, 'r') as fin, open(f"{out_name}_R1.fastq", 'w') as fout1, open(f"{out_name}_R2.fastq", 'w') as fout2:
+def get_out_names(out_prefix, bam_log):
+    f = open(bam_log, 'r')
+    _ = f.readline()
+    log_line_list = f.readline().split(' ')
+    f.close()
+
+    fname_old = ""
+    for i in range(len(log_line_list)):
+        if log_line_list[i] == '--read1':
+            fname_old = log_line_list[i+1]
+            break
+
+    suffix_list = fname_old.split('.')[0].split('_')[2:]
+    assert len(suffix_list)==4 and suffix_list[-2][0]=='R', "Incorrect file name format. The BAM file may not be generated from 10X pipeline."
+
+    fname_dict = dict()
+    suffix_list[-2] = 'R1'
+    fname_dict['R1'] = out_prefix + '_' + '_'.join(suffix_list) + '.fastq'
+    suffix_list[-2] = 'R2'
+    fname_dict['R2'] = out_prefix + '_' + '_'.join(suffix_list) + '.fastq'
+
+    return fname_dict
+
+
+def convert_to_10x_fastq(in_file, fname_dict):
+    with open(in_file, 'r') as fin, open(fname_dict['R1'], 'w') as fout1, open(fname_dict['R2'], 'w') as fout2:
         while True:
             line1 = fin.readline()
             if not line1:
@@ -49,6 +73,8 @@ def convert_to_10x_fastq(in_file, out_name):
 
 if __name__ == '__main__':
     in_file = sys.argv[1]
-    out_name = sys.argv[2]
+    out_prefix = sys.argv[2]
+    bam_log = sys.argv[3]
 
-    convert_to_10x_fastq(in_file, out_name)
+    fname_dict = get_out_names(out_prefix, bam_log)
+    convert_to_10x_fastq(in_file, fname_dict)
