@@ -45,12 +45,14 @@ task run_cumulus_aggregate_matrices {
 		print(' '.join(call_args))
 		check_call(call_args)
 
-		dest = '~{output_directory}' + '/' + '~{output_name}' + '/'
-		# check_call(['mkdir', '-p', dest])
-		# call_args = ['cp', '~{output_name}.aggr.zarr.zip', dest]
-		call_args = ['gsutil', 'cp', '~{output_name}.aggr.zarr.zip', dest]
-		print(' '.join(call_args))
-		check_call(call_args)
+		output_directory = '~{output_directory}'
+		if output_directory != '':
+			dest = output_directory + '/' + '~{output_name}' + '/'
+			# check_call(['mkdir', '-p', dest])
+			# call_args = ['cp', '~{output_name}.aggr.zarr.zip', dest]
+			call_args = ['gsutil', 'cp', '~{output_name}.aggr.zarr.zip', dest]
+			print(' '.join(call_args))
+			check_call(call_args)
 		CODE
 	}
 
@@ -327,26 +329,28 @@ task run_cumulus_cluster {
 		check_call(call_args)
 
 		import glob
-		dest = '~{output_directory}' + '/' + '~{output_name}' + '/'
-		# check_call(['mkdir', '-p', dest])
-		files = ['~{output_name}.zarr.zip', '~{output_name}.log']
-		if ('~{output_h5ad}' is 'true') or ('~{citeseq}' is 'true'):
-			files.extend(glob.glob('~{output_name}.*.h5ad'))
-		if '~{output_filtration_results}' is 'true':
-			files.extend(glob.glob('~{output_name}.*.filt.xlsx'))
-		if ('~{no_select_hvf}' is not 'true') and ('~{plot_hvf}' is 'true'):
-			files.extend(glob.glob('~{output_name}.*.hvf.pdf'))
-		if '~{plot_filtration_results}' is 'true':
-			files.extend(glob.glob('~{output_name}.*.filt.*.pdf'))
-		if '~{infer_doublets}' is 'true':
-			files.extend(glob.glob('~{output_name}.*.dbl.png'))
-		if '~{output_loom}' is 'true':
-			files.extend(glob.glob('~{output_name}.*.loom'))
-		for file in files:
-			# call_args = ['cp', file, dest]
-			call_args = ['gsutil', '-m', 'cp', file, dest]
-			print(' '.join(call_args))
-			check_call(call_args)
+		output_directory = '~{output_directory}'
+		if output_directory != '':
+			dest = output_directory + '/' + '~{output_name}' + '/'
+			# check_call(['mkdir', '-p', dest])
+			files = ['~{output_name}.zarr.zip', '~{output_name}.log']
+			if ('~{output_h5ad}' is 'true') or ('~{citeseq}' is 'true'):
+				files.extend(glob.glob('~{output_name}.*.h5ad'))
+			if '~{output_filtration_results}' is 'true':
+				files.extend(glob.glob('~{output_name}.*.filt.xlsx'))
+			if ('~{no_select_hvf}' is not 'true') and ('~{plot_hvf}' is 'true'):
+				files.extend(glob.glob('~{output_name}.*.hvf.pdf'))
+			if '~{plot_filtration_results}' is 'true':
+				files.extend(glob.glob('~{output_name}.*.filt.*.pdf'))
+			if '~{infer_doublets}' is 'true':
+				files.extend(glob.glob('~{output_name}.*.dbl.png'))
+			if '~{output_loom}' is 'true':
+				files.extend(glob.glob('~{output_name}.*.loom'))
+			for file in files:
+				# call_args = ['cp', file, dest]
+				call_args = ['gsutil', '-m', 'cp', file, dest]
+				print(' '.join(call_args))
+				check_call(call_args)
 		CODE
 	}
 
@@ -499,18 +503,20 @@ task run_cumulus_de_analysis {
 			print(' '.join(call_args))
 			check_call(call_args)
 
-		dest = '~{output_directory}' + '/'
-		# check_call(['mkdir', '-p', dest])
-		files = ['~{output_name}.h5ad', '~{output_name}.de.xlsx']
-		if '~{find_markers_lightgbm}' is 'true':
-			files.append('~{output_name}.markers.xlsx')
-		if '~{annotate_cluster}' is 'true':
-			files.append('~{output_name}.anno.txt')
-		for file in files:
-			# call_args = ['cp', file, dest]
-			call_args = ['gsutil', 'cp', file, dest]
-			print(' '.join(call_args))
-			check_call(call_args)
+		output_directory = '~{output_directory}'
+		if output_directory != '':
+			dest = output_directory + '/'
+			# check_call(['mkdir', '-p', dest])
+			files = ['~{output_name}.h5ad', '~{output_name}.de.xlsx']
+			if '~{find_markers_lightgbm}' is 'true':
+				files.append('~{output_name}.markers.xlsx')
+			if '~{annotate_cluster}' is 'true':
+				files.append('~{output_name}.anno.txt')
+			for file in files:
+				# call_args = ['cp', file, dest]
+				call_args = ['gsutil', 'cp', file, dest]
+				print(' '.join(call_args))
+				check_call(call_args)
 		CODE
 	}
 
@@ -592,16 +598,18 @@ task run_cumulus_plot {
 			check_call(call_args)
 
 		import glob
-		dest = '~{output_directory}' + '/'
-		# check_call(['mkdir', '-p', dest])
-		files = glob.glob('*.pdf')
-		files.extend(glob.glob('*.html'))
+		output_directory = '~{output_directory}'
+		if output_directory != '':
+			dest = output_directory + '/'
+			# check_call(['mkdir', '-p', dest])
+			files = glob.glob('*.pdf')
+			files.extend(glob.glob('*.html'))
 
-		for file in files:
-			# call_args = ['cp', file, dest]
-			call_args = ['gsutil', '-m', 'cp', file, dest]
-			print(' '.join(call_args))
-			check_call(call_args)
+			for file in files:
+				# call_args = ['cp', file, dest]
+				call_args = ['gsutil', '-m', 'cp', file, dest]
+				print(' '.join(call_args))
+				check_call(call_args)
 		CODE
 	}
 
