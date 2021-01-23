@@ -12,8 +12,8 @@ def get_out_names(out_prefix, bam_log):
             fname_old = log_line_list[i+1]
             break
 
-    suffix_list = fname_old.split('.')[0].split('_')[2:]
-    assert len(suffix_list)==4 and suffix_list[-2][0]=='R', "Incorrect file name format. The BAM file may not be generated from 10X pipeline."
+    suffix_list = fname_old.split('.')[0].split('_')[-4:]
+    assert suffix_list[-2][0]=='R', "Incorrect file name format. The BAM file may not be generated from 10X pipeline."
 
     fname_dict = dict()
     suffix_list[-2] = 'R1'
