@@ -8,7 +8,7 @@ task run_cumulus_aggregate_matrices {
 		File input_count_matrix_csv
 		String output_directory
 		String output_name
-		String cumulus_version
+		String pegasus_version
 		String zones
 		String memory
 		Int disk_space
@@ -61,7 +61,7 @@ task run_cumulus_aggregate_matrices {
 	}
 
 	runtime {
-		docker: "~{docker_registry}/cumulus:~{cumulus_version}"
+		docker: "~{docker_registry}/cumulus:~{pegasus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -76,7 +76,7 @@ task run_cumulus_cluster {
 		File input_file
 		String output_directory
 		String output_name
-		String cumulus_version
+		String pegasus_version
 		String zones
 		Int num_cpu
 		String memory
@@ -367,7 +367,7 @@ task run_cumulus_cluster {
 	}
 
 	runtime {
-		docker: "~{docker_registry}/cumulus:~{cumulus_version}"
+		docker: "~{docker_registry}/cumulus:~{pegasus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -383,7 +383,7 @@ task run_cumulus_cirro_output {
 		String output_directory
 		String output_name
 		String docker_registry
-		String cumulus_version
+		String pegasus_version
 		String zones
 		String memory
 		Int disk_space
@@ -408,7 +408,7 @@ task run_cumulus_cirro_output {
 	}
 
 	runtime {
-		docker: "~{docker_registry}/cumulus:~{cumulus_version}"
+		docker: "~{docker_registry}/cumulus:~{pegasus_version}"
 		zones: zones
 		memory: memory
 		disks: "local-disk ~{disk_space} HDD"
@@ -422,7 +422,7 @@ task run_cumulus_de_analysis {
 		File input_h5ad
 		String output_directory
 		String output_name
-		String cumulus_version
+		String pegasus_version
 		String zones
 		Int num_cpu
 		String memory
@@ -529,7 +529,7 @@ task run_cumulus_de_analysis {
 	}
 
 	runtime {
-		docker: "~{docker_registry}/cumulus:~{cumulus_version}"
+		docker: "~{docker_registry}/cumulus:~{pegasus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -544,7 +544,7 @@ task run_cumulus_plot {
 		File input_h5ad
 		String output_directory
 		String output_name
-		String cumulus_version
+		String pegasus_version
 		String zones
 		String memory
 		Int disk_space
@@ -619,7 +619,7 @@ task run_cumulus_plot {
 	}
 
 	runtime {
-		docker: "~{docker_registry}/cumulus:~{cumulus_version}"
+		docker: "~{docker_registry}/cumulus:~{pegasus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12
@@ -635,7 +635,7 @@ task run_cumulus_scp_output {
 		String output_directory
 		String output_name
 		Boolean output_dense
-		String cumulus_version
+		String pegasus_version
 		String zones
 		String memory
 		Int disk_space
@@ -656,7 +656,7 @@ task run_cumulus_scp_output {
 	}
 
 	runtime {
-		docker: "~{docker_registry}/cumulus:~{cumulus_version}"
+		docker: "~{docker_registry}/cumulus:~{pegasus_version}"
 		zones: zones
 		memory: memory
 		bootDiskSizeGb: 12

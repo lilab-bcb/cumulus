@@ -1,6 +1,7 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/26/plain-WDL/descriptor" as tasks
+# import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/26/plain-WDL/descriptor" as tasks
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/cumulus/cumulus_tasks.wdl" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
@@ -12,8 +13,8 @@ workflow cumulus {
 		# Results name prefix and subdirectory name.
 		String output_name
 
-		# cumulus version, default to "1.1.0"
-		String cumulus_version = "1.1.0"
+		# Pegasus version, default to "1.3.0"
+		String pegasus_version = "1.3.0"
 		# Docker registry to use
 		String docker_registry = "quay.io/cumulus"
 		# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
