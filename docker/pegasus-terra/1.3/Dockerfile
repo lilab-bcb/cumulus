@@ -5,9 +5,8 @@ ENV PIP_USER=false
 
 RUN apt-get update && apt-get install -yq --no-install-recommends \
         build-essential \
-        python3.7-dev \
-        libfftw3-dev \
-        default-jdk && \
+        python3-dev \
+        libfftw3-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 

@@ -6,6 +6,7 @@
         "cirrocumulus": "1.1.13.post1",
         "Cython": "0.29.21",
         "demuxEM": "0.1.5.post1",
+        "firecloud": "0.16.25",
         "fitsne": "1.1.1",
         "forceatlas2-python": "1.1",
         "gprofiler-official": "1.0.0",
@@ -15,7 +16,7 @@
         "importlib-metadata": "3.4.0",
         "joblib": "1.0.0",
         "jupyter": "1.0.0",
-        "jupyter-client": "6.1.7",
+        "jupyter-client": "6.1.11",
         "jupyter-console": "6.2.0",
         "jupyter-contrib-core": "0.3.3",
         "jupyter-contrib-nbextensions": "0.5.1",
@@ -34,7 +35,7 @@
         "natsort": "7.1.1",
         "nbclient": "0.5.1",
         "nbconvert": "6.0.7",
-        "nbformat": "5.0.8",
+        "nbformat": "5.1.2",
         "networkx": "2.5",
         "notebook": "6.1.1",
         "numba": "0.52.0",
@@ -42,9 +43,9 @@
         "pandas": "1.2.1",
         "pegasusio": "0.2.10",
         "pegasuspy": "1.3.0",
-        "Pillow": "8.0.1",
-        "pip": "20.3.3",
-        "pyarrow": "2.0.0",
+        "Pillow": "8.1.0",
+        "pip": "21.0.1",
+        "pyarrow": "3.0.0",
         "pybind11": "2.6.1",
         "python-igraph": "0.8.3",
         "scanorama": "1.7",
@@ -57,12 +58,11 @@
         "statsmodels": "0.12.2",
         "torch": "1.7.1",
         "umap-learn": "0.4.6",
-        "xlrd": "2.0.1",
         "XlsxWriter": "1.3.7",
         "zarr": "2.6.1"
     },
     "tools": {
-        "google-cloud-sdk": "319.0.0",
+        "google-cloud-sdk": "324.0.0",
         "ngrok": "2.3.35"
     }
 }
