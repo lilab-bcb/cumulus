@@ -1,6 +1,6 @@
 # Changelog of Pegasus-Terra Docker Image
 
-## 1.3 - 2020/02/02
+## 1.3 - 2021/02/02
 
 * Image based on [terra-jupyter-base](https://github.com/DataBiosphere/terra-docker/tree/master/terra-jupyter-base) image version 0.0.19 at ``us.gcr.io/broad-dsp-gcr-public/terra-jupyter-base:0.0.19``.
 * Use Pegasus 1.3.0. See [here](https://pegasus.readthedocs.io/en/stable/release_notes.html#version-1-3) for changes.
