@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/26/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/27/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
@@ -12,8 +12,8 @@ workflow cumulus {
 		# Results name prefix and subdirectory name.
 		String output_name
 
-		# cumulus version, default to "1.1.0"
-		String cumulus_version = "1.1.0"
+		# Pegasus version, default to "1.3.0"
+		String pegasus_version = "1.3.0"
 		# Docker registry to use
 		String docker_registry = "quay.io/cumulus"
 		# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
@@ -265,7 +265,7 @@ workflow cumulus {
 				default_reference = default_reference,
 				select_only_singlets = select_only_singlets,
 				minimum_number_of_genes = minimum_number_of_genes,
-				cumulus_version = cumulus_version,
+				pegasus_version = pegasus_version,
 				zones = zones,
 				memory = memory,
 				disk_space = disk_space,
@@ -355,7 +355,7 @@ workflow cumulus {
 			citeseq = citeseq,
 			citeseq_umap = citeseq_umap,
 			citeseq_umap_exclude = citeseq_umap_exclude,
-			cumulus_version = cumulus_version,
+			pegasus_version = pegasus_version,
 			zones = zones,
 			num_cpu = num_cpu,
 			memory = memory,
@@ -386,7 +386,7 @@ workflow cumulus {
 						annotate_de_test = annotate_de_test,
 						organism = organism,
 						minimum_report_score = minimum_report_score,
-						cumulus_version = cumulus_version,
+						pegasus_version = pegasus_version,
 						zones = zones,
 						num_cpu = num_cpu,
 						memory = memory,
@@ -411,7 +411,7 @@ workflow cumulus {
 						plot_net_umap = plot_net_umap,
 						plot_net_fle = plot_net_fle,
 						plot_citeseq_umap = plot_citeseq_umap,
-						cumulus_version = cumulus_version,
+						pegasus_version = pegasus_version,
 						zones = zones,
 						memory = memory,
 						disk_space = disk_space,
@@ -426,7 +426,7 @@ workflow cumulus {
 						input_h5ad = focus_h5ad,
 						output_directory = output_directory_stripped + '/' + output_name,
 						output_name = focus_prefix,
-						cumulus_version = cumulus_version,
+						pegasus_version = pegasus_version,
 						zones = zones,
 						memory = memory,
 						disk_space = disk_space,
@@ -443,7 +443,7 @@ workflow cumulus {
 						output_directory = output_directory_stripped + '/' + output_name,
 						output_name = focus_prefix,
 						output_dense = output_dense,
-						cumulus_version = cumulus_version,
+						pegasus_version = pegasus_version,
 						zones = zones,
 						memory = memory,
 						disk_space = disk_space,

@@ -1,3 +1,10 @@
+Version 1.3.0 `February 2, 2021`
+--------------------------------
+
+* On *cumulus* workflow:
+    * Change ``cumulus_version`` to ``pegasus_version`` to avoid confusion.
+    * Update to use Pegasus v1.3.0 for analysis.
+
 Version 1.2.0 `January 19, 2021`
 --------------------------------
 

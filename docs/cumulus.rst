@@ -121,11 +121,10 @@ Cumulus steps:
 #. **plot**. This step is optional. In this step, **Cumulus** can generate 6 types of figures based on the **cluster** step results:
 
     - **composition** plots which are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects.
-    - **tsne**, **fitsne**, and **net_tsne**: t-SNE like plots based on different algorithms, respectively. Users can specify cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
     - **umap** and **net_umap**: UMAP like plots based on different algorithms, respectively. Users can specify cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
+    - **tsne**: FIt-SNE plots. Users can specify cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
     - **fle** and **net_fle**: FLE (Force-directed Layout Embedding) like plots based on different algorithms, respectively. Users can specify cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
-    - **diffmap** plots which are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components.
-    - If input is CITE-Seq data, there will be **citeseq_fitsne** plots which are FIt-SNE plots based on epitope expression.
+    - If input is CITE-Seq data, there will be **citeseq_umap** plots which are UMAP plots based on epitope expression.
 
 #. **cirro_output**. This step is optional. Generate `Cirrocumulus`_ inputs for visualization using `Cirrocumulus`_ .
 
@@ -160,10 +159,10 @@ global inputs
       - This is the name of subdirectory for the current sample; and all output files within the subdirectory will have this string as the common filename prefix.
       - "my_sample"
       -
-    * - cumulus_version
-      - cumulus version to use. Versions available: 1.1.0, 1.0.0, 0.16.0, 0.15.0, 0.13.0, 0.12.0, 0.11.0, 0.10.0.
-      - "1.1.0"
-      - "1.1.0"
+    * - pegasus_version
+      - Pegasus version to use for analysis. Versions available: ``1.3.0``.
+      - "1.3.0"
+      - "1.3.0"
     * - docker_registry
       - Docker registry to use. Options:
 
@@ -599,6 +598,7 @@ cluster outputs
         | To load this file in Python, you need to first install `PegasusIO`_ on your local machine. Then use ``import pegasusio as io; data = io.read_input('output_name.zarr.zip')`` in Python environment.
         | ``data`` is a *MultimodalData* object, and points to its default *UnimodalData* element. You can set its default *UnimodalData* to others by ``data.set_data(focus_key)`` where ``focus_key`` is the key string to the wanted *UnimodalData* element.
         | For its default *UnimodalData* element, the log-normalized expression matrix is stored in ``data.X`` as a Scipy CSR-format sparse matrix, with cell-by-gene shape.
+        | Alternatively, to get the raw count matrix, first run ``data.select_matrix('raw.X')``, then ``data.X`` will be switched to point to the raw matrix.
         | The ``obs`` field contains cell related attributes, including clustering results.
         | For example, ``data.obs_names`` records cell barcodes; ``data.obs['Channel']`` records the channel each cell comes from;
         | ``data.obs['n_genes']``, ``data.obs['n_counts']``, and ``data.obs['percent_mito']`` record the number of expressed genes, total UMI count, and mitochondrial rate for each cell respectively;
@@ -608,8 +608,7 @@ cluster outputs
         | The ``obsm`` field records embedding coordinates.
         | For example, ``data.obsm['X_pca']`` records PCA coordinates, ``data.obsm['X_tsne']`` records t-SNE coordinates,
         | ``data.obsm['X_umap']`` records UMAP coordinates, ``data.obsm['X_diffmap']`` records diffusion map coordinates,
-        | ``data.obsm['X_diffmap_pca']`` records the first 3 PCs by projecting the diffusion components using PCA,
-        | and ``data.obsm['X_fle']`` records the force-directed layout coordinates from the diffusion components.
+        | and ``data.obsm['X_fle']`` records the force-directed layout coordinates.
         | The ``uns`` field stores other related information, such as reference genome (``data.uns['genome']``), kNN on PCA coordinates (``data.uns['pca_knn_indices']`` and ``data.uns['pca_knn_distances']``), etc.
     * - **output_log**
       - File
@@ -619,8 +618,7 @@ cluster outputs
       - | List of output file(s) in Seurat-compatible h5ad format (output_name.focus_key.h5ad), in which each file is associated with a focus of the input data.
         | To load this file in Python, first install `PegasusIO`_ on your local machine. Then use ``import pegasusio as io; data = io.read_input('output_name.focus_key.h5ad')`` in Python environment.
         | After loading, ``data`` has the similar structure as *UnimodalData* object in Description of **output_zarr** in `cluster outputs <./cumulus.html#cluster-outputs>`_ section.
-        | In addition, ``data.raw.X`` records filtered raw count matrix as a Scipy CSR-format sparse matrix, with cell-by-gene shape.
-        | ``data.uns['scale.data']`` records variable-gene-selected and standardized expression matrix which are ready to perform PCA, and ``data.uns['scale.data.rownames']`` records indexes of the selected highly variable genes.
+        | In addition, ``data.uns['scale.data']`` records variable-gene-selected and standardized expression matrix which are ready to perform PCA, and ``data.uns['scale.data.rownames']`` records indexes of the selected highly variable genes.
         | This file is used for loading in R and converting into a Seurat object (see `here <./cumulus.html#load-h5ad-file-into-seurat>`_ for instructions)
     * - output_filt_xlsx
       - File
@@ -660,8 +658,7 @@ cluster outputs
         | ``ds.ca['louvain_labels']``, ``ds.ca['leiden_labels']``, ``ds.ca['spectral_louvain_labels']``, and ``ds.ca['spectral_leiden_labels']`` record each cell's cluster labels using different clustering algorithms;
         | ``ds.ca['X_pca']`` records PCA coordinates, ``ds.ca['X_tsne']`` records t-SNE coordinates,
         | ``ds.ca['X_umap']`` records UMAP coordinates, ``ds.ca['X_diffmap']`` records diffusion map coordinates,
-        | ``ds.ca['X_diffmap_pca']`` records the first 3 PCs by projecting the diffusion components using PCA,
-        | and ``ds.ca['X_fle']`` records the force-directed layout coordinates from the diffusion components.
+        | and ``ds.ca['X_fle']`` records the force-directed layout coordinates.
         | The ``ra`` field contains gene related attributes as column attributes.
         | For example, ``ds.ra['var_names']`` records gene symbols, ``ds.ra['gene_ids']`` records Ensembl gene IDs, and ``ds.ra['highly_variable_features']`` records selected variable genes.
 
@@ -748,8 +745,8 @@ de_analysis outputs
       - | List of h5ad-formatted results with DE results updated (output_name.focus_key.h5ad), in which each file is associated with a focus of the input data.
         | To load this file in Python, you need to first install `PegasusIO`_ on your local machine. Then type ``import pegasusio as io; data = io.read_input('output_name.focus_key.h5ad')`` in Python environment.
         | After loading, ``data`` has the similar structure as *UnimodalData* object in Description of **output_zarr** in `cluster outputs <./cumulus.html#cluster-outputs>`_ section.
-        | Besides, there is one additional field ``varm`` which records DE analysis results in ``data.varm['de_res']``. You can use Pandas DataFrame to convert it into a reader-friendly structure: ``import pandas as pd; df = pd.DataFrame(data.varm['de_res'], index = data.var_names)``. Then in the resulting data frame, genes are rows, and those DE test statistics are columns.
-        | DE analysis in cumulus is performed on each cluster against cells in all the other clusters. For instance, in the data frame, column ``mean_logExpr:1`` refers to the mean expression of genes in log-scale for cells in Cluster 1. The number after colon refers to the cluster label to which this statistic belongs.
+        | Besides, there is one additional field ``varm`` which records DE analysis results in ``data.varm['de_res']``. You can use Pandas DataFrame to convert it into a reader-friendly structure: ``import pandas as pd; df = pd.DataFrame(data.varm['de_res'], index=data.var_names)``. Then in the resulting data frame, genes are rows, and those DE test statistics are columns.
+        | DE analysis in cumulus is performed on each cluster against cells in all the other clusters. For instance, in the data frame, column ``1:log2Mean`` refers to the mean expression of genes in log-scale for cells in Cluster 1. The number before colon refers to the cluster label to which this statistic belongs.
     * - output_de_xlsx
       - Array[File]
       - | List of spreadsheets reporting DE results (output_name.focus_key.de.xlsx), in which each file is associated with a focus of the input data.
