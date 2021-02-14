@@ -60,7 +60,7 @@ Follow the steps below to extract gene-count matrices from SMART-Seq2 data on Te
         cell-1	plate-1	gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-1_L001_R1_001.fastq.gz	gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-1_L001_R2_001.fastq.gz
         cell-2	plate-1	gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-2_L001_R1_001.fastq.gz	gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-2_L001_R2_001.fastq.gz
         cell-3	plate-2	gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-3_L001_R1_001.fastq.gz
-        cell-4,plate-2,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-4_L001_R1_001.fastq.gz,
+        cell-4	plate-2	gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-4_L001_R1_001.fastq.gz
 
 
 #. Upload your sample sheet to the workspace bucket.
@@ -210,7 +210,7 @@ This WDL generates one gene-count matrix in matrix market format:
 
 - output_count_matrix is a folder containing three files: matrix.mtx.gz, barcodes.tsv.gz, and features.tsv.gz.
 - matrix.mtx.gz is a gzipped matrix in matrix market format.
-- barcodes.tsv.gz is a gzipped TSV file, containing 5 columns. 'barcodekey' is cell name. 'plate' is the plate name, which can be used for batch correction. 'total_reads' is the total number of reads. 'alignment_rate' is the alignment rate obtained from the aligner. 'unique_rate' is the percentage of reads aligned uniquely to a gene.
+- barcodes.tsv.gz is a gzipped TSV file, containing 5 columns. 'barcodekey' is cell name. 'plate' is the plate name, which can be used for batch correction. 'total_reads' is the total number of reads. 'alignment_rate' is the alignment rate obtained from the aligner. 'unique_rate' is the percentage of reads aligned uniquely to a gene. Cells sequenced with single-end reads appear first in 'barcodekey'.
 - features.tsv.gz is a gzipped TSV file, containing 2 columns. 'featurekey' is gene symbol. 'featureid' is Ensembl ID.
 
 The gene-count matrix can be fed directly into **cumulus** for downstream analysis.
