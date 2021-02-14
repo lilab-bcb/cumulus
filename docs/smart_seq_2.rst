@@ -35,7 +35,7 @@ Follow the steps below to extract gene-count matrices from SMART-Seq2 data on Te
 
 #. Create a sample sheet. 
 
-    Please note that the columns in the CSV can be in any order, but that the column names must match the recognized headings.
+    Please note that the columns in the TSV can be in any order, but that the column names must match the recognized headings.
 
     The sample sheet provides metadata for each cell:
 
@@ -45,21 +45,21 @@ Follow the steps below to extract gene-count matrices from SMART-Seq2 data on Te
 
         * - Column
           - Description
-        * - Cell
+        * - entity:sample
           - Cell name.
-        * - Plate
+        * - plate
           - Plate name. Cells with the same plate name are from the same plate.
-        * - Read1
+        * - read1
           - Location of the FASTQ file for read1 in the cloud (gsurl).
-        * - Read2
+        * - read2
           - (Optional). Location of the FASTQ file for read2 in the cloud (gsurl). This field can be skipped for single-end reads.
 
     Example::
 
-        Cell,Plate,Read1,Read2
-        cell-1,plate-1,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-1_L001_R1_001.fastq.gz,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-1_L001_R2_001.fastq.gz
-        cell-2,plate-1,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-2_L001_R1_001.fastq.gz,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-2_L001_R2_001.fastq.gz
-        cell-3,plate-2,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-3_L001_R1_001.fastq.gz,
+        entity:sample	plate	read1	read2
+        cell-1	plate-1	gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-1_L001_R1_001.fastq.gz	gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-1_L001_R2_001.fastq.gz
+        cell-2	plate-1	gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-2_L001_R1_001.fastq.gz	gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-2_L001_R2_001.fastq.gz
+        cell-3	plate-2	gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-3_L001_R1_001.fastq.gz
         cell-4,plate-2,gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2/cell-4_L001_R1_001.fastq.gz,
 
 
@@ -96,9 +96,9 @@ Please see the description of inputs below. Note that required inputs are shown 
       - Description
       - Example
       - Default
-    * - **input_csv_file**
-      - Sample Sheet (contains Cell, Plate, Read1, Read2)
-      - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.csv"
+    * - **input_tsv_file**
+      - Sample Sheet (contains entity:sample, plate, read1, read2)
+      - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.tsv"
       - 
     * - **output_directory**
       - Output directory
@@ -125,14 +125,10 @@ Please see the description of inputs below. Note that required inputs are shown 
       - Whether to output bam file with alignments mapped to genomic coordinates and annotated with their posterior probabilities.
       - false
       - false
-    * - normalize_tpm_by_sequencing_depth
-      - Whether to normalize TPM values by sequencing depth.
-      - true
-      - true
     * - smartseq2_version
-      - SMART-Seq2 version to use. Versions available: 1.1.0.
-      - "1.1.0"
-      - "1.1.0"
+      - SMART-Seq2 version to use. Versions available: 1.3.0.
+      - "1.3.0"
+      - "1.3.0"
     * - docker_registry
       - Docker registry to use. Options:
 
@@ -179,50 +175,45 @@ Outputs:
       - Type
       - Description
     * - output_count_matrix
-      - Array[String]
-      - A list of google bucket urls containing gene-count matrices, one per plate. Each gene-count matrix file has the suffix ``.dge.txt.gz``.
-    * - output_qc_report
-      - Array[String]
-      - A list of google bucket urls containing simple quality control statistics, one per plate. Each file contains one line per cell and each line has three columns: Total reads, Alignment rate and Unique rate.
-    * - rsem_gene
-      - Array[Array[File]]
-      - A 2D array of RSEM gene expression estimation files.
-    * - rsem_gene
-      - Array[Array[File]]
-      - A 2D array of RSEM gene expression estimation files.
-    * - rsem_isoform
-      - Array[Array[File]]
-      - A 2D array of RSEM isoform expression estimation files.
+      - String
+      - Point to a Google bucket URL for count matrix in matrix market format.
     * - rsem_trans_bam
-      - Array[Array[File]]
-      - A 2D array of RSEM transcriptomic BAM files.
+      - Array[String?]
+      - An array of Google bucket URLs for RSEM transcriptomic BAM files
     * - rsem_genome_bam
-      - Array[Array[File]]
-      - A 2D array of RSEM genomic BAM files if ``output_genome_bam`` is ``true``.
+      - Array[String?]
+      - An array of Google bucket URLs for RSEM genomic BAM files if ``output_genome_bam`` is ``true``.
+    * - rsem_gene
+      - Array[File?]
+      - An array of RSEM gene expression estimation files.
+    * - rsem_isoform
+      - Array[File?]
+      - An array of RSEM isoform expression estimation files.
     * - rsem_time
-      - Array[Array[File]]
-      - A 2D array of RSEM execution time log files.
+      - Array[File?]
+      - An array of RSEM execution time log files.
     * - aligner_log
-      - Array[Array[File]]
-      - A 2D array of Aligner log files.
+      - Array[File?]
+      - An array of Aligner log files.
     * - rsem_cnt
-      - Array[Array[File]]
-      - A 2D array of RSEM count files.
+      - Array[File?]
+      - An array of RSEM count files.
     * - rsem_model
-      - Array[Array[File]]
-      - A 2D array of RSEM model files.
+      - Array[File?]
+      - An array of RSEM model files.
     * - rsem_theta
-      - Array[Array[File]]
-      - A 2D array of RSEM generated theta files.
+      - Array[File?]
+      - An array of RSEM generated theta files.
 
 
-This WDL generates one gene-count matrix per SMART-Seq2 plate. The gene-count matrix uses Drop-Seq format: 
+This WDL generates one gene-count matrix in matrix market format:
 
-- The first line starts with ``"Gene"`` and then gives cell barcodes separated by tabs. 
-- Starting from the second line, each line describes one gene. 
-  The first item in the line is the gene name and the rest items are TPM-normalized count values of this gene for each cell. 
+- output_count_matrix is a folder containing three files: matrix.mtx.gz, barcodes.tsv.gz, and features.tsv.gz.
+- matrix.mtx.gz is a gzipped matrix in matrix market format.
+- barcodes.tsv.gz is a gzipped TSV file, containing 5 columns. 'barcodekey' is cell name. 'plate' is the plate name, which can be used for batch correction. 'total_reads' is the total number of reads. 'alignment_rate' is the alignment rate obtained from the aligner. 'unique_rate' is the percentage of reads aligned uniquely to a gene.
+- features.tsv.gz is a gzipped TSV file, containing 2 columns. 'featurekey' is gene symbol. 'featureid' is Ensembl ID.
 
-The gene-count matrices can be fed directly into **cumulus** for downstream analysis.
+The gene-count matrix can be fed directly into **cumulus** for downstream analysis.
 
 TPM-normalized counts are calculated as follows:
 
