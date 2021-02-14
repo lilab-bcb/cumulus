@@ -48,9 +48,9 @@ workflow smartseq2 {
 
 
     
-    scatter (i in range(length(data_table))) {
-        Boolean is_se = length(data_table[0]) == 3
+    scatter (i in range(length(data_table)-1)) {
         Int pos = i + 1
+        Boolean is_se = length(data_table[pos]) == 3
 
         # Single-end data
         if (is_se) {
@@ -96,8 +96,8 @@ workflow smartseq2 {
 
     call generate_count_matrix {
         input:
-            gene_results = select_first([run_rsem_se.rsem_gene, run_rsem_pe.rsem_gene]),
-            count_results = select_first([run_rsem_se.rsem_cnt, run_rsem_pe.rsem_cnt]),
+            gene_results = flatten([select_all(run_rsem_se.rsem_gene), select_all(run_rsem_pe.rsem_gene)]),
+            count_results = flatten([select_all(run_rsem_se.rsem_cnt), select_all(run_rsem_pe.rsem_cnt)]),
             output_directory = output_directory,
             smartseq2_version = smartseq2_version,
             zones = zones,
@@ -108,15 +108,15 @@ workflow smartseq2 {
     }
 
     output {
-        Array[File?] rsem_gene = select_first([run_rsem_se.rsem_gene, run_rsem_pe.rsem_gene])
-        Array[File?] rsem_isoform = select_first([run_rsem_se.rsem_isoform, run_rsem_pe.rsem_isoform])
-        Array[String?] rsem_trans_bam = select_first([run_rsem_se.rsem_trans_bam, run_rsem_pe.rsem_trans_bam])
-        Array[String?] rsem_genome_bam = select_first([run_rsem_se.rsem_genome_bam, run_rsem_pe.rsem_genome_bam])
-        Array[File?] rsem_time = select_first([run_rsem_se.rsem_time, run_rsem_pe.rsem_time])
-        Array[File?] aligner_log = select_first([run_rsem_se.aligner_log, run_rsem_pe.aligner_log])
-        Array[File?] rsem_cnt = select_first([run_rsem_se.rsem_cnt, run_rsem_pe.rsem_cnt])
-        Array[File?] rsem_model = select_first([run_rsem_se.rsem_model, run_rsem_pe.rsem_model])
-        Array[File?] rsem_theta = select_first([run_rsem_se.rsem_theta, run_rsem_pe.rsem_theta])
+        Array[File] rsem_gene = flatten([select_all(run_rsem_se.rsem_gene), select_all(run_rsem_pe.rsem_gene)])
+        Array[File] rsem_isoform = flatten([select_all(run_rsem_se.rsem_isoform), select_all(run_rsem_pe.rsem_isoform)])
+        Array[String] rsem_trans_bam = flatten([select_all(run_rsem_se.rsem_trans_bam), select_all(run_rsem_pe.rsem_trans_bam)])
+        Array[String?] rsem_genome_bam = flatten([select_all(run_rsem_se.rsem_genome_bam), select_all(run_rsem_pe.rsem_genome_bam)])
+        Array[File] rsem_time = flatten([select_all(run_rsem_se.rsem_time), select_all(run_rsem_pe.rsem_time)])
+        Array[File] aligner_log = flatten([select_all(run_rsem_se.aligner_log), select_all(run_rsem_pe.aligner_log)])
+        Array[File] rsem_cnt = flatten([select_all(run_rsem_se.rsem_cnt), select_all(run_rsem_pe.rsem_cnt)])
+        Array[File] rsem_model = flatten([select_all(run_rsem_se.rsem_model), select_all(run_rsem_pe.rsem_model)])
+        Array[File] rsem_theta = flatten([select_all(run_rsem_se.rsem_theta), select_all(run_rsem_pe.rsem_theta)])
         String output_count_matrix = generate_count_matrix.output_count_matrix
     }
 }
@@ -189,8 +189,8 @@ task run_rsem {
 
 task generate_count_matrix {
     input {
-        Array[File?] gene_results
-        Array[File?] count_results
+        Array[File] gene_results
+        Array[File] count_results
         String output_directory
         String smartseq2_version
         String zones
