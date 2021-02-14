@@ -38,7 +38,7 @@ workflow smartseq2_per_plate {
 
 	File acronym_file = "gs://regev-lab/resources/smartseq2/index.tsv"
 	# File acronym_file = "smartseq2_index.tsv"
-	 Map[String, String] acronym2gsurl = read_map(acronym_file)
+	Map[String, String] acronym2gsurl = read_map(acronym_file)
 	# If reference is a url
 	Boolean is_url = sub(reference, "^.+\\.(tgz|gz)$", "URL") == "URL"
 
@@ -67,6 +67,7 @@ workflow smartseq2_per_plate {
 					aligner = aligner,
 					output_genome_bam = output_genome_bam,
 					smartseq2_version = smartseq2_version,
+					output_directory = output_directory,
 					zones = zones,
 					num_cpu = num_cpu,
 					memory = memory,
@@ -88,6 +89,7 @@ workflow smartseq2_per_plate {
 					aligner = aligner,
 					output_genome_bam = output_genome_bam,
 					smartseq2_version = smartseq2_version,
+					output_directory = output_directory,
 					zones = zones,
 					num_cpu = num_cpu,
 					memory = memory,
@@ -167,7 +169,7 @@ task parse_sample_sheet {
 	}
 
 	runtime {
-		docker: "~{docker_registry}/smartseq2:~{smartseq2_version}"
+		docker: "~{docker_registry}/config:~{config_version}"
 		zones: zones
 		preemptible: preemptible
 	}
@@ -182,6 +184,7 @@ task run_rsem {
 		String sample_name
 		String aligner
 		String smartseq2_version
+		String output_directory
 		String zones
 		Int num_cpu
 		String memory
@@ -202,6 +205,16 @@ task run_rsem {
 		tar xf ~{reference} -C rsem_ref --strip-components 1
 		REFERENCE_NAME="$(basename `ls rsem_ref/*.grp` .grp)"
 		rsem-calculate-expression --~{aligner} ~{true="--output-genome-bam" false="" output_genome_bam} ~{true="--star-gzipped-read-file" false="" star_gzipped_read_file} ~{true="--paired-end" false="" defined(read2)} -p ~{num_cpu} --append-names --time ~{read1} ~{default="" read2} rsem_ref/$REFERENCE_NAME ~{sample_name}
+
+		gsutil cp ~{sample_name}.transcript.bam ~{output_directory}/
+		# mkdir -p ~{output_directory}
+		# cp ~{sample_name}.transcript.bam ~{output_directory}/
+
+		if [ -f ~{sample_name}.genome.bam ]
+		then
+			gsutil cp ~{sample_name}.genome.bam ~{output_directory}/
+			# cp ~{sample_name}.genome.bam ~{output_directory}/
+		fi
 	}
 
 	output {
