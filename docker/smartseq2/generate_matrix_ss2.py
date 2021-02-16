@@ -52,7 +52,7 @@ for result_file in gene_results.split(','):
     counts = counts.astype(int)
     X.append(counts)
 
-    cnt_file = f'{dirname}/{basename}.cnt'
+    cnt_file = f'{dirname}/{basename}.stat/{basename}.cnt'
     with open(cnt_file) as fin:
         Ns = [int(x) for x in next(fin).strip().split(' ')]
         align_values = [int(x) for x in next(fin).strip().split(' ')]
