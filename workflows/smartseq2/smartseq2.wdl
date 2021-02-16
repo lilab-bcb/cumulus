@@ -28,7 +28,7 @@ workflow smartseq2 {
         # Disk space for count matrix generation task
         Int generate_count_matrix_disk_space = 10
         # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-        String docker_registry = "cumulusprod"  
+        String docker_registry = "quay.io/cumulus"  
     }
 
     # Output directory, with trailing slashes stripped
