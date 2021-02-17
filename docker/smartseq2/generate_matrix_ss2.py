@@ -8,13 +8,24 @@ from scipy.sparse import csr_matrix
 import pegasusio as pio
 
 
-if len(argv) != 3:
-    print('Usage: ./generate_matrix_ss2.py gene_results output_name')
+if len(argv) != 4:
+    print('Usage: ./generate_matrix_ss2.py gene_results cnt_results output_name')
     exit(-1)
 
 
-gene_results = argv[1]
-output_name = argv[2]
+def _map_basename_to_file(results, suffix):
+    basenames = []
+    basename2file = {}
+    for result_file in results.split(','):
+        basename = os.path.basename(result_file)[0:-len(suffix)]
+        basenames.append(basename)
+        basename2file[basename] = result_file
+    return basename2file, basenames
+
+
+b2g, basenames = _map_basename_to_file(argv[1], '.genes.results')
+b2c, _ = _map_basename_to_file(argv[2], '.cnt')
+output_name = argv[3]
 
 barcodes = []
 plates = []
@@ -27,16 +38,14 @@ gene_names = []
 
 X = []
 
-for result_file in gene_results.split(','):
-    dirname, basename = os.path.split(result_file)
-    slen = len('.genes.results')
-    basename = basename[:-slen]
+for basename in basenames:
     barcode, sep, plate = basename.rpartition('.')
 
     barcodes.append(barcode)
     plates.append(plate)
 
-    df = pd.read_table(result_file, header = 0, index_col = 0)
+    assert basename in b2g
+    df = pd.read_table(b2g[basename], header = 0, index_col = 0)
 
     if len(gene_ids) == 0:
         for x in df.index:
@@ -52,7 +61,8 @@ for result_file in gene_results.split(','):
     counts = counts.astype(int)
     X.append(counts)
 
-    cnt_file = f'{dirname}/{basename}.stat/{basename}.cnt'
+    assert basename in b2c
+    cnt_file = b2c[basename]
     with open(cnt_file) as fin:
         Ns = [int(x) for x in next(fin).strip().split(' ')]
         align_values = [int(x) for x in next(fin).strip().split(' ')]

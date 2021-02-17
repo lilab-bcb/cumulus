@@ -204,7 +204,7 @@ task generate_count_matrix {
         set -e
         export TMPDIR=/tmp
 
-        generate_matrix_ss2.py ~{sep=',' gene_results} count_matrix
+        generate_matrix_ss2.py ~{sep=',' gene_results} ~{sep=',' count_results} count_matrix
         gsutil -m cp -r count_matrix ~{output_directory}/
         # mkdir -p ~{output_directory}
         # cp -r count_matrix ~{output_directory}
