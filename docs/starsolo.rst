@@ -105,7 +105,7 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	* - **genome**
 	  - Genome reference. It can be either of the following two formats:
 
-		- String. Pre-built genome reference. Currently support: ``GRCh38``, ``mm10``.
+		- String. Pre-built genome reference. Currently support: ``GRCh38``, ``GRCh38-2020-A``, ``mm10``.
 
 		- Google bucket URL of a custom reference, must be a ``.tar.gz`` file.
 	  - | "GRCh38",
