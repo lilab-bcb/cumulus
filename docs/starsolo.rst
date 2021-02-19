@@ -105,7 +105,7 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	* - **genome**
 	  - Genome reference. It can be either of the following two formats:
 
-		- String. Pre-built genome reference. Currently support: ``GRCh38``, ``GRCh38-2020-A``, ``mm10``.
+		- String. Pre-built `genome reference`_.
 
 		- Google bucket URL of a custom reference, must be a ``.tar.gz`` file.
 	  - | "GRCh38",
@@ -173,5 +173,27 @@ See the table below for *star_solo* workflow outputs.
 	  - String
 	  - Google Bucket URL of output directory. Within it, each folder is for one sample in the input sample sheet.
 
+----------------------------
+
+Prebuilt genome references
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We've built the following genome references for users' convenience:
+
+	.. list-table::
+		:widths: 5 20
+		:header-rows: 1
+
+		* - Keyword
+		  - Description
+		* - **GRCh38-2020-A**
+		  - Human GRCh38 (GENCODE v32/Ensembl 98)
+		* - **GRCh38**
+		  - Human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation
+		* - **mm10**
+		  - Mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation
+
+
 .. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
+.. _genome reference: ./starsolo.html#prebuilt-genome-references
