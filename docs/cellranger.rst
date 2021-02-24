@@ -325,6 +325,14 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  - Number of mismatches allowed in matching barcode indices (bcl2fastq2 default is 1)
 		  - 0
 		  -
+		* - mkfastq_filter_single_index
+		  - Only demultiplex samples identified by an i7-only sample index, ignoring dual-indexed samples. Dual-indexed samples will not be demultiplexed
+		  - false
+		  - false
+		* - mkfastq_use_bases_mask
+		  - Override the read lengths as specified in *RunInfo.xml*
+		  - "Y28n*,I8n*,N10,Y90n*"
+		  - 
 		* - force_cells
 		  - Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells
 		  - 6000
