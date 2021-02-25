@@ -573,13 +573,13 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - 0.1
 		  - 0.1
 		* - cellranger_version
-		  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, 2.2.0
-		  - "4.0.0"
-		  - "4.0.0"
+		  - cellranger version, could be 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
+		  - "5.0.1"
+		  - "5.0.1"
 		* - cumulus_feature_barcoding_version
-		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.3.0, 0.2.0.
-		  - "0.3.0"
-		  - "0.3.0"
+		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.4.0, 0.3.0, 0.2.0.
+		  - "0.4.0"
+		  - "0.4.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -1034,9 +1034,9 @@ For scIR-seq data, ``cellranger_workflow`` takes Illumina outputs as input and r
 	  - "auto"
 	  - "auto"
 	* - cellranger_version
-	  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, 2.2.0
-	  - "4.0.0"
-	  - "4.0.0"
+	  - cellranger version, could be 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
+	  - "5.0.1"
+	  - "5.0.1"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
@@ -1207,9 +1207,9 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, or 2.2.0
-		  - "4.0.0"
-		  - "4.0.0"
+		  - cellranger version, could be 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
+		  - "5.0.1"
+		  - "5.0.1"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -1397,9 +1397,9 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, or 2.2.0
-		  - "4.0.0"
-		  - "4.0.0"
+		  - cellranger version, could be 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
+		  - "5.0.1"
+		  - "5.0.1"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
