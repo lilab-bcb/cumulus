@@ -98,9 +98,9 @@ task run_cellranger_mkfastq {
         barcode_mismatches = '~{barcode_mismatches}'
         if barcode_mismatches != '':
             mkfastq_args += ['--barcode-mismatches', barcode_mismatches]
-        if filter_single_index == 'true':
+        if '~{filter_single_index}' == 'true':
             mkfastq_args.append('--filter-single-index')
-        if use_bases_mask != '':
+        if '~{use_bases_mask}' != '':
             mkfastq_args.extend(['--use-bases-mask', '~{use_bases_mask}'])
         p = subprocess.run(mkfastq_args)
 

@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/7/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/8/plain-WDL/descriptor" as crm
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/6/plain-WDL/descriptor" as crc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/7/plain-WDL/descriptor" as crv
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/7/plain-WDL/descriptor" as ca
@@ -484,7 +484,7 @@ task generate_count_config {
                         chemistry = 'SC3Pv3' # default is different
                     foo4.write(sample_id + '\t' + chemistry + '\n')
                     n_chem += 1
-                
+
                 if datatype in ['rna', 'adt', 'crispr']:
                     has_fbf = ('FeatureBarcodeFile' in df_local.columns) and isinstance(df_local['FeatureBarcodeFile'].iat[0], str) and (df_local['FeatureBarcodeFile'].iat[0] != '')
                     if has_fbf:
