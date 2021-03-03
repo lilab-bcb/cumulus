@@ -112,7 +112,7 @@ task run_souporcell {
 
         if '~{ref_genotypes}' is not '' and '~{de_novo_mode}' is 'false':
             file_ext = '~{ref_genotypes}'.split('.')[-1]
-            if file_ext == '.gz':
+            if file_ext == 'gz':
                 with open('ref_genotypes.vcf', 'w') as fout:
                     check_call(['gunzip', '-k', '~{ref_genotypes}', '-c'], stdout = fout)
             else:
