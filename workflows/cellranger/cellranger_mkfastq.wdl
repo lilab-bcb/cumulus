@@ -13,6 +13,10 @@ workflow cellranger_mkfastq {
         Boolean delete_input_bcl_directory = false
         # Number of allowed mismatches per index
         Int? barcode_mismatches
+        # Only demultiplex samples identified by an i7-only sample index, ignoring dual-indexed samples.  Dual-indexed samples will not be demultiplexed.
+        Boolean filter_single_index = false
+        # Override the read lengths as specified in RunInfo.xml
+        String? use_bases_mask
 
         # cellranger version
         String cellranger_version
@@ -38,6 +42,8 @@ workflow cellranger_mkfastq {
             output_directory = sub(output_directory, "/+$", ""),
             delete_input_bcl_directory = delete_input_bcl_directory,
             barcode_mismatches = barcode_mismatches,
+            filter_single_index = filter_single_index,
+            use_bases_mask = use_bases_mask,
             cellranger_version = cellranger_version,
             docker_registry = docker_registry,
             zones = zones,
@@ -61,6 +67,8 @@ task run_cellranger_mkfastq {
         String output_directory
         Boolean delete_input_bcl_directory
         Int? barcode_mismatches
+        Boolean filter_single_index
+        String? use_bases_mask
         String cellranger_version
         String docker_registry
         String zones
@@ -90,6 +98,10 @@ task run_cellranger_mkfastq {
         barcode_mismatches = '~{barcode_mismatches}'
         if barcode_mismatches != '':
             mkfastq_args += ['--barcode-mismatches', barcode_mismatches]
+        if '~{filter_single_index}' == 'true':
+            mkfastq_args.append('--filter-single-index')
+        if '~{use_bases_mask}' != '':
+            mkfastq_args.extend(['--use-bases-mask', '~{use_bases_mask}'])
         p = subprocess.run(mkfastq_args)
 
         if p.returncode != 0: # ./MAKE_FASTQS_CS/MAKE_FASTQS/BCL2FASTQ_WITH_SAMPLESHEET/fork0/chnk0-u8d92d5526b/_stderr

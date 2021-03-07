@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/5/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/8/plain-WDL/descriptor" as crm
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/6/plain-WDL/descriptor" as crc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/7/plain-WDL/descriptor" as crv
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/7/plain-WDL/descriptor" as ca
@@ -25,6 +25,10 @@ workflow cellranger_workflow {
         Boolean delete_input_bcl_directory = false
         # Number of allowed mismatches per index
         Int? mkfastq_barcode_mismatches
+        # Only demultiplex samples identified by an i7-only sample index, ignoring dual-indexed samples.  Dual-indexed samples will not be demultiplexed.
+        Boolean mkfastq_filter_single_index = false
+        # Override the read lengths as specified in RunInfo.xml
+        String? mkfastq_use_bases_mask
 
         # For cellranger count
 
@@ -67,8 +71,8 @@ workflow cellranger_workflow {
 
         # 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
         String cellranger_version = "6.0.0"
-        # 0.3.0, 0.2.0
-        String cumulus_feature_barcoding_version = "0.3.0"
+        # 0.4.0, 0.3.0, 0.2.0
+        String cumulus_feature_barcoding_version = "0.4.0"
         # 1.2.0, 1.1.0
         String cellranger_atac_version = "1.2.0"
         # 0.2
@@ -134,6 +138,8 @@ workflow cellranger_workflow {
                         output_directory = output_directory_stripped,
                         delete_input_bcl_directory = delete_input_bcl_directory,
                         barcode_mismatches = mkfastq_barcode_mismatches,
+                        filter_single_index = mkfastq_filter_single_index,
+                        use_bases_mask = mkfastq_use_bases_mask,
                         cellranger_version = cellranger_version,
                         docker_registry = mkfastq_docker_registry_stripped,
                         zones = zones,
@@ -478,7 +484,7 @@ task generate_count_config {
                         chemistry = 'SC3Pv3' # default is different
                     foo4.write(sample_id + '\t' + chemistry + '\n')
                     n_chem += 1
-                
+
                 if datatype in ['rna', 'adt', 'crispr']:
                     has_fbf = ('FeatureBarcodeFile' in df_local.columns) and isinstance(df_local['FeatureBarcodeFile'].iat[0], str) and (df_local['FeatureBarcodeFile'].iat[0] != '')
                     if has_fbf:
