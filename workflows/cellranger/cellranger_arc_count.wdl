@@ -13,7 +13,7 @@ workflow cellranger_arc_count {
 		# Keywords or a URL to a tar.gz file
 		String genome
 
-		String cellranger_arc_version = "1.0.0"
+		String cellranger_arc_version = "1.0.1"
 		# Google cloud zones, default to "us-central1-b", which is consistent with Cromwell's genomics.default-zones attribute
 		String zones = "us-central1-b"
 		# Number of cpus per cellranger job
