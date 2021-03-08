@@ -160,9 +160,9 @@ global inputs
       - "my_sample"
       -
     * - pegasus_version
-      - Pegasus version to use for analysis. Versions available: ``1.3.0``.
-      - "1.3.0"
-      - "1.3.0"
+      - Pegasus version to use for analysis. Versions available: ``1.4.0``, ``1.3.0``.
+      - "1.4.0"
+      - "1.4.0"
     * - docker_registry
       - Docker registry to use. Options:
 
@@ -564,17 +564,17 @@ cluster inputs
       - 0.05
       -
     * - doublet_cluster_attribute
-      - | Specify which cluster attribute (e.g. "louvain_labels") should be used for doublet inference. Then doublet clusters will be marked with the following criteria: passing the Fisher's exact test and having >= 50% of cells identified as doublets. 
+      - | Specify which cluster attribute (e.g. "louvain_labels") should be used for doublet inference. Then doublet clusters will be marked with the following criteria: passing the Fisher's exact test and having >= 50% of cells identified as doublets.
       	| If not specified, the first computed cluster attribute in the list of "leiden", "louvain", "spectral_ledein" and "spectral_louvain" will be used.
       - "louvain_labels"
       -
     * - citeseq
-      - | Perform CITE-Seq data analysis. Set to ``true`` if input data contain both RNA and CITE-Seq modalities. 
+      - | Perform CITE-Seq data analysis. Set to ``true`` if input data contain both RNA and CITE-Seq modalities.
       	| This will set *focus* to be the RNA modality and *append* to be the CITE-Seq modality. In addition, ``"ADT-"`` will be added in front of each antibody name to avoid name conflict with genes in the RNA modality.
       - false
       - false
     * - citeseq_umap
-      - For high quality cells kept in the RNA modality, calculate a distinct UMAP embedding based on their antibody expression. 
+      - For high quality cells kept in the RNA modality, calculate a distinct UMAP embedding based on their antibody expression.
       - false
       - false
     * - citeseq_umap_exclude
@@ -692,12 +692,12 @@ de_analysis inputs
       - 0.05
     * - fisher
       - Calculate Fisher’s exact test
-      - true
-      - true
+      - false
+      - false
     * - t_test
       - Calculate Welch's t-test.
-      - true
-      - true
+      - false
+      - false
     * - find_markers_lightgbm
       - If also detect markers using LightGBM
       - false
@@ -720,7 +720,7 @@ de_analysis inputs
       - "mwu"
     * - organism
       - Organism, could either of the follow:
-      
+
         - Preset markers: ``human_immune``, ``mouse_immune``, ``human_brain``, ``mouse_brain``, ``human_lung``, or a combination of them as a string separated by comma.
         - User-defined marker file: A Google bucket link to a user-specified JSON file describing the markers. For example: ``gs://fc-e0000000/my_markers.json``.
       - "mouse_immune,mouse_brain"

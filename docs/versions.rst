@@ -15,7 +15,7 @@ Latest version
       - Snapshot
       - Function
     * - cumulus/cellranger_workflow
-      - `20 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/20>`__
+      - `21 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/21>`__
       - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generating count matrix using cellranger count or cellranger-atac count, running cellranger vdj or feature-barcode extraction.
     * - cumulus/spaceranger_workflow
       - `1 <https://portal.firecloud.org/?return=terra#methods/cumulus/spaceranger_workflow/1>`_
@@ -48,7 +48,7 @@ Latest version
       - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/8>`__
       - Generate user-customized genome references for SMART-Seq2 data.
     * - cumulus/cumulus
-      - `36 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/36>`__
+      - `37 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/37>`__
       - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
 
 
