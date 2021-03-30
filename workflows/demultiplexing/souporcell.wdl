@@ -8,11 +8,12 @@ workflow souporcell {
         String input_bam
         String genome_url
         String ref_genotypes_url
+        File? common_variants
         Boolean de_novo_mode
         Int min_num_genes
         Int num_clusters
         String donor_rename = ''
-        String souporcell_version = "2020.07"
+        String souporcell_version = "2021.03"
         String docker_registry = "quay.io/cumulus"
         Int num_cpu = 32
         Int disk_space = 500
@@ -33,6 +34,7 @@ workflow souporcell {
             input_bam = input_bam,
             genome = genome_url,
             ref_genotypes = ref_genotypes,
+            common_variants = common_variants,
             donor_rename = donor_rename,
             de_novo_mode = de_novo_mode,
             min_num_genes = min_num_genes,
@@ -79,6 +81,7 @@ task run_souporcell {
         File input_bam
         File genome
         File? ref_genotypes
+        File? common_variants
         String? donor_rename
         Boolean de_novo_mode
         Int min_num_genes
@@ -109,6 +112,9 @@ task run_souporcell {
         from subprocess import check_call
 
         souporcell_call_args = ['souporcell_pipeline.py', '-i', '~{input_bam}', '-b', 'result/~{sample_id}.barcodes.tsv', '-f', 'genome_ref/fasta/genome.fa', '-t', '~{num_cpu}', '-o', 'result', '-k', '~{num_clusters}']
+
+        if '~{common_variants}' is not '':
+            souporcell_call_args.extend(['--common_variants', '~{common_variants}'])
 
         if '~{ref_genotypes}' is not '' and '~{de_novo_mode}' is 'false':
             file_ext = '~{ref_genotypes}'.split('.')[-1]
