@@ -117,7 +117,7 @@ task run_souporcell {
             file_ext = '~{common_variants}'.split('.')[-1]
             if file_ext == 'gz':
                 with open('common_variants.vcf', 'w') as fout:
-                    check_call(['gunzip', '~{common_variants.vcf}', '-c'], stdout = fout)
+                    check_call(['gunzip', '~{common_variants}', '-c'], stdout = fout)
             else:
                 check_call(['mv', '~{common_variants}', 'common_variants.vcf'])
             souporcell_call_args.extend(['--common_variants', 'common_variants.vcf'])
