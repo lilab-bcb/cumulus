@@ -13,7 +13,7 @@ workflow souporcell {
         Int min_num_genes
         Int num_clusters
         String donor_rename = ''
-        String souporcell_version = "2021.03"
+        String souporcell_version = "2020.07"
         String docker_registry = "quay.io/cumulus"
         Int num_cpu = 32
         Int disk_space = 500
@@ -114,7 +114,13 @@ task run_souporcell {
         souporcell_call_args = ['souporcell_pipeline.py', '-i', '~{input_bam}', '-b', 'result/~{sample_id}.barcodes.tsv', '-f', 'genome_ref/fasta/genome.fa', '-t', '~{num_cpu}', '-o', 'result', '-k', '~{num_clusters}']
 
         if '~{common_variants}' is not '':
-            souporcell_call_args.extend(['--common_variants', '~{common_variants}'])
+            file_ext = '~{common_variants}'.split('.')[-1]
+            if file_ext == 'gz':
+                with open('common_variants.vcf', 'w') as fout:
+                    check_call(['gunzip', '~{common_variants.vcf}', '-c'], stdout = fout)
+            else:
+                check_call(['mv', '~{common_variants}', 'common_variants.vcf'])
+            souporcell_call_args.extend(['--common_variants', 'common_variants.vcf'])
 
         if '~{ref_genotypes}' is not '' and '~{de_novo_mode}' is 'false':
             file_ext = '~{ref_genotypes}'.split('.')[-1]
