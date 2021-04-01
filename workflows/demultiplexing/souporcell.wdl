@@ -126,7 +126,7 @@ task run_souporcell {
             souporcell_call_args.extend(['--common_variants', 'common_variants.vcf'])
 
             if '~{skip_remap}' is 'true':
-                souporcell_call_args.append('--skip_remap')
+                souporcell_call_args.extend(['--skip_remap', 'True'])
 
         if '~{ref_genotypes}' is not '' and '~{de_novo_mode}' is 'false':
             file_ext = '~{ref_genotypes}'.split('.')[-1]
