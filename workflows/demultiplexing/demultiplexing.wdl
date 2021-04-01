@@ -42,9 +42,10 @@ workflow demultiplexing {
         # For souporcell
         Int souporcell_num_clusters = 1
         File? souporcell_common_variants
+        Boolean souporcell_skip_remap = false
         Boolean souporcell_de_novo_mode = true
         String souporcell_rename_donors = ""
-        String souporcell_version = "2021.03"
+        String souporcell_version = "2020.07"
         Int souporcell_num_cpu = 32
         Int souporcell_disk_space = 500
         Int souporcell_memory = 120
@@ -113,6 +114,7 @@ workflow demultiplexing {
                         genome_url = genome_url,
                         ref_genotypes_url = Config.id2genotype[pooling_id],
                         common_variants = souporcell_common_variants,
+                        skip_remap = souporcell_skip_remap,
                         de_novo_mode = souporcell_de_novo_mode,
                         min_num_genes = min_num_genes,
                         num_clusters = souporcell_num_clusters,

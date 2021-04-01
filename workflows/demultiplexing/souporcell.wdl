@@ -9,6 +9,7 @@ workflow souporcell {
         String genome_url
         String ref_genotypes_url
         File? common_variants
+        Boolean skip_remap
         Boolean de_novo_mode
         Int min_num_genes
         Int num_clusters
@@ -35,6 +36,7 @@ workflow souporcell {
             genome = genome_url,
             ref_genotypes = ref_genotypes,
             common_variants = common_variants,
+            skip_remap = skip_remap,
             donor_rename = donor_rename,
             de_novo_mode = de_novo_mode,
             min_num_genes = min_num_genes,
@@ -82,6 +84,7 @@ task run_souporcell {
         File genome
         File? ref_genotypes
         File? common_variants
+        Boolean skip_remap
         String? donor_rename
         Boolean de_novo_mode
         Int min_num_genes
@@ -121,6 +124,9 @@ task run_souporcell {
             else:
                 check_call(['mv', '~{common_variants}', 'common_variants.vcf'])
             souporcell_call_args.extend(['--common_variants', 'common_variants.vcf'])
+
+            if '~{skip_remap}' is 'true':
+                souporcell_call_args.append('--skip_remap')
 
         if '~{ref_genotypes}' is not '' and '~{de_novo_mode}' is 'false':
             file_ext = '~{ref_genotypes}'.split('.')[-1]
