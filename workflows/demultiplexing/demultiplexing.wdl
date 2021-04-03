@@ -40,7 +40,7 @@ workflow demultiplexing {
         Int demuxEM_memory = 10
 
         # For souporcell
-        Int souporcell_num_clusters
+        Int souporcell_num_clusters = 1
         Boolean souporcell_de_novo_mode = true
         File? souporcell_common_variants
         Boolean souporcell_skip_remap = false

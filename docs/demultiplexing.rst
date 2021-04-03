@@ -209,7 +209,7 @@ souporcell inputs
 	- | souporcell parameter. Number of expected clusters when doing clustering.
 	  | **This needs to be set when running souporcell.**
 	- 8
-	-
+	- 1
 	* - souporcell_de_novo_mode
 	  - | souporcell parameter.
 	    | If ``true``, run souporcell in de novo mode without reference genotypes; and if a reference genotype vcf file is provided in the sample sheet, use it **only** for matching the cluster labels computed by souporcell.
@@ -219,7 +219,7 @@ souporcell inputs
 	* - souporcell_common_variants
 	  - souporcell parameter. Users can provide a common variants list in VCF format for Souporcell to use, instead of calling SNPs de novo
 	  - "1000genome.common.variants.vcf.gz"
-	  - 
+	  -
 	* - souporcell_skip_remap
 	  - souporcell parameter. Skip remap step. Only recommended in non denovo mode or common variants are provided.
 	  - true
