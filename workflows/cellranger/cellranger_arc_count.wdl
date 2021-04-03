@@ -120,7 +120,6 @@ task run_cellranger_arc_count {
 		String output_count_directory = "~{output_directory}/~{sample_id}"
 		String output_metrics_summary = "~{output_directory}/~{sample_id}/summary.csv"
 		String output_web_summary = "~{output_directory}/~{sample_id}/web_summary.html"
-		sample_id.mri.tgz
 	}
 
 	runtime {
