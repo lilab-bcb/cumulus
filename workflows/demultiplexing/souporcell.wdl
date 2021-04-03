@@ -8,12 +8,12 @@ workflow souporcell {
         String input_bam
         String genome_url
         String ref_genotypes_url
+        Int num_clusters
+        Boolean de_novo_mode
         File? common_variants
         Boolean skip_remap
-        Boolean de_novo_mode
-        Int min_num_genes
-        Int num_clusters
         String donor_rename = ''
+        Int min_num_genes
         String souporcell_version = "2020.07"
         String docker_registry = "quay.io/cumulus"
         Int num_cpu = 32
@@ -37,7 +37,6 @@ workflow souporcell {
             ref_genotypes = ref_genotypes,
             common_variants = common_variants,
             skip_remap = skip_remap,
-            donor_rename = donor_rename,
             de_novo_mode = de_novo_mode,
             min_num_genes = min_num_genes,
             num_clusters = num_clusters,
@@ -85,7 +84,6 @@ task run_souporcell {
         File? ref_genotypes
         File? common_variants
         Boolean skip_remap
-        String? donor_rename
         Boolean de_novo_mode
         Int min_num_genes
         Int num_clusters
@@ -116,19 +114,8 @@ task run_souporcell {
 
         souporcell_call_args = ['souporcell_pipeline.py', '-i', '~{input_bam}', '-b', 'result/~{sample_id}.barcodes.tsv', '-f', 'genome_ref/fasta/genome.fa', '-t', '~{num_cpu}', '-o', 'result', '-k', '~{num_clusters}']
 
-        if '~{common_variants}' is not '':
-            file_ext = '~{common_variants}'.split('.')[-1]
-            if file_ext == 'gz':
-                with open('common_variants.vcf', 'w') as fout:
-                    check_call(['gunzip', '~{common_variants}', '-c'], stdout = fout)
-            else:
-                check_call(['mv', '~{common_variants}', 'common_variants.vcf'])
-            souporcell_call_args.extend(['--common_variants', 'common_variants.vcf'])
-
-            if '~{skip_remap}' is 'true':
-                souporcell_call_args.extend(['--skip_remap', 'True'])
-
-        if '~{ref_genotypes}' is not '' and '~{de_novo_mode}' is 'false':
+        if '~{de_novo_mode}' is 'false':
+            assert '~{ref_genotypes}' is not ''
             file_ext = '~{ref_genotypes}'.split('.')[-1]
             if file_ext == 'gz':
                 with open('ref_genotypes.vcf', 'w') as fout:
@@ -137,11 +124,23 @@ task run_souporcell {
                 check_call(['mv', '~{ref_genotypes}', 'ref_genotypes.vcf'])
 
             souporcell_call_args.extend(['--known_genotypes', 'ref_genotypes.vcf'])
+        else:
+            assert '~{de_novo_mode}' is 'true'
+            if '~{common_variants}' is not '':
+                file_ext = '~{common_variants}'.split('.')[-1]
+                if file_ext == 'gz':
+                    with open('common_variants.vcf', 'w') as fout:
+                        check_call(['gunzip', '~{common_variants}', '-c'], stdout = fout)
+                else:
+                    check_call(['mv', '~{common_variants}', 'common_variants.vcf'])
+                souporcell_call_args.extend(['--common_variants', 'common_variants.vcf'])
 
-            assert '~{donor_rename}' is not ''
-
-            name_list = '~{donor_rename}'.split(',')
-            souporcell_call_args.extend(['--known_genotypes_sample_names'] + name_list)
+        if '~{skip_remap}' is 'true':
+            if '~{de_novo_mode}' is 'true' and '~{common_variants}' is '':
+                print("Warning: if de novo mode is true and no common variants provided, skip remap is not recommended and thus is turned off!")
+            else:    
+                check_call(['samtools', 'index', '-@', '~{num_cpu}', '~{input_bam}'])
+                souporcell_call_args.extend(['--skip_remap', 'True'])
 
         print(' '.join(souporcell_call_args))
         check_call(souporcell_call_args)

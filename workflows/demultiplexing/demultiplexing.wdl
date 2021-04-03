@@ -40,10 +40,10 @@ workflow demultiplexing {
         Int demuxEM_memory = 10
 
         # For souporcell
-        Int souporcell_num_clusters = 1
+        Int souporcell_num_clusters
+        Boolean souporcell_de_novo_mode = true
         File? souporcell_common_variants
         Boolean souporcell_skip_remap = false
-        Boolean souporcell_de_novo_mode = true
         String souporcell_rename_donors = ""
         String souporcell_version = "2020.07"
         Int souporcell_num_cpu = 32
