@@ -1,7 +1,8 @@
 version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/5/plain-WDL/descriptor" as dem
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/13/plain-WDL/descriptor" as soc
+#import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/13/plain-WDL/descriptor" as soc
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/demultiplexing/souporcell.wdl" as soc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/5/plain-WDL/descriptor" as dmx
 
 #import "demuxEM.wdl" as dem
@@ -40,6 +41,8 @@ workflow demultiplexing {
 
         # For souporcell
         Int souporcell_num_clusters = 1
+        File? souporcell_common_variants
+        Boolean souporcell_skip_remap = false
         Boolean souporcell_de_novo_mode = true
         String souporcell_rename_donors = ""
         String souporcell_version = "2020.07"
@@ -110,6 +113,8 @@ workflow demultiplexing {
                         input_bam = Config.id2tag[pooling_id],
                         genome_url = genome_url,
                         ref_genotypes_url = Config.id2genotype[pooling_id],
+                        common_variants = souporcell_common_variants,
+                        skip_remap = souporcell_skip_remap,
                         de_novo_mode = souporcell_de_novo_mode,
                         min_num_genes = min_num_genes,
                         num_clusters = souporcell_num_clusters,
