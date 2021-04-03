@@ -94,7 +94,7 @@ task run_cellranger_mkfastq {
         import pandas as pd
         import subprocess
 
-        mkfastq_args = ['cellranger', 'mkfastq', '--id=results', '--run=~{run_id}', '--csv=~{input_csv_file}', '--jobmode=local', '--qc']
+        mkfastq_args = ['cellranger', 'mkfastq', '--id=results', '--run=~{run_id}', '--csv=~{input_csv_file}', '--jobmode=local']
         barcode_mismatches = '~{barcode_mismatches}'
         if barcode_mismatches != '':
             mkfastq_args += ['--barcode-mismatches', barcode_mismatches]
