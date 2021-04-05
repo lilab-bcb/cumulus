@@ -202,7 +202,7 @@ souporcell inputs
 	  - Example
 	  - Default
 	* - souporcell_version
-	  - souporcell version to use. Available versions: "2020.07", "2020.03".
+	  - souporcell version to use. Available versions: "2020.07", "2021.03", "2020.03".
 	  - "2020.07"
 	  - "2020.07"
 	* - souporcell_num_clusters
