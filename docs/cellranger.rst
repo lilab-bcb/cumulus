@@ -332,7 +332,7 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		* - mkfastq_use_bases_mask
 		  - Override the read lengths as specified in *RunInfo.xml*
 		  - "Y28n*,I8n*,N10,Y90n*"
-		  - 
+		  -
 		* - force_cells
 		  - Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells
 		  - 6000
@@ -577,9 +577,9 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - "6.0.0"
 		  - "6.0.0"
 		* - cumulus_feature_barcoding_version
-		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.4.0, 0.3.0, 0.2.0.
-		  - "0.4.0"
-		  - "0.4.0"
+		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.5.0, 0.4.0, 0.3.0, 0.2.0.
+		  - "0.5.0"
+		  - "0.5.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -951,7 +951,7 @@ Sample sheet
 		* - **GRCh38_vdj_v5.0.0**
 		  - Human GRCh38 V(D)J sequences, cellranger reference 5.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
 		* - **GRCm38_vdj_v5.0.0**
-		  - Mouse GRCm38 V(D)J sequences, cellranger reference 5.0.0, annotation built from Ensembl *Mus_musculus.GRCm38.94.gtf*	
+		  - Mouse GRCm38 V(D)J sequences, cellranger reference 5.0.0, annotation built from Ensembl *Mus_musculus.GRCm38.94.gtf*
 		* - **GRCh38_vdj_v4.0.0**
 		  - Human GRCh38 V(D)J sequences, cellranger reference 4.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
 		* - **GRCm38_vdj_v4.0.0**

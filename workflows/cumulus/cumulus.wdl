@@ -250,7 +250,7 @@ workflow cumulus {
 	}
 
 	# Output directory, with trailing slashes stripped
-	String output_directory_stripped = sub(output_directory, "/+$", "")
+	String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 	# If input file is a sample sheet in csv format.
 	Boolean is_sample_sheet = sub(input_file, "^.+\\.csv$", "CSV") == "CSV"
 
