@@ -58,7 +58,7 @@ workflow demultiplexing {
 
     }
 
-    String output_directory_stripped = sub(output_directory, "/+$", "")
+    String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
     File ref_index_file = "gs://regev-lab/resources/cellranger/index.tsv"
     # File ref_index_file = "index.tsv"
