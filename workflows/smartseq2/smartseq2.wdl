@@ -23,17 +23,17 @@ workflow smartseq2 {
         String memory = (if aligner != "star" then "3.60G" else "32G")
         # factor to multiply size of R1 and R2 by for RSEM
         Float disk_space_multiplier = 11
-        # Number of preemptible tries 
+        # Number of preemptible tries
         Int preemptible = 2
         # Disk space for count matrix generation task
         Int generate_count_matrix_disk_space = 10
         # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-        String docker_registry = "quay.io/cumulus"  
+        String docker_registry = "quay.io/cumulus"
     }
 
     # Output directory, with trailing slashes stripped
-    String output_directory_stripped = sub(output_directory, "/+$", "")
-    
+    String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
+
     Array[Array[String]] data_table = read_tsv(input_tsv_file)
 
 
@@ -47,7 +47,7 @@ workflow smartseq2 {
     File reference_file = (if is_url then reference else acronym2gsurl[key])
 
 
-    
+
     scatter (i in range(length(data_table)-1)) {
         Int pos = i + 1
         Boolean is_se = length(data_table[pos]) == 3
@@ -69,9 +69,9 @@ workflow smartseq2 {
                     disk_space_multiplier = disk_space_multiplier,
                     preemptible = preemptible,
                     docker_registry = docker_registry
-            }        
+            }
         }
-        
+
         # Paired-end data
         if (!is_se) {
             call run_rsem as run_rsem_pe {
@@ -137,7 +137,7 @@ task run_rsem {
         String memory
         Float disk_space_multiplier
         Int preemptible
-        String docker_registry  
+        String docker_registry
     }
 
     Boolean is_star = aligner == "star"
@@ -153,14 +153,14 @@ task run_rsem {
         REFERENCE_NAME="$(basename `ls rsem_ref/*.grp` .grp)"
         rsem-calculate-expression --~{aligner} ~{true="--output-genome-bam" false="" output_genome_bam} ~{true="--star-gzipped-read-file" false="" star_gzipped_read_file} ~{true="--paired-end" false="" defined(read2)} -p ~{num_cpu} --append-names --time ~{read1} ~{default="" read2} rsem_ref/$REFERENCE_NAME ~{sample_name}
 
-        gsutil cp ~{sample_name}.transcript.bam ~{output_directory}/
-        # mkdir -p ~{output_directory}
-        # cp ~{sample_name}.transcript.bam ~{output_directory}/
+        gsutil cp ~{sample_name}.transcript.bam "~{output_directory}"/
+        # mkdir -p "~{output_directory}"
+        # cp ~{sample_name}.transcript.bam "~{output_directory}"/
 
         if [ -f ~{sample_name}.genome.bam ]
         then
-            gsutil cp ~{sample_name}.genome.bam ~{output_directory}/
-            # cp ~{sample_name}.genome.bam ~{output_directory}/
+            gsutil cp ~{sample_name}.genome.bam "~{output_directory}"/
+            # cp ~{sample_name}.genome.bam "~{output_directory}"/
         fi
     }
 
@@ -205,9 +205,9 @@ task generate_count_matrix {
         export TMPDIR=/tmp
 
         generate_matrix_ss2.py ~{sep=',' gene_results} ~{sep=',' count_results} count_matrix
-        gsutil -m cp -r count_matrix ~{output_directory}/
-        # mkdir -p ~{output_directory}
-        # cp -r count_matrix ~{output_directory}
+        gsutil -m cp -r count_matrix "~{output_directory}"/
+        # mkdir -p "~{output_directory}"
+        # cp -r count_matrix "~{output_directory}"
     }
 
     output {
