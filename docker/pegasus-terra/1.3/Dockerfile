@@ -46,7 +46,7 @@ RUN pip3 -V && \
     pip3 install umap-learn==0.4.6 && \
     pip3 install torch==1.7.1 && \
     pip3 install harmony-pytorch==0.1.6 && \
-    pip3 install cirrocumulus==1.1.13.post1 && \
+    pip3 install cirrocumulus==1.1.15.post4 && \
     pip3 install annoy==1.17.0 && \
     pip3 install pegasusio==0.2.10 && \
     pip3 install demuxEM==0.1.5.post1 && \
