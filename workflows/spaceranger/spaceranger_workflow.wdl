@@ -1,7 +1,7 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_mkfastq/versions/1/plain-WDL/descriptor" as srm
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_count/versions/1/plain-WDL/descriptor" as src
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_mkfastq/versions/2/plain-WDL/descriptor" as srm
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_count/versions/2/plain-WDL/descriptor" as src
 
 workflow spaceranger_workflow {
     input {
@@ -29,14 +29,14 @@ workflow spaceranger_workflow {
         # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false. This is also a spaceranger argument.
         Boolean secondary = false
 
-        # 1.2.1
+        # Space Ranger version: 1.2.1
         String spaceranger_version = "1.2.1"
-        # 0.2
+        # Config version: 0.2
         String config_version = "0.2"
 
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
-        # spaceranger/spaceranger-atac mkfastq registry, default to gcr.io/broad-cumulus
+        # spaceranger mkfastq registry, default to gcr.io/broad-cumulus
         String mkfastq_docker_registry = "gcr.io/broad-cumulus"
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"

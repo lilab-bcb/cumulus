@@ -98,10 +98,11 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		  - Describes the 10x chemistry used for the sample. This column is optional.
 		* - DataType
 		  -
-			| Describes the data type of the sample --- *rna*, *vdj*, *adt*, *crispr*, *atac*.
+			| Describes the data type of the sample --- *rna*, *vdj*, *adt*, *cmo*, *crispr*, *atac*.
 			| **rna** refers to gene expression data (*cellranger count*),
 			| **vdj** refers to V(D)J data (*cellranger vdj*),
 			| **adt** refers to antibody tag data, which can be either CITE-Seq, cell-hashing, or nucleus-hashing,
+			| **cmo** refers to cell multiplexing oligos used in 10x Genomics' CellPlex assay,
 			| **crispr** refers to Perturb-seq guide tag data,
 			| **atac** refers to scATAC-Seq data (*cellranger-atac count*),
 			| This column is optional and the default data type is *rna*.
