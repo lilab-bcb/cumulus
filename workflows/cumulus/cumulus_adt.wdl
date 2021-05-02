@@ -50,7 +50,7 @@ workflow cumulus_adt {
 		input:
 			sample_id = sample_id,
 			input_fastqs_directories = input_fastqs_directories,
-			output_directory = sub(output_directory, "/+$", ""),
+			output_directory = output_directory,
 			chemistry = chemistry,
 			data_type = data_type,
 			cell_barcodes = cell_barcode_file,
@@ -114,13 +114,15 @@ task run_generate_count_matrix_ADTs {
 			fastqs.append('~{sample_id}_' + str(i))
 	
 		call_args = ['generate_count_matrix_ADTs', '~{cell_barcodes}', '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
-		if '~{data_type}' is 'crispr':
+		if '~{data_type}' == 'crispr':
 			call_args.extend(['--feature', 'crispr', '--scaffold-sequence', '~{scaffold_sequence}'])
-			if '~{chemistry}' is not 'SC3Pv3':
+			if '~{chemistry}' != 'SC3Pv3':
 				call_args.append('--no-match-tso')
 		else:
 			call_args.extend(['--feature', 'antibody'])
-		if '~{chemistry}' is 'SC3Pv3':
+			if '~{data_type}' == 'cmo':
+				call_args.append('--convert-cell-barcode')
+		if '~{chemistry}' == 'SC3Pv3':
 			call_args.extend(['--max-mismatch-cell', '0', '--umi-length', '12'])
 		else:
 			call_args.extend(['--max-mismatch-cell', '1', '--umi-length', '10'])
@@ -128,19 +130,19 @@ task run_generate_count_matrix_ADTs {
 		check_call(call_args)
 		CODE
 
-		if [ -f ~{sample_id}.stat.csv.gz ]
+		if [ -f "~{sample_id}".stat.csv.gz ]
 		then
-			filter_chimeric_reads ~{data_type} ~{feature_barcodes} ~{sample_id}.stat.csv.gz ~{min_read_ratio} ~{sample_id}
+			filter_chimeric_reads ~{data_type} ~{feature_barcodes} "~{sample_id}.stat.csv.gz" ~{min_read_ratio} ~{sample_id}
 		fi
 
-		gsutil -m cp ~{sample_id}.*csv* ~{output_directory}/~{sample_id}/
-		# mkdir -p ~{output_directory}/~{sample_id}
-		# cp -f ~{sample_id}.*csv* ~{output_directory}/~{sample_id}/
+		gsutil -m cp "~{sample_id}".*csv* "~{output_directory}/~{sample_id}/"
+		# mkdir -p "~{output_directory}/~{sample_id}"
+		# cp -f "~{sample_id}".*csv* "~{output_directory}/~{sample_id}/"
 
-		if [ -f ~{sample_id}.umi_count.pdf ]
+		if [ -f "~{sample_id}".umi_count.pdf ]
 		then
-			gsutil cp ~{sample_id}.umi_count.pdf ~{output_directory}/~{sample_id}/
-			# cp -f ~{sample_id}.umi_count.pdf ~{output_directory}/~{sample_id}/
+			gsutil cp "~{sample_id}".umi_count.pdf "~{output_directory}/~{sample_id}/"
+			# cp -f "~{sample_id}".umi_count.pdf "~{output_directory}/~{sample_id}/"
 		fi
 	}
 

@@ -69,8 +69,8 @@ workflow cellranger_workflow {
         # For atac, choose the algorithm for dimensionality reduction prior to clustering and tsne: 'lsa' (default), 'plsa', or 'pca'.
         String? atac_dim_reduce
 
-        # 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
-        String cellranger_version = "6.0.0"
+        # 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
+        String cellranger_version = "6.0.1"
         # 0.5.0, 0.4.0, 0.3.0, 0.2.0
         String cumulus_feature_barcoding_version = "0.5.0"
         # 1.2.0, 1.1.0
@@ -344,10 +344,10 @@ task generate_bcl_csv {
 
         for idx, row in df.iterrows():
             row['Flowcell'] = re.sub('/+$', '', row['Flowcell'])
-            if row['DataType'] not in ['rna', 'vdj', 'adt', 'crispr', 'atac']:
+            if row['DataType'] not in ['rna', 'vdj', 'adt', 'cmo', 'crispr', 'atac']:
                 print("Unknown DataType " + row['DataType'] + " is detected!", file = sys.stderr)
                 sys.exit(1)
-            if row['DataType'] in ['vdj', 'adt', 'crispr']:
+            if row['DataType'] in ['vdj', 'adt', 'cmo', 'crispr']:
                 row['DataType'] = 'rna'
             if re.search('[^a-zA-Z0-9_-]', row['Sample']) is not None:
                 print('Sample must contain only alphanumeric characters, hyphens, and underscores.', file = sys.stderr)
@@ -420,7 +420,7 @@ task generate_count_config {
 
         for idx, row in df.iterrows():
             row['Flowcell'] = re.sub('/+$', '', row['Flowcell'])
-            if row['DataType'] not in ['rna', 'vdj', 'adt', 'crispr', 'atac']:
+            if row['DataType'] not in ['rna', 'vdj', 'adt', 'cmo', 'crispr', 'atac']:
                 print("Unknown DataType " + row['DataType'] + " is detected!", file = sys.stderr)
                 sys.exit(1)
             if re.search('[^a-zA-Z0-9_-]', row['Sample']) is not None:
@@ -447,8 +447,8 @@ task generate_count_config {
 
             n_ref = n_chem = n_fbf = 0 # this mappings can be empty
             foo6.write('Sample,Location,Bam,BamIndex,Barcodes,Reference,Chemistry\n') # count_matrix.csv
-            datatype2fo = dict([('rna', fo1), ('vdj', fo2), ('adt', fo3), ('crispr', fo3), ('atac', fo4)])
-            datatype2r2f = dict([('rna', r2f), ('vdj', r2f), ('adt', r2f), ('crispr', r2f), ('atac', ar2f)])
+            datatype2fo = dict([('rna', fo1), ('vdj', fo2), ('adt', fo3), ('cmo', fo3) ('crispr', fo3), ('atac', fo4)])
+            datatype2r2f = dict([('rna', r2f), ('vdj', r2f), ('adt', r2f), ('cmo', r2f), ('crispr', r2f), ('atac', ar2f)])
             for sample_id in df['Sample'].unique():
                 df_local = df.loc[df['Sample'] == sample_id]
                 if df_local['DataType'].unique().size > 1:
@@ -475,17 +475,17 @@ task generate_count_config {
                     foo3.write(sample_id + '\t' + reference + '\n')
                     n_ref += 1
 
-                if datatype in ['rna', 'adt', 'crispr']:
+                if datatype in ['rna', 'adt', 'cmo', 'crispr']:
                     if df_local['Chemistry'].unique().size > 1:
                         print("Detected multiple chemistry strings for sample " + sample_id + "!", file = sys.stderr)
                         sys.exit(1)
                     chemistry = df_local['Chemistry'].iat[0]
-                    if chemistry == 'auto' and datatype in ['adt', 'crispr']:
+                    if chemistry == 'auto' and datatype in ['adt', 'cmo', 'crispr']:
                         chemistry = 'SC3Pv3' # default is different
                     foo4.write(sample_id + '\t' + chemistry + '\n')
                     n_chem += 1
 
-                if datatype in ['rna', 'adt', 'crispr']:
+                if datatype in ['rna', 'adt', 'cmo', 'crispr']:
                     has_fbf = ('FeatureBarcodeFile' in df_local.columns) and isinstance(df_local['FeatureBarcodeFile'].iat[0], str) and (df_local['FeatureBarcodeFile'].iat[0] != '')
                     if has_fbf:
                         if df_local['FeatureBarcodeFile'].unique().size > 1:
@@ -493,7 +493,7 @@ task generate_count_config {
                             sys.exit(1)
                         feature_barcode_file = df_local['FeatureBarcodeFile'].iat[0]
                     else:
-                        if datatype in ['adt', 'crispr']:
+                        if datatype in ['adt', 'cmo', 'crispr']:
                             print("Please specify one feature barcode file for sample " + sample_id + "!", file = sys.stderr)
                             sys.exit(1)
                         feature_barcode_file = null_file

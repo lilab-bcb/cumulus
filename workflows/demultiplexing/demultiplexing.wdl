@@ -10,14 +10,22 @@ import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/5/pla
 
 workflow demultiplexing {
     input {
+        # Input CSV file describing metadata of RNA and hashtag/genetic data pairing.
         File input_sample_sheet
+        # This is the output directory (gs url + path) for all results. There will be one folder per RNA-hashtag/genetic data pair under this directory.
         String output_directory
+        # Reference genome name
         String genome
+        # demultiplexing algorithm to use for genetic-pooling data
         String demultiplexing_algorithm = "souporcell"
+        # Only demultiplex cells/nuclei with at least <min_num_genes> expressed genes
         Int min_num_genes = 100
 
+        # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
+        # Number of preemptible tries
         Int preemptible = 2
+        # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 
         # For demuxEM
@@ -31,31 +39,47 @@ workflow demultiplexing {
         Int? demuxEM_random_state
         # Generate a series of diagnostic plots, including the background/signal between HTO counts, estimated background probabilities, HTO distributions of cells and non-cells etc. [default: true]
         Boolean demuxEM_generate_diagnostic_plots = true
-        # Generate violin plots using gender-specific genes (e.g. Xist). <demuxEM_generate_gender_plot> is a comma-separated list of gene names.
+        # Generate violin plots using gender-specific genes (e.g. Xist). <demuxEM_generate_gender_plot> is a comma-separated list of gene names
         String? demuxEM_generate_gender_plot
+        # DemuxEM version
         String demuxEM_version = "0.1.5"
+        # Number of CPUs used
         Int demuxEM_num_cpu = 8
+        # Disk space in GB
         Int demuxEM_disk_space = 20
+        # Memory in GB
         Int demuxEM_memory = 10
 
         # For souporcell
+        # Number of expected clusters when doing clustering
         Int souporcell_num_clusters = 1
+        # If true, run souporcell in de novo mode without reference genotypes; and if a reference genotype vcf file is provided in the sample sheet, use it only for matching the cluster labels computed by souporcell. If false, run souporcell with --known_genotypes option using the reference genotype vcf file specified in sample sheet, and souporcell_rename_donors is required in this case.
         Boolean souporcell_de_novo_mode = true
+        # Users can provide a common variants list in VCF format for Souporcell to use, instead of calling SNPs de novo
         File? souporcell_common_variants
+        # Skip remap step. Only recommended in non denovo mode or common variants are provided
         Boolean souporcell_skip_remap = false
+        # A comma-separated list of donor names for renaming clusters achieved by souporcell
         String souporcell_rename_donors = ""
+        # Souporcell version to use. Available versions: "2020.07", "2021.03", "2020.03"
         String souporcell_version = "2020.07"
+        # Number of CPUs to request for souporcell per pair
         Int souporcell_num_cpu = 32
+        # Disk space (integer) in GB needed for souporcell per pair
         Int souporcell_disk_space = 500
+        # Memory size (integer) in GB needed for souporcell per pair
         Int souporcell_memory = 120
 
         # For demuxlet
+        # Demuxlet version to use. Currently only support "0.1b"
         String demuxlet_version = "0.1b"
+        # Memory size (integer) in GB needed for demuxlet per pair
         Int demuxlet_memory = 10
+        # Disk space size (integer) in GB needed for demuxlet per pair. Notice that the overall disk space for demuxlet is this disk space plus the size of provided reference genotypes file in the sample sheet
         Int demuxlet_disk_space = 2
 
+        # Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: ``0.2``, ``0.1``
         String config_version = "0.2"
-
     }
 
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")

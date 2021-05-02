@@ -2,25 +2,44 @@ version 1.0
 
 workflow souporcell {
     input {
+        # Sample ID
         String sample_id
+        # Output directory (gs url + path)
         String output_directory
+        # Link to a RNA count matrix
         String input_rna
+        # Link to a position-sorted BAM
         String input_bam
+        # Link to a reference genome
         String genome_url
+        # Link to reference genotype files
         String ref_genotypes_url
+        # Number of expected clusters when doing clustering
         Int num_clusters
+        # If true, run souporcell in de novo mode without reference genotypes
         Boolean de_novo_mode
+        # Users can provide a common variants list in VCF format for Souporcell to use, instead of calling SNPs de novo
         File? common_variants
+        # Skip remap step. Only recommended in non denovo mode or common variants are provided
         Boolean skip_remap
-        String donor_rename = ''
+        # A comma-separated list of donor names for renaming clusters achieved by souporcell
+        String donor_rename
+        # Only demultiplex cells/nuclei with at least <min_num_genes> expressed genes
         Int min_num_genes
-        String souporcell_version = "2020.07"
-        String docker_registry = "quay.io/cumulus"
-        Int num_cpu = 32
-        Int disk_space = 500
-        Int memory = 120
-        Int preemptible = 2
-        String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        # Souporcell version to use
+        String souporcell_version
+        # Which docker registry to use
+        String docker_registry
+        # Number of CPUs to request for souporcell per pair
+        Int num_cpu
+        # Disk space (integer) in GB needed for souporcell per pair
+        Int disk_space
+        # Memory size (integer) in GB needed for souporcell per pair
+        Int memory
+        # Number of preemptible tries
+        Int preemptible
+        # Google cloud zones
+        String zones
     }
 
     if (ref_genotypes_url != 'null') {
@@ -211,9 +230,9 @@ task match_donors {
 
         mkdir result
         mv match_donors.log ~{sample_id}_demux.zarr.zip ~{souporcell_cluster_tsv} ~{souporcell_genotypes_vcf} result/
-        gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
-        # mkdir -p ~{output_directory}/~{sample_id}
-        # cp -r result/* ~{output_directory}/~{sample_id}
+        gsutil -q -m rsync -r result "~{output_directory}/~{sample_id}"
+        # mkdir -p "~{output_directory}/~{sample_id}"
+        # cp -r result/* "~{output_directory}/~{sample_id}"
     }
 
     output {

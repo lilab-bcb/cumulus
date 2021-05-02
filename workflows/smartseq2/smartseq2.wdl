@@ -31,7 +31,7 @@ workflow smartseq2 {
         String docker_registry = "quay.io/cumulus"
     }
 
-    # Output directory, with trailing slashes stripped
+    # Output directory, with trailing slashes and spaces stripped
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
     Array[Array[String]] data_table = read_tsv(input_tsv_file)

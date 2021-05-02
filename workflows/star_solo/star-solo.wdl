@@ -222,10 +222,9 @@ task run_star_solo {
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
-        # mkdir -p ~{output_directory}/~{sample_id}
-        # cp -r result/* ~{output_directory}/~{sample_id}
-
+        gsutil -q -m rsync -r result "~{output_directory}/~{sample_id}"
+        # mkdir -p "~{output_directory}/~{sample_id}"
+        # cp -r result/* "~{output_directory}/~{sample_id}"
     }
 
     output {

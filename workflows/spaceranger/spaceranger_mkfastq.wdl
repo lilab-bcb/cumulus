@@ -9,7 +9,7 @@ workflow spaceranger_mkfastq {
         # spaceranger output directory, gs url
         String output_directory
 
-        # Whether to delete input bcl directory. If false, you should delete this folder yourself so as to not incur storage charges.
+        # Whether to delete input bcl directory. If false, you should delete this folder yourself so as to not incur storage charges
         Boolean delete_input_bcl_directory = false
         # Number of allowed mismatches per index
         Int? barcode_mismatches
@@ -23,7 +23,7 @@ workflow spaceranger_mkfastq {
         String zones = "us-central1-b"
         # Number of cpus per spaceranger job
         Int num_cpu = 32
-        # Memory string, e.g. 120G
+        # Memory string
         String memory = "120G"
         # Disk space in GB
         Int disk_space = 1500
@@ -33,9 +33,9 @@ workflow spaceranger_mkfastq {
 
     call run_spaceranger_mkfastq {
         input:
-            input_bcl_directory = sub(input_bcl_directory, "/+$", ""),
+            input_bcl_directory = input_bcl_directory,
             input_csv_file = input_csv_file,
-            output_directory = sub(output_directory, "/+$", ""),
+            output_directory = output_directory,
             delete_input_bcl_directory = delete_input_bcl_directory,
             barcode_mismatches = barcode_mismatches,
             spaceranger_version = spaceranger_version,
@@ -125,8 +125,8 @@ task run_spaceranger_mkfastq {
                 subprocess.check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs ~{output_directory}/~{run_id}_spatialfastqs
-        # cp -r results/outs ~{output_directory}/~{run_id}_spatialfastqs
+        gsutil -q -m rsync -d -r results/outs "~{output_directory}/~{run_id}_spatialfastqs"
+        # cp -r results/outs "~{output_directory}/~{run_id}_spatialfastqs"
 
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError

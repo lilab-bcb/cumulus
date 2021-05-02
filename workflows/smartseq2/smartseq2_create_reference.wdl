@@ -28,8 +28,8 @@ workflow smartseq2_create_reference {
         String docker_registry = "cumulusprod"    
     }
 
-    # Output directory, with trailing slashes stripped
-    String output_directory_stripped = sub(output_directory, "/+$", "")
+    # Output directory, with trailing slashes and spaces stripped
+    String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
     call rsem_prepare_reference {
         input:
@@ -73,9 +73,9 @@ task rsem_prepare_reference {
         rsem-prepare-reference --gtf ~{gtf} --~{aligner} -p ~{cpu} ~{fasta} ~{reference_name}_~{aligner}/rsem_ref
         tar -czf ~{reference_name}_~{aligner}.tar.gz ~{reference_name}_~{aligner}
 
-        gsutil -m cp ~{reference_name}_~{aligner}.tar.gz ~{output_dir}
-        # mkdir -p ~{output_dir}
-        # cp ~{reference_name}_~{aligner}.tar.gz ~{output_dir}
+        gsutil -m cp ~{reference_name}_~{aligner}.tar.gz "~{output_dir}"
+        # mkdir -p "~{output_dir}"
+        # cp ~{reference_name}_~{aligner}.tar.gz "~{output_dir}"
     }
 
     output {

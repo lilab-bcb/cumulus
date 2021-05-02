@@ -68,7 +68,7 @@ workflow spaceranger_count {
         input:
             sample_id = sample_id,
             input_fastqs_directories = input_fastqs_directories,
-            output_directory = sub(output_directory, "/+$", ""),
+            output_directory = output_directory,
             genome_file = genome_file,
             image = image,
             darkimage = darkimage,
@@ -222,8 +222,8 @@ task run_spaceranger_count {
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs ~{output_directory}/~{sample_id}
-        # cp -r results/outs ~{output_directory}/~{sample_id}
+        gsutil -q -m rsync -d -r results/outs "~{output_directory}/~{sample_id}"
+        # cp -r results/outs "~{output_directory}/~{sample_id}"
     }
 
     output {

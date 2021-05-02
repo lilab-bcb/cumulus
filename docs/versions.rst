@@ -18,10 +18,10 @@ Latest version
       - `22 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/22>`__
       - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generating count matrix using cellranger count or cellranger-atac count, running cellranger vdj or feature-barcode extraction.
     * - cumulus/spaceranger_workflow
-      - `2 <https://portal.firecloud.org/?return=terra#methods/cumulus/spaceranger_workflow/2>`_
+      - `3 <https://portal.firecloud.org/?return=terra#methods/cumulus/spaceranger_workflow/2>`_
       - Run Space Ranger tools to process spatial transcriptomics data, which includes extracting sequence reads using spaceranger mkfastq, and generating count matrix using spaceranger count.
     * - cumulus/star_solo
-      - `4 <https://portal.firecloud.org/?return=terra#methods/cumulus/star_solo/4>`_
+      - `5 <https://portal.firecloud.org/?return=terra#methods/cumulus/star_solo/4>`_
       - Run STARsolo to generate gene-count matrices fro FASTQ files.
     * - cumulus/count
       - `18 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/18>`__
@@ -45,7 +45,7 @@ Latest version
       - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2/10>`__
       - Run HISAT2/STAR/Bowtie2-RSEM to generate gene-count matrices for SMART-Seq2 data from FASTQ files.
     * - cumulus/smartseq2_create_reference
-      - `8 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/8>`__
+      - `9 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/8>`__
       - Generate user-customized genome references for SMART-Seq2 data.
     * - cumulus/cumulus
       - `38 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/38>`__

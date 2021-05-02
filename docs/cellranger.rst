@@ -98,10 +98,11 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		  - Describes the 10x chemistry used for the sample. This column is optional.
 		* - DataType
 		  -
-			| Describes the data type of the sample --- *rna*, *vdj*, *adt*, *crispr*, *atac*.
+			| Describes the data type of the sample --- *rna*, *vdj*, *adt*, *cmo*, *crispr*, *atac*.
 			| **rna** refers to gene expression data (*cellranger count*),
 			| **vdj** refers to V(D)J data (*cellranger vdj*),
 			| **adt** refers to antibody tag data, which can be either CITE-Seq, cell-hashing, or nucleus-hashing,
+			| **cmo** refers to cell multiplexing oligos used in 10x Genomics' CellPlex assay,
 			| **crispr** refers to Perturb-seq guide tag data,
 			| **atac** refers to scATAC-Seq data (*cellranger-atac count*),
 			| This column is optional and the default data type is *rna*.
@@ -354,9 +355,9 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  - false
 		  - false
 		* - cellranger_version
-		  - cellranger version, could be 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
-		  - "6.0.0"
-		  - "6.0.0"
+		  - cellranger version, could be 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
+		  - "6.0.1"
+		  - "6.0.1"
 		* - config_version
 		  - config docker version used for processing sample sheets, could be 0.2, 0.1
 		  - "0.2"
@@ -573,9 +574,9 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - 0.1
 		  - 0.1
 		* - cellranger_version
-		  - cellranger version, could be 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
-		  - "6.0.0"
-		  - "6.0.0"
+		  - cellranger version, could be 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
+		  - "6.0.1"
+		  - "6.0.1"
 		* - cumulus_feature_barcoding_version
 		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.5.0, 0.4.0, 0.3.0, 0.2.0.
 		  - "0.5.0"
@@ -1034,9 +1035,9 @@ For scIR-seq data, ``cellranger_workflow`` takes Illumina outputs as input and r
 	  - "auto"
 	  - "auto"
 	* - cellranger_version
-	  - cellranger version, could be 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
-	  - "6.0.0"
-	  - "6.0.0"
+	  - cellranger version, could be 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
+	  - "6.0.1"
+	  - "6.0.1"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
@@ -1207,9 +1208,9 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
-		  - "6.0.0"
-		  - "6.0.0"
+		  - cellranger version, could be 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
+		  - "6.0.1"
+		  - "6.0.1"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -1397,9 +1398,9 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
-		  - "6.0.0"
-		  - "6.0.0"
+		  - cellranger version, could be 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
+		  - "6.0.1"
+		  - "6.0.1"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 

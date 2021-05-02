@@ -2,36 +2,44 @@ version 1.0
 
 workflow demuxEM {
     input {
+        # Sample ID
         String sample_id
+        # Output directory (gs url + path)
         String output_directory
-        # Input raw RNA expression matrix in 10x hdf5 format.
+        # Input raw RNA expression matrix in 10x hdf5 format
         String input_rna_h5
-        # Input HTO (antibody tag) count matrix in CSV format.
+        # Input HTO (antibody tag) count matrix in CSV format
         String input_hto_csv
-        # Reference genome name. If not provided, we will infer it from the expression matrix file.
+        # Reference genome name. If not provided, we will infer it from the expression matrix file
         String genome
-        # Only demultiplex cells/nuclei with at least <number> of expressed genes. [default: 100]
+        # Only demultiplex cells/nuclei with at least <number> of expressed genes
         Int min_num_genes
-        # The Dirichlet prior concentration parameter (alpha) on samples. An alpha value < 1.0 will make the prior sparse. [default: 0.0]
+        # The Dirichlet prior concentration parameter (alpha) on samples. An alpha value < 1.0 will make the prior sparse
         Float? alpha_on_samples
-        # Only demultiplex cells/nuclei with at least <number> of UMIs. [default: 100]
+        # Only demultiplex cells/nuclei with at least <number> of UMIs
         Int? min_num_umis
-        # Any cell/nucleus with less than <count> hashtags from the signal will be marked as unknown. [default: 10.0]
+        # Any cell/nucleus with less than <count> hashtags from the signal will be marked as unknown
         Float? min_signal_hashtag
-        # The random seed used in the KMeans algorithm to separate empty ADT droplets from others. [default: 0]
+        # The random seed used in the KMeans algorithm to separate empty ADT droplets from others
         Int? random_state
         # Generate a series of diagnostic plots, including the background/signal between HTO counts, estimated background probabilities, HTO distributions of cells and non-cells etc.
         Boolean generate_diagnostic_plots
-        # Generate violin plots using gender-specific genes (e.g. Xist). <gene> is a comma-separated list of gene names.
+        # Generate violin plots using gender-specific genes (e.g. Xist). <gene> is a comma-separated list of gene names
         String? generate_gender_plot
-
-        String docker_registry = "quay.io/cumulus"
-        String demuxEM_version = "0.1.5"
-        String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-        Int num_cpu = 8
-        Int memory = 10
-        Int disk_space = 20
-        Int preemptible = 2
+        # Which docker registry to use
+        String docker_registry
+        # DemuxEM version
+        String demuxEM_version
+        # Google cloud zones
+        String zones
+        # Number of CPUs used
+        Int num_cpu
+        # Memory in GB
+        Int memory
+        # Disk space in GB
+        Int disk_space
+        # Number of preemptible tries
+        Int preemptible
     }
 
     call run_demuxEM {
@@ -118,9 +126,9 @@ task run_demuxEM {
 
         mkdir result
         cp ~{sample_id}_demux.zarr.zip ~{sample_id}.out.demuxEM.zarr.zip ~{sample_id}.*.pdf result
-        gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
-        # mkdir -p ~{output_directory}/~{sample_id}
-        # cp result/* ~{output_directory}/~{sample_id}
+        gsutil -q -m rsync -r result "~{output_directory}/~{sample_id}"
+        # mkdir -p "~{output_directory}/~{sample_id}"
+        # cp result/* "~{output_directory}/~{sample_id}"
     }
 
     output {
