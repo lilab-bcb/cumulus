@@ -55,7 +55,7 @@ workflow spaceranger_workflow {
     }
 
     # Output directory, with trailing slashes stripped
-    String output_directory_stripped = sub(output_directory, "/+$", "")
+    String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
     String docker_registry_stripped = sub(docker_registry, "/+$", "")
     String mkfastq_docker_registry_stripped = sub(mkfastq_docker_registry, "/+$", "")

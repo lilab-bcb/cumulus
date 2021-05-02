@@ -1,8 +1,7 @@
 version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/5/plain-WDL/descriptor" as dem
-#import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/13/plain-WDL/descriptor" as soc
-import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/demultiplexing/souporcell.wdl" as soc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/14/plain-WDL/descriptor" as soc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/5/plain-WDL/descriptor" as dmx
 
 #import "demuxEM.wdl" as dem
@@ -40,7 +39,7 @@ workflow demultiplexing {
         Int demuxEM_memory = 10
 
         # For souporcell
-        Int souporcell_num_clusters
+        Int souporcell_num_clusters = 1
         Boolean souporcell_de_novo_mode = true
         File? souporcell_common_variants
         Boolean souporcell_skip_remap = false
@@ -59,7 +58,7 @@ workflow demultiplexing {
 
     }
 
-    String output_directory_stripped = sub(output_directory, "/+$", "")
+    String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
     File ref_index_file = "gs://regev-lab/resources/cellranger/index.tsv"
     # File ref_index_file = "index.tsv"

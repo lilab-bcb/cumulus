@@ -9,12 +9,15 @@ workflow starsolo {
         Int num_cpu = 32
         String star_version = "2.7.6a"
         String docker_registry = "quay.io/cumulus"
-        String config_version = "0.1"
+        String config_version = "0.2"
         Int disk_space = 500
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         Int memory = 120
     }
+
+    # Output directory, with trailing slashes stripped
+    String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
     File ref_index_file = "gs://regev-lab/resources/count_tools/ref_index.tsv"
     # File ref_index_file = "ref_index.tsv"
@@ -51,7 +54,7 @@ workflow starsolo {
                     star_version = star_version,
                     genome = genome_url,
                     whitelist = whitelist,
-                    output_directory = output_directory,
+                    output_directory = output_directory_stripped,
                     docker_registry = docker_registry,
                     disk_space = disk_space,
                     zones = zones,

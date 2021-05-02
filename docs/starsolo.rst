@@ -152,9 +152,9 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	  - "2.7.6a"
 	  - "2.7.6a"
 	* - config_version
-	  - Version of docker image to run configuration on the sample sheet. Currently only has version "0.1".
-	  - "0.1"
-	  - "0.1"
+	  - Version of docker image to run configuration on the sample sheet. Version availabel: 0.2, 0.1.
+	  - "0.2"
+	  - "0.2"
 
 
 Workflow outputs
