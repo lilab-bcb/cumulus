@@ -18,7 +18,7 @@ workflow cellranger_vdj_create_reference {
     }
 
     # Output directory, with trailing slashes stripped
-    String output_directory_stripped = sub(output_directory, "/+$", "")
+    String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
     call run_cellranger_vdj_create_reference {
         input:
@@ -88,9 +88,9 @@ task run_cellranger_vdj_create_reference {
         CODE
 
         tar -czf ~{genome}.tar.gz ~{genome}
-        gsutil -m cp ~{genome}.tar.gz ~{output_dir}
-        # mkdir -p ~{output_dir}
-        # cp ~{genome}.tar.gz ~{output_dir}
+        gsutil -m cp ~{genome}.tar.gz "~{output_dir}"
+        # mkdir -p "~{output_dir}"
+        # cp ~{genome}.tar.gz "~{output_dir}"
     }
 
     output {

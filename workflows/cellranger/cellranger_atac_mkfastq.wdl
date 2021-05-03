@@ -27,7 +27,7 @@ workflow cellranger_atac_mkfastq {
         String memory = "120G"
         # Disk space in GB
         Int disk_space = 1500
-        # Number of preemptible tries 
+        # Number of preemptible tries
         Int preemptible = 2
     }
 
@@ -69,9 +69,9 @@ task run_cellranger_atac_mkfastq {
         Int disk_space
         Int preemptible
     }
-    
+
     String run_id = basename(input_bcl_directory)
-    
+
     command {
         set -e
         export TMPDIR=/tmp
@@ -106,7 +106,7 @@ task run_cellranger_atac_mkfastq {
         with open("output_fastqs_flowcell_directory.txt", "w") as fout:
             flowcell = [name for name in os.listdir('results/outs/fastq_path') if name != 'Reports' and name != 'Stats' and os.path.isdir('results/outs/fastq_path/' + name)][0]
             fout.write('~{output_directory}/~{run_id}_atacfastqs/fastq_path/' + flowcell + '\n')
-        
+
         prefix = 'results/outs/fastq_path/' + flowcell + '/'
         df = pd.read_csv('~{input_csv_file}', header = 0)
         for sample_id in df['Sample'].unique():
@@ -125,8 +125,8 @@ task run_cellranger_atac_mkfastq {
                 subprocess.check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs ~{output_directory}/~{run_id}_atacfastqs
-        # cp -r results/outs ~{output_directory}/~{run_id}_atacfastqs
+        gsutil -q -m rsync -d -r results/outs "~{output_directory}"/~{run_id}_atacfastqs
+        # cp -r results/outs "~{output_directory}"/~{run_id}_atacfastqs
 
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError
@@ -157,6 +157,6 @@ task run_cellranger_atac_mkfastq {
         bootDiskSizeGb: 12
         disks: "local-disk ~{disk_space} HDD"
         cpu: num_cpu
-        preemptible: preemptible        
+        preemptible: preemptible
     }
 }

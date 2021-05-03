@@ -41,7 +41,7 @@ workflow cellranger_count {
         String memory = "120G"
         # Disk space in GB
         Int disk_space = 500
-        # Number of preemptible tries 
+        # Number of preemptible tries
         Int preemptible = 2
     }
 
@@ -120,7 +120,7 @@ task run_cellranger_count {
 
         fastqs = []
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
-            directory = re.sub('/+$', '', directory) # remove trailing slashes 
+            directory = re.sub('/+$', '', directory) # remove trailing slashes
             call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/~{sample_id}', '.']
             # call_args = ['cp', '-r', directory + '/~{sample_id}', '.']
             print(' '.join(call_args))
@@ -129,7 +129,7 @@ task run_cellranger_count {
             print(' '.join(call_args))
             check_call(call_args)
             fastqs.append('~{sample_id}_' + str(i))
-        
+
         call_args = ['cellranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--chemistry=~{chemistry}', '--jobmode=local']
         if ('~{target_panel}' is not '') and (os.path.basename('~{target_panel}') != 'null'):
             assert version.parse('~{cellranger_version}') >= version.parse('4.0.0')
@@ -150,8 +150,8 @@ task run_cellranger_count {
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs ~{output_directory}/~{sample_id}
-        # cp -r results/outs ~{output_directory}/~{sample_id}
+        gsutil -q -m rsync -d -r results/outs "~{output_directory}"/~{sample_id}
+        # cp -r results/outs "~{output_directory}"/~{sample_id}
     }
 
     output {

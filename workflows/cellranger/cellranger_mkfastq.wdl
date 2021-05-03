@@ -137,8 +137,8 @@ task run_cellranger_mkfastq {
                 subprocess.check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs ~{output_directory}/~{run_id}_fastqs
-        # cp -r results/outs ~{output_directory}/~{run_id}_fastqs
+        gsutil -q -m rsync -d -r results/outs "~{output_directory}"/~{run_id}_fastqs
+        # cp -r results/outs "~{output_directory}"/~{run_id}_fastqs
 
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError
