@@ -9,7 +9,7 @@ workflow cumulus_adt {
 		# Output directory, gs url
 		String output_directory
 
-		# 10x genomics chemistry 
+		# 10x genomics chemistry
 		String chemistry
 
 		# data type, either adt or crispr
@@ -25,6 +25,8 @@ workflow cumulus_adt {
 		Int max_mismatch = 3
 		# minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for crispr
 		Float min_read_ratio = 0.1
+		# convert cell barcode to match RNA cell barcodes for 10x Genomics' data
+		Boolean convert_cell_barcode = false
 
 		# cumulus_feature_barcoding version
 		String cumulus_feature_barcoding_version
@@ -34,7 +36,7 @@ workflow cumulus_adt {
 		String memory = "32G"
 		# Disk space in GB
 		Int disk_space = 100
-		# Number of preemptible tries 
+		# Number of preemptible tries
 		Int preemptible = 2
 
 		# Which docker registry to use: quay.io/cumulus (default), or cumulusprod
@@ -58,6 +60,7 @@ workflow cumulus_adt {
 			scaffold_sequence = scaffold_sequence,
 			max_mismatch = max_mismatch,
 			min_read_ratio = min_read_ratio,
+			convert_cell_barcode = convert_cell_barcode,
 			cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
 			zones = zones,
 			memory = memory,
@@ -84,6 +87,7 @@ task run_generate_count_matrix_ADTs {
 		String scaffold_sequence
 		Int max_mismatch
 		Float min_read_ratio
+		Boolean convert_cell_barcode
 		String cumulus_feature_barcoding_version
 		String zones
 		String memory
@@ -103,7 +107,7 @@ task run_generate_count_matrix_ADTs {
 
 		fastqs = []
 		for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
-			directory = re.sub('/+$', '', directory) # remove trailing slashes 
+			directory = re.sub('/+$', '', directory) # remove trailing slashes
 			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/~{sample_id}', '.']
 			# call_args = ['cp', '-r', directory + '/~{sample_id}', '.']
 			print(' '.join(call_args))
@@ -112,8 +116,10 @@ task run_generate_count_matrix_ADTs {
 			print(' '.join(call_args))
 			check_call(call_args)
 			fastqs.append('~{sample_id}_' + str(i))
-	
+
 		call_args = ['generate_count_matrix_ADTs', '~{cell_barcodes}', '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
+		if '~{convert_cell_barcode}' == 'true':
+			call_args.append('--convert-cell-barcode')
 		if '~{data_type}' == 'crispr':
 			call_args.extend(['--feature', 'crispr', '--scaffold-sequence', '~{scaffold_sequence}'])
 			if '~{chemistry}' != 'SC3Pv3':
