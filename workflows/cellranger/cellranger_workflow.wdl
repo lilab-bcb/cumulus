@@ -451,7 +451,7 @@ task generate_count_config {
 
             n_ref = n_chem = n_fbf = 0 # this mappings can be empty
             foo6.write('Sample,Location,Bam,BamIndex,Barcodes,Reference,Chemistry\n') # count_matrix.csv
-            datatype2fo = dict([('rna', fo1), ('vdj', fo2), ('adt', fo3), ('cmo', fo3) ('crispr', fo3), ('atac', fo4)])
+            datatype2fo = dict([('rna', fo1), ('vdj', fo2), ('adt', fo3), ('cmo', fo3), ('crispr', fo3), ('atac', fo4)])
             datatype2r2f = dict([('rna', r2f), ('vdj', r2f), ('adt', r2f), ('cmo', r2f), ('crispr', r2f), ('atac', ar2f)])
             for sample_id in df['Sample'].unique():
                 df_local = df.loc[df['Sample'] == sample_id]
