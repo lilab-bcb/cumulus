@@ -13,7 +13,7 @@ workflow smartseq2_create_reference {
         # Aligner name, either "bowtie2", "star" or "hisat2-hca"
         String aligner = "hisat2-hca"
         # Docker version
-        String smartseq2_version = "1.1.0"
+        String smartseq2_version = "1.3.0"
         # Google Cloud Zones
         String zones = "us-central1-b"
         # Number of cpus per job
