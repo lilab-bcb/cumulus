@@ -1,11 +1,11 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/9/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/6/plain-WDL/descriptor" as crc
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/7/plain-WDL/descriptor" as crv
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/7/plain-WDL/descriptor" as ca
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq/versions/4/plain-WDL/descriptor" as cram
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/versions/5/plain-WDL/descriptor" as crac
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/11/plain-WDL/descriptor" as crm
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/8/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/9/plain-WDL/descriptor" as crv
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/8/plain-WDL/descriptor" as ca
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq/versions/6/plain-WDL/descriptor" as cram
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/versions/7/plain-WDL/descriptor" as crac
 
 workflow cellranger_workflow {
     input {
@@ -71,8 +71,8 @@ workflow cellranger_workflow {
 
         # 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
         String cellranger_version = "6.0.1"
-        # 0.5.0, 0.4.0, 0.3.0, 0.2.0
-        String cumulus_feature_barcoding_version = "0.5.0"
+        # 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0
+        String cumulus_feature_barcoding_version = "0.6.0"
         # 1.2.0, 1.1.0
         String cellranger_atac_version = "1.2.0"
         # 0.2
@@ -447,7 +447,7 @@ task generate_count_config {
 
             n_ref = n_chem = n_fbf = 0 # this mappings can be empty
             foo6.write('Sample,Location,Bam,BamIndex,Barcodes,Reference,Chemistry\n') # count_matrix.csv
-            datatype2fo = dict([('rna', fo1), ('vdj', fo2), ('adt', fo3), ('cmo', fo3) ('crispr', fo3), ('atac', fo4)])
+            datatype2fo = dict([('rna', fo1), ('vdj', fo2), ('adt', fo3), ('cmo', fo3), ('crispr', fo3), ('atac', fo4)])
             datatype2r2f = dict([('rna', r2f), ('vdj', r2f), ('adt', r2f), ('cmo', r2f), ('crispr', r2f), ('atac', ar2f)])
             for sample_id in df['Sample'].unique():
                 df_local = df.loc[df['Sample'] == sample_id]

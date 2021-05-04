@@ -396,10 +396,10 @@ task run_cumulus_cirro_output {
 		export TMPDIR=/tmp
 		monitor_script.sh > monitoring.log &
 
-		cirro prepare_data --out ~{output_name}.cirro ~{input_h5ad}
-		gsutil -q -m cp -r ~{output_name}.cirro ~{output_directory}/
-		# mkdir -p ~{output_directory}/
-		# cp -r ~{output_name}.cirro ~{output_directory}/
+		cirro prepare_data --out "~{output_name}".cirro ~{input_h5ad}
+		gsutil -q -m cp -r "~{output_name}".cirro "~{output_directory}"/
+		# mkdir -p "~{output_directory}"/
+		# cp -r "~{output_name}".cirro "~{output_directory}"/
 	}
 
 	output {
@@ -646,9 +646,9 @@ task run_cumulus_scp_output {
 	command {
 		set -e
 		export TMPDIR=/tmp
-		pegasus scp_output ~{true='--dense' false='' output_dense} ~{input_h5ad} ~{output_name}
-		# mkdir -p ~{output_directory} ; cp ~{output_name}.scp.* ~{output_directory}/
-		gsutil -m cp ~{output_name}.scp.* ~{output_directory}/
+		pegasus scp_output ~{true='--dense' false='' output_dense} ~{input_h5ad} "~{output_name}"
+		# mkdir -p "~{output_directory}" ; cp "~{output_name}".scp.* "~{output_directory}"/
+		gsutil -m cp "~{output_name}".scp.* "~{output_directory}"/
 	}
 
 	output {

@@ -87,7 +87,7 @@ task demuxlet_task {
         monitor_script.sh > monitoring.log &
 
         mkdir result
-        python /software/extract_barcodes_from_rna.py ~{input_rna} ~{sample_id}.barcodes.tsv ~{min_num_genes}
+        python /software/extract_barcodes_from_rna.py ~{input_rna} "~{sample_id}".barcodes.tsv ~{min_num_genes}
 
         python <<CODE
         from subprocess import check_call
@@ -114,11 +114,11 @@ task demuxlet_task {
         check_call(call_args)
         CODE
 
-        python /software/generate_zarr.py result/~{sample_id}.best ~{input_rna} result/~{sample_id}_demux.zarr.zip
+        python /software/generate_zarr.py result/"~{sample_id}".best ~{input_rna} result/"~{sample_id}"_demux.zarr.zip
 
-        gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
-        # mkdir -p ~{output_directory}/~{sample_id}
-        # cp result/* ~{output_directory}/~{sample_id}
+        gsutil -q -m rsync -r result "~{output_directory}/~{sample_id}"
+        # mkdir -p "~{output_directory}/~{sample_id}"
+        # cp result/* "~{output_directory}/~{sample_id}"
     }
 
     output {

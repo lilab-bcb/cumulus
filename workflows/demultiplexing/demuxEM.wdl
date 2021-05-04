@@ -125,7 +125,7 @@ task run_demuxEM {
         CODE
 
         mkdir result
-        cp ~{sample_id}_demux.zarr.zip ~{sample_id}.out.demuxEM.zarr.zip ~{sample_id}.*.pdf result
+        cp "~{sample_id}_demux".zarr.zip "~{sample_id}".out.demuxEM.zarr.zip "~{sample_id}".*.pdf result
         gsutil -q -m rsync -r result "~{output_directory}/~{sample_id}"
         # mkdir -p "~{output_directory}/~{sample_id}"
         # cp result/* "~{output_directory}/~{sample_id}"

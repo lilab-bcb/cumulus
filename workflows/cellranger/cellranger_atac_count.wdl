@@ -27,7 +27,7 @@ workflow cellranger_atac_count {
         String memory = "57.6G"
         # Disk space in GB
         Int disk_space = 500
-        # Number of preemptible tries 
+        # Number of preemptible tries
         Int preemptible = 2
 
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
@@ -116,8 +116,8 @@ task run_cellranger_atac_count {
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs ~{output_directory}/~{sample_id}
-        # cp -r results/outs ~{output_directory}/~{sample_id}
+        gsutil -q -m rsync -d -r results/outs "~{output_directory}/~{sample_id}"
+        # cp -r results/outs "~{output_directory}/~{sample_id}"
     }
 
     output {

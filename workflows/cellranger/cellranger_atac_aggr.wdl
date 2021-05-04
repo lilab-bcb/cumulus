@@ -5,7 +5,7 @@ workflow cellranger_atac_aggr {
         # Aggregate ID
         String aggr_id
         # A comma-separated list of input atac count result directories (gs urls), note that each directory should contain fragments.tsv.gz and singlecell.csv
-        String input_counts_directories 
+        String input_counts_directories
         # CellRanger-atac output directory, gs url
         String output_directory
 
@@ -29,7 +29,7 @@ workflow cellranger_atac_aggr {
         String memory = "57.6G"
         # Disk space in GB
         Int disk_space = 500
-        # Number of preemptible tries 
+        # Number of preemptible tries
         Int preemptible = 2
 
         # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
@@ -129,9 +129,9 @@ task run_cellranger_atac_aggr {
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs ~{output_directory}/~{aggr_id}
-        # mkdir -p ~{output_directory}/~{aggr_id}
-        # cp -r results/outs ~{output_directory}/~{aggr_id}
+        gsutil -q -m rsync -d -r results/outs "~{output_directory}/~{aggr_id}"
+        # mkdir -p "~{output_directory}/~{aggr_id}"
+        # cp -r results/outs "~{output_directory}/~{aggr_id}"
     }
 
     output {

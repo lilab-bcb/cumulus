@@ -157,7 +157,7 @@ task run_souporcell {
         if '~{skip_remap}' is 'true':
             if '~{de_novo_mode}' is 'true' and '~{common_variants}' is '':
                 print("Warning: if de novo mode is true and no common variants provided, skip remap is not recommended and thus is turned off!")
-            else:    
+            else:
                 check_call(['samtools', 'index', '-@', '~{num_cpu}', '~{input_bam}'])
                 souporcell_call_args.extend(['--skip_remap', 'True'])
 
@@ -229,7 +229,7 @@ task match_donors {
         CODE
 
         mkdir result
-        mv match_donors.log ~{sample_id}_demux.zarr.zip ~{souporcell_cluster_tsv} ~{souporcell_genotypes_vcf} result/
+        mv match_donors.log "~{sample_id}"_demux.zarr.zip ~{souporcell_cluster_tsv} ~{souporcell_genotypes_vcf} result/
         gsutil -q -m rsync -r result "~{output_directory}/~{sample_id}"
         # mkdir -p "~{output_directory}/~{sample_id}"
         # cp -r result/* "~{output_directory}/~{sample_id}"

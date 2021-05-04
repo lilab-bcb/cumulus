@@ -14,7 +14,7 @@ workflow cellranger_vdj {
 
         # Do not align reads to reference V(D)J sequences before de novo assembly. Default: false
         Boolean denovo = false
-        
+
         # Force the analysis to be carried out for a particular chain type. The accepted values are:
         #   "auto" for autodetection based on TR vs IG representation (default),
         #   "TR" for T cell receptors,
@@ -32,7 +32,7 @@ workflow cellranger_vdj {
         String memory = "120G"
         # Disk space in GB
         Int disk_space = 500
-        # Number of preemptible tries 
+        # Number of preemptible tries
         Int preemptible = 2
 
         # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
@@ -102,7 +102,7 @@ task run_cellranger_vdj {
 
         fastqs = []
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
-            directory = re.sub('/+$', '', directory) # remove trailing slashes 
+            directory = re.sub('/+$', '', directory) # remove trailing slashes
             call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/~{sample_id}', '.']
             # call_args = ['cp', '-r', directory + '/~{sample_id}', '.']
             print(' '.join(call_args))
@@ -119,8 +119,8 @@ task run_cellranger_vdj {
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs ~{output_directory}/~{sample_id}
-        # cp -r results/outs ~{output_directory}/~{sample_id}
+        gsutil -q -m rsync -d -r results/outs "~{output_directory}/~{sample_id}"
+        # cp -r results/outs "~{output_directory}/~{sample_id}"
     }
 
     output {

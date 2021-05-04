@@ -9,7 +9,7 @@ workflow cumulus_adt {
 		# Output directory, gs url
 		String output_directory
 
-		# 10x genomics chemistry 
+		# 10x genomics chemistry
 		String chemistry
 
 		# data type, either adt or crispr
@@ -34,7 +34,7 @@ workflow cumulus_adt {
 		String memory = "32G"
 		# Disk space in GB
 		Int disk_space = 100
-		# Number of preemptible tries 
+		# Number of preemptible tries
 		Int preemptible = 2
 
 		# Which docker registry to use: quay.io/cumulus (default), or cumulusprod
@@ -103,7 +103,7 @@ task run_generate_count_matrix_ADTs {
 
 		fastqs = []
 		for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
-			directory = re.sub('/+$', '', directory) # remove trailing slashes 
+			directory = re.sub('/+$', '', directory) # remove trailing slashes
 			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/~{sample_id}', '.']
 			# call_args = ['cp', '-r', directory + '/~{sample_id}', '.']
 			print(' '.join(call_args))
@@ -112,7 +112,7 @@ task run_generate_count_matrix_ADTs {
 			print(' '.join(call_args))
 			check_call(call_args)
 			fastqs.append('~{sample_id}_' + str(i))
-	
+
 		call_args = ['generate_count_matrix_ADTs', '~{cell_barcodes}', '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
 		if '~{data_type}' == 'crispr':
 			call_args.extend(['--feature', 'crispr', '--scaffold-sequence', '~{scaffold_sequence}'])
