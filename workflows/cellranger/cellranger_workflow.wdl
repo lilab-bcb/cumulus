@@ -4,7 +4,7 @@ import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/vers
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/7/plain-WDL/descriptor" as crc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/8/plain-WDL/descriptor" as crv
 #import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/8/plain-WDL/descriptor" as ca
-import "../cumulus/cumulus_adt.wdl" as ca
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/cumulus/cumulus_adt.wdl" as ca
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq/versions/5/plain-WDL/descriptor" as cram
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/versions/6/plain-WDL/descriptor" as crac
 
@@ -64,8 +64,6 @@ workflow cellranger_workflow {
         Int max_mismatch = 3
         # minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for data type crispr
         Float min_read_ratio = 0.1
-        # convert cell barcode to match RNA cell barcodes for 10x Genomics' data
-        Boolean convert_cell_barcode = false
 
         # For atac
 
@@ -269,7 +267,6 @@ workflow cellranger_workflow {
                         scaffold_sequence = scaffold_sequence,
                         max_mismatch = max_mismatch,
                         min_read_ratio = min_read_ratio,
-                        convert_cell_barcode = convert_cell_barcode,
                         cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
                         zones = zones,
                         memory = feature_memory,
