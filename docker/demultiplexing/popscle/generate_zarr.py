@@ -4,20 +4,26 @@ import pegasusio as io
 import pandas as pd
 
 parser = argparse.ArgumentParser(description='Merge demuxlet result with gene-count matrix.')
-parser.add_argument('demux_res', metavar = 'demux_result.best', help = 'Demuxlet demultiplexing results.')
-parser.add_argument('raw_mat', metavar = 'raw_feature_bc_matrix.h5', help = 'Raw gene count matrix in 10x format.')
-parser.add_argument('out_file', metavar = 'output_result.zarr.zip', help = 'Output zarr file.')
+parser.add_argument('demux_res', metavar='(demux_result.best | demux_result.clust1.samples.gz)', help='Demuxlet or Freemuxlet demultiplexing results.')
+parser.add_argument('raw_mat', metavar='raw_feature_bc_matrix.h5', help='Raw gene count matrix in 10x format.')
+parser.add_argument('out_file', metavar='output_result.zarr.zip', help='Output zarr file.')
 args = parser.parse_args()
 
 demux_type_dict = {'SNG': 'singlet', 'DBL': 'doublet', 'AMB': 'unknown'}
 
 def write_output(assignment_file: str, input_mat_file: str, output_zarr_file: str) -> None:
-    df = pd.read_csv(assignment_file, sep = '\t', header = 0, index_col = 'BARCODE')
-    df.index = pd.Index([x[:-2] for x in df.index])
+    algorithm = 'freemuxlet' if assignment_file.split('.')[-1] == 'gz' else 'demuxlet'
+
+    df = pd.read_csv(assignment_file, sep='\t', header=0, index_col='BARCODE')
+    df.index = pd.Index([x.split('-')[0] for x in df.index])
     df['demux_type'] = df['DROPLET.TYPE'].apply(lambda s: demux_type_dict[s])
     df['assignment'] = ''
-    df.loc[df['demux_type'] == 'singlet', 'assignment'] = df.loc[df['demux_type'] == 'singlet', 'SNG.BEST.GUESS']
-    df.loc[df['demux_type'] == 'doublet', 'assignment'] = df.loc[df['demux_type'] == 'doublet', 'DBL.BEST.GUESS'].apply(lambda s: ','.join(s.split(',')[:-1]))
+    df.loc[df['demux_type']=='singlet', 'assignment'] = df.loc[df['demux_type']=='singlet', 'SNG.BEST.GUESS']
+    if algorithm == 'demuxlet':
+        df.loc[df['demux_type']=='doublet', 'assignment'] = df.loc[df['demux_type']=='doublet', 'DBL.BEST.GUESS'].apply(lambda s: ','.join(s.split(',')[:-1]))
+    else:
+        df.loc[df['demux_type']=='doublet', 'assignment'] = df.loc[df['demux_type']=='doublet', 'DBL.BEST.GUESS']
+        df['assignment'] = df['assignment'].astype('str')
 
     data = io.read_input(input_mat_file)
     data.obs['demux_type'] = ''
