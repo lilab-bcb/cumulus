@@ -3,7 +3,7 @@ Demultiplex genetic-pooling/cell-hashing/nucleus-hashing sc/snRNA-Seq data
 
 This ``demultiplexing`` workflow generates gene-count matrices from cell-hashing/nucleus-hashing/genetic-pooling data by demultiplexing.
 
-In the workflow, ``demuxEM`` is used for analyzing cell-hashing/nucleus-hashing data, while ``souporcell`` and ``demuxlet`` are for genetic-pooling data.
+In the workflow, ``demuxEM`` is used for analyzing cell-hashing/nucleus-hashing data, while ``souporcell``, ``demuxlet``, and  ``freemuxlet`` are for genetic-pooling data.
 
 Prepare input data and import workflow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -108,6 +108,8 @@ global inputs
 	  	- "souporcell": Use souporcell_, a reference-genotypes-free algorithm for demultiplexing droplet scRNA-Seq data.
 
 	  	- "demuxlet": Use demuxlet_, a canonical algorithm for demultiplexing droplet scRNA-Seq data.
+
+        - "freemuxlet": Use freemuxlet_, a canonical algorithm for demultiplexing droplet scRNA-Seq data without reference genotypes.
 	  - "souporcell"
 	  - "souporcell"
 	* - min_num_genes
@@ -216,6 +218,10 @@ souporcell inputs
 	    | If ``false``, run souporcell with ``--known_genotypes`` option using the reference genotype vcf file specified in sample sheet, and *souporcell_rename_donors* is required in this case.
 	  - true
 	  - true
+	* - souporcell_num_clusters
+	  - | souporcell parameter. Number of expected clusters when doing clustering.
+	    | **This needs to be set when running souporcell.**
+	  - 8
 	* - souporcell_common_variants
 	  - souporcell parameter. Users can provide a common variants list in VCF format for Souporcell to use, instead of calling SNPs de novo
 	  - "1000genome.common.variants.vcf.gz"
@@ -242,7 +248,7 @@ souporcell inputs
 	  - 500
 	  - 500
 
-demuxlet inputs
+demuxlet/freemuxlet (popscle) inputs
 +++++++++++++++++
 
 .. list-table::
@@ -254,17 +260,25 @@ demuxlet inputs
 	  - Description
 	  - Example
 	  - Default
-	* - demuxlet_version
-	  - demuxlet version to use. Currently only support "0.1b".
+	* - freeemuxlet_num_samples
+	  - Number of samples when using freemuxlet.
+	  - 4
+	  - 4
+	* - popscle_version
+	  - popscle version to use. Currently supports "0.1b".
 	  - "0.1b"
 	  - "0.1b"
 	* - demuxlet_memory
-	  - demuxlet parameter. Memory size (integer) in GB needed for demuxlet per pair.
+	  - Memory size (integer) in GB needed per pair.
 	  - 10
 	  - 10
-	* - demuxlet_disk_space
-	  - | demuxlet parameter. Disk space size (integer) in GB needed for demuxlet per pair.
-	    | Notice that the overall disk space for demuxlet is this disk space plus the size of provided reference genotypes file in the sample sheet.
+	* - freemuxlet_memory
+	  - Memory size (integer) in GB needed per pair.
+	  - 30
+	  - 30
+	* - popscle_disk_space
+	  - | Disk space size (integer) in GB needed for demuxlet/freemuxlet per pair.
+	    | Notice that the overall disk space for demuxlet/freemuxlet is this disk space plus the size of provided reference genotypes file in the sample sheet.
 	  - 2
 	  - 2
 
@@ -343,7 +357,7 @@ In the output subfolder of each genetic-pooling RNA-hashtag data pair generated 
 	  - Description
 	* - output_name_demux.zarr.zip
 	  - Demultiplexed RNA count matrix in zarr format. Please refer to section `load demultiplexing results into Python and R`_ for its structure.
-	* - output_name.best
+	* - output_name.best (demuxlet) or output_name.clust1.samples.gz (freemuxlet)
 	  - Inferred droplet type and cluster assignment for each cell barcode.
 
 ---------------------------------
@@ -376,6 +390,7 @@ Results are in ``data$obs['demux_type']``, ``data$obs['assignment']``, and simil
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
 .. _genome reference: ./cellranger.html#sample-sheet
 .. _souporcell: https://github.com/wheaton5/souporcell
-.. _demuxlet: https://github.com/statgen/demuxlet
+.. _demuxlet: https://github.com/statgen/popscle
+.. _freemuxlet: https://github.com/statgen/popscle
 .. _pegasusio: https://pypi.org/project/pegasusio/
 .. _load demultiplexing results into Python and R: ./demultiplexing.html#load-demultiplexing-results-into-python-and-r

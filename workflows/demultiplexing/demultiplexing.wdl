@@ -2,11 +2,11 @@ version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/6/plain-WDL/descriptor" as dem
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/15/plain-WDL/descriptor" as soc
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxlet/versions/6/plain-WDL/descriptor" as dmx
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/1/plain-WDL/descriptor" as dmx
 
 #import "demuxEM.wdl" as dem
 #import "souporcell.wdl" as soc
-#import "demuxlet.wdl" as dmx
+#import "popscle.wdl" as dmx
 
 workflow demultiplexing {
     input {
@@ -70,17 +70,19 @@ workflow demultiplexing {
         # Memory size (integer) in GB needed for souporcell per pair
         Int souporcell_memory = 120
 
-        # For demuxlet
-        # Demuxlet version to use. Currently only support "0.1b"
-        String demuxlet_version = "0.1b"
-        # Memory size (integer) in GB needed for demuxlet per pair
+        # For demuxlet/freemuxlet (popscle)
+        String popscle_version = "0.1b"
+        Int freemuxlet_memory = 30
         Int demuxlet_memory = 10
-        # Disk space size (integer) in GB needed for demuxlet per pair. Notice that the overall disk space for demuxlet is this disk space plus the size of provided reference genotypes file in the sample sheet
-        Int demuxlet_disk_space = 2
+        Int popscle_disk_space = 2
+
+        # For freemuxlet
+        Int freeemuxlet_num_samples = 4
 
         # Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: ``0.2``, ``0.1``
         String config_version = "0.2"
     }
+    Int popscle_memory_ = (if demultiplexing_algorithm == 'demuxlet' then demuxlet_memory else freemuxlet_memory)
 
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
@@ -152,19 +154,21 @@ workflow demultiplexing {
                 }
             }
 
-            if (demultiplexing_algorithm == "demuxlet") {
-                call dmx.demuxlet as demuxlet {
+            if (demultiplexing_algorithm == "demuxlet" || demultiplexing_algorithm == "freemuxlet") {
+                call dmx.popscle as popscle {
                     input:
                         sample_id = pooling_id,
+                        algorithm=demultiplexing_algorithm,
                         output_directory = output_directory_stripped,
                         input_rna = Config.id2rna[pooling_id],
                         input_bam = Config.id2tag[pooling_id],
                         ref_genotypes = Config.id2genotype[pooling_id],
                         min_num_genes = min_num_genes,
+                        nsample = freeemuxlet_num_samples,
                         docker_registry = docker_registry,
-                        demuxlet_version = demuxlet_version,
-                        extra_disk_space = demuxlet_disk_space,
-                        memory = demuxlet_memory,
+                        popscle_version = popscle_version,
+                        extra_disk_space = popscle_disk_space,
+                        memory = popscle_memory_,
                         zones = zones,
                         preemptible = preemptible
                 }
@@ -173,8 +177,8 @@ workflow demultiplexing {
     }
 
     output {
-        Array[String] output_folders = select_all(flatten(select_all([demuxEM.output_folder, souporcell.output_folder, demuxlet.output_folder])))
-        Array[File] output_zarr_files = select_all(flatten(select_all([demuxEM.output_zarr, souporcell.output_zarr, demuxlet.output_zarr])))
+        Array[String] output_folders = select_all(flatten(select_all([demuxEM.output_folder, souporcell.output_folder, popscle.output_folder])))
+        Array[File] output_zarr_files = select_all(flatten(select_all([demuxEM.output_zarr, souporcell.output_zarr, popscle.output_zarr])))
     }
 }
 
