@@ -9,7 +9,7 @@ workflow cumulus_adt {
 		# Output directory, gs url
 		String output_directory
 
-		# 10x genomics chemistry 
+		# 10x genomics chemistry
 		String chemistry
 
 		# data type, either adt or crispr
@@ -34,11 +34,11 @@ workflow cumulus_adt {
 		String memory = "32G"
 		# Disk space in GB
 		Int disk_space = 100
-		# Number of preemptible tries 
+		# Number of preemptible tries
 		Int preemptible = 2
 
-		# Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-		String docker_registry = "cumulusprod"
+		# Which docker registry to use: quay.io/cumulus (default), or cumulusprod
+		String docker_registry = "quay.io/cumulus"
 	}
 
 	# cell barcodes white list, from 10x genomics, can be either v2 or v3 chemistry
@@ -50,7 +50,7 @@ workflow cumulus_adt {
 		input:
 			sample_id = sample_id,
 			input_fastqs_directories = input_fastqs_directories,
-			output_directory = sub(output_directory, "/+$", ""),
+			output_directory = output_directory,
 			chemistry = chemistry,
 			data_type = data_type,
 			cell_barcodes = cell_barcode_file,
@@ -103,7 +103,7 @@ task run_generate_count_matrix_ADTs {
 
 		fastqs = []
 		for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
-			directory = re.sub('/+$', '', directory) # remove trailing slashes 
+			directory = re.sub('/+$', '', directory) # remove trailing slashes
 			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/~{sample_id}', '.']
 			# call_args = ['cp', '-r', directory + '/~{sample_id}', '.']
 			print(' '.join(call_args))
@@ -112,15 +112,17 @@ task run_generate_count_matrix_ADTs {
 			print(' '.join(call_args))
 			check_call(call_args)
 			fastqs.append('~{sample_id}_' + str(i))
-	
+
 		call_args = ['generate_count_matrix_ADTs', '~{cell_barcodes}', '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
-		if '~{data_type}' is 'crispr':
+		if '~{data_type}' == 'crispr':
 			call_args.extend(['--feature', 'crispr', '--scaffold-sequence', '~{scaffold_sequence}'])
-			if '~{chemistry}' is not 'SC3Pv3':
+			if '~{chemistry}' != 'SC3Pv3':
 				call_args.append('--no-match-tso')
 		else:
 			call_args.extend(['--feature', 'antibody'])
-		if '~{chemistry}' is 'SC3Pv3':
+			if '~{data_type}' == 'cmo':
+				call_args.append('--convert-cell-barcode')
+		if '~{chemistry}' == 'SC3Pv3':
 			call_args.extend(['--max-mismatch-cell', '0', '--umi-length', '12'])
 		else:
 			call_args.extend(['--max-mismatch-cell', '1', '--umi-length', '10'])
@@ -128,19 +130,19 @@ task run_generate_count_matrix_ADTs {
 		check_call(call_args)
 		CODE
 
-		if [ -f ~{sample_id}.stat.csv.gz ]
+		if [ -f "~{sample_id}".stat.csv.gz ]
 		then
-			filter_chimeric_reads ~{data_type} ~{feature_barcodes} ~{sample_id}.stat.csv.gz ~{min_read_ratio} ~{sample_id}
+			filter_chimeric_reads ~{data_type} ~{feature_barcodes} "~{sample_id}.stat.csv.gz" ~{min_read_ratio} ~{sample_id}
 		fi
 
-		gsutil -m cp ~{sample_id}.*csv* ~{output_directory}/~{sample_id}/
-		# mkdir -p ~{output_directory}/~{sample_id}
-		# cp -f ~{sample_id}.*csv* ~{output_directory}/~{sample_id}/
+		gsutil -m cp "~{sample_id}".*csv* "~{output_directory}/~{sample_id}/"
+		# mkdir -p "~{output_directory}/~{sample_id}"
+		# cp -f "~{sample_id}".*csv* "~{output_directory}/~{sample_id}/"
 
-		if [ -f ~{sample_id}.umi_count.pdf ]
+		if [ -f "~{sample_id}".umi_count.pdf ]
 		then
-			gsutil cp ~{sample_id}.umi_count.pdf ~{output_directory}/~{sample_id}/
-			# cp -f ~{sample_id}.umi_count.pdf ~{output_directory}/~{sample_id}/
+			gsutil cp "~{sample_id}".umi_count.pdf "~{output_directory}/~{sample_id}/"
+			# cp -f "~{sample_id}".umi_count.pdf "~{output_directory}/~{sample_id}/"
 		fi
 	}
 

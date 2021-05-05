@@ -6,7 +6,7 @@ RUN apt-get update && apt-get install -y wget build-essential curl libncurses5-d
     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    apt-get update && apt-get install -y google-cloud-sdk=301.0.0-0 && \
+    apt-get update && apt-get install -y google-cloud-sdk=311.0.0-0 && \
     apt-get -qq -y autoremove && \
     apt-get clean
 
@@ -50,17 +50,17 @@ RUN cd /opt && \
 ENV PATH=/opt/souporcell:/opt/souporcell/troublet/target/release:$PATH
 
 RUN conda install -y python==3.6.10 && \
-    pip install numpy==1.19.0 && \
-    pip install pandas==1.0.5 && \
-    pip install scipy==1.5.1 && \
+    pip install numpy==1.19.2 && \
+    pip install pandas==1.1.2 && \
+    pip install scipy==1.5.2 && \
     pip install pysam==0.16.0.1 && \
     pip install pyvcf==0.6.8 && \
     pip install pystan==2.19.1.1 && \
     pip install pyfaidx==0.5.9 && \
     pip install anndata==0.7.4 && \
     pip install zarr==2.4.0 && \
-    pip install networkx==2.4 && \
-    pip install pegasusio==0.2.4
+    pip install networkx==2.5 && \
+    pip install pegasusio==0.2.5.post2
 
 RUN cd /opt && \
     wget -O htslib.tar.bz2 https://github.com/samtools/htslib/releases/download/1.9/htslib-1.9.tar.bz2 && \

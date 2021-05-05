@@ -73,9 +73,9 @@ Prepare input data and import workflow
 
 		.. image:: images/single_workflow.png
 
-	and click ``SAVE`` button. Select ``Use call caching`` and click ``INPUTS``. Then fill in appropriate values in the ``Attribute`` column. Alternative, you can upload a JSON file to configure input by clicking ``Drag or click to upload json``. 
+	and click ``SAVE`` button. Select ``Use call caching`` and click ``INPUTS``. Then fill in appropriate values in the ``Attribute`` column. Alternative, you can upload a JSON file to configure input by clicking ``Drag or click to upload json``.
 
-	Once INPUTS are appropriated filled, click ``RUN ANALYSIS`` and then click ``LAUNCH``. 
+	Once INPUTS are appropriated filled, click ``RUN ANALYSIS`` and then click ``LAUNCH``.
 
 ----------------------------
 
@@ -95,13 +95,13 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	* - **input_tsv_file**
 	  - Input TSV sample sheet describing metadata of each sample.
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.tsv"
-	  - 
+	  -
 	* - **genome**
 	  - Genome reference name. Current support: GRCh38, mm10.
 	  - "GRCh38"
 	  -
 	* - **chemistry**
-	  - 10X genomics' chemistry name. Current support: "tenX_v3" (for V3 chemistry), "tenX_v2" (for V2 chemistry).
+	  - 10X genomics' chemistry name. Current support: "tenX_v3" (for V3 chemistry), "tenX_v2" (for V2 chemistry), "dropseq" (for Drop-Seq).
 	  - "tenX_v3"
 	  -
 	* - **output_directory**
@@ -113,7 +113,7 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	  - true
 	  - true
 	* - count_tool
-	  - Count tool to generate result. Options: 
+	  - Count tool to generate result. Options:
 
 	  	- "StarSolo": Use STARsolo_.
 
@@ -127,11 +127,15 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	* - docker_registry
 	  - Docker registry to use. Notice that docker image for Bustools is seperate.
 
-	  	- "cumulusprod" for Docker Hub images; 
+	  	- "quay.io/cumulus" for images on Red Hat registry;
 
-	  	- "quay.io/cumulus" for backup images on Red Hat registry.
-	  -
-	  - "cumulusprod"
+	  	- "cumulusprod" for backup images on Docker Hub.
+	  - "quay.io/cumulus"
+	  - "quay.io/cumulus"
+	* - config_version
+	  - Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: ``0.2``, ``0.1``.
+	  - "0.2"
+	  - "0.2"
 	* - zones
 	  - Google cloud zones to consider for execution.
 	  - "us-east1-d us-west1-a us-west1-b"

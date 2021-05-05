@@ -18,16 +18,15 @@ Say the reference is in folder ``/projects/mm10`` on your local machine.
 
 ## Build Reference for StarSolo
 
-Pull docker image from [cumulusprod/starsolo](https://hub.docker.com/r/cumulusprod/starsolo/tags) for building. In this example, I use tag ``2.7.3a``. Then start a docker container:
+Pull docker image from [quay.io/cumulus/starsolo](https://quay.io/repository/cumulus/starsolo?tab=tags) for building. In this example, I use tag ``2.7.6a``. Then start a docker container:
 
 ```
-docker run -it --rm -v /projects/mm10:/ref -v /projects/starsolo-ref:/output cumulusprod/starsolo:2.7.3a
+docker run -it --rm -v /projects/mm10:/ref -v /projects/starsolo-ref:/output quay.io/cumulus/starsolo:2.7.6a
 ```
 
 Then inside the docker container, type:
 
 ```
-mkdir /output/star
 STAR --runMode genomeGenerate --runThreadN 32 --genomeDir /output --genomeFastaFiles /ref/fasta/genome.fa --sjdbGTFfile /ref/genes/genes.gtf --genomeSAindexNbases 14 --genomeChrBinNbits 18
 ```
 
@@ -151,7 +150,7 @@ gsutil -m cp alevin.tar.gz gs://regev-lab/resources/count_tools/mm10/
 
 ## Wrap Up
 
-We are almost done. Next step is to update the index file, and add GS URL of mm10 reference to it. 
+We are almost done. Next step is to update the index file, and add GS URL of mm10 reference to it.
 
 The index file is at Cumulus GitHub repository: https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/count_tools/ref_index.tsv. Add a new line as follows in this file:
 

@@ -22,7 +22,7 @@ workflow cellranger_create_reference {
     }
 
     # Output directory, with trailing slashes stripped
-    String output_directory_stripped = sub(output_directory, "/+$", "")
+    String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
     call generate_create_reference_config {
         input:
@@ -268,9 +268,9 @@ task run_cellranger_mkref {
         CODE
 
         tar -czf ~{output_genome}.tar.gz ~{output_genome}
-        gsutil cp ~{output_genome}.tar.gz ~{output_dir}/
-        # mkdir -p ~{output_dir}
-        # cp ~{output_genome}.tar.gz ~{output_dir}
+        gsutil cp ~{output_genome}.tar.gz "~{output_dir}"/
+        # mkdir -p "~{output_dir}"
+        # cp ~{output_genome}.tar.gz "~{output_dir}"
     }
 
     output {

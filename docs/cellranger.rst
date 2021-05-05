@@ -80,12 +80,12 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		* - **Reference**
 		  -
 		  	| Provides the reference genome used by Cell Ranger for each 10x channel.
-		  	| The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as *GRCh38_v3.0.0*.
+		  	| The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as *GRCh38-2020-A*.
 		  	| A full list of available keywords is included in each of the following data type sections (e.g. sc/snRNA-seq) below.
 		* - **Flowcell**
 		  -
 		    | Indicates the Google bucket URLs of uploaded BCL folders.
-		    | If starts with FASTQ files, this should be Google bucekt URLs of uploaded FASTQ folders.
+		    | If starts with FASTQ files, this should be Google bucket URLs of uploaded FASTQ folders.
 		    | The FASTQ folders should contain one subfolder for each sample in the flowcell with the sample name as the subfolder name.
 		    | Each subfolder contains FASTQ files for that sample.
 		* - **Lane**
@@ -98,32 +98,33 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		  - Describes the 10x chemistry used for the sample. This column is optional.
 		* - DataType
 		  -
-			| Describes the data type of the sample --- *rna*, *vdj*, *adt*, or *crispr*.
+			| Describes the data type of the sample --- *rna*, *vdj*, *adt*, *cmo*, *crispr*, *atac*.
 			| **rna** refers to gene expression data (*cellranger count*),
 			| **vdj** refers to V(D)J data (*cellranger vdj*),
 			| **adt** refers to antibody tag data, which can be either CITE-Seq, cell-hashing, or nucleus-hashing,
+			| **cmo** refers to cell multiplexing oligos used in 10x Genomics' CellPlex assay,
 			| **crispr** refers to Perturb-seq guide tag data,
-			| **atac** refers to scATAC-Seq data (*cellranger-atac count*).
+			| **atac** refers to scATAC-Seq data (*cellranger-atac count*),
 			| This column is optional and the default data type is *rna*.
 		* - FeatureBarcodeFile
 		  -
-		  	| Google bucket urls pointing to feature barcode files for *adt* and *crispr* data.
-		  	| Features can be either antibody for CITE-Seq, cell-hashing, nucleus-hashing or gRNA for Perburb-seq.
-		  	| This column is optional provided no *adt* or *crispr* data are in the sample sheet.
+		  	| Google bucket urls pointing to feature barcode files for *rna*, *adt* and *crispr* data.
+		  	| Features can be either targeted genes for targeted gene expression analysis, antibody for CITE-Seq, cell-hashing, nucleus-hashing or gRNA for Perburb-seq.
+		  	| This column is only required for targeted gene expression analysis (*rna*), CITE-Seq, cell-hashing, nucleus-hashing (*adt*) and Perturb-seq (*crispr*).
 
 	The sample sheet supports sequencing the same 10x channels across multiple flowcells. If a sample is sequenced across multiple flowcells, simply list it in multiple rows, with one flowcell per row. In the following example, we have 4 samples sequenced in two flowcells.
 
 	Example::
 
-		Sample,Reference,Flowcell,Lane,Index,Chemistry,DataType,FeatureBarcodeFile
-		sample_1,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,threeprime,rna
-		sample_2,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3-4,SI-GA-B8,SC3Pv3,rna
-		sample_3,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,5-6,SI-GA-C8,fiveprime,rna
-		sample_4,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,7-8,SI-GA-D8,fiveprime,rna
-		sample_1,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,1-2,SI-GA-A8,threeprime,rna
-		sample_2,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,3-4,SI-GA-B8,SC3Pv3,rna
-		sample_3,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,5-6,SI-GA-C8,fiveprime,rna
-		sample_4,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,7-8,SI-GA-D8,fiveprime,rna
+		Sample,Reference,Flowcell,Lane,Index,Chemistry,DataType
+		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,threeprime,rna
+		sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3-4,SI-GA-B8,SC3Pv3,rna
+		sample_3,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,5-6,SI-GA-C8,fiveprime,rna
+		sample_4,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,7-8,SI-GA-D8,fiveprime,rna
+		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,1-2,SI-GA-A8,threeprime,rna
+		sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,3-4,SI-GA-B8,SC3Pv3,rna
+		sample_3,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,5-6,SI-GA-C8,fiveprime,rna
+		sample_4,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,7-8,SI-GA-D8,fiveprime,rna
 
 	**3.2 Upload your sample sheet to the workspace bucket:**
 
@@ -156,7 +157,7 @@ Sometimes, users might want to perform demultiplexing locally and only run the c
 
 #. Copy your FASTQ files to the workspace using gsutil_ in your unix terminal.
 
-	You should upload folders of FASTQ files. The uploaded folder (for one flowcell) should contain one subfolder for each sample belong to the this flowcell. **In addition, the subfolder name and the sample name in your sample sheet MUST be the same.** Each subfolder contains FASTQ files for that sample.
+	You should upload folders of FASTQ files. The uploaded folder (for one flowcell) should contain one subfolder for each sample belong to the this flowcell. **In addition, the subfolder name and the sample name in your sample sheet MUST be the same.** Each subfolder contains FASTQ files for that sample. Please note that if your FASTQ file are downloaded from the Sequence Read Archive (SRA) from NCBI, you must rename your FASTQs to follow the bcl2fastq `file naming conventions`_.
 
 	Example::
 
@@ -170,7 +171,7 @@ Sometimes, users might want to perform demultiplexing locally and only run the c
 	Example::
 
 		Sample,Reference,Flowcell
-		sample_1,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq
+		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq
 
 #. Set optional input ``run_mkfastq`` to ``false``.
 
@@ -242,7 +243,7 @@ Sample sheet
 
 #. **Index** column.
 
-	Put `10x single cell 3' sample index set names`_ (e.g. SI-GA-A12) here.
+	Put `10x single cell RNA-seq sample index set names`_ (e.g. SI-GA-A12) here.
 
 #. *Chemistry* column.
 
@@ -277,20 +278,16 @@ Sample sheet
 
 #. *FetureBarcodeFile* column.
 
-	Leave it blank for scRNA-seq and snRNA-seq.
+	Put target panel CSV file here for targeted expressiond data. Note that if a target panel CSV is present, cell ranger version must be >= 4.0.0.
 
 #. Example::
 
 	Sample,Reference,Flowcell,Lane,Index,Chemistry,DataType,FeatureBarcodeFile
-	sample_1,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,threeprime,rna
-	sample_2,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3-4,SI-GA-B8,SC3Pv3,rna
-	sample_3,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,5-6,SI-GA-C8,fiveprime,rna
-	sample_4,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,7-8,SI-GA-D8,fiveprime,rna
-	sample_1,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,1-2,SI-GA-A8,threeprime,rna
-	sample_2,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,3-4,SI-GA-B8,SC3Pv3,rna
-	sample_3,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,5-6,SI-GA-C8,fiveprime,rna
-	sample_4,mm10_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,7-8,SI-GA-D8,fiveprime,rna
-
+	sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,threeprime,rna
+	sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,1-2,SI-GA-A8,threeprime,rna
+	sample_2,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,5-6,SI-GA-C8,fiveprime,rna
+	sample_2,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,5-6,SI-GA-C8,fiveprime,rna
+	sample_3,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3,SI-TT-A1,auto,rna,gs://fc-e0000000-0000-0000-0000-000000000000/immunology_v1.0_GRCh38-2020-A.target_panel.csv
 
 Workflow input
 ++++++++++++++
@@ -312,7 +309,7 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		* - **output_directory**
 		  - Output directory
 		  - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_output"
-		  - Results are written to $output_directory/$bcl_directory_fastqs/fastq_path/ and will overwrite any existing files at this location.
+		  - Results are written under directory *output_directory* and will overwrite any existing files at this location.
 		* - run_mkfastq
 		  - If you want to run ``cellranger mkfastq``
 		  - true
@@ -321,13 +318,21 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  - If you want to run ``cellranger count``
 		  - true
 		  - true
-		* - delete_input_directory
+		* - delete_input_bcl_directory
 		  - If delete BCL directories after demux. If false, you should delete this folder yourself so as to not incur storage charges
 		  - false
 		  - false
 		* - mkfastq_barcode_mismatches
 		  - Number of mismatches allowed in matching barcode indices (bcl2fastq2 default is 1)
 		  - 0
+		  -
+		* - mkfastq_filter_single_index
+		  - Only demultiplex samples identified by an i7-only sample index, ignoring dual-indexed samples. Dual-indexed samples will not be demultiplexed
+		  - false
+		  - false
+		* - mkfastq_use_bases_mask
+		  - Override the read lengths as specified in *RunInfo.xml*
+		  - "Y28n*,I8n*,N10,Y90n*"
 		  -
 		* - force_cells
 		  - Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells
@@ -337,22 +342,34 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  - Expected number of recovered cells. Mutually exclusive with force_cells
 		  - 3000
 		  -
+		* - include_introns
+		  - Turn this option on to also count reads mapping to intronic regions. With this option, users do not need to use pre-mRNA references. Note that if this option is set, cellranger_version must be >= 5.0.0.
+		  - false
+		  - false
+		* - no_bam
+		  - Turn this option on to disable BAM file generation. This option is only available if cellranger_version >= 5.0.0.
+		  - false
+		  - false
 		* - secondary
 		  - Perform Cell Ranger secondary analysis (dimensionality reduction, clustering, etc.)
 		  - false
 		  - false
 		* - cellranger_version
-		  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, or 2.2.0
-		  - "4.0.0"
-		  - "4.0.0"
+		  - cellranger version, could be 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
+		  - "6.0.1"
+		  - "6.0.1"
+		* - config_version
+		  - config docker version used for processing sample sheets, could be 0.2, 0.1
+		  - "0.2"
+		  - "0.2"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
-		  	- "cumulusprod" for Docker Hub images;
+		  	- "quay.io/cumulus" for images on Red Hat registry;
 
-		  	- "quay.io/cumulus" for backup images on Red Hat registry.
-		  - "cumulusprod"
-		  - "cumulusprod"
+		  	- "cumulusprod" for backup images on Docker Hub.
+		  - "quay.io/cumulus"
+		  - "quay.io/cumulus"
 		* - cellranger_mkfastq_docker_registry
 		  - Docker registry to use for ``cellranger mkfastq``.
 		    Default is the registry to which only Broad users have access.
@@ -456,7 +473,7 @@ Sample sheet
 
 #. **Index** column.
 
-	The ADT/HTO index can be either Illumina index primer sequence (e.g. ``ATTACTCG``, also known as ``D701``), or `10x single cell 3' sample index set names`_ (e.g. SI-GA-A12).
+	The ADT/HTO index can be either Illumina index primer sequence (e.g. ``ATTACTCG``, also known as ``D701``), or `10x single cell RNA-seq sample index set names`_ (e.g. SI-GA-A12).
 
 	**Note 1**: All ADT/HTO index sequences (including 10x's) should have the same length (8 bases). If one index sequence is shorter (e.g. ATCACG), pad it with P7 sequence (e.g. ATCACGAT).
 
@@ -557,21 +574,21 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - 0.1
 		  - 0.1
 		* - cellranger_version
-		  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, 2.2.0
-		  - "4.0.0"
-		  - "4.0.0"
+		  - cellranger version, could be 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
+		  - "6.0.1"
+		  - "6.0.1"
 		* - cumulus_feature_barcoding_version
-		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.3.0, 0.2.0.
-		  - "0.3.0"
-		  - "0.3.0"
+		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.5.0, 0.4.0, 0.3.0, 0.2.0.
+		  - "0.5.0"
+		  - "0.5.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
-		  	- "cumulusprod" for Docker Hub images;
+		  	- "quay.io/cumulus" for images on Red Hat registry;
 
-		  	- "quay.io/cumulus" for backup images on Red Hat registry.
-		  - "cumulusprod"
-		  - "cumulusprod"
+		  	- "cumulusprod" for backup images on Docker Hub.
+		  - "quay.io/cumulus"
+		  - "quay.io/cumulus"
 		* - mkfastq_docker_registry
 		  - Docker registry to use for ``cellranger mkfastq``.
 		    Default is the registry to which only Broad users have access.
@@ -771,11 +788,11 @@ Workflow input
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
-	  	- "cumulusprod" for Docker Hub images;
+	  	- "quay.io/cumulus" for images on Red Hat registry;
 
-	  	- "quay.io/cumulus" for backup images on Red Hat registry.
-	  - "cumulusprod"
-	  - "cumulusprod"
+	  	- "cumulusprod" for backup images on Docker Hub.
+	  - "quay.io/cumulus"
+	  - "quay.io/cumulus"
 	* - zones
 	  - Google cloud zones
 	  - "us-central1-a us-west1-a"
@@ -904,11 +921,11 @@ To aggregate multiple scATAC-Seq samples, follow the instructions below:
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
-	  	- "cumulusprod" for Docker Hub images;
+	  	- "quay.io/cumulus" for images on Red Hat registry;
 
-	  	- "quay.io/cumulus" for backup images on Red Hat registry.
-	  - "cumulusprod"
-	  - "cumulusprod"
+	  	- "cumulusprod" for backup images on Docker Hub.
+	  - "quay.io/cumulus"
+	  - "quay.io/cumulus"
 
 3. Check out the output in ``output_directory/aggr_id`` folder, where ``output_directory`` and ``aggr_id`` are the inputs you set in Step 2.
 
@@ -932,6 +949,10 @@ Sample sheet
 
 		* - Keyword
 		  - Description
+		* - **GRCh38_vdj_v5.0.0**
+		  - Human GRCh38 V(D)J sequences, cellranger reference 5.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
+		* - **GRCm38_vdj_v5.0.0**
+		  - Mouse GRCm38 V(D)J sequences, cellranger reference 5.0.0, annotation built from Ensembl *Mus_musculus.GRCm38.94.gtf*
 		* - **GRCh38_vdj_v4.0.0**
 		  - Human GRCh38 V(D)J sequences, cellranger reference 4.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
 		* - **GRCm38_vdj_v4.0.0**
@@ -999,26 +1020,32 @@ For scIR-seq data, ``cellranger_workflow`` takes Illumina outputs as input and r
 	  - Number of mismatches allowed in matching barcode indices (bcl2fastq2 default is 1)
 	  - 0
 	  -
-	* - force_cells
-	  - Force pipeline to use this number of cells, bypassing the cell detection algorithm
-	  - 6000
-	  -
 	* - vdj_denovo
 	  - Do not align reads to reference V(D)J sequences before de novo assembly
 	  - false
 	  - false
+	* - vdj_chain
+	  - Force the analysis to be carried out for a particular chain type. The accepted values are:
+
+		- "auto" for auto detection based on TR vs IG representation;
+
+		- "TR" for T cell receptors;
+
+		- "IG" for B cell receptors.
+	  - "auto"
+	  - "auto"
 	* - cellranger_version
-	  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, 2.2.0
-	  - "4.0.0"
-	  - "4.0.0"
+	  - cellranger version, could be 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
+	  - "6.0.1"
+	  - "6.0.1"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
-	  	- "cumulusprod" for Docker Hub images;
+	  	- "quay.io/cumulus" for images on Red Hat registry;
 
-	  	- "quay.io/cumulus" for backup images on Red Hat registry.
-	  - "cumulusprod"
-	  - "cumulusprod"
+	  	- "cumulusprod" for backup images on Docker Hub.
+	  - "quay.io/cumulus"
+	  - "quay.io/cumulus"
 	* - cellranger_mkfastq_docker_registry
 	  - Docker registry to use for ``cellranger mkfastq``.
 	    Default is the registry to which only Broad users have access.
@@ -1181,17 +1208,17 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, or 2.2.0
-		  - "4.0.0"
-		  - "4.0.0"
+		  - cellranger version, could be 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
+		  - "6.0.1"
+		  - "6.0.1"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
-		  	- "cumulusprod" for Docker Hub images;
+		  	- "quay.io/cumulus" for images on Red Hat registry;
 
-		  	- "quay.io/cumulus" for backup images on Red Hat registry.
-		  - "cumulusprod"
-		  - "cumulusprod"
+		  	- "cumulusprod" for backup images on Docker Hub.
+		  - "quay.io/cumulus"
+		  - "quay.io/cumulus"
 		* - zones
 		  - Google cloud zones
 		  - "us-central1-a us-west1-a"
@@ -1280,11 +1307,11 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
-		  	- "cumulusprod" for Docker Hub images;
+		  	- "quay.io/cumulus" for images on Red Hat registry;
 
-		  	- "quay.io/cumulus" for backup images on Red Hat registry.
-		  - "cumulusprod"
-		  - "cumulusprod"
+		  	- "cumulusprod" for backup images on Docker Hub.
+		  - "quay.io/cumulus"
+		  - "quay.io/cumulus"
 		* - zones
 		  - Google cloud zones
 		  - "us-central1-a us-west1-a"
@@ -1371,17 +1398,17 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be 4.0.0, 3.1.0, 3.0.2, or 2.2.0
-		  - "4.0.0"
-		  - "4.0.0"
+		  - cellranger version, could be 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
+		  - "6.0.1"
+		  - "6.0.1"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
-		  	- "cumulusprod" for Docker Hub images;
+		  	- "quay.io/cumulus" for images on Red Hat registry;
 
-		  	- "quay.io/cumulus" for backup images on Red Hat registry.
-		  - "cumulusprod"
-		  - "cumulusprod"
+		  	- "cumulusprod" for backup images on Docker Hub.
+		  - "quay.io/cumulus"
+		  - "quay.io/cumulus"
 		* - zones
 		  - Google cloud zones
 		  - "us-central1-a us-west1-a"
@@ -1418,7 +1445,7 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 
 .. _10x genomics v2 cell barcode white list: gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
 .. _10x genomics v3 cell barcode white list: gs://regev-lab/resources/cellranger/3M-february-2018.txt.gz
-.. _10x single cell 3' sample index set names: https://support.10xgenomics.com/single-cell-gene-expression/index/doc/specifications-sample-index-sets-for-single-cell-3
+.. _10x single cell RNA-seq sample index set names: https://support.10xgenomics.com/single-cell-gene-expression/index/doc/specifications-sample-index-sets-for-single-cell-3
 .. _10x single cell ATAC sample index set names: https://support.10xgenomics.com/single-cell-atac/sequencing/doc/specifications-sample-index-sets-for-single-cell-atac
 .. _10x single cell V(D)J sample index set names: https://support.10xgenomics.com/single-cell-vdj/sequencing/doc/specifications-sample-index-sets-for-single-cell-vdj
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
@@ -1429,3 +1456,4 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 .. _10x build Cell Ranger compatible pre-mRNA Reference Package: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/advanced/references#premrna
 .. _Carly Ziegler: http://shaleklab.com/author/carly/
 .. _[Kim et al. Cell 2020]: https://www.sciencedirect.com/science/article/pii/S0092867420304062
+.. _`file naming conventions`: https://kb.10xgenomics.com/hc/en-us/articles/115003802691-How-do-I-prepare-Sequence-Read-Archive-SRA-data-from-NCBI-for-Cell-Ranger-

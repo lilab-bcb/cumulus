@@ -29,7 +29,7 @@ workflow popscle {
         Int memory = 10
         Int extra_disk_space = 2
         Int preemptible = 2
-        String docker_registry = "cumulusprod"
+        String docker_registry = "quay.io/cumulus"
         String popscle_version = "0.1b"
         String algorithm
     }
@@ -105,7 +105,7 @@ task popscle_task {
         monitor_script.sh > monitoring.log &
 
         mkdir result
-        python /software/extract_barcodes_from_rna.py ~{input_rna} ~{sample_id}.barcodes.tsv ~{min_num_genes}
+        python /software/extract_barcodes_from_rna.py ~{input_rna} "~{sample_id}".barcodes.tsv ~{min_num_genes}
 
         python <<CODE
         from subprocess import check_call
@@ -148,10 +148,10 @@ task popscle_task {
             check_call(['python', '/software/generate_zarr.py', 'result/~{sample_id}.best', '~{input_rna}', 'result/~{sample_id}_demux.zarr.zip'])
         CODE
 
-        gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
+        gsutil -q -m rsync -r result "~{output_directory}/~{sample_id}"
 
-        # mkdir -p ~{output_directory}/~{sample_id}
-        # cp result/* ~{output_directory}/~{sample_id}
+        # mkdir -p "~{output_directory}/~{sample_id}"
+        # cp result/* "~{output_directory}/~{sample_id}"
     }
 
     output {

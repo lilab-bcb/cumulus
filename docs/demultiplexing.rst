@@ -119,15 +119,15 @@ global inputs
 	* - docker_registry
 	  - Docker registry to use. Notice that docker image for Bustools is seperate.
 
-	  	- "cumulusprod" for Docker Hub images;
+	  	- "quay.io/cumulus" for images on Red Hat registry;
 
-	  	- "quay.io/cumulus" for backup images on Red Hat registry.
-	  - "cumulusprod"
-	  - "cumulusprod"
+	  	- "cumulusprod" for backup images on Docker Hub.
+	  - "quay.io/cumulus"
+	  - "quay.io/cumulus"
 	* - config_version
-	  - Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Currently only one version is available: "0.1".
-	  - "0.1"
-	  - "0.1"
+	  - Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: ``0.2``, ``0.1``.
+	  - "0.2"
+	  - "0.2"
 	* - zones
 	  - Google cloud zones to consider for execution.
 	  - "us-east1-d us-west1-a us-west1-b"
@@ -175,9 +175,9 @@ demuxEM inputs
 	  - "XIST"
 	  -
 	* - demuxEM_version
-	  - demuxEM version to use. Currently only support "0.1.4".
-	  - "0.1.4"
-	  - "0.1.4"
+	  - demuxEM version to use. Currently only support "0.1.5".
+	  - "0.1.5"
+	  - "0.1.5"
 	* - demuxEM_num_cpu
 	  - demuxEM parameter. Number of CPUs to request for demuxEM per pair.
 	  - 8
@@ -204,9 +204,14 @@ souporcell inputs
 	  - Example
 	  - Default
 	* - souporcell_version
-	  - souporcell version to use. Available versions: "2020.06", "2020.03".
-	  - "2020.06"
-	  - "2020.06"
+	  - souporcell version to use. Available versions: "2020.07", "2021.03", "2020.03".
+	  - "2020.07"
+	  - "2020.07"
+	* - souporcell_num_clusters
+	- | souporcell parameter. Number of expected clusters when doing clustering.
+	  | **This needs to be set when running souporcell.**
+	- 8
+	- 1
 	* - souporcell_de_novo_mode
 	  - | souporcell parameter.
 	    | If ``true``, run souporcell in de novo mode without reference genotypes; and if a reference genotype vcf file is provided in the sample sheet, use it **only** for matching the cluster labels computed by souporcell.
@@ -217,7 +222,14 @@ souporcell inputs
 	  - | souporcell parameter. Number of expected clusters when doing clustering.
 	    | **This needs to be set when running souporcell.**
 	  - 8
+	* - souporcell_common_variants
+	  - souporcell parameter. Users can provide a common variants list in VCF format for Souporcell to use, instead of calling SNPs de novo
+	  - "1000genome.common.variants.vcf.gz"
 	  -
+	* - souporcell_skip_remap
+	  - souporcell parameter. Skip remap step. Only recommended in non denovo mode or common variants are provided.
+	  - true
+	  - false
 	* - souporcell_rename_donors
 	  - | souporcell parameter. A comma-separated list of donor names for renaming clusters achieved by souporcell.
 	    | By default, the resulting donors are *Donor1*, *Donor2*, ...

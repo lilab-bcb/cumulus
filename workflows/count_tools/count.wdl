@@ -1,7 +1,7 @@
 version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_merge_fastqs/versions/5/plain-WDL/descriptor" as mfs
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_starsolo/versions/10/plain-WDL/descriptor" as sts
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_starsolo/versions/12/plain-WDL/descriptor" as sts
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_bustools/versions/4/plain-WDL/descriptor" as kbc
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_alevin/versions/2/plain-WDL/descriptor" as ale
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:count_tools_optimus/versions/7/plain-WDL/descriptor" as opm
@@ -24,7 +24,8 @@ workflow count {
         Boolean run_count = true
         String count_tool = "StarSolo"
 
-        String docker_registry = "cumulusprod"
+        String docker_registry = "quay.io/cumulus"
+        String config_version = "0.2"
         Int num_cpu = 32
         Int disk_space = 500
         Int memory = 120
@@ -54,6 +55,7 @@ workflow count {
         input:
             input_tsv_file = input_tsv_file,
             docker_registry = docker_registry,
+            config_version = config_version,
             zones = zones,
             preemptible = preemptible
     }
@@ -175,6 +177,7 @@ task generate_count_config {
     input {
         File input_tsv_file
         String docker_registry
+        String config_version
         String zones
         Int preemptible
     }
@@ -247,7 +250,7 @@ task generate_count_config {
     }
 
     runtime {
-        docker: "~{docker_registry}/count"
+        docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: "~{preemptible}"
     }

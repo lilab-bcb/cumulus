@@ -6,7 +6,7 @@ RUN apt-get update && \
     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    apt-get update && apt-get install -y google-cloud-sdk=301.0.0-0 && \
+    apt-get update && apt-get install -y google-cloud-sdk=311.0.0-0 && \
     apt-get -qq -y autoremove && \
     apt-get clean
 
@@ -24,8 +24,7 @@ RUN pip install --upgrade pip && \
     pip install zarr==2.4.0 && \
     pip install natsort==7.0.1 && \
     pip install h5py==2.10.0 && \
-    pip install numba==0.50.1 && \
-    pip install numcodecs==0.6.4 && \
+    pip install numba==0.51.2 && \
     pip install argparse==1.4.0 && \
     pip install pegasusio==0.2.5.post2
 
