@@ -97,7 +97,6 @@ task popscle_task {
         String zones
     }
 
-    String type  = if algorithm=='demuxlet' then "demuxlet" else "dsc-pileup"
     Int disk_space = ceil(extra_disk_space + size(input_rna,"GB") + size(input_bam,"GB") + size(ref_genotypes, "GB"))
 
     command {
@@ -109,14 +108,10 @@ task popscle_task {
 
         python <<CODE
         from subprocess import check_call
-        type = '~{type}'
 
+        assert '~{algorithm}' in ['demuxlet', 'freemuxlet'], "The 'algorithm' input must be chosen from ['demuxlet', 'freemuxlet']!"
 
-        call_args = ['popscle', '~{type}',  '--sam', '~{input_bam}', '--group-list', '~{sample_id}.barcodes.tsv', '--out', 'result/~{sample_id}', '--vcf', '~{ref_genotypes}']
-
-        if type == 'demuxlet':
-            call_args.extend(['--field', '~{field}'])
-
+        call_args = ['popscle', 'dsc-pileup', '--sam', '~{input_bam}', '--vcf', '~{ref_genotypes}', '--group-list', '~{sample_id}.barcodes.tsv', '--out', '~{sample_id}.plp']
         if '~{min_MQ}' is not '':
             call_args.extend(['--min-MQ', '~{min_MQ}'])
         if '~{min_TD}' is not '':
@@ -125,7 +120,14 @@ task popscle_task {
             call_args.extend(['--tag-group', '~{tag_group}'])
         if '~{tag_UMI}' is not '':
             call_args.extend(['--tag-UMI', '~{tag_UMI}'])
-        if type == 'demuxlet':
+
+        print(' '.join(call_args))
+        check_call(call_args)
+
+        call_args = ['popscle', '~{algorithm}', '--plp', '~{sample_id}.plp', '--out', 'result/~{sample_id}']
+        if '~{algorithm}' == 'demuxlet':
+            if '~{field}' is not '':
+                call_args.extend(['--field', '~{field}'])
             if '~{alpha}' is not '':
                 alpha_list = '~{alpha}'.split(',')
                 prefix_list = ['--alpha'] * len(alpha_list)
@@ -134,18 +136,18 @@ task popscle_task {
             if '~{geno_error}' is not '':
                 call_args.extend(['--geno-error-offset', '~{geno_error}'])
 
+        if '~{algorithm}' == 'freemuxlet':
+            if '~{nsample}' is not '':
+                call_args.extend(['--nsample', '~{nsample}'])
+
         print(' '.join(call_args))
         check_call(call_args)
 
-        if type != 'demuxlet':
-            call_args = ['popscle', 'freemuxlet', '--plp', 'result/~{sample_id}', '--out', 'result/~{sample_id}']
-            if '~{nsample}' is not '':
-                call_args.extend(['--nsample', '~{nsample}'])
-            print(' '.join(call_args))
-            check_call(call_args)
-            check_call(['python', '/software/generate_zarr.py', 'result/~{sample_id}.clust1.samples.gz', '~{input_rna}', 'result/~{sample_id}_demux.zarr.zip'])
-        else:
-            check_call(['python', '/software/generate_zarr.py', 'result/~{sample_id}.best', '~{input_rna}', 'result/~{sample_id}_demux.zarr.zip'])
+        cluster_result = 'result/~{sample_id}.best' if '~{algorithm}' == 'demuxlet' else 'result/~{sample_id}.clust1.samples.gz'
+        call_args = ['python', '/software/generate_zarr.py', cluster_result, '~{input_rna}', 'result/~{sample_id}_demux.zarr.zip']
+
+        print(' '.join(call_args))
+        check_call(call_args)
         CODE
 
         gsutil -q -m rsync -r result "~{output_directory}/~{sample_id}"

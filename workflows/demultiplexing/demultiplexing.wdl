@@ -2,11 +2,9 @@ version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/6/plain-WDL/descriptor" as dem
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/15/plain-WDL/descriptor" as soc
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/1/plain-WDL/descriptor" as dmx
+#import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/1/plain-WDL/descriptor" as psc
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/demultiplexing/popscle.wdl" as psc
 
-#import "demuxEM.wdl" as dem
-#import "souporcell.wdl" as soc
-#import "popscle.wdl" as dmx
 
 workflow demultiplexing {
     input {
@@ -77,9 +75,9 @@ workflow demultiplexing {
         Int popscle_disk_space = 2
 
         # For freemuxlet
-        Int freeemuxlet_num_samples = 4
+        Int freemuxlet_num_samples = 1
 
-        # Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: ``0.2``, ``0.1``
+        # Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: "0.2", "0.1"
         String config_version = "0.2"
     }
     Int popscle_memory_ = (if demultiplexing_algorithm == 'demuxlet' then demuxlet_memory else freemuxlet_memory)
@@ -155,7 +153,7 @@ workflow demultiplexing {
             }
 
             if (demultiplexing_algorithm == "demuxlet" || demultiplexing_algorithm == "freemuxlet") {
-                call dmx.popscle as popscle {
+                call psc.popscle as popscle {
                     input:
                         sample_id = pooling_id,
                         algorithm=demultiplexing_algorithm,
@@ -164,7 +162,7 @@ workflow demultiplexing {
                         input_bam = Config.id2tag[pooling_id],
                         ref_genotypes = Config.id2genotype[pooling_id],
                         min_num_genes = min_num_genes,
-                        nsample = freeemuxlet_num_samples,
+                        nsample = freemuxlet_num_samples,
                         docker_registry = docker_registry,
                         popscle_version = popscle_version,
                         extra_disk_space = popscle_disk_space,
