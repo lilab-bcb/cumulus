@@ -694,6 +694,10 @@ Sample sheet
 
 		* - Keyword
 		  - Description
+		* - **GRCh38-2020-A_arc_v2.0.0**
+		  - Human GRCh38, cellranger-arc/atac reference 2.0.0
+		* - **mm10-2020-A_arc_v2.0.0**	
+		  - Mouse mm10, cellranger-arc/atac reference 2.0.0
 		* - **GRCh38_atac_v1.2.0**
 		  - Human GRCh38, cellranger-atac reference 1.2.0
 		* - **mm10_atac_v1.2.0**
@@ -759,7 +763,7 @@ Workflow input
 	  -
 	* - **output_directory**
 	  - Output directory
-	  - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_output"
+	  - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_atac_output"
 	  -
 	* - run_mkfastq
 	  - If you want to run ``cellranger-atac mkfastq``
@@ -781,10 +785,18 @@ Workflow input
 	  - Force pipeline to use this number of cells, bypassing the cell detection algorithm
 	  - 6000
 	  -
+	* - atac_dim_reduce
+	  - Choose the algorithm for dimensionality reduction prior to clustering and tsne: "lsa", "plsa", or "pca"
+	  - "lsa"
+	  - "lsa"
+	* - atac_peaks
+	  - A 3-column BED file of peaks to override cellranger atac peak caller. Peaks must be sorted by position and not contain overlapping peaks; comment lines beginning with `#` are allowed
+	  - "gs://fc-e0000000-0000-0000-0000-000000000000/common_peaks.bed"
+	  - 
 	* - cellranger_atac_version
-	  - cellranger-atac version. Available options: 1.2.0, 1.1.0
-	  - "1.2.0"
-	  - "1.2.0"
+	  - cellranger-atac version. Available options: 2.0.0, 1.2.0, 1.1.0
+	  - "2.0.0"
+	  - "2.0.0"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
@@ -889,15 +901,19 @@ To aggregate multiple scATAC-Seq samples, follow the instructions below:
 	  - false
 	  - false
 	* - dim_reduce
-	  - Chose the algorithm for dimensionality reduction prior to clustering and tsne.
+	  - Choose the algorithm for dimensionality reduction prior to clustering and tsne.
 	    Options are: ``lsa``, ``plsa``, or ``pca``.
 	  - "lsa"
 	  - "lsa"
+	* - peaks
+	  - A 3-column BED file of peaks to override cellranger atac peak caller. Peaks must be sorted by position and not contain overlapping peaks; comment lines beginning with `#` are allowed
+	  - "gs://fc-e0000000-0000-0000-0000-000000000000/common_peaks.bed"
+	  - 
 	* - cellranger_atac_version
 	  - Cell Ranger ATAC version to use.
-	    Options: ``1.2.0``, ``1.1.0``.
-	  - "1.2.0"
-	  - "1.2.0"
+	    Options: ``2.0.0``, ``1.2.0``, ``1.1.0``.
+	  - "2.0.0"
+	  - "2.0.0"
 	* - zones
 	  - Google cloud zones
 	  - “us-central1-a us-west1-a”
@@ -1292,18 +1308,34 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 		  - Genome reference name. New reference will be stored in a folder named **genome**
 		  - refdata-cellranger-atac-mm10-1.1.0
 		  -
-		* - **config_json**
-		  - Configuration file defined in `10x genomics configuration file`_. Note that links to files in the JSON must be Google bucket URLs
-		  - "gs://fc-e0000000-0000-0000-0000-000000000000/config.json"
+		* - **input_fasta**
+		  - GSURL for input fasta file
+		  - "gs://fc-e0000000-0000-0000-0000-000000000000/GRCh38.fa"
 		  -
+		* - **input_gtf**
+          - GSURL for input GTF file
+          - "gs://fc-e0000000-0000-0000-0000-000000000000/annotation.gtf"
+          -
+        * - organism
+          - Name of the organism
+          - "human"
+          -
+        * - non_nuclear_contigs
+          - A comma separated list of names of contigs that are not in nucleus
+          - "chrM"
+          - "chrM"
+        * - input_motifs
+          - Optional file containing transcription factor motifs in JASPAR format
+          - "gs://fc-e0000000-0000-0000-0000-000000000000/motifs.pfm"
+          -
 		* - **output_directory**
 		  - Output directory
 		  - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_atac_reference"
 		  -
 		* - cellranger_atac_version
-		  - cellranger-atac version, could be: 1.2.0, 1.1.0
-		  - "1.2.0"
-		  - "1.2.0"
+		  - cellranger-atac version, could be: 2.0.0, 1.2.0, 1.1.0
+		  - "2.0.0"
+		  - "2.0.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 

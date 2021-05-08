@@ -18,9 +18,11 @@ workflow cellranger_atac_aggr {
         Boolean secondary = false
         # Chose the algorithm for dimensionality reduction prior to clustering and tsne: 'lsa' (default), 'plsa', or 'pca'.
         String dim_reduce = "lsa"
+        # A BED file to override peak caller
+        File? peaks
 
-        # 1.2.0 or 1.1.0
-        String cellranger_atac_version = "1.2.0"
+        # 2.0.0, 1.2.0, 1.1.0
+        String cellranger_atac_version = "2.0.0"
         # Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
         String zones = "us-central1-b"
         # Number of cpus per cellranger job
@@ -53,6 +55,7 @@ workflow cellranger_atac_aggr {
             normalize = normalize,
             secondary = secondary,
             dim_reduce = dim_reduce,
+            peaks = peaks,
             cellranger_atac_version = cellranger_atac_version,
             zones = zones,
             num_cpu = num_cpu,
@@ -79,6 +82,7 @@ task run_cellranger_atac_aggr {
         String normalize
         Boolean secondary
         String dim_reduce
+        File? peaks
         String cellranger_atac_version
         String zones
         Int num_cpu
@@ -121,10 +125,13 @@ task run_cellranger_atac_aggr {
                 fout.write(library_id + "," + current_dir + '/' + library_id + "/fragments.tsv.gz," + current_dir + '/' + library_id + "/singlecell.csv\n")
 
         call_args = ['cellranger-atac', 'aggr', '--id=results', '--reference=genome_dir', '--csv=aggr.csv', '--normalize=~{normalize}', '--jobmode=local']
-        if '~{secondary}' is not 'true':
+        if '~{secondary}' != 'true':
             call_args.append('--nosecondary')
         else:
             call_args.append('--dim-reduce=~{dim_reduce}')
+        if '~{peaks}' != '':
+            assert version.parse('~{cellranger_atac_version}') >= version.parse('2.0.0')
+            call_args.append('--peaks=~{peaks}')
         print(' '.join(call_args))
         check_call(call_args)
         CODE
