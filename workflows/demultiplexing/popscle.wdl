@@ -21,6 +21,7 @@ workflow popscle {
 
         # freemuxlet
         Int? nsample = 4
+        String? donor_rename
 
         String? tag_group = "CB"
         String? tag_UMI = "UB"
@@ -43,6 +44,7 @@ workflow popscle {
             input_rna = input_rna,
             input_bam = input_bam,
             ref_genotypes = ref_genotypes,
+            donor_rename = donor_rename,
             algorithm = algorithm,
             min_num_genes = min_num_genes,
             min_MQ = min_MQ,
@@ -87,6 +89,7 @@ task popscle_task {
         String? tag_group
         String? tag_UMI
         Float? geno_error
+        String? donor_rename
 
         String docker_registry
         String popscle_version
@@ -144,7 +147,11 @@ task popscle_task {
         check_call(call_args)
 
         cluster_result = 'result/~{sample_id}.best' if '~{algorithm}' == 'demuxlet' else 'result/~{sample_id}.clust1.samples.gz'
-        call_args = ['python', '/software/generate_zarr.py', cluster_result, '~{input_rna}', 'result/~{sample_id}_demux.zarr.zip']
+        call_args = ['python', '/software/generate_zarr.py', cluster_result, '~{input_rna}', 'result/~{sample_id}_demux.zarr.zip', '--ref-genotypes', '~{ref_genotypes}']
+        if '~{algorithm}' == 'freemuxlet':
+            call_args.extend(['--cluster-genotypes', 'result/~{sample_id}.clust1.vcf.gz'])
+            if '~{donor_rename}' is not '':
+                call_args.extend(['--donor-names', '~{donor_rename}'])
 
         print(' '.join(call_args))
         check_call(call_args)

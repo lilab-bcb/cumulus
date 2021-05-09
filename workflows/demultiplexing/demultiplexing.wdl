@@ -70,6 +70,7 @@ workflow demultiplexing {
 
         # For demuxlet/freemuxlet (popscle)
         String popscle_version = "0.1b"
+        String popscle_rename_donors = ""
         Int freemuxlet_memory = 30
         Int demuxlet_memory = 10
         Int popscle_disk_space = 2
@@ -156,11 +157,12 @@ workflow demultiplexing {
                 call psc.popscle as popscle {
                     input:
                         sample_id = pooling_id,
-                        algorithm=demultiplexing_algorithm,
+                        algorithm = demultiplexing_algorithm,
                         output_directory = output_directory_stripped,
                         input_rna = Config.id2rna[pooling_id],
                         input_bam = Config.id2tag[pooling_id],
                         ref_genotypes = Config.id2genotype[pooling_id],
+                        donor_rename = popscle_rename_donors,
                         min_num_genes = min_num_genes,
                         nsample = freemuxlet_num_samples,
                         docker_registry = docker_registry,
