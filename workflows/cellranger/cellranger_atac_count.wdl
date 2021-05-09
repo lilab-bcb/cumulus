@@ -99,7 +99,8 @@ task run_cellranger_atac_count {
         python <<CODE
         import re
         from subprocess import check_call
-
+        from packaging import version
+        
         fastqs = []
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
             directory = re.sub('/+$', '', directory) # remove trailing slashes

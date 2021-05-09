@@ -2,18 +2,24 @@ version 1.0
 
 workflow cellranger_arc_count {
 	input {
-		# Sample ID
-		String sample_id
+		# Link ID
+		String link_id
+		# A comma-separated list of input sample names
+		String input_samples
 		# A comma-separated list of input FASTQs directories (gs urls)
-		String input_gex_fastqs_directories
-		String input_atac_fastqs_directories
-
+		String input_fastqs_directories
+		# A comma-separated list of input data types
+		String input_data_types
+		# CellRanger ARC output directory
 		String output_directory
 
 		# Keywords or a URL to a tar.gz file
 		String genome
+		# Which docker registry to use: quay.io/cumulus (default) or cumulusprod
+		String docker_registry
 
-		String cellranger_arc_version = "1.0.1"
+		# CellRanger ARC version
+		String cellranger_arc_version
 		# Google cloud zones, default to "us-central1-b", which is consistent with Cromwell's genomics.default-zones attribute
 		String zones = "us-central1-b"
 		# Number of cpus per cellranger job
@@ -25,8 +31,6 @@ workflow cellranger_arc_count {
 		# Number of preemptible tries
 		Int preemptible = 2
 
-		# Which docker registry to use: quay.io/cumulus (default) or cumulusprod
-		String docker_registry = "quay.io/cumulus"
 	}
 
 	File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"

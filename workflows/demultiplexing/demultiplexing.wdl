@@ -16,7 +16,7 @@ workflow demultiplexing {
         String output_directory
         # Reference genome name
         String genome
-        # demultiplexing algorithm to use for genetic-pooling data
+        # demultiplexing algorithm to use for genetic-pooling data, choosing from 'souporcell' or 'popscle' (demuxlet/freemuxlet)
         String demultiplexing_algorithm = "souporcell"
         # Only demultiplex cells/nuclei with at least <min_num_genes> expressed genes
         Int min_num_genes = 100
@@ -70,14 +70,15 @@ workflow demultiplexing {
         # Memory size (integer) in GB needed for souporcell per pair
         Int souporcell_memory = 120
 
-        # For demuxlet/freemuxlet (popscle)
+        # For popscle (demuxlet/freemuxlet)
+        # Default is 0, means to use demuxlet, if this number > 0, use freemuxlet
+        Int popscle_num_samples = 0
+        # Popscle version. Available versions: "latest", "0.1b"
         String popscle_version = "0.1b"
-        Int freemuxlet_memory = 30
-        Int demuxlet_memory = 10
+        # Disk space (integer) in GB needed for popscle per pair
         Int popscle_disk_space = 2
-
-        # For freemuxlet
-        Int freeemuxlet_num_samples = 4
+        # Memory size in GB needed for popscle per pair
+        Int popscle_memory = 30
 
         # Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: ``0.2``, ``0.1``
         String config_version = "0.2"
@@ -154,21 +155,20 @@ workflow demultiplexing {
                 }
             }
 
-            if (demultiplexing_algorithm == "demuxlet" || demultiplexing_algorithm == "freemuxlet") {
+            if (demultiplexing_algorithm == "popscle") {
                 call dmx.popscle as popscle {
                     input:
                         sample_id = pooling_id,
-                        algorithm=demultiplexing_algorithm,
                         output_directory = output_directory_stripped,
                         input_rna = Config.id2rna[pooling_id],
                         input_bam = Config.id2tag[pooling_id],
                         ref_genotypes = Config.id2genotype[pooling_id],
                         min_num_genes = min_num_genes,
-                        nsample = freeemuxlet_num_samples,
+                        nsample = popscle_num_samples,
                         docker_registry = docker_registry,
                         popscle_version = popscle_version,
                         extra_disk_space = popscle_disk_space,
-                        memory = popscle_memory_,
+                        memory = popscle_memory,
                         zones = zones,
                         preemptible = preemptible
                 }
