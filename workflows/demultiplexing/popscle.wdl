@@ -20,7 +20,7 @@ workflow popscle {
         Float? geno_error
 
         # freemuxlet
-        Int? nsample = 4
+        Int nsample
         String? donor_rename
 
         String? tag_group = "CB"
@@ -32,7 +32,6 @@ workflow popscle {
         Int preemptible = 2
         String docker_registry = "quay.io/cumulus"
         String popscle_version = "0.1b"
-        String algorithm
     }
 
 
@@ -45,7 +44,6 @@ workflow popscle {
             input_bam = input_bam,
             ref_genotypes = ref_genotypes,
             donor_rename = donor_rename,
-            algorithm = algorithm,
             min_num_genes = min_num_genes,
             min_MQ = min_MQ,
             alpha = alpha,
@@ -79,9 +77,8 @@ task popscle_task {
         File input_rna
         File input_bam
         File ref_genotypes
-        String algorithm
         Int min_num_genes
-        Int? nsample
+        Int nsample
         String field
         Int? min_MQ
         String? alpha
@@ -101,6 +98,7 @@ task popscle_task {
     }
 
     Int disk_space = ceil(extra_disk_space + size(input_rna,"GB") + size(input_bam,"GB") + size(ref_genotypes, "GB"))
+    String algorithm = if nsample == 0 then 'demuxlet' else 'freemuxlet'
 
     command {
         set -e
@@ -140,8 +138,7 @@ task popscle_task {
                 call_args.extend(['--geno-error-offset', '~{geno_error}'])
 
         if '~{algorithm}' == 'freemuxlet':
-            if '~{nsample}' is not '':
-                call_args.extend(['--nsample', '~{nsample}'])
+            call_args.extend(['--nsample', '~{nsample}'])
 
         print(' '.join(call_args))
         check_call(call_args)

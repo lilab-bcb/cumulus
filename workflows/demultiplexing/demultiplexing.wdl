@@ -1,10 +1,13 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/6/plain-WDL/descriptor" as dem
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/15/plain-WDL/descriptor" as soc
-#import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/1/plain-WDL/descriptor" as psc
-import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/demultiplexing/popscle.wdl" as psc
+#import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/6/plain-WDL/descriptor" as dem
+#import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/15/plain-WDL/descriptor" as soc
+##import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/1/plain-WDL/descriptor" as psc
+#import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/demultiplexing/popscle.wdl" as psc
 
+import "demuxEM.wdl" as dem
+import "souporcell.wdl" as soc
+import "popscle.wdl" as psc
 
 workflow demultiplexing {
     input {
@@ -13,7 +16,7 @@ workflow demultiplexing {
         # This is the output directory (gs url + path) for all results. There will be one folder per RNA-hashtag/genetic data pair under this directory.
         String output_directory
         # Reference genome name
-        String genome
+        String genome = ""
         # demultiplexing algorithm to use for genetic-pooling data
         String demultiplexing_algorithm = "souporcell"
         # Only demultiplex cells/nuclei with at least <min_num_genes> expressed genes
@@ -68,12 +71,17 @@ workflow demultiplexing {
         # Memory size (integer) in GB needed for souporcell per pair
         Int souporcell_memory = 120
 
-        # For demuxlet/freemuxlet (popscle)
+        # For popscle (demuxlet/freemuxlet)
+        # Default is 0, means to use demuxlet, if this number > 0, use freemuxlet
+        Int popscle_num_samples = 0
+        # Popscle version. Available versions: "2021.04", "0.1b"
         String popscle_version = "0.1b"
+        # A comma-separated list of donor names for renaming clusters achieved by freemuxlet
         String popscle_rename_donors = ""
-        Int freemuxlet_memory = 30
-        Int demuxlet_memory = 10
-        Int popscle_disk_space = 2
+        # Memory size in GB needed for popscle per pair
+        Int popscle_memory = 30
+        # Extra disk space (integer) in GB needed for popscle per pair
+        Int popscle_extra_disk_space = 2
 
         # For freemuxlet
         Int freemuxlet_num_samples = 1
@@ -81,14 +89,8 @@ workflow demultiplexing {
         # Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: "0.2", "0.1"
         String config_version = "0.2"
     }
-    Int popscle_memory_ = (if demultiplexing_algorithm == 'demuxlet' then demuxlet_memory else freemuxlet_memory)
 
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
-
-    File ref_index_file = "gs://regev-lab/resources/cellranger/index.tsv"
-    # File ref_index_file = "index.tsv"
-    Map[String, String] ref_index2gsurl = read_map(ref_index_file)
-    String genome_url = ref_index2gsurl[genome]
 
     call generate_demux_config as Config {
         input:
@@ -129,6 +131,11 @@ workflow demultiplexing {
     if (Config.pooling_ids[0] != '') {
         scatter (pooling_id in Config.pooling_ids) {
             if (demultiplexing_algorithm == "souporcell") {
+                File ref_index_file = "gs://regev-lab/resources/cellranger/index.tsv"
+                # File ref_index_file = "index.tsv"
+                Map[String, String] ref_index2gsurl = read_map(ref_index_file)
+                String genome_url = ref_index2gsurl[genome]
+
                 call soc.souporcell as souporcell {
                     input:
                         sample_id = pooling_id,
@@ -153,22 +160,21 @@ workflow demultiplexing {
                 }
             }
 
-            if (demultiplexing_algorithm == "demuxlet" || demultiplexing_algorithm == "freemuxlet") {
+            if (demultiplexing_algorithm == "popscle") {
                 call psc.popscle as popscle {
                     input:
                         sample_id = pooling_id,
-                        algorithm = demultiplexing_algorithm,
                         output_directory = output_directory_stripped,
                         input_rna = Config.id2rna[pooling_id],
                         input_bam = Config.id2tag[pooling_id],
                         ref_genotypes = Config.id2genotype[pooling_id],
                         donor_rename = popscle_rename_donors,
                         min_num_genes = min_num_genes,
-                        nsample = freemuxlet_num_samples,
+                        nsample = popscle_num_samples,
                         docker_registry = docker_registry,
                         popscle_version = popscle_version,
-                        extra_disk_space = popscle_disk_space,
-                        memory = popscle_memory_,
+                        extra_disk_space = popscle_extra_disk_space,
+                        memory = popscle_memory,
                         zones = zones,
                         preemptible = preemptible
                 }
