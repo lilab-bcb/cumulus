@@ -1,13 +1,9 @@
 version 1.0
 
-#import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/6/plain-WDL/descriptor" as dem
-#import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/15/plain-WDL/descriptor" as soc
-##import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/1/plain-WDL/descriptor" as psc
-#import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/demultiplexing/popscle.wdl" as psc
-
-import "demuxEM.wdl" as dem
-import "souporcell.wdl" as soc
-import "popscle.wdl" as psc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/6/plain-WDL/descriptor" as dem
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/15/plain-WDL/descriptor" as soc
+#import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/1/plain-WDL/descriptor" as psc
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/demultiplexing/popscle.wdl" as psc
 
 workflow demultiplexing {
     input {
@@ -82,9 +78,6 @@ workflow demultiplexing {
         Int popscle_memory = 30
         # Extra disk space (integer) in GB needed for popscle per pair
         Int popscle_extra_disk_space = 2
-
-        # For freemuxlet
-        Int freemuxlet_num_samples = 1
 
         # Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: "0.2", "0.1"
         String config_version = "0.2"
