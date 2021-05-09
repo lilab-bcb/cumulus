@@ -67,14 +67,17 @@ workflow cellranger_workflow {
         # For atac
 
         # For atac, choose the algorithm for dimensionality reduction prior to clustering and tsne: 'lsa' (default), 'plsa', or 'pca'.
-        String? atac_dim_reduce
+        String? atac_dim_reduce = "lsa"
+        # A BED file to override peak caller
+        File? atac_peaks
+
 
         # 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
         String cellranger_version = "6.0.1"
         # 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0
         String cumulus_feature_barcoding_version = "0.6.0"
-        # 1.2.0, 1.1.0
-        String cellranger_atac_version = "1.2.0"
+        # 2.0.0, 1.2.0, 1.1.0
+        String cellranger_atac_version = "2.0.0"
         # 0.2
         String config_version = "0.2"
 
@@ -286,6 +289,7 @@ workflow cellranger_workflow {
                         genome = generate_count_config.sample2genome[sample_id],
                         force_cells = force_cells,
                         dim_reduce = atac_dim_reduce,
+                        peaks = atac_peaks,
                         cellranger_atac_version = cellranger_atac_version,
                         zones = zones,
                         num_cpu = atac_num_cpu,

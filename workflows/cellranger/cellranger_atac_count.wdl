@@ -14,11 +14,16 @@ workflow cellranger_atac_count {
 
         # Force pipeline to use this number of cells, bypassing the cell detection algorithm
         Int? force_cells
-        # Chose the algorithm for dimensionality reduction prior to clustering and tsne: 'lsa' (default), 'plsa', or 'pca'.
+        # Choose the algorithm for dimensionality reduction prior to clustering and tsne: 'lsa' (default), 'plsa', or 'pca'.
         String? dim_reduce
+        # A BED file to override peak caller
+        File? peaks
 
-        # 1.2.0 or 1.1.0
-        String cellranger_atac_version = "1.2.0"
+        # cellranger-atac version
+        String cellranger_atac_version
+        # Which docker registry to use
+        String docker_registry
+
         # Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
         String zones = "us-central1-b"
         # Number of cpus per cellranger job
@@ -30,8 +35,6 @@ workflow cellranger_atac_count {
         # Number of preemptible tries
         Int preemptible = 2
 
-        # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
-        String docker_registry = "quay.io/cumulus"
     }
 
     File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
@@ -50,6 +53,7 @@ workflow cellranger_atac_count {
             genome_file = genome_file,
             force_cells = force_cells,
             dim_reduce = dim_reduce,
+            peaks = peaks,
             cellranger_atac_version = cellranger_atac_version,
             zones = zones,
             num_cpu = num_cpu,
@@ -75,6 +79,7 @@ task run_cellranger_atac_count {
         File genome_file
         Int? force_cells
         String? dim_reduce
+        File? peaks
         String cellranger_atac_version
         String zones
         Int num_cpu
@@ -108,10 +113,13 @@ task run_cellranger_atac_count {
             fastqs.append('~{sample_id}_' + str(i))
 
         call_args = ['cellranger-atac', 'count', '--id=results', '--reference=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local']
-        if '~{force_cells}' is not '':
+        if '~{force_cells}' != '':
             call_args.append('--force-cells=~{force_cells}')
-        if '~{dim_reduce}' is not '':
+        if '~{dim_reduce}' != '':
             call_args.append('--dim-reduce=~{dim_reduce}')
+        if '~{peaks}' != '':
+            assert version.parse('~{cellranger_atac_version}') >= version.parse('2.0.0')
+            call_args.append('--peaks=~{peaks}')
         print(' '.join(call_args))
         check_call(call_args)
         CODE
