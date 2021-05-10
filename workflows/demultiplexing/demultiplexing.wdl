@@ -12,7 +12,7 @@ workflow demultiplexing {
         String output_directory
         # Reference genome name
         String genome = ""
-        # demultiplexing algorithm to use for genetic-pooling data
+        # demultiplexing algorithm to use for genetic-pooling data, choosing from 'souporcell' or 'popscle' (demuxlet/freemuxlet)
         String demultiplexing_algorithm = "souporcell"
         # Only demultiplex cells/nuclei with at least <min_num_genes> expressed genes
         Int min_num_genes = 100

@@ -103,6 +103,7 @@ task run_cellranger_atac_aggr {
         import re
         import os
         from subprocess import check_call
+        from packaging import version
 
         counts = []
         with open('aggr.csv', 'w') as fout:
