@@ -315,6 +315,10 @@ Popscle inputs
 	  - popscle parameter. popscle version to use. Available options: "2021.04", "0.1b".
 	  - "0.1b"
 	  - "0.1b"
+	* - popscle_num_cpu
+	  - popscle parameter. Number of CPU used by popscle per pair.
+	  - 1
+	  - 1
 	* - popscle_memory
 	  - popscle parameter. Memory size (integer) in GB needed per pair.
 	  - 30

@@ -86,6 +86,8 @@ workflow demultiplexing {
         String popscle_version = "0.1b"
         # A comma-separated list of donor names for renaming clusters achieved by freemuxlet
         String? popscle_rename_donors
+        # Number of CPUs used for popscle per pair
+        Int popscle_num_cpu = 1
         # Memory size in GB needed for popscle per pair
         Int popscle_memory = 30
         # Extra disk space (integer) in GB needed for popscle per pair
@@ -185,6 +187,7 @@ workflow demultiplexing {
                         docker_registry = docker_registry,
                         popscle_version = popscle_version,
                         extra_disk_space = popscle_extra_disk_space,
+                        num_cpu = popscle_num_cpu,
                         memory = popscle_memory,
                         zones = zones,
                         preemptible = preemptible
