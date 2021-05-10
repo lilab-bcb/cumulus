@@ -3,7 +3,7 @@ Demultiplex genetic-pooling/cell-hashing/nucleus-hashing sc/snRNA-Seq data
 
 This ``demultiplexing`` workflow generates gene-count matrices from cell-hashing/nucleus-hashing/genetic-pooling data by demultiplexing.
 
-In the workflow, ``demuxEM`` is used for analyzing cell-hashing/nucleus-hashing data, while ``souporcell``, ``demuxlet``, and  ``freemuxlet`` are for genetic-pooling data.
+In the workflow, ``demuxEM`` is used for analyzing cell-hashing/nucleus-hashing data, while ``souporcell`` and ``popscle`` (including *demuxlet* and *freemuxlet*) are for genetic-pooling data.
 
 Prepare input data and import workflow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -44,15 +44,24 @@ Import *demultiplexing* workflow to your workspace.
 		* - **RNA**
 		  - Google bucket url to the raw gene count matrix generated in Step 1.
 		* - **TagFile/ADT**
-		  - Google bucket url to the hashtag file generated in Step 1. The column name can be either *TagFile* or *ADT*, where *ADT* is to be backward compatible with sample sheets working with *cumulus/cumulus_hashing_cite_seq* workflow.
+		  - Google bucket url to the hashtag file generated in Step 1. The column name can be either *TagFile* or *ADT*, where *ADT* is for backward compatibility with older snapshots.
 		* - **TYPE**
 		  - Assay type, which can be ``cell-hashing``, ``nucleus-hashing``, or ``genetic-pooling``.
 		* - Genotype
-		  - Google bucket url to the reference genotypes in ``vcf.gz`` format. This column is **not required** in the following cases:
+		  - Google bucket url to the reference genotypes in ``vcf.gz`` format. This column is **required** in the following cases:
 
-		  	- When *TYPE* is ``cell-hashing`` or ``nucleus-hashing``;
+		    - Run ``genetic-pooling`` assay with ``souporcell`` algorithm (i.e. *TYPE* is ``genetic-pooling``, *demultiplexing_algorithm* input is ``souporcell``):
 
-		  	- When *TYPE* is ``genetic-pooling``, *demultiplexing_algorithm* input is ``souporcell``, and user wish to run in *de novo* mode without reference genotypes, and don't need to rename cluster names by information from a known genotype vcf file.
+		      - Run with reference genotypes: *souporcell_de_novo_mode* is ``false``.
+
+		      - Run in *de novo* mode, but needs to rename the resulting cluster names by information from reference genotypes: i.e. *souporcell_de_novo_mode* is ``true``, and *souporcell_rename_donors* is not empty.
+
+		    - Run ``genetic-pooling`` assay with ``popscle`` algorithm (i.e. *TYPE* is ``genetic-pooling``, *demultiplexing_algorithm* input is ``popscle``):
+
+		      - *popscle_num_samples* input is ``0``. In this case, *demuxlet* will be run with reference genotypes.
+
+		      - *popscle_num_samples* input is larger than ``0``. In this case, reference genotypes will be only used to generate pileups, then *freemuxlet* will be used for demultiplexing **without** reference genotypes.
+
 
 
 	Example::
@@ -98,8 +107,14 @@ global inputs
 	  - This is the output directory (gs url + path) for all results. There will be one folder per RNA-hashtag data pair under this directory.
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/demux_output"
 	  -
-	* - **genome**
-	  - Reference genome name. You should choose one from this `genome reference`_ list.
+	* - genome
+	  - Reference genome name. Its usage depends on the assay type:
+
+	    - For *cell-hashing* or *nucleus-hashing*, only write this name as an annotation into the resulting count matrix file.
+
+	    - For *genetic-pooling*, if *demultiplexing_algorithm* input is ``souporcell``, you should choose one name from this `genome reference`_ list.
+
+	    - For *genetic-pooling*, if *demultiplexing_algorithm* input is ``popscle``, reference genome name is not needed.
 	  - "GRCh38"
 	  -
 	* - demultiplexing_algorithm
@@ -107,9 +122,7 @@ global inputs
 
 	  	- "souporcell": Use souporcell_, a reference-genotypes-free algorithm for demultiplexing droplet scRNA-Seq data.
 
-	  	- "demuxlet": Use demuxlet_, a canonical algorithm for demultiplexing droplet scRNA-Seq data.
-
-        - "freemuxlet": Use freemuxlet_, a canonical algorithm for demultiplexing droplet scRNA-Seq data without reference genotypes.
+	  	- "popscle": Use popscle_, a canonical algorithm for demultiplexing droplet scRNA-Seq data, including *demuxlet* (with reference genotypes) and *freemuxlet* (reference-genotype-free) components.
 	  - "souporcell"
 	  - "souporcell"
 	* - min_num_genes
@@ -204,14 +217,14 @@ souporcell inputs
 	  - Example
 	  - Default
 	* - souporcell_version
-	  - souporcell version to use. Available versions: "2020.07", "2021.03", "2020.03".
+	  - souporcell version to use. Available versions: "2021.03", "2020.07", "2020.03".
 	  - "2020.07"
 	  - "2020.07"
 	* - souporcell_num_clusters
-	- | souporcell parameter. Number of expected clusters when doing clustering.
-	  | **This needs to be set when running souporcell.**
-	- 8
-	- 1
+	  - | souporcell parameter. Number of expected clusters when doing clustering.
+	    | **This needs to be set when running souporcell.**
+	  - 8
+	  - 1
 	* - souporcell_de_novo_mode
 	  - | souporcell parameter.
 	    | If ``true``, run souporcell in de novo mode without reference genotypes; and if a reference genotype vcf file is provided in the sample sheet, use it **only** for matching the cluster labels computed by souporcell.
@@ -222,6 +235,7 @@ souporcell inputs
 	  - | souporcell parameter. Number of expected clusters when doing clustering.
 	    | **This needs to be set when running souporcell.**
 	  - 8
+	  - 1
 	* - souporcell_common_variants
 	  - souporcell parameter. Users can provide a common variants list in VCF format for Souporcell to use, instead of calling SNPs de novo
 	  - "1000genome.common.variants.vcf.gz"
@@ -231,7 +245,7 @@ souporcell inputs
 	  - true
 	  - false
 	* - souporcell_rename_donors
-	  - | souporcell parameter. A comma-separated list of donor names for renaming clusters achieved by souporcell.
+	  - | souporcell parameter. A comma-separated list of donor names for renaming clusters achieved by souporcell. Must be consistent with *souporcell_num_clusters* input.
 	    | By default, the resulting donors are *Donor1*, *Donor2*, ...
 	  - "CB1,CB2,CB3,CB4"
 	  -
@@ -248,7 +262,7 @@ souporcell inputs
 	  - 500
 	  - 500
 
-demuxlet/freemuxlet (popscle) inputs
+Popscle inputs
 +++++++++++++++++
 
 .. list-table::
@@ -260,25 +274,29 @@ demuxlet/freemuxlet (popscle) inputs
 	  - Description
 	  - Example
 	  - Default
-	* - freeemuxlet_num_samples
-	  - Number of samples when using freemuxlet.
+	* - popscle_num_samples
+	  - popscle parameter. Number of samples to be multiplexed together:
+
+	    - If ``0``, run with *demuxlet* using reference genotypes.
+
+	    - Otherwise, run with *freemuxlet* in de novo mode without reference genotypes.
 	  - 4
-	  - 4
+	  - 0
+	* - popscle_rename_donors
+	  - | popscle parameter. A comma-separated list of donor names for renaming clusters achieved by popscle. Must be consistent with *popscle_num_samples* input.
+	    | By default, the resulting donors are *Donor1*, *Donor2*, ...
+	  - "CB1,CB2,CB3,CB4"
+	  -
 	* - popscle_version
-	  - popscle version to use. Currently supports "0.1b".
+	  - popscle parameter. popscle version to use. Available options: "2021.04", "0.1b".
 	  - "0.1b"
 	  - "0.1b"
-	* - demuxlet_memory
-	  - Memory size (integer) in GB needed per pair.
-	  - 10
-	  - 10
-	* - freemuxlet_memory
-	  - Memory size (integer) in GB needed per pair.
+	* - popscle_memory
+	  - popscle parameter. Memory size (integer) in GB needed per pair.
 	  - 30
 	  - 30
-	* - popscle_disk_space
-	  - | Disk space size (integer) in GB needed for demuxlet/freemuxlet per pair.
-	    | Notice that the overall disk space for demuxlet/freemuxlet is this disk space plus the size of provided reference genotypes file in the sample sheet.
+	* - popscle_extra_disk_space
+	  - popscle parameter. Extra disk space size (integer) in GB needed for popscle per pair, besides the disk size required to hold input files specified in the sample sheet.
 	  - 2
 	  - 2
 
@@ -365,7 +383,7 @@ In the output subfolder of each genetic-pooling RNA-hashtag data pair generated 
 Load demultiplexing results into Python and R
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-To load demultiplexed RNA count matrix into Python, you need to install Python package `pegasusio <https://pypi.org/project/pegasusio/>`_ first. Then follow the codes below::
+To load demultiplexed RNA count matrix into Python, you need to install Python package pegasusio_ first. Then follow the codes below::
 
 	import pegasusio as io
 	data = io.read_input('output_name_demux.zarr.zip')
@@ -390,7 +408,6 @@ Results are in ``data$obs['demux_type']``, ``data$obs['assignment']``, and simil
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
 .. _genome reference: ./cellranger.html#sample-sheet
 .. _souporcell: https://github.com/wheaton5/souporcell
-.. _demuxlet: https://github.com/statgen/popscle
-.. _freemuxlet: https://github.com/statgen/popscle
+.. _popscle: https://github.com/statgen/popscle
 .. _pegasusio: https://pypi.org/project/pegasusio/
 .. _load demultiplexing results into Python and R: ./demultiplexing.html#load-demultiplexing-results-into-python-and-r
