@@ -282,6 +282,30 @@ Popscle inputs
 	    - Otherwise, run with *freemuxlet* in de novo mode without reference genotypes.
 	  - 4
 	  - 0
+	* - popscle_min_MQ
+	  - popscle parameter. Minimum mapping quality to consider (lower MQ will be ignored).
+	  - 20
+	  - 20
+	* - popscle_min_TD
+	  - popscle parameter. Minimum distance to the tail (lower will be ignored).
+	  - 0
+	  - 0
+	* - popscle_tag_group
+	  - popscle parameter. Tag representing readgroup or cell barcodes, in the case to partition the BAM file into multiple groups. For 10x genomics, use ``CB``.
+	  - "CB"
+	  - "CB"
+	* - popscle_tag_UMI
+	  - popscle parameter. Tag representing UMIs. For 10x genomiucs, use ``UB``.
+	  - "UB"
+	  - "UB"
+	* - popscle_field
+	  - popscle parameter. FORMAT field to extract from: genotype (``GT``), genotype likelihood (``GL``), or posterior probability (``GP``).
+	  - "GT"
+	  - "GT"
+	* - popscle_alpha
+	  - popscle parameter. Grid of alpha to search for, in a comma separated list format of all alpha values to be considered.
+	  - "0.1,0.2,0.3,0.4,0.5"
+	  - "0.1,0.2,0.3,0.4,0.5"
 	* - popscle_rename_donors
 	  - | popscle parameter. A comma-separated list of donor names for renaming clusters achieved by popscle. Must be consistent with *popscle_num_samples* input.
 	    | By default, the resulting donors are *Donor1*, *Donor2*, ...

@@ -2,37 +2,54 @@ version 1.0
 
 workflow popscle {
     input {
+        # Sample ID
         String sample_id
+        # Output directory (gs url + path)
         String output_directory
+        # Link to a RNA count matrix in hdf5 format
         File input_rna
+        # Link to a position-sorted BAM
         File input_bam
+        # Link to reference genotype files
         File ref_genotypes
-
-        Int min_num_genes = 100
+        # Only demultiplex cells/nuclei with at least <min_num_genes> expressed genes
+        Int min_num_genes
+        # Minimum mapping quality to consider (lower MQ will be ignored) [default: 20]
         Int? min_MQ
+        # Minimum distance to the tail (lower will be ignored) [default: 0]
         Int? min_TD
-        String? tag_group = "CB"
-        String? tag_UMI = "UB"
+        # Tag representing readgroup or cell barcodes, in the case to partition the BAM file into multiple groups. For 10x genomics, use CB
+        String tag_group = "CB"
+        # Tag representing UMIs. For 10x genomiucs, use UB
+        String tag_UMI = "UB"
 
-        # demuxlet
+        # demuxlet-specific input fields
+        # FORMAT field to extract the genotype, likelihood, or posterior from
         String field = "GT"
+        # Grid of alpha to search for [default: "0.1,0.2,0.3,0.4,0.5"]
         String? alpha
-        Float? geno_error
 
-        # freemuxlet
+        # freemuxlet-specific input fields
+        # Number of samples multiplexed together
         Int nsample
+        # A comma-separated list of donor names for renaming clusters achieved by souporcell
         String? donor_rename
 
-
-        String zones = "us-central1-b us-east1-d us-west1-a us-west1-b"
-        Int num_cpu = 1
-        Int memory = 10
-        Int extra_disk_space = 2
-        Int preemptible = 2
-        String docker_registry = "quay.io/cumulus"
-        String popscle_version = "0.1b"
+        # # Google cloud zones
+        String zones
+        # Number of CPUs to request for souporcell per pair
+        Int num_cpu
+        # Memory size (integer) in GB needed for souporcell per pair
+        Int memory
+        # Extra disk space (integer) in GB needed for popscle per pair
+        Int extra_disk_space
+        # Number of preemptible tries
+        Int preemptible
+        # Which docker registry to use
+        String docker_registry
+        # Popscle version to use
+        String popscle_version
     }
-
 
 
     call popscle_task {
@@ -51,7 +68,6 @@ workflow popscle {
             tag_UMI = tag_UMI,
             field = field,
             nsample = nsample,
-            geno_error = geno_error,
             docker_registry = docker_registry,
             popscle_version = popscle_version,
             num_cpu = num_cpu,
@@ -82,9 +98,8 @@ task popscle_task {
         Int? min_MQ
         String? alpha
         Int? min_TD
-        String? tag_group
-        String? tag_UMI
-        Float? geno_error
+        String tag_group
+        String tag_UMI
         String? donor_rename
 
         String docker_registry
@@ -116,16 +131,13 @@ task popscle_task {
             call_args.extend(['--min-MQ', '~{min_MQ}'])
         if '~{min_TD}' is not '':
             call_args.extend(['--min-TD', '~{min_TD}'])
-        if '~{tag_group}' is not '':
-            call_args.extend(['--tag-group', '~{tag_group}'])
-        if '~{tag_UMI}' is not '':
-            call_args.extend(['--tag-UMI', '~{tag_UMI}'])
 
         print(' '.join(call_args))
         check_call(call_args)
 
         call_args = ['popscle', '~{algorithm}', '--plp', '~{sample_id}.plp', '--out', 'result/~{sample_id}']
         if '~{algorithm}' == 'demuxlet':
+            call_args.extend(['--vcf', '~{ref_genotypes}'])
             if '~{field}' is not '':
                 call_args.extend(['--field', '~{field}'])
             if '~{alpha}' is not '':
@@ -133,10 +145,7 @@ task popscle_task {
                 prefix_list = ['--alpha'] * len(alpha_list)
                 alpha_args = list(sum(list(zip(prefix_list, alpha_list)), ()))
                 call_args.extend(alpha_args)
-            if '~{geno_error}' is not '':
-                call_args.extend(['--geno-error-offset', '~{geno_error}'])
-
-        if '~{algorithm}' == 'freemuxlet':
+        else:
             call_args.extend(['--nsample', '~{nsample}'])
 
         print(' '.join(call_args))
