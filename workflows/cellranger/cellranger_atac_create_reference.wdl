@@ -87,7 +87,7 @@ task run_cellranger_atac_create_reference {
             fout.write("    input_fasta: [\"~{input_fasta}\"]\n")
             fout.write("    input_gtf: [\"~{input_gtf}\"]\n")
             if '~{non_nuclear_contigs}' != "":
-                fout.write("    non_nuclear_contigs: [\"" + ", ".join(['"' + x + '"' for x in '~{non_nuclear_contigs}'.split(',')]) + "\"]\n")
+                fout.write("    non_nuclear_contigs: [" + ", ".join(['"' + x + '"' for x in '~{non_nuclear_contigs}'.split(',')]) + "]\n")
             if '~{input_motifs}' != "":
                 fout.write("    input_motifs: \"~{input_motifs}\"\n")
             fout.write("\x7D\n") # '\x7D' refers to right brace bracket
