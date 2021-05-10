@@ -217,7 +217,13 @@ souporcell inputs
 	  - Example
 	  - Default
 	* - souporcell_version
-	  - souporcell version to use. Available versions: "2021.03", "2020.07", "2020.03".
+	  - souporcell version to use. Available versions:
+
+	    - ``2021.03``: Based on commitment `1bd9f1 <https://github.com/wheaton5/souporcell/tree/1bd9f11d70eaee6ac14713de09c377c285ca2787>`_ on 2021/03/07.
+
+	    - ``2020.07``: Based on commitment `0d09fb <https://github.com/wheaton5/souporcell/tree/0d09fbe26d878adb294b536c4f41a7718c0d0f9d>`_ on 2020/07/27.
+
+	    - ``2020.03``: Based on commitment `eeddcd <https://github.com/wheaton5/souporcell/tree/eeddcde5892c5cbf8aba2149f0e77756f830a5ae>`_ on 2020/03/31.
 	  - "2020.07"
 	  - "2020.07"
 	* - souporcell_num_clusters
@@ -312,7 +318,11 @@ Popscle inputs
 	  - "CB1,CB2,CB3,CB4"
 	  -
 	* - popscle_version
-	  - popscle parameter. popscle version to use. Available options: "2021.04", "0.1b".
+	  - popscle parameter. popscle version to use. Available options:
+
+	    - ``2021.05``: Based on commitment `da70fc7 <https://github.com/statgen/popscle/tree/da70fc78da385ef049e0e890342acfd62842cae0>`_ on 2021/05/05.
+
+	    - ``0.1b``: Based on version `0.1-beta <https://github.com/statgen/popscle/releases/tag/v0.1-beta>`_ released on 2019/10/03.
 	  - "0.1b"
 	  - "0.1b"
 	* - popscle_num_cpu
