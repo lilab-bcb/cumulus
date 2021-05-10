@@ -27,13 +27,13 @@ Latest version
       - `18 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/18>`__
       - Run alternative tools (STARsolo, Optimus, Salmon alevin, or Kallisto BUStools) to generate gene-count matrices from FASTQ files.
     * - cumulus/demultiplexing
-      - `25 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/25>`_
-      - Run tools (demuxEM, souporcell, or demuxlet) for cell-hashing/nucleus-hashing/genetic-pooling analysis.
+      - `26 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/26>`_
+      - Run tools (demuxEM, souporcell, or popscle) for cell-hashing/nucleus-hashing/genetic-pooling analysis.
     * - cumulus/cellranger_create_reference
       - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/10>`__
       - Run Cell Ranger tools to build sc/snRNA-seq references.
     * - cumulus/cellranger_atac_aggr
-      - `5 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_aggr/4>`__
+      - `5 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_aggr/5>`__
       - Run Cell Ranger tools to aggregate scATAC-seq samples.
     * - cumulus/cellranger_atac_create_reference
       - `3 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_create_reference/3>`__
