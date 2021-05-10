@@ -50,17 +50,19 @@ Import *demultiplexing* workflow to your workspace.
 		* - Genotype
 		  - Google bucket url to the reference genotypes in ``vcf.gz`` format. This column is **required** in the following cases:
 
-		    - Run ``genetic-pooling`` assay with reference genotype vcf information:
+		    - Run ``genetic-pooling`` assay with ``souporcell`` algorithm (i.e. *TYPE* is ``genetic-pooling``, *demultiplexing_algorithm* input is ``souporcell``):
 
-		      - *TYPE* is ``genetic-pooling``, *demultiplexing_algorithm* input is ``souporcell``, and *souporcell_de_novo_mode* input is ``false``;
+		      - Run with reference genotypes: *souporcell_de_novo_mode* is ``false``.
 
-		      - *TYPE* is ``genetic-pooling``, *demultiplexing_algorithm* input is ``popscle``, and *popscle_num_samples* input is **larger than** ``0``.
+		      - Run in *de novo* mode, but needs to rename the resulting cluster names by information from reference genotypes: i.e. *souporcell_de_novo_mode* is ``true``, and *souporcell_rename_donors* is not empty.
 
-		    - Run ``genetic-pooling`` assay in *de novo* mode, but need to rename the resulting cluster names by information from a known genotype vcf file:
+		    - Run ``genetic-pooling`` assay with ``popscle`` algorithm (i.e. *TYPE* is ``genetic-pooling``, *demultiplexing_algorithm* input is ``popscle``):
 
-		      - *TYPE* is ``genetic-pooling``, *demultiplexing_algoritm* input is ``souporcell``, *souporcell_de_novo_mode* is ``true``, and *souporcell_rename_donors* is not empty;
+		      - *popscle_num_samples* input is ``0``. In this case, *demuxlet* will be run with reference genotypes.
 
-		      - *TYPE* is ``genetic-pooling``, *demultiplexing_algorithm* input is ``popscle``, *popscle_num_samples* input is ``0``, and *popscle_rename_donors* is not empty.
+		      - *popscle_num_samples* input is larger than ``0``. In this case, reference genotypes will be only used to generate pileups, then *freemuxlet* will be used for demultiplexing **without** reference genotypes.
+
+
 
 	Example::
 
