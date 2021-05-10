@@ -6,16 +6,16 @@ workflow popscle {
         String output_directory
         File input_rna
         File input_bam
-
-        Int min_num_genes = 100
-        String field = "GT"
-        Int? min_MQ
-        Int? min_TD
-
-
         File ref_genotypes
 
+        Int min_num_genes = 100
+        Int? min_MQ
+        Int? min_TD
+        String? tag_group = "CB"
+        String? tag_UMI = "UB"
+
         # demuxlet
+        String field = "GT"
         String? alpha
         Float? geno_error
 
@@ -23,8 +23,7 @@ workflow popscle {
         Int nsample
         String? donor_rename
 
-        String? tag_group = "CB"
-        String? tag_UMI = "UB"
+
         String zones = "us-central1-b us-east1-d us-west1-a us-west1-b"
         Int num_cpu = 1
         Int memory = 10
