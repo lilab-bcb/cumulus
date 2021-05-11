@@ -1,4 +1,4 @@
-This section mainly considers jobs starting from BCL files. If your job starts with FASTQ files, and only need to run ``cellranger count`` part, please refer to `this subsection <./cellranger.html#run-cellranger-count-only>`_.
+This section mainly considers jobs starting from BCL files. If your job starts with FASTQ files, and only need to run ``cellranger count`` part, please refer to `this subsection <./index.html#run-cellranger-count-only>`_.
 
 1. Import ``cellranger_workflow``
 +++++++++++++++++++++++++++++++++
@@ -166,7 +166,7 @@ Sometimes, users might want to perform demultiplexing locally and only run the c
 
 		gsutil -m cp -r /foo/bar/fastq_path/K18WBC6Z4 gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq
 
-#. Create a sample sheet following the similar structure as `above <./cellranger.html#prepare-a-sample-sheet>`_, except the following differences:
+#. Create a sample sheet following the similar structure as `above <./index.html#prepare-a-sample-sheet>`_, except the following differences:
 
 	- **Flowcell** column should list Google bucket URLs of the FASTQ folders for flowcells.
 	- **Lane** and **Index** columns are NOT required in this case.

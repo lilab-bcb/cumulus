@@ -200,7 +200,7 @@ Aggregate scATAC-Seq Samples
 
 To aggregate multiple scATAC-Seq samples, follow the instructions below:
 
-1. Import ``cellranger_atac_aggr`` workflow. Please see Step 1 `here <./cellranger.html#a-general-step-by-step-instruction>`_, and the name of workflow is "**cumulus/cellranger_atac_aggr**".
+1. Import ``cellranger_atac_aggr`` workflow. Please see Step 1 `here <./index.html#a-general-step-by-step-instruction>`_, and the name of workflow is "**cumulus/cellranger_atac_aggr**".
 
 2. Set the inputs of workflow. Please see the description of inputs below. Notice that required inputs are shown in bold:
 
@@ -225,7 +225,7 @@ To aggregate multiple scATAC-Seq samples, follow the instructions below:
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/aggregate_result"
 	  -
 	* - **genome**
-	  - The reference genome name used by Cell Ranger, can be either a keyword of pre-built genome, or a Google Bucket URL. See `this table <./cellranger.html#single-cell-and-single-nucleus-rna-seq>`_ for the list of keywords of pre-built genomes.
+	  - The reference genome name used by Cell Ranger, can be either a keyword of pre-built genome, or a Google Bucket URL. See `this table <./index.html#single-cell-and-single-nucleus-rna-seq>`_ for the list of keywords of pre-built genomes.
 	  - "GRCh38_atac_v1.2.0"
 	  -
 	* - normalize

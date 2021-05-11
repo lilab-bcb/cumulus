@@ -1,7 +1,7 @@
 Run Cell Ranger tools using cellranger_workflow
 -----------------------------------------------
 
-``cellranger_workflow`` wraps Cell Ranger to process single-cell/nucleus RNA-seq, single-cell ATAC-seq and single-cell immune profiling data, and supports feature barcoding (cell/nucleus hashing, CITE-seq, Perturb-seq). It also provide routines to build cellranger references.
+**cellranger_workflow** wraps Cell Ranger to process single-cell/nucleus RNA-seq, single-cell ATAC-seq and single-cell immune profiling data, and supports feature barcoding (cell/nucleus hashing, CITE-seq, Perturb-seq). It also provide routines to build cellranger references.
 
 A general step-by-step instruction
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
