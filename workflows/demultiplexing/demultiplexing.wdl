@@ -74,7 +74,7 @@ workflow demultiplexing {
         Int? popscle_min_TD
         # Tag representing readgroup or cell barcodes, in the case to partition the BAM file into multiple groups. For 10x genomics, use CB
         String popscle_tag_group = "CB"
-        # Tag representing UMIs. For 10x genomiucs, use UB
+        # Tag representing UMIs. For 10x genomics, use UB
         String popscle_tag_UMI = "UB"
         # Default is 0, means to use demuxlet, if this number > 0, use freemuxlet
         Int popscle_num_samples = 0
@@ -82,7 +82,7 @@ workflow demultiplexing {
         String popscle_field = "GT"
         # Grid of alpha to search for [default: "0.1,0.2,0.3,0.4,0.5"]
         String? popscle_alpha
-        # Popscle version. Available versions: "2021.04", "0.1b"
+        # Popscle version. Available versions: "2021.05", "0.1b"
         String popscle_version = "0.1b"
         # A comma-separated list of donor names for renaming clusters achieved by freemuxlet
         String? popscle_rename_donors

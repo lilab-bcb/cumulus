@@ -301,7 +301,7 @@ Popscle inputs
 	  - "CB"
 	  - "CB"
 	* - popscle_tag_UMI
-	  - popscle parameter. Tag representing UMIs. For 10x genomiucs, use ``UB``.
+	  - popscle parameter. Tag representing UMIs. For 10x genomics, use ``UB``.
 	  - "UB"
 	  - "UB"
 	* - popscle_field

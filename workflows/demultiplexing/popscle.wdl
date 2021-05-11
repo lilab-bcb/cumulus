@@ -20,7 +20,7 @@ workflow popscle {
         Int? min_TD
         # Tag representing readgroup or cell barcodes, in the case to partition the BAM file into multiple groups. For 10x genomics, use CB
         String tag_group = "CB"
-        # Tag representing UMIs. For 10x genomiucs, use UB
+        # Tag representing UMIs. For 10x genomics, use UB
         String tag_UMI = "UB"
 
         # demuxlet-specific input fields
@@ -123,8 +123,6 @@ task popscle_task {
 
         python <<CODE
         from subprocess import check_call
-
-        assert '~{algorithm}' in ['demuxlet', 'freemuxlet'], "The 'algorithm' input must be chosen from ['demuxlet', 'freemuxlet']!"
 
         call_args = ['popscle', 'dsc-pileup', '--sam', '~{input_bam}', '--vcf', '~{ref_genotypes}', '--group-list', '~{sample_id}.barcodes.tsv', '--out', '~{sample_id}.plp']
         if '~{min_MQ}' is not '':
