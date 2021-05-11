@@ -115,7 +115,7 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		  	| If *cmo* data is analyzed separately using *cumulus_feature_barcoding*, file format should follow the guide in Feature barcoding assays section, otherwise follow the guide in Single-cell multiomics section.
 		  	| This column is only required for targeted gene expression analysis (*rna*), CITE-Seq (*citeseq*), cell-hashing or nucleus-hashing (*hashing*), CellPlex (*cmo*) and Perturb-seq (*crispr*).
 		* - Link
-		  - 
+		  -
 			| Designed for Single Cell Multiome	ATAC + Gene Expression, Feature Barcoding, or CellPlex.
 			| Link multiple modalities together using a single link name.
 			| cellranger-arc count, cellranger count, or cellranger multi will be triggered automatically depending on the modalities.
@@ -727,7 +727,7 @@ Sample sheet
 		  - Description
 		* - **GRCh38-2020-A_arc_v2.0.0**
 		  - Human GRCh38, cellranger-arc/atac reference 2.0.0
-		* - **mm10-2020-A_arc_v2.0.0**	
+		* - **mm10-2020-A_arc_v2.0.0**
 		  - Mouse mm10, cellranger-arc/atac reference 2.0.0
 		* - **GRCh38_atac_v1.2.0**
 		  - Human GRCh38, cellranger-atac reference 1.2.0
@@ -835,7 +835,7 @@ Workflow input
 	* - atac_peaks
 	  - A 3-column BED file of peaks to override cellranger atac peak caller. Peaks must be sorted by position and not contain overlapping peaks; comment lines beginning with `#` are allowed
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/common_peaks.bed"
-	  - 
+	  -
 	* - cellranger_atac_version
 	  - cellranger-atac version. Available options: 2.0.0, 1.2.0, 1.1.0
 	  - "2.0.0"
@@ -957,7 +957,7 @@ To aggregate multiple scATAC-Seq samples, follow the instructions below:
 	* - peaks
 	  - A 3-column BED file of peaks to override cellranger atac peak caller. Peaks must be sorted by position and not contain overlapping peaks; comment lines beginning with `#` are allowed
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/common_peaks.bed"
-	  - 
+	  -
 	* - cellranger_atac_version
 	  - Cell Ranger ATAC version to use.
 	    Options: ``2.0.0``, ``1.2.0``, ``1.1.0``.
@@ -1221,7 +1221,7 @@ Sample sheet
 
 #. *FetureBarcodeFile* column.
 
-	For RNA-seq modality, only set this if a target panel is provided. 
+	For RNA-seq modality, only set this if a target panel is provided.
 	For CMO (CellPlex), provide sample name - CMO tag association as follows::
 
 		sample1,CMO301|CMO302
@@ -1237,7 +1237,7 @@ Sample sheet
 
 	Sample,Reference,Flowcell,Lane,Index,DataType,FeatureBarcodeFile,Link
 	sample1_rna,GRCh38-2020-A_arc_v2.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZZ,*,SI-TT-A1,rna,,sample1
-	sample1_atac,GRCh38-2020-A_arc_v2.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZZ,*,SI-TT-N1,atac,sample1
+	sample1_atac,GRCh38-2020-A_arc_v2.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZZ,*,SI-TT-N1,atac,,sample1
 	sample2_rna,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZX,*,SI-TT-A2,rna,,sample2
 	sample2_cmo,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZX,*,SI-TT-N2,cmo,gs://fc-e0000000-0000-0000-0000-000000000000/cmo.csv,sample2
 	sample3_rna,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZY,*,SI-TT-A3,rna,,sample3
