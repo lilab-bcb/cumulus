@@ -1,3 +1,19 @@
+Version 1.4.0 `May 11, 2021`
+----------------------------
+
+* On *cellranger* workflow
+    * Add support for multiomics analysis using linked samples, *cellranger-arc count*, *cellranger multi* and *cellranger count* will be automatically triggered based on the sample sheet
+    * Add support for cellranger version 6.0.1 and 6.0.0
+    * Add support for cellranger-arc version 2.0.0, 1.0.1, 1.0.0
+    * Add support for cellranger-atac version 2.0.0
+    * Add support for cumulus_feature_barcoding version 0.6.0, which handles CellPlex CMO tags
+    * Add *GRCh38-2020-A_arc_v2.0.0*, *mm10-2020-A_arc_v2.0.0*, *GRCh38-2020-A_arc_v1.0.0* and *mm10-2020-A_arc_v1.0.0* references for *cellranger-arc*.
+    * Fixed bugs in cellranger_atac_create_reference
+    * Add delete undetermined FASTQs option for mkfastq
+* On *demultiplexing* workflow
+    * Replace *demuxlet* with *popscle*, which includes both *demuxlet* and *freemuxlet*
+* Modified workflows to remove trailing spaces and support spaces within output_directory
+
 Version 1.3.0 `February 2, 2021`
 --------------------------------
 
@@ -12,7 +28,7 @@ Version 1.2.0 `January 19, 2021`
     * Wrap up spaceranger version 1.2.1
 * On *cellranger* workflow:
     * Fix workflow WDL to support both single index and dual index
-    * Add support for cellranger version 5.0.0 and 5.0.1
+    * Add support for cellranger version 5.0.1 and 5.0.0
     * Add support for targeted gene expression analysis
     * Add support for ``--include-introns`` and ``--no-bam`` options for cellranger count
     * Remove ``--force-cells`` option for cellranger vdj as noted in cellranger 5.0.0 release note
