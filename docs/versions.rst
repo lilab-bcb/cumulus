@@ -15,7 +15,7 @@ Latest version
       - Snapshot
       - Function
     * - cumulus/cellranger_workflow
-      - `23 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/23>`__
+      - `26 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/23>`__
       - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generating count matrix using cellranger count or cellranger-atac count, running cellranger vdj or feature-barcode extraction.
     * - cumulus/spaceranger_workflow
       - `3 <https://portal.firecloud.org/?return=terra#methods/cumulus/spaceranger_workflow/3>`_
@@ -27,7 +27,7 @@ Latest version
       - `18 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/18>`__
       - Run alternative tools (STARsolo, Optimus, Salmon alevin, or Kallisto BUStools) to generate gene-count matrices from FASTQ files.
     * - cumulus/demultiplexing
-      - `26 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/26>`_
+      - `28 <https://portal.firecloud.org/?return=terra#methods/cumulus/demultiplexing/26>`_
       - Run tools (demuxEM, souporcell, or popscle) for cell-hashing/nucleus-hashing/genetic-pooling analysis.
     * - cumulus/cellranger_create_reference
       - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_create_reference/10>`__

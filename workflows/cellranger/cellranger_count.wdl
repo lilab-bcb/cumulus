@@ -4,8 +4,14 @@ workflow cellranger_count {
     input {
         # Sample ID
         String sample_id
+        # A comma-separated list of input sample names
+        String? input_samples
         # A comma-separated list of input FASTQs directories (gs urls)
         String input_fastqs_directories
+        # A comma-separated list of input data types
+        String? input_data_types
+        # A comma-separated list of input feature barcode files
+        String? input_fbf
         # CellRanger output directory, gs url
         String output_directory
 
@@ -56,8 +62,11 @@ workflow cellranger_count {
     call run_cellranger_count {
         input:
             sample_id = sample_id,
+            input_samples = input_samples,
             input_fastqs_directories = input_fastqs_directories,
-            output_directory = sub(output_directory, "/+$", ""),
+            input_data_types = input_data_types,
+            input_fbf = input_fbf,
+            output_directory = output_directory,
             genome_file = genome_file,
             target_panel = target_panel,
             chemistry = chemistry,
@@ -86,7 +95,10 @@ workflow cellranger_count {
 task run_cellranger_count {
     input {
         String sample_id
+        String? input_samples
         String input_fastqs_directories
+        String? input_data_types
+        String? input_fbf
         String output_directory
         File genome_file
         File? target_panel
@@ -115,43 +127,112 @@ task run_cellranger_count {
         python <<CODE
         import re
         import os
+        import sys
         from subprocess import check_call
         from packaging import version
 
-        fastqs = []
-        for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
-            directory = re.sub('/+$', '', directory) # remove trailing slashes
-            call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/~{sample_id}', '.']
-            # call_args = ['cp', '-r', directory + '/~{sample_id}', '.']
-            print(' '.join(call_args))
-            check_call(call_args)
-            call_args = ['mv', '~{sample_id}', '~{sample_id}_' + str(i)]
-            print(' '.join(call_args))
-            check_call(call_args)
-            fastqs.append('~{sample_id}_' + str(i))
+        samples = data_types = fbfs = None
+        fastqs_dirs = []
 
-        call_args = ['cellranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--chemistry=~{chemistry}', '--jobmode=local']
-        if ('~{target_panel}' is not '') and (os.path.basename('~{target_panel}') != 'null'):
-            assert version.parse('~{cellranger_version}') >= version.parse('4.0.0')
-            call_args.append('--target-panel=~{target_panel}')
-        if '~{force_cells}' is not '':
+        if '~{input_samples}' != '':
+            assert version.parse('~{cellranger_version}') >= version.parse('3.0.2')
+            samples = '~{input_samples}'.split(',')
+            data_types = '~{input_data_types}'.split(',')
+            fbfs = '~{input_fbf}'.split(',')
+
+            target_panel = set()
+            feature_file = set()
+            for dtype, fbf in zip(data_types, fbfs):
+                if dtype == 'rna':
+                    target_panel.add(fbf)
+                else:
+                    feature_file.add(fbf)
+
+            def _locate_file(file_set, keyword):
+                if len(file_set) > 1:
+                    print("Detected multiple " + keyword + " files!", file = sys.stderr)
+                    sys.exit(1)
+                if len(file_set) == 0 or list(file_set)[0] == 'null':
+                    return ''
+                file_loc = list(file_set)[0]
+                call_args = ['gsutil', '-q', '-m', 'cp', file_loc, '.']
+                # call_args = ['cp', file_loc, '.']
+                print(' '.join(call_args))
+                check_call(call_args)
+                return os.path.abspath(os.path.basename(file_loc))
+
+            target_panel = _locate_file(target_panel, 'target panel')
+            feature_file = _locate_file(feature_file, 'feature reference')
+            assert feature_file != ''
+
+            with open('libraries.csv', 'w') as fout:
+                fout.write('fastqs,sample,library_type\n')
+                for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
+                    directory = re.sub('/+$', '', directory) # remove trailing slashes
+                    call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/' + samples[i], '.']
+                    # call_args = ['cp', '-r', directory + '/' + samples[i], '.']
+                    print(' '.join(call_args))
+                    check_call(call_args)
+                    fastqs = samples[i] + '_' + str(i)
+                    call_args = ['mv', samples[i], fastqs]
+                    print(' '.join(call_args))
+                    check_call(call_args)
+                    feature_type = ''
+                    if data_types[i] == 'rna':
+                        feature_type = 'Gene Expression'
+                    elif data_types[i] == 'crispr':
+                        feature_type = 'CRISPR Guide Capture'
+                    elif data_types[i] == 'citeseq':
+                        feature_type = 'Antibody Capture'
+                    elif data_types[i] == 'hashing':
+                        feature_type = 'Custom'
+                    if feature_type == '':
+                        print("Do not expect " + data_types[i] + " in a cellranger count (Feature Barcode) run!", file = sys.stderr)
+                        sys.exit(1)
+                    fout.write(os.path.abspath(fastqs) + ',' + samples[i] + ',' + feature_type + '\n')
+        else:
+            for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
+                directory = re.sub('/+$', '', directory) # remove trailing slashes
+                call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/~{sample_id}', '.']
+                # call_args = ['cp', '-r', directory + '/~{sample_id}', '.']
+                print(' '.join(call_args))
+                check_call(call_args)
+                call_args = ['mv', '~{sample_id}', '~{sample_id}_' + str(i)]
+                print(' '.join(call_args))
+                check_call(call_args)
+                fastqs_dirs.append('~{sample_id}_' + str(i))
+
+        call_args = ['cellranger', 'count', '--id=results', '--transcriptome=genome_dir', '--chemistry=~{chemistry}', '--jobmode=local']
+
+        if samples is None: # not Feature Barcode
+            call_args.extend(['--sample=~{sample_id}', '--fastqs=' + ','.join(fastqs_dirs)])
+            if ('~{target_panel}' != '') and (os.path.basename('~{target_panel}') != 'null'):
+                assert version.parse('~{cellranger_version}') >= version.parse('4.0.0')
+                call_args.append('--target-panel=~{target_panel}')
+        else:
+            call_args.extend(['--libraries=libraries.csv', '--feature-ref=' + feature_file])
+            if target_panel != '':
+                assert version.parse('~{cellranger_version}') >= version.parse('4.0.0')
+                call_args.append('--target-panel=' + target_panel)
+
+        if '~{force_cells}' != '':
             call_args.append('--force-cells=~{force_cells}')
-        if '~{expect_cells}' is not '':
+        if '~{expect_cells}' != '':
             call_args.append('--expect-cells=~{expect_cells}')
-        if '~{include_introns}' is 'true':
+        if '~{include_introns}' == 'true':
             assert version.parse('~{cellranger_version}') >= version.parse('5.0.0')
             call_args.append('--include-introns')
-        if '~{no_bam}' is 'true':
+        if '~{no_bam}' == 'true':
             assert version.parse('~{cellranger_version}') >= version.parse('5.0.0')
             call_args.append('--no-bam')
-        if '~{secondary}' is not 'true':
+        if '~{secondary}' != 'true':
             call_args.append('--nosecondary')
         print(' '.join(call_args))
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs "~{output_directory}/~{sample_id}"
-        # cp -r results/outs "~{output_directory}/~{sample_id}"
+        gsutil -q -m rsync -d -r results/outs "~{output_directory}"/~{sample_id}
+        # cp -r results/outs "~{output_directory}"/~{sample_id}
     }
 
     output {

@@ -1,17 +1,19 @@
 version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/12/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/8/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/10/plain-WDL/descriptor" as crc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_multi/versions/2/plain-WDL/descriptor" as crmulti
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/9/plain-WDL/descriptor" as crv
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/8/plain-WDL/descriptor" as ca
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq/versions/7/plain-WDL/descriptor" as cram
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/versions/8/plain-WDL/descriptor" as crac
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_arc_mkfastq/versions/1/plain-WDL/descriptor" as crarm
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_arc_count/versions/3/plain-WDL/descriptor" as crarc
 
 
 workflow cellranger_workflow {
     input {
-        # 5 - 8 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry, DataType, FeatureBarcodeFile]). gs URL
+        # 5 - 9 columns (Sample, Reference, Flowcell, Lane, Index, [Chemistry, DataType, FeatureBarcodeFile, Link]). gs URL
         File input_csv_file
         # Output directory, gs URL
         String output_directory
@@ -37,7 +39,7 @@ workflow cellranger_workflow {
 
         # For cellranger count
 
-        # Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells. This is also a cellranger-atac argument.
+        # Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells. 
         Int? force_cells
         # Expected number of recovered cells. Mutually exclusive with force_cells
         Int? expect_cells
@@ -45,7 +47,7 @@ workflow cellranger_workflow {
         Boolean include_introns = false
         # If generate bam outputs. This is also a spaceranger argument.
         Boolean no_bam = false
-        # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false. This is also a spaceranger argument.
+        # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false.
         Boolean secondary = false
 
         # For vdj
@@ -76,6 +78,11 @@ workflow cellranger_workflow {
         # A BED file to override peak caller
         File? atac_peaks
 
+        # For multi
+
+        # CMO set CSV file, delaring CMO constructs and associated barcodes
+        File? cmo_set
+
 
         # 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
         String cellranger_version = "6.0.1"
@@ -90,10 +97,11 @@ workflow cellranger_workflow {
 
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
-        # cellranger/cellranger-atac mkfastq registry, default to gcr.io/broad-cumulus
+        # cellranger/cellranger-atac/cellranger-arc mkfastq registry, default to gcr.io/broad-cumulus
         String mkfastq_docker_registry = "gcr.io/broad-cumulus"
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+
         # Number of cpus per cellranger and spaceranger job
         Int num_cpu = 32
         # Memory string
@@ -107,6 +115,11 @@ workflow cellranger_workflow {
         # Optional memory string for cumulus_adt
         String feature_memory = "32G"
 
+        # Number of cpus for cellranger-arc count
+        Int arc_num_cpu = 64
+        # Memory string for cellranger-arc count
+        String arc_memory = "160G"
+
         # Optional disk space for mkfastq.
         Int mkfastq_disk_space = 1500
         # Optional disk space needed for cell ranger count.
@@ -117,6 +130,8 @@ workflow cellranger_workflow {
         Int feature_disk_space = 100
         # Optional disk space needed for cellranger-atac count
         Int atac_disk_space = 500
+        # Optional disk space needed for cellranger-arc count
+        Int arc_disk_space = 700
 
         # Number of preemptible tries
         Int preemptible = 2
@@ -347,9 +362,102 @@ workflow cellranger_workflow {
             }
         }
 
+        if (generate_count_config.link_arc_ids[0] != '') {
+            scatter (link_id in generate_count_config.link_arc_ids) {
+                call crarc.cellranger_arc_count as cellranger_arc_count {
+                    input:
+                        link_id = link_id,
+                        input_samples = generate_count_config.link2sample[link_id],
+                        input_fastqs_directories = generate_count_config.sample2dir[link_id],
+                        input_data_types = generate_count_config.sample2datatype[link_id],
+                        output_directory = output_directory_stripped,
+                        genome = generate_count_config.sample2genome[link_id],
+                        no_bam = no_bam,
+                        cellranger_arc_version = cellranger_arc_version,
+                        docker_registry = docker_registry_stripped,
+                        zones = zones,
+                        num_cpu = arc_num_cpu,
+                        memory = arc_memory,
+                        disk_space = arc_disk_space,
+                        preemptible = preemptible
+                }
+            }
 
-        
-        
+            call collect_summaries as collect_summaries_arc {
+                input:
+                    summaries = cellranger_arc_count.output_metrics_summary,
+                    sample_ids = cellranger_arc_count.output_count_directory,
+                    config_version = config_version,
+                    zones = zones,
+                    preemptible = preemptible,
+                    docker_registry = docker_registry_stripped
+            }
+        }
+
+        if (generate_count_config.link_multi_ids[0] != '') {
+            scatter (link_id in generate_count_config.link_multi_ids) {
+                call crmulti.cellranger_multi as cellranger_multi {
+                    input:
+                        link_id = link_id,
+                        input_samples = generate_count_config.link2sample[link_id],
+                        input_fastqs_directories = generate_count_config.sample2dir[link_id],
+                        input_data_types = generate_count_config.sample2datatype[link_id],
+                        input_fbf = generate_count_config.sample2fbf[link_id],
+                        output_directory = output_directory_stripped,
+                        genome = generate_count_config.sample2genome[link_id],
+                        cmo_set = cmo_set,
+                        include_introns = include_introns,
+                        no_bam = no_bam,
+                        secondary = secondary,
+                        force_cells = force_cells,
+                        expect_cells = expect_cells,
+                        cellranger_version = cellranger_version,
+                        docker_registry = docker_registry_stripped,
+                        zones = zones,
+                        num_cpu = num_cpu,
+                        memory = memory,
+                        disk_space = count_disk_space,
+                        preemptible = preemptible
+                }
+            }
+        }
+
+        if (generate_count_config.link_fbc_ids[0] != '') {
+            scatter (link_id in generate_count_config.link_fbc_ids) {
+                call crc.cellranger_count as cellranger_count_fbc {
+                    input:
+                        sample_id = link_id,
+                        input_samples = generate_count_config.link2sample[link_id],
+                        input_fastqs_directories = generate_count_config.sample2dir[link_id],
+                        input_data_types = generate_count_config.sample2datatype[link_id],
+                        input_fbf = generate_count_config.sample2fbf[link_id],
+                        output_directory = output_directory_stripped,
+                        genome = generate_count_config.sample2genome[link_id],
+                        include_introns = include_introns,
+                        no_bam = no_bam,
+                        secondary = secondary,
+                        force_cells = force_cells,
+                        expect_cells = expect_cells,
+                        cellranger_version = cellranger_version,
+                        zones = zones,
+                        num_cpu = num_cpu,
+                        memory = memory,
+                        disk_space = count_disk_space,
+                        preemptible = preemptible,
+                        docker_registry = docker_registry_stripped
+                }
+            }
+
+            call collect_summaries as collect_summaries_fbc {
+                input:
+                    summaries = cellranger_count_fbc.output_metrics_summary,
+                    sample_ids = cellranger_count_fbc.output_count_directory,
+                    config_version = config_version,
+                    zones = zones,
+                    preemptible = preemptible,
+                    docker_registry = docker_registry_stripped
+            }
+        }
     }
 
     output {
@@ -504,7 +612,7 @@ task generate_count_config {
         with open('sample_ids.txt', 'w') as fo1, open('sample_vdj_ids.txt', 'w') as fo2, open('sample_feature_ids.txt', 'w') as fo3, open('sample_atac_ids.txt', 'w') as fo4, \
              open('sample2dir.txt', 'w') as foo1, open('sample2datatype.txt', 'w') as foo2, open('sample2genome.txt', 'w') as foo3, \
              open('sample2chemistry.txt', 'w') as foo4, open('sample2fbf.txt', 'w') as foo5, open('count_matrix.csv', 'w') as foo6, \
-             open('sample_arc_ids.txt', 'w') as fo5, open('sample_multi_ids.txt', 'w') as fo6, open('sample_fbc_ids.txt', 'w') as fo7, \
+             open('link_arc_ids.txt', 'w') as fo5, open('link_multi_ids.txt', 'w') as fo6, open('link_fbc_ids.txt', 'w') as fo7, \
              open('link2sample.txt', 'w') as foo7:
 
             n_ref = n_chem = n_fbf = n_link = 0 # this mappings can be empty
@@ -516,6 +624,7 @@ task generate_count_config {
             link2dir = defaultdict(list)
             link2dt = defaultdict(list)
             link2fbf = defaultdict(list)
+            link2ref = defaultdict(set)
 
             for sample_id in df['Sample'].unique():
                 df_local = df.loc[df['Sample'] == sample_id]
@@ -529,6 +638,13 @@ task generate_count_config {
                     dirs = df_local['Flowcell'].map(lambda x: r2f[os.path.basename(x)]).values # if also run mkfastq
                 else:
                     dirs = df_local['Flowcell'].values # if start from count step
+
+                reference = 'null'
+                if datatype in ['rna', 'vdj', 'atac']:
+                    if df_local['Reference'].unique().size > 1:
+                        print("Detected multiple references for sample " + sample_id + "!", file = sys.stderr)
+                        sys.exit(1)
+                    reference = df_local['Reference'].iat[0]
 
                 feature_barcode_file = 'null'
                 if datatype in ['rna', 'adt', 'citeseq', 'hashing', 'cmo', 'crispr']:
@@ -548,14 +664,18 @@ task generate_count_config {
                     if df_local['Link'].unique().size > 1:
                         print("Detected multiple Link values for sample '" + sample_id + "'!", file = sys.stderr)
                         sys.exit(1)
-                    link = df_local['Reference'].iat[0]
+                    link = df_local['Link'].iat[0]
                     if pd.notnull(link) and (link != ''):
                         multiomics[link].add(datatype)
                         size = dirs.size
                         link2sample[link].extend([sample_id] * size)
                         link2dir[link].extend(list(dirs))
                         link2dt[link].extend([datatype] * size)
+                        if feature_barcode_file == null_file:
+                            feature_barcode_file = 'null'
                         link2fbf[link].extend([feature_barcode_file] * size)
+                        if reference != 'null':
+                            link2ref[link].add(reference)
                         continue
 
                 datatype2fo[datatype].write(sample_id + '\n')
@@ -563,17 +683,13 @@ task generate_count_config {
                 foo1.write(sample_id + '\t' + ','.join(dirs) + '\n')
                 foo2.write(sample_id + '\t' + datatype + '\n')
 
+                if reference != 'null':
+                    foo3.write(sample_id + '\t' + reference + '\n')
+                    n_ref += 1
+
                 if feature_barcode_file != 'null':
                     foo5.write(sample_id + '\t' + feature_barcode_file + '\n')
                     n_fbf += 1
-
-                if datatype in ['rna', 'vdj', 'atac']:
-                    if df_local['Reference'].unique().size > 1:
-                        print("Detected multiple references for sample " + sample_id + "!", file = sys.stderr)
-                        sys.exit(1)
-                    reference = df_local['Reference'].iat[0]
-                    foo3.write(sample_id + '\t' + reference + '\n')
-                    n_ref += 1
 
                 if datatype in ['rna', 'adt', 'citeseq', 'hashing', 'cmo', 'crispr']:
                     if df_local['Chemistry'].unique().size > 1:
@@ -595,32 +711,39 @@ task generate_count_config {
 
             for link_id in multiomics.keys():
                 n_link += 1
+
+                ref_set = link2ref.get(link_id, set())
+                if len(ref_set) > 1:
+                    print("Link '" + link_id + "' contains multiple references!", file = sys.stderr)
+                    sys.exit(1)
+                if len(ref_set) == 1:
+                    n_ref += 1
+                    foo3.write(link_id + '\t' + list(ref_set)[0] + '\n')
+
+                foo1.write(link_id + '\t' + ','.join(link2dir[link_id]) + '\n')
+                foo2.write(link_id + '\t' + ','.join(link2dt[link_id]) + '\n')
+                foo7.write(link_id + '\t' + ','.join(link2sample[link_id]) + '\n')
+
                 if 'atac' in multiomics[link_id]:
-                    if multiomics[link_id] != set(['atac', 'rna'])::
+                    if multiomics[link_id] != set(['atac', 'rna']):
                         print("CellRanger ARC only works with ATAC+RNA data! Link '" + link_id + "' contains " + ', '.join(list(multiomics[link_id])) + '.', file = sys.stderr)
                         sys.exit(1)                        
                     fo5.write(link_id + '\n')
-                    foo7.write(link_id + '\t' + ','.join(link2sample[link_id]) + '\n')
-                    foo1.write(link_id + '\t' + ','.join(link2dir[link_id]) + '\n')
-                    foo2.write(link_id + '\t' + ','.join(link2dt[link_id]) + '\n')
                 elif 'cmo' in multiomics[link_id]:
+                    if 'rna' not in multiomics[link_id]:
+                        print("CellRanger multi expect RNA modality!", file = sys.stderr)
+                        sys.exit(1)
                     if not multiomics[link_id].issubset(set(['rna', 'cmo', 'crispr', 'citeseq'])):
                         print("CellRanger multi only works with RNA/CMO/CRISPR/CITESEQ data! Link '" + link_id + "' contains " + ', '.join(list(multiomics[link_id])) + '.', file = sys.stderr)
                         sys.exit(1)
                     fo6.write(link_id + '\n')
-                    foo7.write(link_id + '\t' + ','.join(link2sample[link_id]) + '\n')
-                    foo1.write(link_id + '\t' + ','.join(link2dir[link_id]) + '\n')
-                    foo2.write(link_id + '\t' + ','.join(link2dt[link_id]) + '\n')
                     foo5.write(link_id + '\t' + ','.join(link2fbf[link_id]) + '\n')
                     n_fbf += 1
                 else:
-                    if not multiomics[link_id] issubset(set(['rna', 'crispr', 'citeseq', 'hashing'])):
+                    if not multiomics[link_id].issubset(set(['rna', 'crispr', 'citeseq', 'hashing'])):
                         print("CellRanger count only works with RNA/CRISPR/CITESEQ/HASHING data! Link '" + link_id + "' contains " + ', '.join(list(multiomics[link_id])) + '.', file = sys.stderr)
                         sys.exit(1)
                     fo7.write(link_id + '\n')
-                    foo7.write(link_id + '\t' + ','.join(link2sample[link_id]) + '\n')
-                    foo1.write(link_id + '\t' + ','.join(link2dir[link_id]) + '\n')
-                    foo2.write(link_id + '\t' + ','.join(link2dt[link_id]) + '\n')
                     foo5.write(link_id + '\t' + ','.join(link2fbf[link_id]) + '\n')
                     n_fbf += 1
 
@@ -640,9 +763,9 @@ task generate_count_config {
         Array[String] sample_vdj_ids = read_lines('sample_vdj_ids.txt')
         Array[String] sample_feature_ids = read_lines('sample_feature_ids.txt')
         Array[String] sample_atac_ids = read_lines('sample_atac_ids.txt')
-        Array[String] sample_arc_ids = read_lines('sample_arc_ids.txt')
-        Array[String] sample_multi_ids = read_lines('sample_multi_ids.txt')
-        Array[String] sample_fbc_ids = read_lines('sample_fbc_ids.txt')
+        Array[String] link_arc_ids = read_lines('link_arc_ids.txt')
+        Array[String] link_multi_ids = read_lines('link_multi_ids.txt')
+        Array[String] link_fbc_ids = read_lines('link_fbc_ids.txt')
         Map[String, String] sample2dir = read_map('sample2dir.txt')
         Map[String, String] sample2datatype = read_map('sample2datatype.txt')
         Map[String, String] sample2genome = read_map('sample2genome.txt')
