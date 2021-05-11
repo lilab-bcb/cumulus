@@ -331,12 +331,12 @@ Popscle inputs
 	  - 1
 	* - popscle_memory
 	  - popscle parameter. Memory size (integer) in GB needed per pair.
-	  - 30
-	  - 30
+	  - 120
+	  - 120
 	* - popscle_extra_disk_space
 	  - popscle parameter. Extra disk space size (integer) in GB needed for popscle per pair, besides the disk size required to hold input files specified in the sample sheet.
-	  - 2
-	  - 2
+	  - 100
+	  - 100
 
 ---------------------
 

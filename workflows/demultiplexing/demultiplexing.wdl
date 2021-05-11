@@ -2,7 +2,7 @@ version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/6/plain-WDL/descriptor" as dem
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/15/plain-WDL/descriptor" as soc
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/2/plain-WDL/descriptor" as psc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/3/plain-WDL/descriptor" as psc
 
 
 workflow demultiplexing {
@@ -89,9 +89,9 @@ workflow demultiplexing {
         # Number of CPUs used for popscle per pair
         Int popscle_num_cpu = 1
         # Memory size in GB needed for popscle per pair
-        Int popscle_memory = 30
+        Int popscle_memory = 120
         # Extra disk space (integer) in GB needed for popscle per pair
-        Int popscle_extra_disk_space = 2
+        Int popscle_extra_disk_space = 100
 
         # Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: "0.2", "0.1"
         String config_version = "0.2"
