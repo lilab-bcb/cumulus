@@ -217,7 +217,13 @@ souporcell inputs
 	  - Example
 	  - Default
 	* - souporcell_version
-	  - souporcell version to use. Available versions: "2021.03", "2020.07", "2020.03".
+	  - souporcell version to use. Available versions:
+
+	    - ``2021.03``: Based on commitment `1bd9f1 <https://github.com/wheaton5/souporcell/tree/1bd9f11d70eaee6ac14713de09c377c285ca2787>`_ on 2021/03/07.
+
+	    - ``2020.07``: Based on commitment `0d09fb <https://github.com/wheaton5/souporcell/tree/0d09fbe26d878adb294b536c4f41a7718c0d0f9d>`_ on 2020/07/27.
+
+	    - ``2020.03``: Based on commitment `eeddcd <https://github.com/wheaton5/souporcell/tree/eeddcde5892c5cbf8aba2149f0e77756f830a5ae>`_ on 2020/03/31.
 	  - "2020.07"
 	  - "2020.07"
 	* - souporcell_num_clusters
@@ -282,15 +288,47 @@ Popscle inputs
 	    - Otherwise, run with *freemuxlet* in de novo mode without reference genotypes.
 	  - 4
 	  - 0
+	* - popscle_min_MQ
+	  - popscle parameter. Minimum mapping quality to consider (lower MQ will be ignored).
+	  - 20
+	  - 20
+	* - popscle_min_TD
+	  - popscle parameter. Minimum distance to the tail (lower will be ignored).
+	  - 0
+	  - 0
+	* - popscle_tag_group
+	  - popscle parameter. Tag representing readgroup or cell barcodes, in the case to partition the BAM file into multiple groups. For 10x genomics, use ``CB``.
+	  - "CB"
+	  - "CB"
+	* - popscle_tag_UMI
+	  - popscle parameter. Tag representing UMIs. For 10x genomics, use ``UB``.
+	  - "UB"
+	  - "UB"
+	* - popscle_field
+	  - popscle parameter. FORMAT field to extract from: genotype (``GT``), genotype likelihood (``GL``), or posterior probability (``GP``).
+	  - "GT"
+	  - "GT"
+	* - popscle_alpha
+	  - popscle parameter. Grid of alpha to search for, in a comma separated list format of all alpha values to be considered.
+	  - "0.1,0.2,0.3,0.4,0.5"
+	  - "0.1,0.2,0.3,0.4,0.5"
 	* - popscle_rename_donors
 	  - | popscle parameter. A comma-separated list of donor names for renaming clusters achieved by popscle. Must be consistent with *popscle_num_samples* input.
 	    | By default, the resulting donors are *Donor1*, *Donor2*, ...
 	  - "CB1,CB2,CB3,CB4"
 	  -
 	* - popscle_version
-	  - popscle parameter. popscle version to use. Available options: "2021.04", "0.1b".
+	  - popscle parameter. popscle version to use. Available options:
+
+	    - ``2021.05``: Based on commitment `da70fc7 <https://github.com/statgen/popscle/tree/da70fc78da385ef049e0e890342acfd62842cae0>`_ on 2021/05/05.
+
+	    - ``0.1b``: Based on version `0.1-beta <https://github.com/statgen/popscle/releases/tag/v0.1-beta>`_ released on 2019/10/03.
 	  - "0.1b"
 	  - "0.1b"
+	* - popscle_num_cpu
+	  - popscle parameter. Number of CPU used by popscle per pair.
+	  - 1
+	  - 1
 	* - popscle_memory
 	  - popscle parameter. Memory size (integer) in GB needed per pair.
 	  - 30

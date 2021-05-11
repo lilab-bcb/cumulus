@@ -24,7 +24,7 @@ workflow cellranger_atac_create_reference {
         # GSURL for input GTF file
         File input_gtf
         # A comma separated list of names of contigs that are not in nucleus
-        String? non_nuclear_contigs = "chrM"
+        String non_nuclear_contigs = "chrM"
         # Optional file containing transcription factor motifs in JASPAR format
         File? input_motifs
 
@@ -79,21 +79,21 @@ task run_cellranger_atac_create_reference {
         monitor_script.sh > monitoring.log &
 
         python <<CODE
-            with open("ref.config", "w") as fout:
-                fout.write("{\n")                
-                if '~{organism}' != "":
-                    fout.write("    organism: \"~{organism}\"\n")
-                fout.write("    genome: [\"~{genome}\"]\n")
-                fout.write("    input_fasta: [\"~{input_fasta}\"]\n")
-                fout.write("    input_gtf: [\"~{input_gtf}\"]\n")
-                if '~{non_nuclear_contigs}' != "":
-                    fout.write("    non_nuclear_contigs: [\"" + ", ".join(['"' + x + '"' for x in '~{non_nuclear_contigs}'.split(',')]) + "\"]\n")
-                if '~{input_motifs}' != "":
-                    fout.write("    input_motifs: \"~{input_motifs}\"\n")
-                fout.write("\x7D\n") # \x7D refers to }
+        with open("ref.config", "w") as fout:
+            fout.write("{\n")
+            if '~{organism}' != "":
+                fout.write("    organism: \"~{organism}\"\n")
+            fout.write("    genome: [\"~{genome}\"]\n")
+            fout.write("    input_fasta: [\"~{input_fasta}\"]\n")
+            fout.write("    input_gtf: [\"~{input_gtf}\"]\n")
+            if '~{non_nuclear_contigs}' != "":
+                fout.write("    non_nuclear_contigs: [" + ", ".join(['"' + x + '"' for x in '~{non_nuclear_contigs}'.split(',')]) + "]\n")
+            if '~{input_motifs}' != "":
+                fout.write("    input_motifs: \"~{input_motifs}\"\n")
+            fout.write("\x7D\n") # '\x7D' refers to right brace bracket
         CODE
 
-        cellranger-atac --config=ref.config
+        cellranger-atac mkref --config=ref.config
         tar -czf ~{genome}.tar.gz ~{genome}
         gsutil -m cp ~{genome}.tar.gz "~{output_dir}"
         # mkdir -p "~{output_dir}"

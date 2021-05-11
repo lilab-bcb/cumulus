@@ -134,11 +134,11 @@ def find_max_matching(ref_names: List[str], sample_names: List[str], mmat: np.ar
         i = ref_n2i[result[sample_name]]
         if mmat[i, j] != mmat[:, j].max():
             k = np.where(mmat[:, j] == mmat[:, j].max())[0][0]
-            print("Warning: souporcell donor {} shares most SNPs with ref donor {}, but matches to ref donor {}!".format(sample_name, ref_names[k][5:], ref_names[i][5:]))
+            print("Warning: popscle donor {} shares most SNPs with ref donor {}, but matches to ref donor {}!".format(sample_name, ref_names[k][5:], ref_names[i][5:]))
 
     print()
     for sample_name in sample_names:
-        print("Souporcell donor {} matches reference donor {}.".format(sample_name, result[sample_name][5:]))
+        print("Popscle donor {} matches reference donor {}.".format(sample_name, result[sample_name][5:]))
     print()
 
     return result

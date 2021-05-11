@@ -2,7 +2,8 @@ version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/6/plain-WDL/descriptor" as dem
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/15/plain-WDL/descriptor" as soc
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/1/plain-WDL/descriptor" as psc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/2/plain-WDL/descriptor" as psc
+
 
 workflow demultiplexing {
     input {
@@ -67,12 +68,26 @@ workflow demultiplexing {
         Int souporcell_memory = 120
 
         # For popscle (demuxlet/freemuxlet)
+        # Minimum mapping quality to consider (lower MQ will be ignored) [default: 20]
+        Int? popscle_min_MQ
+        # Minimum distance to the tail (lower will be ignored) [default: 0]
+        Int? popscle_min_TD
+        # Tag representing readgroup or cell barcodes, in the case to partition the BAM file into multiple groups. For 10x genomics, use CB
+        String popscle_tag_group = "CB"
+        # Tag representing UMIs. For 10x genomics, use UB
+        String popscle_tag_UMI = "UB"
         # Default is 0, means to use demuxlet, if this number > 0, use freemuxlet
         Int popscle_num_samples = 0
-        # Popscle version. Available versions: "2021.04", "0.1b"
+        # FORMAT field to extract the genotype, likelihood, or posterior from
+        String popscle_field = "GT"
+        # Grid of alpha to search for [default: "0.1,0.2,0.3,0.4,0.5"]
+        String? popscle_alpha
+        # Popscle version. Available versions: "2021.05", "0.1b"
         String popscle_version = "0.1b"
         # A comma-separated list of donor names for renaming clusters achieved by freemuxlet
-        String popscle_rename_donors = ""
+        String? popscle_rename_donors
+        # Number of CPUs used for popscle per pair
+        Int popscle_num_cpu = 1
         # Memory size in GB needed for popscle per pair
         Int popscle_memory = 30
         # Extra disk space (integer) in GB needed for popscle per pair
@@ -160,12 +175,19 @@ workflow demultiplexing {
                         input_rna = Config.id2rna[pooling_id],
                         input_bam = Config.id2tag[pooling_id],
                         ref_genotypes = Config.id2genotype[pooling_id],
-                        donor_rename = popscle_rename_donors,
                         min_num_genes = min_num_genes,
+                        min_MQ = popscle_min_MQ,
+                        min_TD = popscle_min_TD,
+                        tag_group = popscle_tag_group,
+                        tag_UMI = popscle_tag_UMI,
+                        field = popscle_field,
+                        alpha = popscle_alpha,
                         nsample = popscle_num_samples,
+                        donor_rename = popscle_rename_donors,
                         docker_registry = docker_registry,
                         popscle_version = popscle_version,
                         extra_disk_space = popscle_extra_disk_space,
+                        num_cpu = popscle_num_cpu,
                         memory = popscle_memory,
                         zones = zones,
                         preemptible = preemptible
