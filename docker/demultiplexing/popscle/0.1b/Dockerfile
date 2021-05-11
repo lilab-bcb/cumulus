@@ -26,6 +26,7 @@ RUN pip install --upgrade pip && \
     pip install h5py==3.2.1 && \
     pip install numba==0.53.1 && \
     pip install argparse==1.4.0 && \
+    pip install networkx==2.5.1 && \
     pip install pegasusio==0.2.10
 
 RUN mkdir /software
