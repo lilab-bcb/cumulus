@@ -13,7 +13,7 @@
    :maxdepth: 1
    :hidden:
 
-   cellranger
+   cellranger/index
    spaceranger
    starsolo
    demultiplexing

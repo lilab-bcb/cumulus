@@ -4,7 +4,7 @@ Latest and stable versions on Terra_
 Cumulus is a fast growing project. As a result, we frequently update WDL snapshot versions on Terra_.
 See below for latest and stable WDL versions you can use.
 
-Latest version
+Stable version - v1.4.0
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table::
@@ -36,7 +36,7 @@ Latest version
       - `5 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_aggr/5>`__
       - Run Cell Ranger tools to aggregate scATAC-seq samples.
     * - cumulus/cellranger_atac_create_reference
-      - `3 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_create_reference/3>`__
+      - `4 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_atac_create_reference/4>`__
       - Run Cell Ranger tools to build scATAC-seq references.
     * - cumulus/cellranger_vdj_create_reference
       - `4 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_vdj_create_reference/4>`__
@@ -48,7 +48,7 @@ Latest version
       - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/10>`__
       - Generate user-customized genome references for SMART-Seq2 data.
     * - cumulus/cumulus
-      - `38 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/38>`__
+      - `39 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/39>`__
       - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
 
 
