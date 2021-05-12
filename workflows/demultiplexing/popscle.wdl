@@ -18,10 +18,10 @@ workflow popscle {
         Int? min_MQ
         # Minimum distance to the tail (lower will be ignored) [default: 0]
         Int? min_TD
-        # Tag representing readgroup or cell barcodes, in the case to partition the BAM file into multiple groups. For 10x genomics, use CB
-        String tag_group = "CB"
-        # Tag representing UMIs. For 10x genomics, use UB
-        String tag_UMI = "UB"
+        # Tag representing readgroup or cell barcodes, in the case to partition the BAM file into multiple groups. For 10x genomics, use CB  [default: "CB"]
+        String? tag_group
+        # Tag representing UMIs. For 10x genomics, use UB  [default: "UB"]
+        String? tag_UMI
 
         # demuxlet-specific input fields
         # FORMAT field to extract the genotype, likelihood, or posterior from
@@ -98,8 +98,8 @@ task popscle_task {
         Int? min_MQ
         String? alpha
         Int? min_TD
-        String tag_group
-        String tag_UMI
+        String? tag_group
+        String? tag_UMI
         String? donor_rename
 
         String docker_registry
@@ -125,6 +125,10 @@ task popscle_task {
         from subprocess import check_call
 
         call_args = ['popscle', 'dsc-pileup', '--sam', '~{input_bam}', '--vcf', '~{ref_genotypes}', '--group-list', '~{sample_id}.barcodes.tsv', '--out', '~{sample_id}.plp']
+        if '~{tag_group}' is not '':
+            call_args.extend(['--tag-group', '~{tag_group}'])
+        if '~{tag_UMI}' is not '':
+            call_args.extend(['--tag-UMI', '~{tag_UMI}'])
         if '~{min_MQ}' is not '':
             call_args.extend(['--min-MQ', '~{min_MQ}'])
         if '~{min_TD}' is not '':

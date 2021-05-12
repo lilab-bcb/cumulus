@@ -2,8 +2,7 @@ version 1.0
 
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/6/plain-WDL/descriptor" as dem
 import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/15/plain-WDL/descriptor" as soc
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/3/plain-WDL/descriptor" as psc
-
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/4/plain-WDL/descriptor" as psc
 
 workflow demultiplexing {
     input {
@@ -72,10 +71,10 @@ workflow demultiplexing {
         Int? popscle_min_MQ
         # Minimum distance to the tail (lower will be ignored) [default: 0]
         Int? popscle_min_TD
-        # Tag representing readgroup or cell barcodes, in the case to partition the BAM file into multiple groups. For 10x genomics, use CB
-        String popscle_tag_group = "CB"
-        # Tag representing UMIs. For 10x genomics, use UB
-        String popscle_tag_UMI = "UB"
+        # Tag representing readgroup or cell barcodes, in the case to partition the BAM file into multiple groups. For 10x genomics, use CB  [default: "CB"]
+        String? popscle_tag_group
+        # Tag representing UMIs. For 10x genomics, use UB  [default: "UB"]
+        String? popscle_tag_UMI
         # Default is 0, means to use demuxlet, if this number > 0, use freemuxlet
         Int popscle_num_samples = 0
         # FORMAT field to extract the genotype, likelihood, or posterior from
