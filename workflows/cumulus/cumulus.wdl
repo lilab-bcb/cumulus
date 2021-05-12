@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/28/plain-WDL/descriptor" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/29/plain-WDL/descriptor" as tasks
 # import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
