@@ -17,6 +17,8 @@ task run_cumulus_aggregate_matrices {
 		String? attributes
 		String? default_reference
 		Boolean? select_only_singlets
+		String? remap_singlets
+		String? subset_singlets
 		Int? minimum_number_of_genes
 		String docker_registry
 	}
@@ -39,6 +41,10 @@ task run_cumulus_aggregate_matrices {
 			call_args.extend(['--default-reference', '~{default_reference}'])
 		if '~{select_only_singlets}' is 'true':
 			call_args.append('--select-only-singlets')
+		if '~{remap_singlets}' is not '':
+			call_args.extend(['--remap-singlets', '~{remap_singlets}'])
+		if '~{subset_singlets}' is not '':
+			call_args.extend(['--subset-singlets', '~{subset_singlets}'])
 		if '~{minimum_number_of_genes}' is not '':
 			call_args.extend(['--min-genes', '~{minimum_number_of_genes}'])
 

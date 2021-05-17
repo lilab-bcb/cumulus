@@ -15,7 +15,7 @@ RUN apt-get -qq update && \
     pip3 --no-cache-dir install numpy pandas matplotlib && \
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
-    apt-get update -y && apt-get install -y google-cloud-sdk=338.0.0-0
+    apt-get update -y && apt-get install -y google-cloud-sdk=340.0.0-0
 
 RUN tar -xzf /software/0.6.0.tar.gz -C /software && \
     cd /software/cumulus_feature_barcoding-0.6.0 && make clean && make all && cd ../.. && \
