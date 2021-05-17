@@ -1,4 +1,4 @@
-Version 1.4.0 `May 11, 2021`
+Version 1.4.0 `May 17, 2021`
 ----------------------------
 
 * On *cellranger* workflow
@@ -12,6 +12,8 @@ Version 1.4.0 `May 11, 2021`
     * Add delete undetermined FASTQs option for mkfastq
 * On *demultiplexing* workflow
     * Replace *demuxlet* with *popscle*, which includes both *demuxlet* and *freemuxlet*
+* On *cumulus* workflow
+    * Fixed bug that ``remap_singlets`` and ``subset_singlets`` don't work when input is in sample sheet format.
 * Modified workflows to remove trailing spaces and support spaces within output_directory
 
 Version 1.3.0 `February 2, 2021`
