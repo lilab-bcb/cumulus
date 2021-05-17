@@ -1,7 +1,7 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/29/plain-WDL/descriptor" as tasks
-# import "cumulus_tasks.wdl" as tasks
+#import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/29/plain-WDL/descriptor" as tasks
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/cumulus/cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
 	input {
@@ -38,6 +38,10 @@ workflow cumulus {
 		String? attributes
 		# If we have demultiplexed data, turning on this option will make cumulus only include barcodes that are predicted as singlets
 		Boolean select_only_singlets = false
+		# Remap singlet names using <remap_string>, where <remap_string> takes the format "new_name_i:old_name_1,old_name_2;new_name_ii:old_name_3;...". For example, if we hashed 5 libraries from 3 samples sample1_lib1, sample1_lib2, sample2_lib1, sample2_lib2 and sample3, we can remap them to 3 samples using this string: "sample1:sample1_lib1,sample1_lib2;sample2:sample2_lib1,sample2_lib2". After that, original singlet names will be kept in metadate field with key name 'assignment.orig'.
+		String? remap_singlets
+		# If select singlets, only select singlets in the <subset_string>, which takes the format "name1,name2,...". Note that if --remap-singlets is specified, subsetting happens after remapping. For example, we can only select singlets from sampe 1 and 3 using "sample1,sample3".
+		String? subset_singlets
 		# Only keep barcodes with at least this number of expressed genes
 		Int minimum_number_of_genes = 100
 		# If inputs are dropseq data
@@ -51,10 +55,6 @@ workflow cumulus {
 		String? black_list
 		# If input are raw 10x matrix, which include all barcodes, perform a pre-filtration step to keep the data size small. In the pre-filtration step, only keep cells with at least <number> of genes. [default: 100]
 		Int? min_genes_before_filtration
-		# Remap singlet names using <remap_string>, where <remap_string> takes the format "new_name_i:old_name_1,old_name_2;new_name_ii:old_name_3;...". For example, if we hashed 5 libraries from 3 samples sample1_lib1, sample1_lib2, sample2_lib1, sample2_lib2 and sample3, we can remap them to 3 samples using this string: "sample1:sample1_lib1,sample1_lib2;sample2:sample2_lib1,sample2_lib2". After that, original singlet names will be kept in metadate field with key name 'assignment.orig'.
-		String? remap_singlets
-		# If select singlets, only select singlets in the <subset_string>, which takes the format "name1,name2,...". Note that if --remap-singlets is specified, subsetting happens after remapping. For example, we can only select singlets from sampe 1 and 3 using "sample1,sample3".
-		String? subset_singlets
 		# Focus analysis on Unimodal data with <keys>. <keys> is a comma-separated list of keys. If None, the self._selected will be the focused one.
 		String? focus
 		# Append Unimodal data <key> to any <keys> in --focus.
@@ -264,6 +264,8 @@ workflow cumulus {
 				attributes = attributes,
 				default_reference = default_reference,
 				select_only_singlets = select_only_singlets,
+				remap_singlets = remap_singlets,
+				subset_singlets = subset_singlets,
 				minimum_number_of_genes = minimum_number_of_genes,
 				pegasus_version = pegasus_version,
 				zones = zones,
@@ -285,8 +287,8 @@ workflow cumulus {
 			black_list = black_list,
 			min_genes_before_filtration = min_genes_before_filtration,
 			select_singlets = if is_sample_sheet then false else select_only_singlets,
-			remap_singlets = remap_singlets,
-			subset_singlets = subset_singlets,
+			remap_singlets = if is_sample_sheet then "" else remap_singlets,
+			subset_singlets = if is_sample_sheet then "" else subset_singlets,
 			genome = default_reference,
 			focus = focus,
 			append = append,
