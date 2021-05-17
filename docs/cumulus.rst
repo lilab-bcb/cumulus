@@ -220,6 +220,19 @@ aggregate_matrices inputs
       - If we have demultiplexed data, turning on this option will make cumulus only include barcodes that are predicted as singlets.
       - true
       - false
+    * - remap_singlets
+      - | For demultiplexed data, user can remap singlet names using assignment in String in this input. This string assignment takes the format "new_name_i:old_name_1,old_name_2;new_name_ii:old_name_3;...".
+        | For example, if we hashed 5 libraries from 3 samples: sample1_lib1, sample1_lib2; sample2_lib1, sample2_lib2; sample3, we can remap them to 3 samples using this string: ``"sample1:sample1_lib1,sample1_lib2;sample2:sample2_lib1,sample2_lib2"``.
+        | In this way, the new singlet names will be in metadata field with key ``assignment``, while the old names are kept in metadata with key ``assignment.orig``.
+        | **Notice:** This input is enabled only when *select_only_singlets* input is ``true``.
+      - "Group1:CB1,CB2;Group2:CB3,CB4,CB5"
+      -
+    * - subset_singlets
+      - | For demultiplexed data, user can use this input to choose a subset of singlets based on their names. This string takes the format "name1,name2,...".
+        | Note that if *remap_singlets* input is specified, subsetting happens after remapping, i.e. you should use the new singlet names for choosing subset.
+        | **Notice:** This input is enabled only when *select_only_singlets* input is ``true``.
+      - "Group2,CB6,CB7"
+      -
     * - minimum_number_of_genes
       - Only keep barcodes with at least this number of expressed genes
       - 100
@@ -291,11 +304,13 @@ cluster inputs
       - | For demultiplexed data, user can remap singlet names using assignment in String in this input. This string assignment takes the format "new_name_i:old_name_1,old_name_2;new_name_ii:old_name_3;...".
         | For example, if we hashed 5 libraries from 3 samples: sample1_lib1, sample1_lib2; sample2_lib1, sample2_lib2; sample3, we can remap them to 3 samples using this string: ``"sample1:sample1_lib1,sample1_lib2;sample2:sample2_lib1,sample2_lib2"``.
         | In this way, the new singlet names will be in metadata field with key ``assignment``, while the old names are kept in metadata with key ``assignment.orig``.
+        | **Notice:** This input is enabled only when *select_only_singlets* input is ``true``.
       - "Group1:CB1,CB2;Group2:CB3,CB4,CB5"
       -
     * - subset_singlets
       - | For demultiplexed data, user can use this input to choose a subset of singlets based on their names. This string takes the format "name1,name2,...".
-        | Note that if ``remap_singlets`` is specified, subsetting happens after remapping, i.e. you should use the new singlet names for choosing subset.
+        | Note that if *remap_singlets* is specified, subsetting happens after remapping, i.e. you should use the new singlet names for choosing subset.
+        | **Notice:** This input is enabled only when *select_only_singlets* input is ``true``.
       - "Group2,CB6,CB7"
       -
     * - output_filtration_results
