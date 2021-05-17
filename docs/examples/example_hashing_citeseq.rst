@@ -24,7 +24,7 @@ where option ``-m`` means copy in parallel, ``-r`` means copy the directory recu
 1. Extract Gene-Count Matrices
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-First step is to extract gene-count matrices from sequencing output. 
+First step is to extract gene-count matrices from sequencing output.
 
 
 You need two original files from your dataset to start:
@@ -61,13 +61,13 @@ Next, create a sample sheet, ``cellranger_sample_sheet.csv``, for Cell Ranger pr
 
 For the details on how to prepare this sample sheet, please refer to Step 3 of `Cell Ranger sample sheet instruction`_.
 
-	.. _Cell Ranger sample sheet instruction: ../cellranger.html#prepare-a-sample-sheet
+	.. _Cell Ranger sample sheet instruction: ../cellranger/index.html#prepare-a-sample-sheet
 
 When you are done with the sample sheet, upload it to Google bucket::
 
 	gsutil cp cellranger_sample_sheet.csv gs://fc-e0000000/my-dir/
 
-Now we are ready to set up **cellranger_workflow** workflow for this phase. If your workspace doesn't have this workflow, import it to your workspace by following `cellranger_workflow import instructions <../cellranger.html#import-cellranger-workflow>`_. 
+Now we are ready to set up **cellranger_workflow** workflow for this phase. If your workspace doesn't have this workflow, import it to your workspace by following `cellranger_workflow import instructions <../cellranger/index.html#import-cellranger-workflow>`_.
 
 Then prepare a JSON file, ``cellranger_inputs.json``, which is used to set up the workflow inputs::
 
@@ -78,11 +78,11 @@ Then prepare a JSON file, ``cellranger_inputs.json``, which is used to set up th
 
 where ``gs://fc-e0000000/my-dir`` is the remote directory in which the output of cellranger_workflow will be generated. For the details on the options above, please refer to `Cell Ranger workflow inputs`_.
 
-	.. _Cell Ranger workflow inputs: ../cellranger.html#workflow-input
+	.. _Cell Ranger workflow inputs: ../cellranger/index.html#workflow-input
 
 When you are done with the JSON file, on cellranger_workflow workflow page, upload ``cellranger_inputs.json`` by clicking ``upload json`` link as below:
 
-	.. image:: ../images/upload_json.png 
+	.. image:: ../images/upload_json.png
 	   :scale: 70%
 
 Then Click ``SAVE`` button to save the inputs, and click ``RUN ANALYSIS`` button as below to start the job:
@@ -90,7 +90,7 @@ Then Click ``SAVE`` button to save the inputs, and click ``RUN ANALYSIS`` button
 	.. image:: ../images/run_analysis.png
 	   :scale: 70%
 
-When the execution is done, all the output results will be in folder ``gs://fc-e0000000/my-dir``. 
+When the execution is done, all the output results will be in folder ``gs://fc-e0000000/my-dir``.
 
 For the next phases, you'll need 3 files from the output:
 
@@ -115,7 +115,7 @@ For the next phases, you'll need 3 files from the output:
 	   	gsutil cp demux_sample_sheet.csv gs://fc-e0000000/my-dir/
 
 	#. If your workspace doesn't have **demultiplexing** workflow, import it to your workspace by following Step 2 of `demultiplexing workflow preparation instructions <../demultiplexing.html#prepare-input-data-and-import-workflow>`_.
-	
+
 	#. Prepare an input JSON file, ``demux_inputs.json`` with the following content to set up cumulus_hashing_cite_seq workflow inputs::
 
 		{
@@ -143,8 +143,8 @@ In this step, we need to merge RNA and ADT matrices for CITE-Seq data, and perfo
 		exp,gs://fc-e0000000/my-dir/exp/exp_demux.zarr.zip,rna
 		exp,gs://fc-e0000000/my-dir/sample_cite_seq/sample_cite_seq.csv,citeseq
 
-	   This sample sheet describes the metadata for each modality (as one row in the sheet): 
-	   
+	   This sample sheet describes the metadata for each modality (as one row in the sheet):
+
 	   	* **Sample** specifies the name of the modality, and all modalities must have *the same name*, as otherwise their count matrices won't be aggregated together;
 		* **Location** specifies the file location. For RNA data, it's the output of Phase 2; for CITE-Seq antibody data, it's the output of Phase 1.
 		* **Modality** specifies the modality type, which is either ``rna`` for RNA matrix, or ``citeseq`` for CITE-Seq antibody matrix.
@@ -183,7 +183,7 @@ In this step, we need to merge RNA and ADT matrices for CITE-Seq data, and perfo
 	#. On the page of cumulus workflow, upload ``cumulus_inputs.json`` by clicking ``upload json`` link. Save the inputs, and click ``RUN ANALYSIS`` button to start the job.
 
 When the execution is done, you'll get the following results stored on cloud ``gs://fc-e0000000/my-dir/results/exp_merged_out/`` to check:
-	
+
 	* ``exp_merged_out.aggr.zarr.zip``: The *ZARR* format file containing both the aggregated count matrix in ``<genome>-rna`` modality, as well as CITE-Seq antibody count matrix in ``<genome>-citeseq`` modality, where ``<genome>`` is the genome reference name of your count matrices, e.g. GRCh38.
 	* ``exp_merged_out.zarr.zip``: The *ZARR* format file containing the analysis results in ``<genome>-rna`` modality, and CITE-Seq antibody count matrix in ``<genome>-citeseq`` modality.
 	* ``exp_merged_out.<genome>-rna.h5ad``: The processed RNA matrix data in *H5AD* format.
@@ -241,7 +241,7 @@ First, install *altocumulus* by following `altocumulus installation instruction 
 		... ...
 	}
 
-   where all the rest parameters remain the same as in Phase 3. 
+   where all the rest parameters remain the same as in Phase 3.
 
    Run the following command in the same directory of your ``cumulus_inputs.json`` file::
 

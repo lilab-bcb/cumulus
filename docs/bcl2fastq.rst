@@ -52,9 +52,8 @@ In this example we create a docker image for running ``cellranger mkfastq`` vers
     docker tag cellranger-3.0.2 gcr.io/PROJECT_ID/cellranger:3.0.2
     gcr.io/PROJECT_ID/cellranger:3.0.2
 
-#. Import **cellranger_workflow** workflow to your workspace (see `cellranger_workflow steps <./cellranger.html>`_), and enter your docker registry URL (in this example, ``"gcr.io/PROJECT_ID/"``) in ``cellranger_mkfastq_docker_registry`` field of `cellranger_workflow inputs <./cellranger.html#cellranger-workflow-inputs>`_.
+#. Import **cellranger_workflow** workflow to your workspace (see `cellranger_workflow steps <./cellranger/index.html>`_), and enter your docker registry URL (in this example, ``"gcr.io/PROJECT_ID/"``) in ``cellranger_mkfastq_docker_registry`` field of `cellranger_workflow inputs <./cellranger/index.html#cellranger-workflow-inputs>`_.
 
 .. _`Google Container Registry`: https://cloud.google.com/container-registry/docs/
 .. _`bcl2fastq license`: https://support.illumina.com/content/dam/illumina-support/documents/downloads/software/bcl2fastq/bcl2fastq2-v2-20-eula.pdf
 .. _`Docker installed`: https://www.docker.com/products/docker-desktop
-

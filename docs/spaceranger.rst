@@ -107,7 +107,7 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		* - Area
 		  - Visium capture area identifier. Options for Visium are A1, B1, C1, D1. If both Slide and Area are empty, the --unknown-slide option would be set.
 		* - SlideFile
-		  - Slide layout file indicating capture spot and fiducial spot positions. Only required if internet access is not available. 
+		  - Slide layout file indicating capture spot and fiducial spot positions. Only required if internet access is not available.
 		* - ReorientImages
 		  - Use with automatic image alignment to specify that images may not be in canonical orientation with the hourglass in the top left corner of the image. The automatic fiducial alignment will attempt to align any rotation or mirroring of the image.
 		* - LoupeAlignment
@@ -358,7 +358,7 @@ See the table below for important sc/snRNA-seq outputs.
 Build Space Ranger References
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Reference built by Cell Ranger for sc/snRNA-seq should be compatible with Space Ranger. For more details on building references uing Cell Ranger, please refer to `here <./cellranger.html#build-references-for-sc-snrna-seq>`_.
+Reference built by Cell Ranger for sc/snRNA-seq should be compatible with Space Ranger. For more details on building references uing Cell Ranger, please refer to `here <./cellranger/index.html#build-references-for-sc-snrna-seq>`_.
 
 
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil

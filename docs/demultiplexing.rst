@@ -441,10 +441,10 @@ To load the results into R, you need to install R package ``reticulate`` in addi
 Results are in ``data$obs['demux_type']``, ``data$obs['assignment']``, and similarly as above, for cell-hashing/nucleus-hashing data, you'll find an additional field ``data$obs['assignment.dedup']`` for deduplicated sample assignment in the case that one sample name can correspond to multiple feature barcodes.
 
 
-.. _cellranger_workflow tutorial: ./cellranger.html
+.. _cellranger_workflow tutorial: ./cellranger/index.html
 .. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
-.. _genome reference: ./cellranger.html#sample-sheet
+.. _genome reference: ./cellranger/index.html#sample-sheet
 .. _souporcell: https://github.com/wheaton5/souporcell
 .. _popscle: https://github.com/statgen/popscle
 .. _pegasusio: https://pypi.org/project/pegasusio/

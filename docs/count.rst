@@ -11,7 +11,7 @@ Prepare input data and import workflow
 
 	You can skip this step if your data are already in FASTQ format.
 
-	Otherwise, you need to first run *cellranger_workflow* to generate FASTQ files from BCL raw data for each sample. Please follow `cellranger_workflow manual <cellranger.html>`_.
+	Otherwise, you need to first run *cellranger_workflow* to generate FASTQ files from BCL raw data for each sample. Please follow `cellranger_workflow manual <./cellranger/index.html>`_.
 
 	Notice that you should set **run_mkfastq** to ``true`` to get FASTQ output. You can also set **run_count** to ``false`` if you want to skip Cell Ranger count, and only use the result from *count* workflow.
 
