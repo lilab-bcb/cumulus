@@ -38,7 +38,7 @@ workflow demultiplexing {
         # Generate violin plots using gender-specific genes (e.g. Xist). <demuxEM_generate_gender_plot> is a comma-separated list of gene names
         String? demuxEM_generate_gender_plot
         # DemuxEM version
-        String demuxEM_version = "0.1.5"
+        String demuxEM_version = "0.1.6"
         # Number of CPUs used
         Int demuxEM_num_cpu = 8
         # Disk space in GB
