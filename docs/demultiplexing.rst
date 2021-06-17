@@ -52,9 +52,9 @@ Import *demultiplexing* workflow to your workspace.
 
 		    - Run ``genetic-pooling`` assay with ``souporcell`` algorithm (i.e. *TYPE* is ``genetic-pooling``, *demultiplexing_algorithm* input is ``souporcell``):
 
-		      - Run with reference genotypes: *souporcell_de_novo_mode* is ``false``.
+		      - Run with reference genotypes, i.e. *souporcell_de_novo_mode* is ``false``.
 
-		      - Run in *de novo* mode, but needs to rename the resulting cluster names by information from reference genotypes: i.e. *souporcell_de_novo_mode* is ``true``, and *souporcell_rename_donors* is not empty.
+		      - Run in *de novo* mode (i.e. *souporcell_de_novo_mode* is ``true``), but need to match the resulting cluster names by information from reference genotypes (see description of *souporcell_rename_donors* input below).
 
 		    - Run ``genetic-pooling`` assay with ``popscle`` algorithm (i.e. *TYPE* is ``genetic-pooling``, *demultiplexing_algorithm* input is ``popscle``):
 
@@ -232,9 +232,15 @@ souporcell inputs
 	  - 8
 	  - 1
 	* - souporcell_de_novo_mode
-	  - | souporcell parameter.
-	    | If ``true``, run souporcell in de novo mode without reference genotypes; and if a reference genotype vcf file is provided in the sample sheet, use it **only** for matching the cluster labels computed by souporcell.
-	    | If ``false``, run souporcell with ``--known_genotypes`` option using the reference genotype vcf file specified in sample sheet, and *souporcell_rename_donors* is required in this case.
+	  - souporcell parameter.
+
+	    - If ``true``, run souporcell in de novo mode without reference genotypes:
+
+		  - If input *souporcell_common_variants* is further provided, use this common variants list instead of calling SNPs de novo.
+
+		  - If a reference genotype vcf file is provided in the sample sheet, use it **only** for matching the cluster labels computed by souporcell.
+
+	    - If ``false``, run souporcell with ``--known_genotypes`` option using the reference genotype vcf file specified in sample sheet.
 	  - true
 	  - true
 	* - souporcell_num_clusters
@@ -243,7 +249,8 @@ souporcell inputs
 	  - 8
 	  - 1
 	* - souporcell_common_variants
-	  - souporcell parameter. Users can provide a common variants list in VCF format for Souporcell to use, instead of calling SNPs de novo
+	  - | souporcell parameter. Users can provide a common variants list in VCF format for Souporcell to use, instead of calling SNPs de novo.
+	    | **Notice:** This input is enabled only when *souporcell_de_novo_mode* is ``false``.
 	  - "1000genome.common.variants.vcf.gz"
 	  -
 	* - souporcell_skip_remap
@@ -251,8 +258,13 @@ souporcell inputs
 	  - true
 	  - false
 	* - souporcell_rename_donors
-	  - | souporcell parameter. A comma-separated list of donor names for renaming clusters achieved by souporcell. Must be consistent with *souporcell_num_clusters* input.
-	    | By default, the resulting donors are *Donor1*, *Donor2*, ...
+	  - souporcell parameter. A comma-separated list of donor names for matching clusters achieved by souporcell. Must be consistent with *souporcell_num_clusters* input.
+
+	    - If this input is empty, use cluster labels from the reference genotype vcf file if provided in the sample sheet; if this vcf file is not provided, simply name clusters as *Donor1*, *Donor2*, ...
+
+	    - If this input is not empty, and a reference genotype vcf file is provided in the sample sheet, first match the cluster labels using those from this vcf file, then rename to donor names specified in this input.
+
+	    - If this input is not empty, and **NO** reference genotype vcf file is provided in the sample sheet, simply match the cluster labels in one-to-one correspondence with donor names specified in this input.
 	  - "CB1,CB2,CB3,CB4"
 	  -
 	* - souporcell_num_cpu
