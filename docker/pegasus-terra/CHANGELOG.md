@@ -1,5 +1,12 @@
 # Changelog of Pegasus-Terra Docker Image
 
+## 1.4 - 2021/06/25
+
+* Image based on [terra-jupyter-base](https://github.com/DataBiosphere/terra-docker/tree/master/terra-jupyter-base) image version 0.0.20 at ``us.gcr.io/broad-dsp-gcr-public/terra-jupyter-base:0.0.20``.
+* Use Pegasus v1.4. See [here](https://pegasus.readthedocs.io/en/stable/release_notes.html#version-1-4) for changes.
+* Add [nmf-torch](https://github.com/lilab-bcb/nmf-torch) package for Non-negative Matrix Factorization (NMF) and data integration method integrative NMF (iNMF) using Pytorch.
+* Update dependency packages.
+
 ## 1.3 - 2021/02/02 (Latest update on 2021/04/29)
 
 * **Update on 2021/04/29**: Update `cirrocumulus` to v1.1.16.post1.
