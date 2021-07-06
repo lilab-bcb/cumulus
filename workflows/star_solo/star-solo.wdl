@@ -5,6 +5,9 @@ workflow starsolo {
         File input_tsv_file
         String genome
         String chemistry
+        Int cell_BC_length
+        Int UMI_start_position
+        Int UMI_length
         String output_directory
         Int num_cpu = 32
         String star_version = "2.7.6a"
@@ -208,6 +211,12 @@ task run_star_solo {
             call_args.extend(['--soloCBwhitelist', '~{whitelist}', '--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '10'])
         elif '~{chemistry}' in ['SeqWell', 'DropSeq']:
             call_args.extend(['--soloCBwhitelist', 'None', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8'])
+        elif '~{chemistry}' in ['custom_no_wl']:
+            # cases without whitelist
+            call_args.extend(['--soloCBwhitelist', 'None', '--soloCBstart', '1', '--soloCBlen', '~{cell_BC_length}', '--soloUMIstart', '~{UMI_start_position}', '--soloUMIlen', '~{UMI_length}'])
+        elif '~{chemistry}' in ['custom_wl']:
+            # cases with whitelist
+            call_args.extend(['--soloCBwhitelist', '~{whitelist}', '--soloCBstart', '1', '--soloCBlen', '~{cell_BC_length}', '--soloUMIstart', '~{UMI_start_position}', '--soloUMIlen', '~{UMI_length}'])
 
         if file_ext == '.fastq.gz':
             call_args.extend(['--readFilesCommand', 'zcat'])
