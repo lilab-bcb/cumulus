@@ -2,33 +2,52 @@ version 1.0
 
 workflow starsolo {
     input {
+        # Input TSV sample sheet describing metadata of each sample
         File input_tsv_file
+        # Genome reference
         String genome
+        # Chemistry, choosing from tenX_v3 (for 10X V3 chemistry), tenX_v2 (for 10X V2 chemistry), DropSeq, SeqWell and custom
         String chemistry
-        Int cell_BC_length
-        Int UMI_start_position
-        Int UMI_length
+        # Cell barcode start position (1-based coordinate)
+        Int? CBstart
+        # Cell barcode length
+        Int? CBlen
+        # UMI start position (1-based coordinate)
+        Int? UMIstart
+        # UMI length
+        Int? UMIlen
+        # Cell barcode white list
+        File? CBwhitelist
+        # URL of output directory
         String output_directory
+        # Number of CPUs to request per sample
         Int num_cpu = 32
+        # STAR version to use. Currently only support 2.7.6a
         String star_version = "2.7.6a"
+        # Docker registry, default to quay.io/cumulus 
         String docker_registry = "quay.io/cumulus"
+        # Version of docker image to run configuration on the sample sheet
         String config_version = "0.2"
+        # Disk space in GB needed per sample
         Int disk_space = 500
+        # Number of maximum preemptible tries allowed
         Int preemptible = 2
+        # Google cloud zones to consider for execution
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        # Memory size in GB needed for count per sample
         Int memory = 120
+        # backend choose from "gcp", "aws", "local"
+        String backend = "gcp"
     }
 
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
-    File ref_index_file = "gs://regev-lab/resources/count_tools/ref_index.tsv"
-    # File ref_index_file = "ref_index.tsv"
+    File ref_index_file = if backend == "gcp" then "gs://regev-lab/resources/count_tools/ref_index.tsv" else (if backend == "aws" then "AWS URL" else "ref_index.tsv")
     Map[String, String] ref_index2gsurl = read_map(ref_index_file)
-    String genome_url = if sub(genome, "^gs://.*", "gs://")=="gs://" then genome else ref_index2gsurl[genome] + '/starsolo.tar.gz'
+    String genome_url = if sub(genome, "^gs://.*", "gs://")=="gs://" then genome else ref_index2gsurl[genome] + '/starsolo.tar.gz' # Need to modify for AWS etc.
 
-    File wl_index_file = "gs://regev-lab/resources/count_tools/whitelist_index.tsv"
-    # File wl_index_file = "whitelist_index.tsv"
+    File wl_index_file = if backend == "gcp" then "gs://regev-lab/resources/count_tools/whitelist_index.tsv" else (if backend == "aws" then "AWS URL" else "whitelist_index.tsv")
     Map[String, String] wl_index2gsurl = read_map(wl_index_file)
     String whitelist_url = wl_index2gsurl[chemistry]
 
@@ -36,13 +55,15 @@ workflow starsolo {
         File whitelist = whitelist_url
     }
 
+
     call generate_count_config {
         input:
             input_tsv_file = input_tsv_file,
             docker_registry = docker_registry,
             zones = zones,
             version = config_version,
-            preemptible = preemptible
+            preemptible = preemptible,
+            backend = backend
     }
 
     if (generate_count_config.sample_ids[0] != '') {
@@ -56,13 +77,19 @@ workflow starsolo {
                     num_cpu = num_cpu,
                     star_version = star_version,
                     genome = genome_url,
+                    CBstart = CBstart,
+                    CBlen = CBlen,
+                    UMIstart = UMIstart,
+                    UMIlen = UMIlen,
+                    CBwhitelist = CBwhitelist,
                     whitelist = whitelist,
                     output_directory = output_directory_stripped,
                     docker_registry = docker_registry,
                     disk_space = disk_space,
                     zones = zones,
                     memory = memory,
-                    preemptible = preemptible
+                    preemptible = preemptible,
+                    backend = backend
             }
         }
     }
@@ -81,6 +108,7 @@ task generate_count_config {
         String zones
         String version
         Int preemptible
+        String backend
     }
 
     command {
@@ -162,6 +190,11 @@ task run_star_solo {
         String chemistry
         Int num_cpu
         File genome
+        Int? CBstart
+        Int? CBlen
+        Int? UMIstart
+        Int? UMIlen
+        File? CBwhitelist
         File? whitelist
         String output_directory
         String docker_registry
@@ -170,6 +203,7 @@ task run_star_solo {
         String zones
         Int memory
         Int preemptible
+        String backend
     }
 
 
@@ -205,18 +239,21 @@ task run_star_solo {
 
         call_args = ['STAR', '--soloType', 'CB_UMI_Simple', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}', '--outSAMtype', 'BAM', 'Unsorted', '--outSAMheaderHD', '\\@HD', 'VN:1.4', 'SO:unsorted']
 
-        if '~{chemistry}' is 'tenX_v3':
-            call_args.extend(['--soloCBwhitelist', '~{whitelist}', '--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '12'])
-        elif '~{chemistry}' is 'tenX_v2':
-            call_args.extend(['--soloCBwhitelist', '~{whitelist}', '--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '10'])
+        white_list = 'None'
+        if '~{whitelist}' != '':
+            white_list = '~{whitelist}'
+        else:
+            if '~{chemistry}' == 'custom' and '~{CBwhitelist}' != '':
+                white_list = '~{CBwhitelist}'
+
+        if '~{chemistry}' == 'tenX_v3':
+            call_args.extend(['--soloCBwhitelist', white_list, '--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '12'])
+        elif '~{chemistry}' == 'tenX_v2':
+            call_args.extend(['--soloCBwhitelist', white_list, '--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '10'])
         elif '~{chemistry}' in ['SeqWell', 'DropSeq']:
             call_args.extend(['--soloCBwhitelist', 'None', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8'])
-        elif '~{chemistry}' in ['custom_no_wl']:
-            # cases without whitelist
-            call_args.extend(['--soloCBwhitelist', 'None', '--soloCBstart', '1', '--soloCBlen', '~{cell_BC_length}', '--soloUMIstart', '~{UMI_start_position}', '--soloUMIlen', '~{UMI_length}'])
-        elif '~{chemistry}' in ['custom_wl']:
-            # cases with whitelist
-            call_args.extend(['--soloCBwhitelist', '~{whitelist}', '--soloCBstart', '1', '--soloCBlen', '~{cell_BC_length}', '--soloUMIstart', '~{UMI_start_position}', '--soloUMIlen', '~{UMI_length}'])
+        elif '~{chemistry}' == 'custom':
+            call_args.extend(['--soloCBwhitelist', white_list, '--soloCBstart', '~{CBstart}', '--soloCBlen', '~{CBlen}', '--soloUMIstart', '~{UMIstart}', '--soloUMIlen', '~{UMIlen}'])
 
         if file_ext == '.fastq.gz':
             call_args.extend(['--readFilesCommand', 'zcat'])

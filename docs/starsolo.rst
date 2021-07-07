@@ -112,12 +112,33 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	    | or "gs://user-bucket/starsolo.tar.gz"
 	  -
 	* - **chemistry**
-	  - Chemistry name. Available options: "tenX_v3" (for 10X V3 chemistry), "tenX_v2" (for 10X V2 chemistry), "DropSeq", and "SeqWell".
+	  - | Chemistry name. Available options: "tenX_v3" (for 10X V3 chemistry), "tenX_v2" (for 10X V2 chemistry), "DropSeq", "SeqWell" and "custom".
+	    | For "DropSeq" and "SeqWell", CBstart=1, CBlen=12, UMIstart=13, UMIlen=8.
 	  - "tenX_v3"
 	  -
 	* - **output_directory**
 	  - GS URL of output directory.
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/count_result"
+	  -
+	* - CBstart
+	  - Cell barcode start position (1-based coordinate). Only matters if *chemistry* is "custom".
+	  - 1
+	  - 
+	* - CBlen
+	  - Cell barcode length. Only matters if *chemistry* is "custom".
+	  - 16
+	  -
+	* - UMIstart
+	  - UMI start position (1-based coordinate). Only matters if *chemistry* is "custom".
+	  - 17
+	  - 
+	* -	UMIlen
+	  - UMI length. Only matters if *chemistry* is "custom".
+	  - 12
+	  -  
+	* - CBwhitelist
+	  - Cell barcode white list. Only matters if *chemistry* is "custom".
+	  - gs://my_bucket/my_white_list.txt
 	  -
 	* - docker_registry
 	  - Docker registry to use:
@@ -178,7 +199,7 @@ See the table below for *star_solo* workflow outputs.
 Prebuilt genome references
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-We've built the following genome references for users' convenience:
+We've built the following scRNA-seq references for users' convenience:
 
 	.. list-table::
 		:widths: 5 20
@@ -187,11 +208,26 @@ We've built the following genome references for users' convenience:
 		* - Keyword
 		  - Description
 		* - **GRCh38-2020-A**
-		  - Human GRCh38 (GENCODE v32/Ensembl 98)
+		  - Human GRCh38, comparable to cellranger reference 2020-A (GENCODE v32/Ensembl 98)
+		* - **mm10-2020-A**
+		  - Mouse mm10, comparable to cellranger reference 2020-A (GENCODE vM23/Ensembl 98)
 		* - **GRCh38**
-		  - Human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation
+		  - Human GRCh38, comparable to cellranger reference 3.0.0, Ensembl v93 gene annotation
 		* - **mm10**
-		  - Mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation
+		  - Mouse mm10, comparable to cellranger reference 3.0.0, Ensembl v93 gene annotation
+
+We've built the following snRNA-seq references for users' convenience:
+
+	.. list-table::
+		:widths: 5 20
+		:header-rows: 1
+
+		* - Keyword
+		  - Description
+		* - **GRCh38-2020-A-premrna**
+		  - Human, introns included, built from GRCh38 cellranger reference 2020-A, GENCODE v32/Ensembl 98 gene annotation, treating annotated transcripts as exons
+		* - **mm10-2020-A-premrna**
+		  - Mouse, introns included, built from mm10 cellranger reference 2020-A, GENCODE vM23/Ensembl 98 gene annotation, treating annotated transcripts as exons
 
 
 .. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
