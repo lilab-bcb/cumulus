@@ -123,7 +123,7 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	* - CBstart
 	  - Cell barcode start position (1-based coordinate). Only matters if *chemistry* is "custom".
 	  - 1
-	  - 
+	  -
 	* - CBlen
 	  - Cell barcode length. Only matters if *chemistry* is "custom".
 	  - 16
@@ -131,11 +131,11 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	* - UMIstart
 	  - UMI start position (1-based coordinate). Only matters if *chemistry* is "custom".
 	  - 17
-	  - 
+	  -
 	* -	UMIlen
 	  - UMI length. Only matters if *chemistry* is "custom".
 	  - 12
-	  -  
+	  -
 	* - CBwhitelist
 	  - Cell barcode white list. Only matters if *chemistry* is "custom".
 	  - gs://my_bucket/my_white_list.txt
@@ -172,10 +172,6 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	  - STAR version to use. Currently only support ``2.7.6a``.
 	  - "2.7.6a"
 	  - "2.7.6a"
-	* - config_version
-	  - Version of docker image to run configuration on the sample sheet. Version availabel: 0.2, 0.1.
-	  - "0.2"
-	  - "0.2"
 
 
 Workflow outputs
