@@ -24,10 +24,8 @@ workflow starsolo {
         Int num_cpu = 32
         # STAR version to use. Currently only support 2.7.6a
         String star_version = "2.7.6a"
-        # Docker registry, default to quay.io/cumulus 
+        # Docker registry, default to quay.io/cumulus
         String docker_registry = "quay.io/cumulus"
-        # Version of docker image to run configuration on the sample sheet
-        String config_version = "0.2"
         # Disk space in GB needed per sample
         Int disk_space = 500
         # Number of maximum preemptible tries allowed
@@ -61,7 +59,7 @@ workflow starsolo {
             input_tsv_file = input_tsv_file,
             docker_registry = docker_registry,
             zones = zones,
-            version = config_version,
+            star_version = star_version,
             preemptible = preemptible,
             backend = backend
     }
@@ -106,7 +104,7 @@ task generate_count_config {
         File input_tsv_file
         String docker_registry
         String zones
-        String version
+        String star_version
         Int preemptible
         String backend
     }
@@ -176,7 +174,7 @@ task generate_count_config {
     }
 
     runtime {
-        docker: "~{docker_registry}/config:~{version}"
+        docker: "~{docker_registry}/starsolo:~{star_version}"
         zones: zones
         preemptible: "~{preemptible}"
     }
