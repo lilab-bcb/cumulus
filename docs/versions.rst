@@ -21,7 +21,7 @@ Latest version
       - `3 <https://portal.firecloud.org/?return=terra#methods/cumulus/spaceranger_workflow/3>`_
       - Run Space Ranger tools to process spatial transcriptomics data, which includes extracting sequence reads using spaceranger mkfastq, and generating count matrix using spaceranger count.
     * - cumulus/star_solo
-      - `6 <https://portal.firecloud.org/?return=terra#methods/cumulus/star_solo/6>`_
+      - `7 <https://portal.firecloud.org/?return=terra#methods/cumulus/star_solo/7>`_
       - Run STARsolo to generate gene-count matrices fro FASTQ files.
     * - cumulus/count
       - `18 <https://portal.firecloud.org/?return=terra#methods/cumulus/count/18>`__
