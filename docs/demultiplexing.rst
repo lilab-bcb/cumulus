@@ -380,9 +380,9 @@ In the output subfolder of each cell-hashing/nuclei-hashing RNA-hashtag data pai
 	* - Name
 	  - Description
 	* - output_name_demux.zarr.zip
-	  - Demultiplexed RNA count matrix in zarr format. Please refer to section `load demultiplexing results into Python and R`_ for its structure.
+	  - Demultiplexed RNA raw count matrix in zarr format. Please refer to section `load demultiplexing results into Python and R`_ for its structure.
 	* - output_name.out.demuxEM.zarr.zip
-	  - | RNA expression matrix with demultiplexed sample identities in zarr format.
+	  - | This file contains intermediate results for both RNA and hashing count matrices.
 	    | To load this file into Python, you need to first install `Pegasusio`_ on your local machine. Then use ``import pegasusio as io; data = io.read_input("output_name.out.demuxEM.zarr.zip")`` in Python environment.
 	    | It contains 2 UnimodalData objects: one with key name suffix ``-hashing`` is the hashtag count matrix, the other one with key name suffix ``-rna`` is the demultiplexed RNA count matrix.
 	    | To load the hashtag count matrix, type ``hash_data = data.get_data('<genome>-hashing')``, where ``<genome>`` is the genome name of the data. The count matrix is ``hash_data.X``; cell barcode attributes are stored in ``hash_data.obs``; sample names are in ``hash_data.var_names``. Moreover, the estimated background probability regarding hashtags is in ``hash_data.uns['background_probs']``.

@@ -1,3 +1,6 @@
-GRCh38	gs://regev-lab/resources/count_tools/GRCh38
 GRCh38-2020-A	gs://regev-lab/resources/count_tools/GRCh38-2020-A
+mm10-2020-A	gs://regev-lab/resources/count_tools/mm10-2020-A
+GRCh38	gs://regev-lab/resources/count_tools/GRCh38
 mm10	gs://regev-lab/resources/count_tools/mm10
+GRCh38-2020-A-premrna	gs://regev-lab/resources/count_tools/GRCh38-2020-A-premrna
+mm10-2020-A-premrna	gs://regev-lab/resources/count_tools/mm10-2020-A-premrna

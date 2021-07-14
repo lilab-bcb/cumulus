@@ -293,7 +293,7 @@ cluster inputs
       - "attr1,attr2,attr3""
       -
     * - min_genes_before_filtration
-      - If raw data matrix is input, empty barcodes will dominate pre-filtration statistics. To avoid this, for raw data matrix, only consider barcodes with at lease <min_genes_before_filtration> genes for pre-filtration condition.
+      - If raw data matrix is input, empty barcodes will dominate pre-filtration statistics. To avoid this, for raw data matrix, only consider barcodes with at least <min_genes_before_filtration> genes for pre-filtration condition.
       - 100
       - 100
     * - select_only_singlets
