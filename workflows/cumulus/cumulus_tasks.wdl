@@ -376,7 +376,6 @@ task run_cumulus_cluster {
 		Array[File] output_filt_plot = glob("~{output_name}.*.filt.*.pdf")
 		Array[File] output_hvf_plot = glob("~{output_name}.*.hvf.pdf")
 		Array[File] output_dbl_plot = glob("~{output_name}.*.dbl.png")
-		Array[File] output_wordcloud_plot = glob("~{output_name}.*.word_cloud_*.pdf")
 		Array[File] output_loom_file = glob("~{output_name}.*.loom")
 		File output_log = "~{output_name}.log"
 		File monitoringLog = "monitoring.log"
@@ -616,8 +615,12 @@ task run_cumulus_plot {
 			check_call(call_args)
 		if '~{plot_nmf}' is not '':
 			for i in range(int('~{nmf_n}')):
-				cur_attr = 'X_' + '~{plot_nmf}' + '@' + str(i)
-				call_args = ['pegasus', 'plot', 'scatter', '--basis', 'umap', '--attributes', cur_attr, '~{input_h5ad}', '~{output_name}.~{plot_nmf}_'+str(i)+'.umap.pdf']
+				cur_factor = 'X_' + '~{plot_nmf}' + '@' + str(i)
+				call_args = ['pegasus', 'plot', 'scatter', '--basis', 'umap', '--attributes', cur_factor, '~{input_h5ad}', '~{output_name}.~{plot_nmf}_'+str(i)+'.umap.pdf']
+				print(' '.join(call_args))
+				check_call(call_args)
+
+				call_args = ['pegasus', 'plot', 'wordcloud', '--factor', str(i), '~{input_h5ad}', '~{output_name}.word_cloud_'+str(i)+'.pdf']
 				print(' '.join(call_args))
 				check_call(call_args)
 

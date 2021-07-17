@@ -482,7 +482,6 @@ workflow cumulus {
 		Array[File] output_filt_plot = cluster.output_filt_plot
 		Array[File] output_hvf_plot = cluster.output_hvf_plot
 		Array[File] output_dbl_plot = cluster.output_dbl_plot
-		Array[File] output_wordcloud_plot = cluster.output_wordcloud_plot
 		Array[File] output_loom_file = cluster.output_loom_file
 		Array[File?]? output_de_h5ad = de_analysis.output_de_h5ad
 		Array[File?]? output_de_xlsx =  de_analysis.output_de_xlsx
