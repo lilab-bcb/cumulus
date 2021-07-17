@@ -118,9 +118,12 @@ task run_cumulus_cluster {
 		Boolean? correct_batch_effect
 		String? correction_method
 		String? batch_group_by
+		Int? inmf_lambda
 		Int? random_state
 		String? gene_signature_set
 		Int? nPC
+		Boolean? run_nmf
+		Int? nmf_n
 		Int? knn_K
 		Boolean? knn_full_speed
 		Boolean? run_diffmap
@@ -214,6 +217,8 @@ task run_cumulus_cluster {
 				call_args.extend(['--correction-method', '~{correction_method}'])
 			if '~{batch_group_by}' is not '':
 				call_args.extend(['--batch-group-by', '~{batch_group_by}'])
+			if '~{correction_method}' == 'inmf' and '~{inmf_lambda}' is not '':
+				call_args.extend(['--inmf-lambda', '~{inmf_lambda}'])
 		if '~{min_genes}' is not '':
 			call_args.extend(['--min-genes', '~{min_genes}'])
 		if '~{max_genes}' is not '':
@@ -247,6 +252,10 @@ task run_cumulus_cluster {
 			call_args.append('--plot-hvf')
 		if '~{nPC}' is not '':
 			call_args.extend(['--pca-n', '~{nPC}'])
+		if '~{run_nmf}' is not '':
+			call_args.append('--nmf')
+		if '~{nmf_n}' is not '':
+			call_args.extend(['--nmf-n', '~{nmf_n}'])
 		if '~{knn_K}' is not '':
 			call_args.extend(['--knn-K', '~{knn_K}'])
 		if '~{knn_full_speed}' is 'true':
@@ -367,6 +376,7 @@ task run_cumulus_cluster {
 		Array[File] output_filt_plot = glob("~{output_name}.*.filt.*.pdf")
 		Array[File] output_hvf_plot = glob("~{output_name}.*.hvf.pdf")
 		Array[File] output_dbl_plot = glob("~{output_name}.*.dbl.png")
+		Array[File] output_wordcloud_plot = glob("~{output_name}.*.word_cloud_*.pdf")
 		Array[File] output_loom_file = glob("~{output_name}.*.loom")
 		File output_log = "~{output_name}.log"
 		File monitoringLog = "monitoring.log"
@@ -562,6 +572,8 @@ task run_cumulus_plot {
 		String? plot_net_umap
 		String? plot_net_fle
 		String? plot_citeseq_umap
+		String? plot_nmf
+		Int nmf_n
 		String docker_registry
 	}
 
@@ -602,6 +614,12 @@ task run_cumulus_plot {
 			call_args = ['pegasus', 'plot', 'scatter', '--basis', 'citeseq_umap', '--attributes', '~{plot_citeseq_umap}', '~{input_h5ad}', '~{output_name}.citeseq.umap.pdf']
 			print(' '.join(call_args))
 			check_call(call_args)
+		if '~{plot_nmf}' is not '':
+			for i in range(int('~{nmf_n}')):
+				cur_attr = 'X_' + '~{plot_nmf}' + '@' + str(i)
+				call_args = ['pegasus', 'plot', 'scatter', '--basis', 'umap', '--attributes', cur_attr, '~{input_h5ad}', '~{output_name}.~{plot_nmf}_'+str(i)+'.umap.pdf']
+				print(' '.join(call_args))
+				check_call(call_args)
 
 		import glob
 		output_directory = '~{output_directory}'

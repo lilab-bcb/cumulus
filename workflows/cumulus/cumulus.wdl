@@ -1,6 +1,7 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/30/plain-WDL/descriptor" as tasks
+#import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/30/plain-WDL/descriptor" as tasks
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/cumulus/cumulus_tasks.wdl" as tasks
 
 
 workflow cumulus {
@@ -12,8 +13,8 @@ workflow cumulus {
 		# Results name prefix and subdirectory name.
 		String output_name
 
-		# Pegasus version, default to "1.4.0"
-		String pegasus_version = "1.4.0"
+		# Pegasus version, default to "1.4.1"
+		String pegasus_version = "1.4.1"
 		# Docker registry to use
 		String docker_registry = "quay.io/cumulus"
 		# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
@@ -95,16 +96,24 @@ workflow cumulus {
 		Boolean? no_select_hvf
 		# If correct batch effects [default: false]
 		Boolean? correct_batch_effect
-		# Batch correction method, can be either ‘L/S’ for location/scale adjustment algorithm (Li and Wong. The analysis of Gene Expression Data 2003) or ‘harmony’ for Harmony (Korsunsky et al. Nature Methods 2019). [default: harmony]
+		# Batch correction method, can be either 'L/S' for location/scale adjustment algorithm (Li and Wong. The analysis of Gene Expression Data 2003),
+		# 'harmony' for Harmony (Korsunsky et al. Nature Methods 2019),
+		# or 'inmf' for integrative NMF (Yang and Michailidis Bioinformatics 2016, Welch et al. Cell 2019, Gao et al. Natuer Biotechnology 2021). [default: harmony]
 		String? correction_method
 		# Batch correction assumes the differences in gene expression between channels are due to batch effects. However, in many cases, we know that channels can be partitioned into several groups and each group is biologically different from others. In this case, we will only perform batch correction for channels within each group. This option defines the groups. If <expression> is None, we assume all channels are from one group. Otherwise, groups are defined according to <expression>. <expression> takes the form of either ‘attr’, or ‘attr1+attr2+…+attrn’, or ‘attr=value11,…,value1n_1;value21,…,value2n_2;…;valuem1,…,valuemn_m’. In the first form, ‘attr’ should be an existing sample attribute, and groups are defined by ‘attr’. In the second form, ‘attr1’,…,’attrn’ are n existing sample attributes and groups are defined by the Cartesian product of these n attributes. In the last form, there will be m + 1 groups. A cell belongs to group i (i > 0) if and only if its sample attribute ‘attr’ has a value among valuei1,…,valuein_i. A cell belongs to group 0 if it does not belong to any other groups.
 		String? batch_group_by
+		# Coefficient of regularization for iNMF. [default: 5.0]
+		Int? inmf_lambda
 		# Random number generator seed. [default: 0]
 		Int? random_state
 		# Calculate signature scores for gene sets in <sig_list>. <sig_list> is a comma-separated list of strings. Each string should either be a <GMT_file> or one of 'cell_cycle_human', 'cell_cycle_mouse', 'gender_human', 'gender_mouse', 'mitochondrial_genes_human', 'mitochondrial_genes_mouse', 'ribosomal_genes_human' and 'ribosomal_genes_mouse'
 		String? calc_signature_scores
 		# Number of PCs. [default: 50]
 		Int? nPC
+		# Compute nonnegative matrix factorization (NMF) on highly variable features.
+		Boolean? run_nmf
+		# Number of NMF components. IF iNMF is used for batch correction, this parameter also sets iNMF number of components. [default: 20]
+		Int nmf_n = 20
 		# Number of neighbors used for constructing affinity matrix. [default: 100]
 		Int? knn_K
 		# For the sake of reproducibility, we only run one thread for building kNN indices. Turn on this option will allow multiple threads to be used for index building. However, it will also reduce reproducibility due to the racing between multiple threads. [default: false]
@@ -312,9 +321,12 @@ workflow cumulus {
 			correct_batch_effect = correct_batch_effect,
 			correction_method = correction_method,
 			batch_group_by = batch_group_by,
+			inmf_lambda = inmf_lambda,
 			random_state = random_state,
 			gene_signature_set = calc_signature_scores,
 			nPC = nPC,
+			run_nmf = run_nmf,
+			nmf_n = nmf_n,
 			knn_K = knn_K,
 			knn_full_speed = knn_full_speed,
 			run_diffmap = run_diffmap,
@@ -400,6 +412,8 @@ workflow cumulus {
 
 			Boolean do_plot = defined(plot_composition) || defined(plot_tsne) || defined(plot_umap) || defined(plot_fle) || defined(plot_net_umap) || defined(plot_net_fle)
 
+			String plot_nmf = if (defined(correct_batch_effect) && defined(correction_method) && correction_method == 'inmf') then 'inmf' else (if (defined(run_nmf) && run_nmf) then 'nmf' else '')
+
 			if (do_plot) {
 				call tasks.run_cumulus_plot as plot {
 					input:
@@ -413,6 +427,8 @@ workflow cumulus {
 						plot_net_umap = plot_net_umap,
 						plot_net_fle = plot_net_fle,
 						plot_citeseq_umap = plot_citeseq_umap,
+						plot_nmf = plot_nmf,
+						nmf_n = nmf_n,
 						pegasus_version = pegasus_version,
 						zones = zones,
 						memory = memory,
@@ -466,6 +482,7 @@ workflow cumulus {
 		Array[File] output_filt_plot = cluster.output_filt_plot
 		Array[File] output_hvf_plot = cluster.output_hvf_plot
 		Array[File] output_dbl_plot = cluster.output_dbl_plot
+		Array[File] output_wordcloud_plot = cluster.output_wordcloud_plot
 		Array[File] output_loom_file = cluster.output_loom_file
 		Array[File?]? output_de_h5ad = de_analysis.output_de_h5ad
 		Array[File?]? output_de_xlsx =  de_analysis.output_de_xlsx
