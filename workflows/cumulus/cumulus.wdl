@@ -13,8 +13,8 @@ workflow cumulus {
 		# Results name prefix and subdirectory name.
 		String output_name
 
-		# Pegasus version, default to "1.4.1"
-		String pegasus_version = "1.4.1"
+		# Pegasus version, default to "1.4.2"
+		String pegasus_version = "1.4.2"
 		# Docker registry to use
 		String docker_registry = "quay.io/cumulus"
 		# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
