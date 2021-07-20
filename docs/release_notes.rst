@@ -1,3 +1,14 @@
+Version 1.5.0 `July 20, 2021`
+------------------------------
+
+* On *demultiplexing* workflow
+    * Update *demuxEM* to v0.1.6.
+* On *cumulus* workflow
+    * Add Nonnegative Matrix Factorization (NMF) feature: ``run_nmf`` and ``nmf_n`` inputs.
+    * Add integrative NMF (iNMF) data integration method: ``inmf`` option in ``correction_method`` input; the number of expected factors is also specified by ``nmf_n`` input.
+    * When NMF or iNMF is enabled, word cloud plots and gene program UMAP plots of NMF/iNMF results will be generated.
+    * Update *Pegasus* to v1.4.2.
+
 Version 1.4.0 `May 17, 2021`
 ----------------------------
 

@@ -4,7 +4,7 @@ Latest and stable versions on Terra_
 Cumulus is a fast growing project. As a result, we frequently update WDL snapshot versions on Terra_.
 See below for latest and stable WDL versions you can use.
 
-Latest version
+Stable version - v1.5.0
 ^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. list-table::
