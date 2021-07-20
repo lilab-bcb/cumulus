@@ -1,7 +1,6 @@
 version 1.0
 
-#import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/30/plain-WDL/descriptor" as tasks
-import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/yiming/workflows/cumulus/cumulus_tasks.wdl" as tasks
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/31/plain-WDL/descriptor" as tasks
 
 
 workflow cumulus {

@@ -48,7 +48,7 @@ Latest version
       - `10 <https://portal.firecloud.org/?return=terra#methods/cumulus/smartseq2_create_reference/10>`__
       - Generate user-customized genome references for SMART-Seq2 data.
     * - cumulus/cumulus
-      - `42 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/42>`__
+      - `43 <https://portal.firecloud.org/?return=terra#methods/cumulus/cumulus/43>`__
       - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
 
 
