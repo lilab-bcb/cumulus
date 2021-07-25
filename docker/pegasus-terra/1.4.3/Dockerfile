@@ -4,14 +4,16 @@ USER root
 ENV PIP_USER=false
 
 RUN apt-get update && apt-get install -yq --no-install-recommends \
-        python3-dev \
-        libfftw3-dev && \
+        gcc-g++ \
+        python3-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
+RUN conda install -y -c conda-forge \
+        pyfit-sne \
+        python-annoy
+
 RUN pip3 -V && \
-    pip3 install --upgrade pip && \
-    pip3 install setuptools==57.4.0 && \
     pip3 install numpy==1.21.1 && \
     pip3 install pandas==1.2.5 && \
     pip3 install scipy==1.7.0 && \
@@ -20,7 +22,6 @@ RUN pip3 -V && \
     pip3 install scikit-image==0.18.2 && \
     pip3 install scikit-learn==0.24.2 && \
     pip3 install h5py==3.3.0 && \
-    pip3 install fitsne==1.2.1 && \
     pip3 install importlib-metadata==4.6.1 && \
     pip3 install joblib==1.0.1 && \
     pip3 install psutil==5.8.0 && \
@@ -46,7 +47,6 @@ RUN pip3 -V && \
     pip3 install torch==1.9.0 && \
     pip3 install harmony-pytorch==0.1.6 && \
     pip3 install cirrocumulus==1.1.17.post1 && \
-    pip3 install annoy==1.17.0 && \
     pip3 install pegasusio==0.3.1.post2 && \
     pip3 install demuxEM==0.1.6 && \
     pip3 install forceatlas2-python==1.1 && \
