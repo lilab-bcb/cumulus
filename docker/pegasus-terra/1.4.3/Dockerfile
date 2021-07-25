@@ -4,14 +4,14 @@ USER root
 ENV PIP_USER=false
 
 RUN apt-get update && apt-get install -yq --no-install-recommends \
-        gcc-g++ \
         python3-dev && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
 RUN conda install -y -c conda-forge \
         pyfit-sne \
-        python-annoy
+        python-annoy \
+        hnswlib
 
 RUN pip3 -V && \
     pip3 install numpy==1.21.1 && \
@@ -41,7 +41,6 @@ RUN pip3 -V && \
     pip3 install networkx==2.5.1 && \
     pip3 install zarr==2.8.3 && \
     pip3 install anndata==0.7.6 && \
-    pip3 install hnswlib==0.5.2 && \
     pip3 install louvain==0.7.0 && \
     pip3 install umap-learn==0.5.1 && \
     pip3 install torch==1.9.0 && \
@@ -61,9 +60,9 @@ RUN wget https://bin.equinox.io/c/4VmDzA7iaHb/ngrok-stable-linux-amd64.zip && \
 
 ENV PATH=/software:$PATH
 
-ENV USER jupyter-user
+ENV USER jupyter
 USER $USER
 #we want pip to install into the user's dir when the notebook is running
 ENV PIP_USER=true
 
-ENTRYPOINT ["/usr/local/bin/jupyter", "notebook"]
+ENTRYPOINT ["/opt/conda/bin/jupyter", "notebook"]
