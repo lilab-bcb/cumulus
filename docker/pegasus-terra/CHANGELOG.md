@@ -1,9 +1,15 @@
 # Changelog of Pegasus-Terra Docker Image
 
-## 1.4 - 2021/06/25
+## 1.4.3 - 2021/07/25
+
+* Image based on [terra-jupyter-base](https://github.com/DataBiosphere/terra-docker/tree/master/terra-jupyter-base) image version 1.0.0 at `us.gcr.io/broad-dsp-gcr-public/terra-jupyter-base:0.0.20`, which adds the support of CUDA.
+* Use Pegasus v1.4.3. See [here](https://pegasus.readthedocs.io/en/stable/release_notes.html#version-1-4) for changes.
+* Update dependency packages.
+
+## 1.4.0 - 2021/06/25
 
 * Image based on [terra-jupyter-base](https://github.com/DataBiosphere/terra-docker/tree/master/terra-jupyter-base) image version 0.0.20 at ``us.gcr.io/broad-dsp-gcr-public/terra-jupyter-base:0.0.20``.
-* Use Pegasus v1.4. See [here](https://pegasus.readthedocs.io/en/stable/release_notes.html#version-1-4) for changes.
+* Use Pegasus v1.4.0. See [here](https://pegasus.readthedocs.io/en/stable/release_notes.html#version-1-4) for changes.
 * Add [nmf-torch](https://github.com/lilab-bcb/nmf-torch) package for Non-negative Matrix Factorization (NMF) and data integration method integrative NMF (iNMF) using Pytorch.
 * Update dependency packages.
 
