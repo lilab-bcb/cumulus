@@ -15,7 +15,7 @@ Stable version - v1.5.0
       - Snapshot
       - Function
     * - cumulus/cellranger_workflow
-      - `26 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/26>`__
+      - `27 <https://portal.firecloud.org/?return=terra#methods/cumulus/cellranger_workflow/27>`__
       - Run Cell Ranger tools, which include extracting sequence reads using cellranger mkfastq or cellranger-atac mkfastq, generating count matrix using cellranger count or cellranger-atac count, running cellranger vdj or feature-barcode extraction.
     * - cumulus/spaceranger_workflow
       - `3 <https://portal.firecloud.org/?return=terra#methods/cumulus/spaceranger_workflow/3>`_
