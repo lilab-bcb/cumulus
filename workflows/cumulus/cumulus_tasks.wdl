@@ -56,8 +56,6 @@ task run_cumulus_aggregate_matrices {
 		backend = '~{backend}'
 		if output_directory != '':
 			dest = output_directory + '/' + '~{output_name}' + '/'
-			# check_call(['mkdir', '-p', dest])
-			# call_args = ['cp', '~{output_name}.aggr.zarr.zip', dest]
 			call_args = ['strato','cp','--backend',backend,'~{output_name}.aggr.zarr.zip', dest]
 			print(' '.join(call_args))
 			check_call(call_args)
@@ -366,11 +364,8 @@ task run_cumulus_cluster {
 			if '~{output_loom}' is 'true':
 				files.extend(glob.glob('~{output_name}.*.loom'))
 			for file in files:
-				# call_args = ['cp', file, dest]
-				call_args = ['strato','cp','--backend',backend]
-				if backend=="gcp":
-					call_args.append("-m")
-				call_args.extend([file, dest])
+				call_args = ['strato','cp','--backend',backend,'-m',
+						file, dest]
 				print(' '.join(call_args))
 				check_call(call_args)
 		CODE
@@ -426,25 +421,15 @@ task run_cumulus_cirro_output {
 		from subprocess import check_call
 
 		backend=~{backend}
-		call_args=['strato','cp','--backend',backend]
-
-		if backend=='gcp':
-			call_args.append('-m')
-
-		if backend=='gcp' or backend=='local':
-			call_args.append('-r')
-
-		call_args.append("~{output_name}".cirro)
+		call_args=['strato','cp','--backend',backend,'-m','-r',"~{output_name}".cirro]
 
 		if output_directory != '':
 			output_directory=~{output_directory}+'/'
+			call_args.append(output_directory)
 			print(' '.join(call_args))
 			check_call(call_args)
 		CODE
 
-		# gsutil -q -m cp -r "~{output_name}".cirro "~{output_directory}"/
-		# mkdir -p "~{output_directory}"/
-		# cp -r "~{output_name}".cirro "~{output_directory}"/
 	}
 
 	output {
@@ -560,7 +545,6 @@ task run_cumulus_de_analysis {
 			if '~{annotate_cluster}' is 'true':
 				files.append('~{output_name}.anno.txt')
 			for file in files:
-				# call_args = ['cp', file, dest]
 				call_args = ['strato', 'cp','--backend',backend, file, dest]
 				print(' '.join(call_args))
 				check_call(call_args)
@@ -667,11 +651,7 @@ task run_cumulus_plot {
 			files.extend(glob.glob('*.html'))
 
 			for file in files:
-				# call_args = ['cp', file, dest]
-				call_args = ['strato','cp','--backend',backend]
-				if backend == 'gcp':
-					call_args.append("-m")
-				call_args.extend([file, dest])
+				call_args = ['strato','cp','--backend',backend,'-m',file, dest]
 				print(' '.join(call_args))
 				check_call(call_args)
 		CODE
@@ -721,9 +701,6 @@ task run_cumulus_scp_output {
 		backend='~{backend}'
 
 		call_args=['strato','cp','--backend',backend]
-
-		if backend=='gcp':
-			call_args.append("-m")
 
 		if output_directory != '':
 			output_directory='~{output_directory}' + '/'
