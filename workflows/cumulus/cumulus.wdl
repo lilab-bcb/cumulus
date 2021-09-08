@@ -21,7 +21,7 @@ workflow cumulus {
                 # Backend
 		String backend
 		# Number of cpus per cumulus job
-		Int num_cpu = 4 #32
+		Int num_cpu = 32
 		# Memory size string
 		String memory = "200G"
 		# Total disk space
