@@ -53,10 +53,9 @@ task run_cumulus_aggregate_matrices {
 		check_call(call_args)
 
 		output_directory = '~{output_directory}'
-		backend = '~{backend}'
 		if output_directory != '':
 			dest = output_directory + '/' + '~{output_name}' + '/'
-			call_args = ['strato','cp','--backend',backend,'~{output_name}.aggr.zarr.zip', dest]
+			call_args = ['strato', 'cp', '--backend', '~{backend}', '~{output_name}.aggr.zarr.zip', dest]
 			print(' '.join(call_args))
 			check_call(call_args)
 		CODE

@@ -19,7 +19,7 @@ workflow cumulus {
 		# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
                 # Backend
-		String backend
+		String backend = "gcp"
 		# Number of cpus per cumulus job
 		Int num_cpu = 32
 		# Memory size string
@@ -257,7 +257,6 @@ workflow cumulus {
 		Boolean generate_scp_outputs = false
 		# Output dense expression matrix instead.
 		Boolean output_dense = false
-
 	}
 
 	# Output directory, with trailing slashes stripped
