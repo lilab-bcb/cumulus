@@ -345,10 +345,8 @@ task run_cumulus_cluster {
 
 		import glob
 		output_directory = '~{output_directory}'
-		backend = '~{backend}'
 		if output_directory != '':
 			dest = output_directory + '/' + '~{output_name}' + '/'
-			# check_call(['mkdir', '-p', dest])
 			files = ['~{output_name}.zarr.zip', '~{output_name}.log']
 			if ('~{output_h5ad}' is 'true') or ('~{citeseq}' is 'true'):
 				files.extend(glob.glob('~{output_name}.*.h5ad'))
@@ -363,8 +361,7 @@ task run_cumulus_cluster {
 			if '~{output_loom}' is 'true':
 				files.extend(glob.glob('~{output_name}.*.loom'))
 			for file in files:
-				call_args = ['strato','cp','--backend',backend,'-m',
-						file, dest]
+				call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', file, dest]
 				print(' '.join(call_args))
 				check_call(call_args)
 		CODE
@@ -419,8 +416,7 @@ task run_cumulus_cirro_output {
 
 		from subprocess import check_call
 
-		backend=~{backend}
-		call_args=['strato','cp','--backend',backend,'-m','-r',"~{output_name}".cirro]
+		call_args=['strato', 'cp', '--backend', '~{backend}', '-m', '-r', "~{output_name}".cirro]
 
 		if output_directory != '':
 			output_directory=~{output_directory}+'/'
@@ -534,17 +530,15 @@ task run_cumulus_de_analysis {
 			check_call(call_args)
 
 		output_directory = '~{output_directory}'
-		backend = '~{backend}'
 		if output_directory != '':
 			dest = output_directory + '/'
-			# check_call(['mkdir', '-p', dest])
 			files = ['~{output_name}.h5ad', '~{output_name}.de.xlsx']
 			if '~{find_markers_lightgbm}' is 'true':
 				files.append('~{output_name}.markers.xlsx')
 			if '~{annotate_cluster}' is 'true':
 				files.append('~{output_name}.anno.txt')
 			for file in files:
-				call_args = ['strato', 'cp','--backend',backend, file, dest]
+				call_args = ['strato', 'cp', '--backend', '~{backend}', file, dest]
 				print(' '.join(call_args))
 				check_call(call_args)
 		CODE
@@ -644,13 +638,11 @@ task run_cumulus_plot {
 		output_directory = '~{output_directory}'
 		if output_directory != '':
 			dest = output_directory + '/'
-			backend='~{backend}'
-			# check_call(['mkdir', '-p', dest])
 			files = glob.glob('*.pdf')
 			files.extend(glob.glob('*.html'))
 
 			for file in files:
-				call_args = ['strato','cp','--backend',backend,'-m',file, dest]
+				call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', file, dest]
 				print(' '.join(call_args))
 				check_call(call_args)
 		CODE
@@ -691,23 +683,20 @@ task run_cumulus_scp_output {
 		set -e
 		export TMPDIR=/tmp
 		pegasus scp_output ~{true='--dense' false='' output_dense} ~{input_h5ad} "~{output_name}"
-		# mkdir -p "~{output_directory}" ; cp "~{output_name}".scp.* "~{output_directory}"/
-		# strato -m cp "~{output_name}".scp.* "~{output_directory}"/
 
 		python <<CODE
 
 		from subprocess import check_call
-		backend='~{backend}'
 
-		call_args=['strato','cp','--backend',backend]
+		call_args=['strato', 'cp', '--backend', '~{backend}']
 
 		if output_directory != '':
 			output_directory='~{output_directory}' + '/'
-			call_args.extend([~{output_name}".scp.*,output_directory])
+			call_args.extend(['~{output_name}.scp.*', output_directory])
 			print(' '.join(call_args))
 			check_call(call_args)
 
-		CODE 
+		CODE
 	}
 
 	output {
