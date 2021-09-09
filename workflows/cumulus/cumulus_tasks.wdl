@@ -11,6 +11,7 @@ task run_cumulus_aggregate_matrices {
 		String pegasus_version
 		String zones
 		String memory
+		String backend
 		Int disk_space
 		Int preemptible
 		String? restrictions
@@ -54,9 +55,7 @@ task run_cumulus_aggregate_matrices {
 		output_directory = '~{output_directory}'
 		if output_directory != '':
 			dest = output_directory + '/' + '~{output_name}' + '/'
-			# check_call(['mkdir', '-p', dest])
-			# call_args = ['cp', '~{output_name}.aggr.zarr.zip', dest]
-			call_args = ['gsutil', 'cp', '~{output_name}.aggr.zarr.zip', dest]
+			call_args = ['strato', 'cp', '--backend', '~{backend}', '~{output_name}.aggr.zarr.zip', dest]
 			print(' '.join(call_args))
 			check_call(call_args)
 		CODE
@@ -84,6 +83,7 @@ task run_cumulus_cluster {
 		String output_name
 		String pegasus_version
 		String zones
+		String backend
 		Int num_cpu
 		String memory
 		Int disk_space
@@ -176,7 +176,7 @@ task run_cumulus_cluster {
 		monitor_script.sh > monitoring.log &
 
 		if [ ~{is_url} == true ]; then
-			gsutil -q cp ~{gene_signature_set} gene_signature.gmt
+			strato cp --backend ~{backend} ~{gene_signature_set} gene_signature.gmt
 		fi
 
 		python <<CODE
@@ -345,6 +345,7 @@ task run_cumulus_cluster {
 
 		import glob
 		output_directory = '~{output_directory}'
+		backend = '~{backend}'
 		if output_directory != '':
 			dest = output_directory + '/' + '~{output_name}' + '/'
 			# check_call(['mkdir', '-p', dest])
@@ -362,8 +363,8 @@ task run_cumulus_cluster {
 			if '~{output_loom}' is 'true':
 				files.extend(glob.glob('~{output_name}.*.loom'))
 			for file in files:
-				# call_args = ['cp', file, dest]
-				call_args = ['gsutil', '-m', 'cp', file, dest]
+				call_args = ['strato','cp','--backend',backend,'-m',
+						file, dest]
 				print(' '.join(call_args))
 				check_call(call_args)
 		CODE
@@ -401,6 +402,7 @@ task run_cumulus_cirro_output {
 		String pegasus_version
 		String zones
 		String memory
+		String backend
 		Int disk_space
 		Int num_cpu
 		Int preemptible
@@ -412,9 +414,21 @@ task run_cumulus_cirro_output {
 		monitor_script.sh > monitoring.log &
 
 		cirro prepare_data --out "~{output_name}".cirro ~{input_h5ad}
-		gsutil -q -m cp -r "~{output_name}".cirro "~{output_directory}"/
-		# mkdir -p "~{output_directory}"/
-		# cp -r "~{output_name}".cirro "~{output_directory}"/
+
+		python <<CODE
+
+		from subprocess import check_call
+
+		backend=~{backend}
+		call_args=['strato','cp','--backend',backend,'-m','-r',"~{output_name}".cirro]
+
+		if output_directory != '':
+			output_directory=~{output_directory}+'/'
+			call_args.append(output_directory)
+			print(' '.join(call_args))
+			check_call(call_args)
+		CODE
+
 	}
 
 	output {
@@ -443,6 +457,7 @@ task run_cumulus_de_analysis {
 		String memory
 		Int disk_space
 		Int preemptible
+		String backend
 		String? labels
 		Boolean? t_test
 		Boolean? fisher
@@ -468,7 +483,7 @@ task run_cumulus_de_analysis {
 		monitor_script.sh > monitoring.log &
 
 		if [ ~{is_url} == true ]; then
-			gsutil -q cp ~{organism} markers.json
+			strato cp --backend ~{backend} ~{organism} markers.json
 		fi
 
 		python <<CODE
@@ -519,6 +534,7 @@ task run_cumulus_de_analysis {
 			check_call(call_args)
 
 		output_directory = '~{output_directory}'
+		backend = '~{backend}'
 		if output_directory != '':
 			dest = output_directory + '/'
 			# check_call(['mkdir', '-p', dest])
@@ -528,8 +544,7 @@ task run_cumulus_de_analysis {
 			if '~{annotate_cluster}' is 'true':
 				files.append('~{output_name}.anno.txt')
 			for file in files:
-				# call_args = ['cp', file, dest]
-				call_args = ['gsutil', 'cp', file, dest]
+				call_args = ['strato', 'cp','--backend',backend, file, dest]
 				print(' '.join(call_args))
 				check_call(call_args)
 		CODE
@@ -564,6 +579,7 @@ task run_cumulus_plot {
 		String memory
 		Int disk_space
 		Int preemptible
+		String backend
 		String? plot_composition
 		String? plot_tsne
 		String? plot_umap
@@ -628,13 +644,13 @@ task run_cumulus_plot {
 		output_directory = '~{output_directory}'
 		if output_directory != '':
 			dest = output_directory + '/'
+			backend='~{backend}'
 			# check_call(['mkdir', '-p', dest])
 			files = glob.glob('*.pdf')
 			files.extend(glob.glob('*.html'))
 
 			for file in files:
-				# call_args = ['cp', file, dest]
-				call_args = ['gsutil', '-m', 'cp', file, dest]
+				call_args = ['strato','cp','--backend',backend,'-m',file, dest]
 				print(' '.join(call_args))
 				check_call(call_args)
 		CODE
@@ -665,6 +681,7 @@ task run_cumulus_scp_output {
 		String pegasus_version
 		String zones
 		String memory
+		String backend
 		Int disk_space
 		Int preemptible
 		String docker_registry
@@ -675,7 +692,22 @@ task run_cumulus_scp_output {
 		export TMPDIR=/tmp
 		pegasus scp_output ~{true='--dense' false='' output_dense} ~{input_h5ad} "~{output_name}"
 		# mkdir -p "~{output_directory}" ; cp "~{output_name}".scp.* "~{output_directory}"/
-		gsutil -m cp "~{output_name}".scp.* "~{output_directory}"/
+		# strato -m cp "~{output_name}".scp.* "~{output_directory}"/
+
+		python <<CODE
+
+		from subprocess import check_call
+		backend='~{backend}'
+
+		call_args=['strato','cp','--backend',backend]
+
+		if output_directory != '':
+			output_directory='~{output_directory}' + '/'
+			call_args.extend([~{output_name}".scp.*,output_directory])
+			print(' '.join(call_args))
+			check_call(call_args)
+
+		CODE 
 	}
 
 	output {

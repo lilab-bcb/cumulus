@@ -1,7 +1,6 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_tasks/versions/31/plain-WDL/descriptor" as tasks
-
+import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
 	input {
@@ -12,12 +11,14 @@ workflow cumulus {
 		# Results name prefix and subdirectory name.
 		String output_name
 
-		# Pegasus version, default to "1.4.2"
-		String pegasus_version = "1.4.2"
+		# Pegasus version, default to "1.4.3"
+		String pegasus_version = "1.4.3"
 		# Docker registry to use
 		String docker_registry = "quay.io/cumulus"
 		# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        # Backend
+		String backend = "gcp"
 		# Number of cpus per cumulus job
 		Int num_cpu = 32
 		# Memory size string
@@ -280,7 +281,8 @@ workflow cumulus {
 				memory = memory,
 				disk_space = disk_space,
 				preemptible = preemptible,
-				docker_registry = docker_registry
+				docker_registry = docker_registry,
+				backend = backend
 		}
 	}
 
@@ -374,7 +376,8 @@ workflow cumulus {
 			memory = memory,
 			disk_space = disk_space,
 			preemptible = preemptible,
-			docker_registry = docker_registry
+			docker_registry = docker_registry,
+			backend = backend
 	}
 
 	if (length(cluster.output_h5ad) > 0) {
@@ -405,7 +408,8 @@ workflow cumulus {
 						memory = memory,
 						disk_space = disk_space,
 						preemptible = preemptible,
-						docker_registry = docker_registry
+						docker_registry = docker_registry,
+						backend = backend
 				}
 			}
 
@@ -433,7 +437,8 @@ workflow cumulus {
 						memory = memory,
 						disk_space = disk_space,
 						preemptible = preemptible,
-						docker_registry = docker_registry
+						docker_registry = docker_registry,
+						backend = backend
 				}
 			}
 
@@ -449,7 +454,8 @@ workflow cumulus {
 						disk_space = disk_space,
 						num_cpu = num_cpu,
 						preemptible = preemptible,
-						docker_registry = docker_registry
+						docker_registry = docker_registry,
+						backend = backend
 				}
 			}
 
@@ -465,7 +471,8 @@ workflow cumulus {
 						memory = memory,
 						disk_space = disk_space,
 						preemptible = preemptible,
-						docker_registry = docker_registry
+						docker_registry = docker_registry,
+						backend = backend
 				}
 			}
 		}
