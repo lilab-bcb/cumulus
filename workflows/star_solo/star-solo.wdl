@@ -64,7 +64,7 @@ workflow starsolo {
             backend = backend
     }
 
-    if (generate_count_config.sample_ids[0] != '') {
+    if (length(generate_count_config.sample_ids) > 0) {
         scatter (sample_id in generate_count_config.sample_ids) {
             call run_star_solo {
                 input:
