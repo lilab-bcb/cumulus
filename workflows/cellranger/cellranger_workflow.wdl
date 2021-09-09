@@ -240,7 +240,7 @@ workflow cellranger_workflow {
                 docker_registry = docker_registry_stripped
         }
 
-        if (length(generate_count_config.sample_ids) > 0 && generate_count_config.sample_ids[0] != '') {
+        if (length(generate_count_config.sample_ids) > 0) {
             scatter (sample_id in generate_count_config.sample_ids) {
                 call crc.cellranger_count as cellranger_count {
                     input:
@@ -276,7 +276,7 @@ workflow cellranger_workflow {
             }
         }
 
-        if (length(generate_count_config.sample_vdj_ids) > 0 && generate_count_config.sample_vdj_ids[0] != '') {
+        if (length(generate_count_config.sample_vdj_ids) > 0) {
             scatter (sample_id in generate_count_config.sample_vdj_ids) {
                 call crv.cellranger_vdj as cellranger_vdj {
                     input:
@@ -307,7 +307,7 @@ workflow cellranger_workflow {
             }
         }
 
-        if (length(generate_count_config.sample_feature_ids) > 0 && generate_count_config.sample_feature_ids[0] != '') {
+        if (length(generate_count_config.sample_feature_ids) > 0) {
             scatter (sample_id in generate_count_config.sample_feature_ids) {
                 call ca.cumulus_adt as cumulus_adt {
                     input:
@@ -330,7 +330,7 @@ workflow cellranger_workflow {
             }
         }
 
-        if (length(generate_count_config.sample_atac_ids) > 0 && generate_count_config.sample_atac_ids[0] != '') {
+        if (length(generate_count_config.sample_atac_ids) > 0) {
             scatter (sample_id in generate_count_config.sample_atac_ids) {
                 call crac.cellranger_atac_count as cellranger_atac_count {
                     input:
@@ -362,7 +362,7 @@ workflow cellranger_workflow {
             }
         }
 
-        if (length(generate_count_config.link_arc_ids) > 0 && generate_count_config.link_arc_ids[0] != '') {
+        if (length(generate_count_config.link_arc_ids) > 0) {
             scatter (link_id in generate_count_config.link_arc_ids) {
                 call crarc.cellranger_arc_count as cellranger_arc_count {
                     input:
@@ -394,7 +394,7 @@ workflow cellranger_workflow {
             }
         }
 
-        if (length(generate_count_config.link_multi_ids) > 0 && generate_count_config.link_multi_ids[0] != '') {
+        if (length(generate_count_config.link_multi_ids) > 0) {
             scatter (link_id in generate_count_config.link_multi_ids) {
                 call crmulti.cellranger_multi as cellranger_multi {
                     input:
@@ -422,7 +422,7 @@ workflow cellranger_workflow {
             }
         }
 
-        if (length(generate_count_config.link_fbc_ids) > 0 && generate_count_config.link_fbc_ids[0] != '') {
+        if (length(generate_count_config.link_fbc_ids) > 0) {
             scatter (link_id in generate_count_config.link_fbc_ids) {
                 call crc.cellranger_count as cellranger_count_fbc {
                     input:

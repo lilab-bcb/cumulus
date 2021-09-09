@@ -107,7 +107,7 @@ workflow demultiplexing {
             preemptible = preemptible
     }
 
-    if (length(Config.hashing_ids) > 0 && Config.hashing_ids[0] != '') {
+    if (length(Config.hashing_ids) > 0) {
         scatter (hashing_id in Config.hashing_ids) {
             call dem.demuxEM as demuxEM {
                 input:
@@ -134,7 +134,7 @@ workflow demultiplexing {
         }
     }
 
-    if (length(Config.pooling_ids) > 0 && Config.pooling_ids[0] != '') {
+    if (length(Config.pooling_ids) > 0) {
         scatter (pooling_id in Config.pooling_ids) {
             if (demultiplexing_algorithm == "souporcell") {
                 File ref_index_file = "gs://regev-lab/resources/cellranger/index.tsv"
