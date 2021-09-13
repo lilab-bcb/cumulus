@@ -103,7 +103,7 @@ workflow cellranger_workflow {
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         # Backend
-        String backend = "backend"
+        String backend = "gcp"
         # Number of cpus per cellranger and spaceranger job
         Int num_cpu = 32
         # Memory string
