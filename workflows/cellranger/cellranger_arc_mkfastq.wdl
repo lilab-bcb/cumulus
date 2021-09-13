@@ -35,6 +35,8 @@ workflow cellranger_arc_mkfastq {
         Int disk_space = 1500
         # Number of preemptible tries
         Int preemptible = 2
+        # Backend
+        String backend = "gcp"
     }
 
     call run_cellranger_arc_mkfastq {
@@ -146,19 +148,15 @@ task run_cellranger_arc_mkfastq {
                 subprocess.check_call(call_args)
         CODE
 
-        # gsutil -q -m rsync -d -r results/outs "~{output_directory}/~{run_id}_arcfastqs"
-        # cp -r results/outs "~{output_directory}/~{run_id}_arcfastqs"
         strato sync --backend ~{backend} -m --ionice results/outs "~{output_directory}/~{run_id}_arcfastqs"
 
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError
         if '~{delete_input_bcl_directory}' is 'true':
             try:
-                #call_args = ['gsutil', '-q', 'stat', '~{output_directory}/~{run_id}_arcfastqs/input_samplesheet.csv']
                 call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_arcfastqs/input_samplesheet.csv']
                 print(' '.join(call_args))
                 check_output(call_args)
-                #call_args = ['gsutil', '-q', '-m', 'rm', '-r', '~{input_bcl_directory}']
                 call_args = ['strato', '--backend', '~{backend}', 'rm', '-m' ,'-r', '~{input_bcl_directory}']
                 print(' '.join(call_args))
                 check_call(call_args)

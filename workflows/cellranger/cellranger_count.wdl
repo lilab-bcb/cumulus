@@ -172,9 +172,7 @@ task run_cellranger_count {
                 fout.write('fastqs,sample,library_type\n')
                 for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                     directory = re.sub('/+$', '', directory) # remove trailing slashes
-                    # call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/' + samples[i], '.']
                     call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/' + samples[i], '.']
-                    # call_args = ['cp', '-r', directory + '/' + samples[i], '.']
                     print(' '.join(call_args))
                     check_call(call_args)
                     fastqs = samples[i] + '_' + str(i)
@@ -197,9 +195,7 @@ task run_cellranger_count {
         else:
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
-                # call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/~{sample_id}', '.']
                 call_args = ['strato', 'cp', '-m', '--backend', '~{backend}', '-r', directory + '/~{sample_id}', '.']
-                # call_args = ['cp', '-r', directory + '/~{sample_id}', '.']
                 print(' '.join(call_args))
                 check_call(call_args)
                 call_args = ['mv', '~{sample_id}', '~{sample_id}_' + str(i)]
@@ -236,9 +232,7 @@ task run_cellranger_count {
         check_call(call_args)
         CODE
 
-        #gsutil -q -m rsync -d -r results/outs "~{output_directory}"/~{sample_id}
         strato sync --backend "~{backend}" -m --ionice results/outs "~{output_directory}"/~{sample_id}
-        # cp -r results/outs "~{output_directory}"/~{sample_id}
     }
 
     output {

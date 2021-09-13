@@ -42,6 +42,8 @@ workflow cellranger_vdj {
 
         # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
         String docker_registry
+        # Backend
+        String backend = backend
     }
 
     Map[String, String] acronym2gsurl = read_map(acronym_file)
@@ -122,7 +124,7 @@ task run_cellranger_vdj {
         print(' '.join(call_args))
         check_call(call_args)
         CODE
-        
+
         strato sync --backend "~{backend}" -m --ionice results/outs "~{output_directory}/~{sample_id}"
     }
 

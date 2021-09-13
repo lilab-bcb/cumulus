@@ -37,7 +37,8 @@ workflow cellranger_atac_count {
         Int disk_space = 500
         # Number of preemptible tries
         Int preemptible = 2
-
+        # Backend
+        String backend = "gcp"
     }
 
     Map[String, String] acronym2gsurl = read_map(acronym_file)
