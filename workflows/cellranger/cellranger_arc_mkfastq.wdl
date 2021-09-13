@@ -146,7 +146,7 @@ task run_cellranger_arc_mkfastq {
                 subprocess.check_call(call_args)
         CODE
 
-        strato sync --backend ~{backend} -m --ionice results/outs "~{output_directory}/~{run_id}_arcfastqs"
+        strato sync --backend ~{backend} -m results/outs "~{output_directory}/~{run_id}_arcfastqs"
 
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError

@@ -140,7 +140,7 @@ task run_cellranger_atac_aggr {
         check_call(call_args)
         CODE
 
-        strato sync --backend ~{backend} -m --ionice results/outs "~{output_directory}/~{aggr_id}"
+        strato sync --backend ~{backend} -m results/outs "~{output_directory}/~{aggr_id}"
     }
 
     output {

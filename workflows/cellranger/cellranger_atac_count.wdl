@@ -128,7 +128,7 @@ task run_cellranger_atac_count {
         check_call(call_args)
         CODE
 
-        strato sync --backend ~{backend} -m --ionice results/outs "~{output_directory}/~{sample_id}"
+        strato sync --backend ~{backend} -m results/outs "~{output_directory}/~{sample_id}"
     }
 
     output {
