@@ -83,7 +83,7 @@ workflow cellranger_workflow {
         File? cmo_set
 
         # Index TSV file
-        File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
+        File acronym_file
 
         # 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
         String cellranger_version = "6.1.1"
@@ -256,6 +256,7 @@ workflow cellranger_workflow {
                         target_panel = generate_count_config.sample2fbf[sample_id],
                         chemistry = generate_count_config.sample2chemistry[sample_id],
                         include_introns = include_introns,
+                        acronym_file = acronym_file,
                         no_bam = no_bam,
                         secondary = secondary,
                         force_cells = force_cells,
@@ -290,6 +291,7 @@ workflow cellranger_workflow {
                         input_fastqs_directories = generate_count_config.sample2dir[sample_id],
                         output_directory = output_directory_stripped,
                         genome = generate_count_config.sample2genome[sample_id],
+                        acronym_file = acronym_file,
                         denovo = vdj_denovo,
                         chain = vdj_chain,
                         cellranger_version = cellranger_version,
@@ -346,6 +348,7 @@ workflow cellranger_workflow {
                         input_fastqs_directories = generate_count_config.sample2dir[sample_id],
                         output_directory = output_directory_stripped,
                         genome = generate_count_config.sample2genome[sample_id],
+                        acronym_file = acronym_file,
                         force_cells = force_cells,
                         dim_reduce = atac_dim_reduce,
                         peaks = atac_peaks,
@@ -380,6 +383,7 @@ workflow cellranger_workflow {
                         input_fastqs_directories = generate_count_config.sample2dir[link_id],
                         input_data_types = generate_count_config.sample2datatype[link_id],
                         output_directory = output_directory_stripped,
+                        acronym_file = acronym_file,
                         genome = generate_count_config.sample2genome[link_id],
                         no_bam = no_bam,
                         cellranger_arc_version = cellranger_arc_version,
@@ -414,6 +418,7 @@ workflow cellranger_workflow {
                         input_data_types = generate_count_config.sample2datatype[link_id],
                         input_fbf = generate_count_config.sample2fbf[link_id],
                         output_directory = output_directory_stripped,
+                        acronym_file = acronym_file,
                         genome = generate_count_config.sample2genome[link_id],
                         cmo_set = cmo_set,
                         include_introns = include_introns,
@@ -443,6 +448,7 @@ workflow cellranger_workflow {
                         input_data_types = generate_count_config.sample2datatype[link_id],
                         input_fbf = generate_count_config.sample2fbf[link_id],
                         output_directory = output_directory_stripped,
+                        acronym_file = acronym_file, 
                         genome = generate_count_config.sample2genome[link_id],
                         include_introns = include_introns,
                         no_bam = no_bam,

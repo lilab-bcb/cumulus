@@ -30,6 +30,8 @@ workflow cellranger_atac_create_reference {
 
         # Output directory, gs URL
         String output_directory
+        # Backend
+        String backend = "gcp"
     }
 
     # Output directory, with trailing slashes stripped
@@ -49,7 +51,8 @@ workflow cellranger_atac_create_reference {
             input_gtf = input_gtf,
             non_nuclear_contigs = non_nuclear_contigs,
             input_motifs = input_motifs,
-            output_dir = output_directory_stripped
+            output_dir = output_directory_stripped,
+            backend = backend
     }
 
 }
@@ -71,6 +74,7 @@ task run_cellranger_atac_create_reference {
         File? input_motifs
 
         String output_dir
+        String backend
     }
 
     command {
@@ -95,9 +99,7 @@ task run_cellranger_atac_create_reference {
 
         cellranger-atac mkref --config=ref.config
         tar -czf ~{genome}.tar.gz ~{genome}
-        gsutil -m cp ~{genome}.tar.gz "~{output_dir}"
-        # mkdir -p "~{output_dir}"
-        # cp ~{genome}.tar.gz "~{output_dir}"
+        strato cp --backend ~{backend} -m ~{genome}.tar.gz "~{output_dir}"
     }
 
     output {

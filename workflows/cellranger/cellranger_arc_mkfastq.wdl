@@ -92,8 +92,6 @@ task run_cellranger_arc_mkfastq {
         set -e
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
-        # gsutil -q -m cp -r ~{input_bcl_directory} .
-        # cp -r ~{input_bcl_directory} .
         strato cp --backend ~{backend} -r -m ~{input_bcl_directory} .
 
         python <<CODE

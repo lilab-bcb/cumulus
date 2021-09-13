@@ -18,8 +18,8 @@ workflow cellranger_count {
         # GRCh38, hg19, mm10, GRCh38_and_mm10, GRCh38_premrna, mm10_premrna, GRCh38_premrna_and_mm10_premrna or a URL to a tar.gz file
         String genome
         # Index TSV file
-        File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
-
+        File acronym_file
+        
         # Target panel CSV for targeted gene expression analysis
         File? target_panel
 

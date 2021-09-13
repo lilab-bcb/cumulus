@@ -17,7 +17,7 @@ workflow cellranger_arc_count {
         String genome
 
         # Index TSV file
-        File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
+        File acronym_file
 
         # If generate bam outputs
         Boolean no_bam = false

@@ -22,7 +22,7 @@ workflow cellranger_multi {
         File? cmo_set
 
         # Index TSV file
-        File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
+        File acronym_file
 
         # Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells.
         Int? force_cells
@@ -217,7 +217,7 @@ task run_cellranger_multi {
         check_call(call_args)
         CODE
 
-        strato sync --backend "~{backend}" -m --ionice results/outs "~{output_directory}"/~{link_id}
+        strato sync --backend ~{backend} -m --ionice results/outs "~{output_directory}"/~{link_id}
     }
 
     output {

@@ -13,7 +13,7 @@ workflow cellranger_atac_count {
         String genome
 
         # Index TSV file
-        File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
+        File acronym_file
 
         # Force pipeline to use this number of cells, bypassing the cell detection algorithm
         Int? force_cells

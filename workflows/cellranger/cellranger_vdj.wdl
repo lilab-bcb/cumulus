@@ -13,7 +13,7 @@ workflow cellranger_vdj {
         String genome
 
         # Index TSV file    
-        File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
+        File acronym_file
 
         # Do not align reads to reference V(D)J sequences before de novo assembly. Default: false
         Boolean denovo = false
