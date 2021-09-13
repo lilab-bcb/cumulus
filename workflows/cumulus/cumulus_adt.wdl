@@ -63,7 +63,8 @@ workflow cumulus_adt {
 			memory = memory,
 			disk_space = disk_space,
 			preemptible = preemptible,
-			docker_registry = docker_registry
+			docker_registry = docker_registry,
+			backend = backend
 	}
 
 	output {
@@ -90,6 +91,7 @@ task run_generate_count_matrix_ADTs {
 		Int disk_space
 		Int preemptible
 		String docker_registry
+		String backend
 	}
 
 	command {
@@ -104,7 +106,8 @@ task run_generate_count_matrix_ADTs {
 		fastqs = []
 		for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
 			directory = re.sub('/+$', '', directory) # remove trailing slashes
-			call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/~{sample_id}', '.']
+			# call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/~{sample_id}', '.']
+			call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/~{sample_id}', '.']
 			# call_args = ['cp', '-r', directory + '/~{sample_id}', '.']
 			print(' '.join(call_args))
 			check_call(call_args)
@@ -135,13 +138,15 @@ task run_generate_count_matrix_ADTs {
 			filter_chimeric_reads ~{data_type} ~{feature_barcodes} "~{sample_id}.stat.csv.gz" ~{min_read_ratio} ~{sample_id}
 		fi
 
-		gsutil -m cp "~{sample_id}".*csv* "~{output_directory}/~{sample_id}/"
+		#gsutil -m cp "~{sample_id}".*csv* "~{output_directory}/~{sample_id}/"
+		strato cp --backend ~{backend} -m "~{sample_id}".*csv* "~{output_directory}/~{sample_id}/"
 		# mkdir -p "~{output_directory}/~{sample_id}"
 		# cp -f "~{sample_id}".*csv* "~{output_directory}/~{sample_id}/"
 
 		if [ -f "~{sample_id}".umi_count.pdf ]
 		then
-			gsutil cp "~{sample_id}".umi_count.pdf "~{output_directory}/~{sample_id}/"
+			# gsutil cp "~{sample_id}".umi_count.pdf "~{output_directory}/~{sample_id}/"
+			strato cp --backend ~{backend} "~{sample_id}".umi_count.pdf "~{output_directory}/~{sample_id}/"
 			# cp -f "~{sample_id}".umi_count.pdf "~{output_directory}/~{sample_id}/"
 		fi
 	}

@@ -12,6 +12,9 @@ workflow cellranger_vdj {
         # GRCh38_vdj, GRCm38_vdj or a URL to a tar.gz file
         String genome
 
+        # Index TSV file    
+        File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
+
         # Do not align reads to reference V(D)J sequences before de novo assembly. Default: false
         Boolean denovo = false
 
@@ -26,6 +29,8 @@ workflow cellranger_vdj {
         String cellranger_version
         # Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
         String zones = "us-central1-b"
+        # Backend
+        String backend = "gcp"
         # Number of cpus per cellranger job
         Int num_cpu = 32
         # Memory string, e.g. 120G
@@ -39,8 +44,6 @@ workflow cellranger_vdj {
         String docker_registry
     }
 
-    File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
-    # File acronym_file = "index.tsv"
     Map[String, String] acronym2gsurl = read_map(acronym_file)
     # If reference is a url
     Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
@@ -61,7 +64,8 @@ workflow cellranger_vdj {
             memory = memory,
             disk_space = disk_space,
             preemptible = preemptible,
-            docker_registry = docker_registry
+            docker_registry = docker_registry,
+            backend = backend
     }
 
     output {
@@ -87,6 +91,7 @@ task run_cellranger_vdj {
         Int disk_space
         Int preemptible
         String docker_registry
+        String backend
     }
 
     command {
@@ -103,8 +108,7 @@ task run_cellranger_vdj {
         fastqs = []
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
             directory = re.sub('/+$', '', directory) # remove trailing slashes
-            call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/~{sample_id}', '.']
-            # call_args = ['cp', '-r', directory + '/~{sample_id}', '.']
+            call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/~{sample_id}', '.']
             print(' '.join(call_args))
             check_call(call_args)
             call_args = ['mv', '~{sample_id}', '~{sample_id}_' + str(i)]
@@ -118,9 +122,8 @@ task run_cellranger_vdj {
         print(' '.join(call_args))
         check_call(call_args)
         CODE
-
-        gsutil -q -m rsync -d -r results/outs "~{output_directory}/~{sample_id}"
-        # cp -r results/outs "~{output_directory}/~{sample_id}"
+        
+        strato sync --backend "~{backend}" -m --ionice results/outs "~{output_directory}/~{sample_id}"
     }
 
     output {

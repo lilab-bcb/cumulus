@@ -53,7 +53,8 @@ workflow cellranger_arc_mkfastq {
             num_cpu = num_cpu,
             memory = memory,
             disk_space = disk_space,
-            preemptible = preemptible
+            preemptible = preemptible,
+            backend = backend
     }
 
     output {
@@ -80,6 +81,7 @@ task run_cellranger_arc_mkfastq {
         String memory
         Int disk_space
         Int preemptible
+        String backend
     }
 
     String run_id = basename(input_bcl_directory)
@@ -88,8 +90,9 @@ task run_cellranger_arc_mkfastq {
         set -e
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
-        gsutil -q -m cp -r ~{input_bcl_directory} .
+        # gsutil -q -m cp -r ~{input_bcl_directory} .
         # cp -r ~{input_bcl_directory} .
+        strato cp --backend ~{backend} -r -m ~{input_bcl_directory} .
 
         python <<CODE
         import os
@@ -143,17 +146,20 @@ task run_cellranger_arc_mkfastq {
                 subprocess.check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs "~{output_directory}/~{run_id}_arcfastqs"
+        # gsutil -q -m rsync -d -r results/outs "~{output_directory}/~{run_id}_arcfastqs"
         # cp -r results/outs "~{output_directory}/~{run_id}_arcfastqs"
+        strato sync --backend ~{backend} -m --ionice results/outs "~{output_directory}/~{run_id}_arcfastqs"
 
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError
         if '~{delete_input_bcl_directory}' is 'true':
             try:
-                call_args = ['gsutil', '-q', 'stat', '~{output_directory}/~{run_id}_arcfastqs/input_samplesheet.csv']
+                #call_args = ['gsutil', '-q', 'stat', '~{output_directory}/~{run_id}_arcfastqs/input_samplesheet.csv']
+                call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_arcfastqs/input_samplesheet.csv']
                 print(' '.join(call_args))
                 check_output(call_args)
-                call_args = ['gsutil', '-q', '-m', 'rm', '-r', '~{input_bcl_directory}']
+                #call_args = ['gsutil', '-q', '-m', 'rm', '-r', '~{input_bcl_directory}']
+                call_args = ['strato', '--backend', '~{backend}', 'rm', '-m' ,'-r', '~{input_bcl_directory}']
                 print(' '.join(call_args))
                 check_call(call_args)
                 print('~{input_bcl_directory} is deleted!')
