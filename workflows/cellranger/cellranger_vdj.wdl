@@ -42,8 +42,6 @@ workflow cellranger_vdj {
 
         # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
         String docker_registry
-        # Backend
-        String backend = backend
     }
 
     Map[String, String] acronym2gsurl = read_map(acronym_file)
