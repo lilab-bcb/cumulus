@@ -10,6 +10,8 @@ workflow cellranger_atac_aggr {
         String output_directory
         # Index TSV file
         File acronym_file
+        # Backend
+        String backend = "gcp"
 
         # Keywords or a URL to a tar.gz file
         String genome
@@ -62,7 +64,8 @@ workflow cellranger_atac_aggr {
             memory = memory,
             disk_space = disk_space,
             preemptible = preemptible,
-            docker_registry = docker_registry
+            docker_registry = docker_registry,
+            backend = backend
     }
 
     output {
@@ -90,6 +93,7 @@ task run_cellranger_atac_aggr {
         Int disk_space
         Int preemptible
         String docker_registry
+        String backend
     }
 
     command {

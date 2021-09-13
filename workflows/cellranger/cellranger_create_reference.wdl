@@ -230,6 +230,7 @@ task run_cellranger_mkref {
         String zones
         Int num_cpu
         Int memory
+        String backend
     }
 
     command {
