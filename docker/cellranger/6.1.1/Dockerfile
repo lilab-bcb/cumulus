@@ -18,11 +18,13 @@ ADD cellranger-6.1.1.tar.gz /software
 #ADD bcl2fastq2-v2-20-0-linux-x86-64.zip /software/
 #RUN unzip -d /software/ /software/bcl2fastq2-v2-20-0-linux-x86-64.zip && alien -i /software/bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm && rm -f /software/bcl2fastq2-v2*
 
+RUN ln -s /usr/bin/python3 /usr/bin/python
+RUN python -m pip install stratocumulus==0.1 --no-cache-dir
+
 RUN apt-get -qq -y remove alien curl gnupg python3-pip unzip && \
     apt-get -qq -y autoremove && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /var/log/dpkg.log && \
-    rm -f /usr/bin/python && ln -s /usr/bin/python3 /usr/bin/python
+    rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
 
 RUN chmod a+rx /software/monitor_script.sh
 ENV PATH=/software:/software/cellranger-6.1.1:$PATH
