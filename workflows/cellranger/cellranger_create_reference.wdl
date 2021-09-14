@@ -19,6 +19,7 @@ workflow cellranger_create_reference {
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         Int num_cpu = 32
         Int memory = 32
+        String backend = "gcp"
     }
 
     # Output directory, with trailing slashes stripped
@@ -67,7 +68,8 @@ workflow cellranger_create_reference {
             memory = memory,
             num_cpu = num_cpu,
             zones = zones,
-            preemptible = preemptible
+            preemptible = preemptible,
+            backend = backend
     }
 }
 
@@ -228,6 +230,7 @@ task run_cellranger_mkref {
         String zones
         Int num_cpu
         Int memory
+        String backend
     }
 
     command {
@@ -268,9 +271,7 @@ task run_cellranger_mkref {
         CODE
 
         tar -czf ~{output_genome}.tar.gz ~{output_genome}
-        gsutil cp ~{output_genome}.tar.gz "~{output_dir}"/
-        # mkdir -p "~{output_dir}"
-        # cp ~{output_genome}.tar.gz "~{output_dir}"
+        strato cp --backend ~{backend} ~{output_genome}.tar.gz "~{output_dir}"/
     }
 
     output {

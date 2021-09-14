@@ -15,6 +15,7 @@ workflow cellranger_vdj_create_reference {
         String output_directory
         String genome
         String ref_version = ""
+        String backend = "gcp"
     }
 
     # Output directory, with trailing slashes stripped
@@ -32,7 +33,8 @@ workflow cellranger_vdj_create_reference {
             input_gtf = input_gtf,
             output_dir = output_directory_stripped,
             genome = genome,
-            ref_version = ref_version
+            ref_version = ref_version,
+            backend = backend
     }
 }
 
@@ -49,6 +51,7 @@ task run_cellranger_vdj_create_reference {
         String output_dir
         String genome
         String ref_version
+        String backend
     }
 
     command {
@@ -88,9 +91,7 @@ task run_cellranger_vdj_create_reference {
         CODE
 
         tar -czf ~{genome}.tar.gz ~{genome}
-        gsutil -m cp ~{genome}.tar.gz "~{output_dir}"
-        # mkdir -p "~{output_dir}"
-        # cp ~{genome}.tar.gz "~{output_dir}"
+        strato cp --backend ~{backend} -m ~{genome}.tar.gz "~{output_dir}"
     }
 
     output {

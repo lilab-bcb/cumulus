@@ -16,6 +16,9 @@ workflow cellranger_arc_count {
         # Keywords or a URL to a tar.gz file
         String genome
 
+        # Index TSV file
+        File acronym_file
+
         # If generate bam outputs
         Boolean no_bam = false
 
@@ -34,10 +37,10 @@ workflow cellranger_arc_count {
         Int disk_space = 700
         # Number of preemptible tries
         Int preemptible = 2
+        # Backend
+        String backend = "gcp"
     }
 
-    File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
-    # File acronym_file = "index.tsv"
     Map[String, String] acronym2gsurl = read_map(acronym_file)
     # If reference is a url
     Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
@@ -59,7 +62,8 @@ workflow cellranger_arc_count {
             num_cpu = num_cpu,
             memory = memory,
             disk_space = disk_space,
-            preemptible = preemptible
+            preemptible = preemptible,
+            backend = backend
     }
 
     output {
@@ -85,6 +89,7 @@ task run_cellranger_arc_count {
         String memory
         Int disk_space
         Int preemptible
+        String backend
     }
 
     command {
@@ -105,8 +110,7 @@ task run_cellranger_arc_count {
             fout.write('fastqs,sample,library_type\n')
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
-                call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/' + samples[i], '.']
-                # call_args = ['cp', '-r', directory + '/' + samples[i], '.']
+                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/' + samples[i], '.']
                 print(' '.join(call_args))
                 check_call(call_args)
                 fastqs = samples[i] + '_' + str(i)
@@ -122,8 +126,7 @@ task run_cellranger_arc_count {
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs "~{output_directory}"/~{link_id}
-        # cp -r results/outs "~{output_directory}"/~{link_id}
+        strato sync --backend ~{backend} -m results/outs "~{output_directory}"/~{link_id}
     }
 
     output {

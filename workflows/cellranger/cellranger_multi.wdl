@@ -21,6 +21,9 @@ workflow cellranger_multi {
         # CMO set CSV file, delaring CMO constructs and associated barcodes
         File? cmo_set
 
+        # Index TSV file
+        File acronym_file
+
         # Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells.
         Int? force_cells
         # Expected number of recovered cells. Mutually exclusive with force_cells
@@ -47,10 +50,10 @@ workflow cellranger_multi {
         Int disk_space = 500
         # Number of preemptible tries
         Int preemptible = 2
+        # Backend
+        String backend = "gcp"
     }
 
-    File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
-    # File acronym_file = "index.tsv"
     Map[String, String] acronym2gsurl = read_map(acronym_file)
     # If reference is a url
     Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
@@ -78,7 +81,8 @@ workflow cellranger_multi {
             num_cpu = num_cpu,
             memory = memory,
             disk_space = disk_space,
-            preemptible = preemptible
+            preemptible = preemptible,
+            backend = backend
     }
 
     output {
@@ -108,6 +112,7 @@ task run_cellranger_multi {
         String memory
         Int disk_space
         Int preemptible
+        String backend
     }
 
     command {
@@ -145,8 +150,7 @@ task run_cellranger_multi {
             if len(file_set) == 0 or list(file_set)[0] == 'null':
                 return ''
             file_loc = list(file_set)[0]
-            call_args = ['gsutil', '-q', '-m', 'cp', file_loc, '.']
-            # call_args = ['cp', file_loc, '.']
+            call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', file_loc, '.']
             print(' '.join(call_args))
             check_call(call_args)
             return os.path.abspath(os.path.basename(file_loc))
@@ -179,8 +183,7 @@ task run_cellranger_multi {
             fout.write('\n[libraries]\nfastq_id,fastqs,feature_types\n')
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
-                call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/' + samples[i], '.']
-                # call_args = ['cp', '-r', directory + '/' + samples[i], '.']
+                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/' + samples[i], '.']
                 print(' '.join(call_args))
                 check_call(call_args)
                 fastqs = samples[i] + '_' + str(i)
@@ -214,8 +217,7 @@ task run_cellranger_multi {
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs "~{output_directory}"/~{link_id}
-        # cp -r results/outs "~{output_directory}"/~{link_id}
+        strato sync --backend ~{backend} -m --ionice results/outs "~{output_directory}"/~{link_id}
     }
 
     output {

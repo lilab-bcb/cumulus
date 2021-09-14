@@ -1,15 +1,14 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_mkfastq/versions/12/plain-WDL/descriptor" as crm
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_count/versions/10/plain-WDL/descriptor" as crc
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_multi/versions/2/plain-WDL/descriptor" as crmulti
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_vdj/versions/9/plain-WDL/descriptor" as crv
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cumulus_adt/versions/8/plain-WDL/descriptor" as ca
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_mkfastq/versions/7/plain-WDL/descriptor" as cram
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_atac_count/versions/8/plain-WDL/descriptor" as crac
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_arc_mkfastq/versions/1/plain-WDL/descriptor" as crarm
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:cellranger_arc_count/versions/3/plain-WDL/descriptor" as crarc
-
+import "cellranger_mkfastq.wdl" as crm
+import "cellranger_count.wdl" as crc
+import "cellranger_multi.wdl" as crmulti
+import "cellranger_vdj.wdl" as crv
+import "../cumulus/cumulus_adt.wdl" as ca
+import "cellranger_atac_mkfastq.wdl" as cram
+import "cellranger_atac_count.wdl" as crac
+import "cellranger_arc_mkfastq.wdl" as crarm
+import "cellranger_arc_count.wdl" as crarc
 
 workflow cellranger_workflow {
     input {
@@ -83,9 +82,11 @@ workflow cellranger_workflow {
         # CMO set CSV file, delaring CMO constructs and associated barcodes
         File? cmo_set
 
+        # Index TSV file
+        File acronym_file
 
-        # 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
-        String cellranger_version = "6.0.1"
+        # 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
+        String cellranger_version = "6.1.1"
         # 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0
         String cumulus_feature_barcoding_version = "0.6.0"
         # 2.0.0, 1.2.0, 1.1.0
@@ -101,7 +102,8 @@ workflow cellranger_workflow {
         String mkfastq_docker_registry = "gcr.io/broad-cumulus"
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-
+        # Backend
+        String backend = "gcp"
         # Number of cpus per cellranger and spaceranger job
         Int num_cpu = 32
         # Memory string
@@ -172,7 +174,8 @@ workflow cellranger_workflow {
                         num_cpu = num_cpu,
                         memory = memory,
                         disk_space = mkfastq_disk_space,
-                        preemptible = preemptible
+                        preemptible = preemptible,
+                        backend = backend
                 }
             }
         }
@@ -196,7 +199,8 @@ workflow cellranger_workflow {
                         num_cpu = num_cpu,
                         memory = memory,
                         disk_space = mkfastq_disk_space,
-                        preemptible = preemptible
+                        preemptible = preemptible,
+                        backend = backend
                 }
             }
         }
@@ -220,7 +224,8 @@ workflow cellranger_workflow {
                         num_cpu = num_cpu,
                         memory = memory,
                         disk_space = mkfastq_disk_space,
-                        preemptible = preemptible
+                        preemptible = preemptible,
+                        backend = backend
                 }
             }
         }
@@ -251,6 +256,7 @@ workflow cellranger_workflow {
                         target_panel = generate_count_config.sample2fbf[sample_id],
                         chemistry = generate_count_config.sample2chemistry[sample_id],
                         include_introns = include_introns,
+                        acronym_file = acronym_file,
                         no_bam = no_bam,
                         secondary = secondary,
                         force_cells = force_cells,
@@ -261,7 +267,8 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = count_disk_space,
                         preemptible = preemptible,
-                        docker_registry = docker_registry_stripped
+                        docker_registry = docker_registry_stripped,
+                        backend = backend
                 }
             }
 
@@ -284,6 +291,7 @@ workflow cellranger_workflow {
                         input_fastqs_directories = generate_count_config.sample2dir[sample_id],
                         output_directory = output_directory_stripped,
                         genome = generate_count_config.sample2genome[sample_id],
+                        acronym_file = acronym_file,
                         denovo = vdj_denovo,
                         chain = vdj_chain,
                         cellranger_version = cellranger_version,
@@ -292,7 +300,8 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = vdj_disk_space,
                         preemptible = preemptible,
-                        docker_registry = docker_registry_stripped
+                        docker_registry = docker_registry_stripped,
+                        backend = backend
                 }
             }
 
@@ -325,7 +334,8 @@ workflow cellranger_workflow {
                         memory = feature_memory,
                         disk_space = feature_disk_space,
                         preemptible = preemptible,
-                        docker_registry = docker_registry_stripped
+                        docker_registry = docker_registry_stripped,
+                        backend = backend
                 }
             }
         }
@@ -338,6 +348,7 @@ workflow cellranger_workflow {
                         input_fastqs_directories = generate_count_config.sample2dir[sample_id],
                         output_directory = output_directory_stripped,
                         genome = generate_count_config.sample2genome[sample_id],
+                        acronym_file = acronym_file,
                         force_cells = force_cells,
                         dim_reduce = atac_dim_reduce,
                         peaks = atac_peaks,
@@ -347,7 +358,8 @@ workflow cellranger_workflow {
                         memory = atac_memory,
                         disk_space = atac_disk_space,
                         preemptible = preemptible,
-                        docker_registry = docker_registry_stripped
+                        docker_registry = docker_registry_stripped,
+                        backend = backend
                 }
             }
 
@@ -371,6 +383,7 @@ workflow cellranger_workflow {
                         input_fastqs_directories = generate_count_config.sample2dir[link_id],
                         input_data_types = generate_count_config.sample2datatype[link_id],
                         output_directory = output_directory_stripped,
+                        acronym_file = acronym_file,
                         genome = generate_count_config.sample2genome[link_id],
                         no_bam = no_bam,
                         cellranger_arc_version = cellranger_arc_version,
@@ -379,7 +392,8 @@ workflow cellranger_workflow {
                         num_cpu = arc_num_cpu,
                         memory = arc_memory,
                         disk_space = arc_disk_space,
-                        preemptible = preemptible
+                        preemptible = preemptible,
+                        backend = backend
                 }
             }
 
@@ -404,6 +418,7 @@ workflow cellranger_workflow {
                         input_data_types = generate_count_config.sample2datatype[link_id],
                         input_fbf = generate_count_config.sample2fbf[link_id],
                         output_directory = output_directory_stripped,
+                        acronym_file = acronym_file,
                         genome = generate_count_config.sample2genome[link_id],
                         cmo_set = cmo_set,
                         include_introns = include_introns,
@@ -417,7 +432,8 @@ workflow cellranger_workflow {
                         num_cpu = num_cpu,
                         memory = memory,
                         disk_space = count_disk_space,
-                        preemptible = preemptible
+                        preemptible = preemptible,
+                        backend = backend
                 }
             }
         }
@@ -432,6 +448,7 @@ workflow cellranger_workflow {
                         input_data_types = generate_count_config.sample2datatype[link_id],
                         input_fbf = generate_count_config.sample2fbf[link_id],
                         output_directory = output_directory_stripped,
+                        acronym_file = acronym_file, 
                         genome = generate_count_config.sample2genome[link_id],
                         include_introns = include_introns,
                         no_bam = no_bam,
@@ -444,7 +461,8 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = count_disk_space,
                         preemptible = preemptible,
-                        docker_registry = docker_registry_stripped
+                        docker_registry = docker_registry_stripped,
+                        backend = backend
                 }
             }
 

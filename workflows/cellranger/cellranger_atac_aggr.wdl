@@ -8,6 +8,10 @@ workflow cellranger_atac_aggr {
         String input_counts_directories
         # CellRanger-atac output directory, gs url
         String output_directory
+        # Index TSV file
+        File acronym_file
+        # Backend
+        String backend = "gcp"
 
         # Keywords or a URL to a tar.gz file
         String genome
@@ -38,8 +42,6 @@ workflow cellranger_atac_aggr {
         String docker_registry = "cumulusprod"
     }
 
-    File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
-    # File acronym_file = "index.tsv"
     Map[String, String] acronym2gsurl = read_map(acronym_file)
     # If reference is a url
     Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
@@ -62,7 +64,8 @@ workflow cellranger_atac_aggr {
             memory = memory,
             disk_space = disk_space,
             preemptible = preemptible,
-            docker_registry = docker_registry
+            docker_registry = docker_registry,
+            backend = backend
     }
 
     output {
@@ -90,6 +93,7 @@ task run_cellranger_atac_aggr {
         Int disk_space
         Int preemptible
         String docker_registry
+        String backend
     }
 
     command {
@@ -118,8 +122,7 @@ task run_cellranger_atac_aggr {
                     raise Exception("Found duplicated library id " + library_id + "!")
                 libs_seen.add(library_id)
 
-                call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory, current_dir]
-                # call_args = ['cp', '-r', directory, current_dir]
+                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory, current_dir]
                 print(' '.join(call_args))
                 check_call(call_args)
                 counts.append(library_id)
@@ -137,9 +140,7 @@ task run_cellranger_atac_aggr {
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs "~{output_directory}/~{aggr_id}"
-        # mkdir -p "~{output_directory}/~{aggr_id}"
-        # cp -r results/outs "~{output_directory}/~{aggr_id}"
+        strato sync --backend ~{backend} -m results/outs "~{output_directory}/~{aggr_id}"
     }
 
     output {

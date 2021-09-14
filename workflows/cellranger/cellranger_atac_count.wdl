@@ -12,6 +12,9 @@ workflow cellranger_atac_count {
         # Keywords or a URL to a tar.gz file
         String genome
 
+        # Index TSV file
+        File acronym_file
+
         # Force pipeline to use this number of cells, bypassing the cell detection algorithm
         Int? force_cells
         # Choose the algorithm for dimensionality reduction prior to clustering and tsne: 'lsa' (default), 'plsa', or 'pca'.
@@ -34,11 +37,10 @@ workflow cellranger_atac_count {
         Int disk_space = 500
         # Number of preemptible tries
         Int preemptible = 2
-
+        # Backend
+        String backend = "gcp"
     }
 
-    File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
-    # File acronym_file = "index.tsv"
     Map[String, String] acronym2gsurl = read_map(acronym_file)
     # If reference is a url
     Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
@@ -60,7 +62,8 @@ workflow cellranger_atac_count {
             memory = memory,
             disk_space = disk_space,
             preemptible = preemptible,
-            docker_registry = docker_registry
+            docker_registry = docker_registry,
+            backend = backend
     }
 
     output {
@@ -87,6 +90,7 @@ task run_cellranger_atac_count {
         Int disk_space
         Int preemptible
         String docker_registry
+        String backend
     }
 
     command {
@@ -104,8 +108,7 @@ task run_cellranger_atac_count {
         fastqs = []
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
             directory = re.sub('/+$', '', directory) # remove trailing slashes
-            call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/~{sample_id}', '.']
-            # call_args = ['cp', '-r', directory + '/~{sample_id}', '.']
+            call_args = ['strato', 'cp', '--backend','~{backend}','-r', '-m', directory + '/~{sample_id}', '.']
             print(' '.join(call_args))
             check_call(call_args)
             call_args = ['mv', '~{sample_id}', '~{sample_id}_' + str(i)]
@@ -125,8 +128,7 @@ task run_cellranger_atac_count {
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs "~{output_directory}/~{sample_id}"
-        # cp -r results/outs "~{output_directory}/~{sample_id}"
+        strato sync --backend ~{backend} -m results/outs "~{output_directory}/~{sample_id}"
     }
 
     output {

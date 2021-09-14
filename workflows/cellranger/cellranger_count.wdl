@@ -17,7 +17,9 @@ workflow cellranger_count {
 
         # GRCh38, hg19, mm10, GRCh38_and_mm10, GRCh38_premrna, mm10_premrna, GRCh38_premrna_and_mm10_premrna or a URL to a tar.gz file
         String genome
-
+        # Index TSV file
+        File acronym_file
+        
         # Target panel CSV for targeted gene expression analysis
         File? target_panel
 
@@ -49,10 +51,10 @@ workflow cellranger_count {
         Int disk_space = 500
         # Number of preemptible tries
         Int preemptible = 2
+        # Backend
+        String backend = "gcp"
     }
 
-    File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
-    # File acronym_file = "index.tsv"
     Map[String, String] acronym2gsurl = read_map(acronym_file)
     # If reference is a url
     Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
@@ -81,7 +83,8 @@ workflow cellranger_count {
             num_cpu = num_cpu,
             memory = memory,
             disk_space = disk_space,
-            preemptible = preemptible
+            preemptible = preemptible,
+            backend = backend
     }
 
     output {
@@ -115,6 +118,7 @@ task run_cellranger_count {
         String memory
         Int disk_space
         Int preemptible
+        String backend
     }
 
     command {
@@ -155,8 +159,7 @@ task run_cellranger_count {
                 if len(file_set) == 0 or list(file_set)[0] == 'null':
                     return ''
                 file_loc = list(file_set)[0]
-                call_args = ['gsutil', '-q', '-m', 'cp', file_loc, '.']
-                # call_args = ['cp', file_loc, '.']
+                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', file_loc, '.']
                 print(' '.join(call_args))
                 check_call(call_args)
                 return os.path.abspath(os.path.basename(file_loc))
@@ -169,8 +172,7 @@ task run_cellranger_count {
                 fout.write('fastqs,sample,library_type\n')
                 for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                     directory = re.sub('/+$', '', directory) # remove trailing slashes
-                    call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/' + samples[i], '.']
-                    # call_args = ['cp', '-r', directory + '/' + samples[i], '.']
+                    call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/' + samples[i], '.']
                     print(' '.join(call_args))
                     check_call(call_args)
                     fastqs = samples[i] + '_' + str(i)
@@ -193,8 +195,7 @@ task run_cellranger_count {
         else:
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
-                call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/~{sample_id}', '.']
-                # call_args = ['cp', '-r', directory + '/~{sample_id}', '.']
+                call_args = ['strato', 'cp', '-m', '--backend', '~{backend}', '-r', directory + '/~{sample_id}', '.']
                 print(' '.join(call_args))
                 check_call(call_args)
                 call_args = ['mv', '~{sample_id}', '~{sample_id}_' + str(i)]
@@ -231,8 +232,7 @@ task run_cellranger_count {
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs "~{output_directory}"/~{sample_id}
-        # cp -r results/outs "~{output_directory}"/~{sample_id}
+        strato sync --backend "~{backend}" -m results/outs "~{output_directory}"/~{sample_id}
     }
 
     output {
