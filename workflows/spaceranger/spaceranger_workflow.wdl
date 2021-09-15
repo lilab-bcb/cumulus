@@ -1,7 +1,7 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_mkfastq/versions/2/plain-WDL/descriptor" as srm
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_count/versions/2/plain-WDL/descriptor" as src
+import "spaceranger_mkfastq.wdl" as srm
+import "spaceranger_count.wdl" as src
 
 workflow spaceranger_workflow {
     input {
@@ -21,6 +21,9 @@ workflow spaceranger_workflow {
         Boolean delete_input_bcl_directory = false
         # Number of allowed mismatches per index
         Int? mkfastq_barcode_mismatches
+
+        # null_file
+        String null_file = "gs://regev-lab/resources/cellranger/null"
 
         # For spaceranger count
 
@@ -52,6 +55,8 @@ workflow spaceranger_workflow {
 
         # Number of preemptible tries
         Int preemptible = 2
+        # Backend
+        String backend
     }
 
     # Output directory, with trailing slashes stripped
@@ -86,7 +91,8 @@ workflow spaceranger_workflow {
                         num_cpu = num_cpu,
                         memory = memory,
                         disk_space = mkfastq_disk_space,
-                        preemptible = preemptible
+                        preemptible = preemptible,
+                        backend = backend
                 }
             }
         }
@@ -100,7 +106,8 @@ workflow spaceranger_workflow {
                 config_version = config_version,
                 zones = zones,
                 preemptible = preemptible,
-                docker_registry = docker_registry_stripped
+                docker_registry = docker_registry_stripped,
+                null_file = null_file
         }
 
         scatter (sample_row in generate_count_config.sample_table) {
@@ -127,7 +134,8 @@ workflow spaceranger_workflow {
                     num_cpu = num_cpu,
                     memory = memory,
                     disk_space = count_disk_space,
-                    preemptible = preemptible
+                    preemptible = preemptible,
+                    backend = backend
             }
         }
 
@@ -204,6 +212,7 @@ task generate_count_config {
         String zones
         Int preemptible
         String docker_registry
+        String null_file
     }
 
     command {
@@ -215,8 +224,6 @@ task generate_count_config {
         import re
         import sys
         import pandas as pd
-
-        null_file = 'gs://regev-lab/resources/cellranger/null' # null file
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
 
