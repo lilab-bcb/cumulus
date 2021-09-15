@@ -14,9 +14,10 @@ RUN apt-get -qq update && \
         build-essential \
         libboost-iostreams-dev && \
     pip3 --no-cache-dir install numpy pandas matplotlib && \
+    pip3 --no-cache-dir install stratocumulus==0.1.1 && \
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
-    apt-get update -y && apt-get install -y google-cloud-sdk=340.0.0-0
+    apt-get update -y && apt-get install -y google-cloud-sdk=357.0.0-0
 
 RUN tar -xzf /software/0.6.0.tar.gz -C /software && \
     cd /software/cumulus_feature_barcoding-0.6.0 && make clean && make all && cd ../.. && \
@@ -27,7 +28,5 @@ RUN tar -xzf /software/0.6.0.tar.gz -C /software && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log && \
     ln -s /usr/bin/python3 /usr/bin/python && \
     chmod a+rx /software/*
-
-RUN python -m pip install stratocumulus==0.1 --no-cache-dir 
 
 ENV PATH=/software:/software/cumulus_feature_barcoding-0.6.0:$PATH
