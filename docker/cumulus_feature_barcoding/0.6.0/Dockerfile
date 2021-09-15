@@ -9,6 +9,7 @@ RUN apt-get -qq update && \
         curl \
         gnupg \
         python3 \
+        python3-dev \
         python3-pip \
         build-essential \
         libboost-iostreams-dev && \
@@ -26,5 +27,7 @@ RUN tar -xzf /software/0.6.0.tar.gz -C /software && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log && \
     ln -s /usr/bin/python3 /usr/bin/python && \
     chmod a+rx /software/*
+
+RUN python -m pip install stratocumulus==0.1 --no-cache-dir 
 
 ENV PATH=/software:/software/cumulus_feature_barcoding-0.6.0:$PATH
