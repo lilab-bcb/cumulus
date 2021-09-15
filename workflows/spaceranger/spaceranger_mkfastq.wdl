@@ -29,6 +29,8 @@ workflow spaceranger_mkfastq {
         Int disk_space = 1500
         # Number of preemptible tries
         Int preemptible = 2
+        # Backend
+        String backend
     }
 
     call run_spaceranger_mkfastq {
@@ -44,7 +46,8 @@ workflow spaceranger_mkfastq {
             num_cpu = num_cpu,
             memory = memory,
             disk_space = disk_space,
-            preemptible = preemptible
+            preemptible = preemptible,
+            backend = backend
     }
 
     output {
@@ -68,6 +71,7 @@ task run_spaceranger_mkfastq {
         String memory
         Int disk_space
         Int preemptible
+        String backend
     }
 
     String run_id = basename(input_bcl_directory)
@@ -76,8 +80,7 @@ task run_spaceranger_mkfastq {
         set -e
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
-        gsutil -q -m cp -r ~{input_bcl_directory} .
-        # cp -r ~{input_bcl_directory} .
+        strato cp --backend ~{backend} -m -r ~{input_bcl_directory} .
 
         python <<CODE
         import os
@@ -125,17 +128,16 @@ task run_spaceranger_mkfastq {
                 subprocess.check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs "~{output_directory}/~{run_id}_spatialfastqs"
-        # cp -r results/outs "~{output_directory}/~{run_id}_spatialfastqs"
+        strato sync --backend ~{backend} -m results/outs "~{output_directory}/~{run_id}_spatialfastqs"
 
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError
         if '~{delete_input_bcl_directory}' is 'true':
             try:
-                call_args = ['gsutil', '-q', 'stat', '~{output_directory}/~{run_id}_spatialfastqs/input_samplesheet.csv']
+                call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_spatialfastqs/input_samplesheet.csv']
                 print(' '.join(call_args))
                 check_output(call_args)
-                call_args = ['gsutil', '-q', '-m', 'rm', '-r', '~{input_bcl_directory}']
+                call_args = ['strato', 'rm', '-m', '-r', '~{input_bcl_directory}']
                 print(' '.join(call_args))
                 check_call(call_args)
                 print('~{input_bcl_directory} is deleted!')

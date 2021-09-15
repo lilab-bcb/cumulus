@@ -11,6 +11,8 @@ workflow spaceranger_count {
 
         # A reference genome name or a URL to a tar.gz file
         String genome
+        # Referece index TSV
+        File acronym_file
 
         # Brightfield tissue H&E image in .jpg or .tiff format.
         File? image
@@ -54,10 +56,10 @@ workflow spaceranger_count {
         Int disk_space = 500
         # Number of preemptible tries 
         Int preemptible = 2
+        # Backend
+        String backend
     }
 
-    File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
-    # File acronym_file = "index.tsv"
     Map[String, String] acronym2gsurl = read_map(acronym_file)
     # If reference is a url
     Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
@@ -88,7 +90,8 @@ workflow spaceranger_count {
             num_cpu = num_cpu,
             memory = memory,
             disk_space = disk_space,
-            preemptible = preemptible
+            preemptible = preemptible,
+            backend = backend
     }
 
     output {
@@ -124,6 +127,7 @@ task run_spaceranger_count {
         String memory
         Int disk_space
         Int preemptible
+        String backend
     }
 
     command {
@@ -142,8 +146,7 @@ task run_spaceranger_count {
         fastqs = []
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
             directory = re.sub('/+$', '', directory) # remove trailing slashes 
-            call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/~{sample_id}', '.']
-            # call_args = ['cp', '-r', directory + '/~{sample_id}', '.']
+            call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/~{sample_id}', '.']
             print(' '.join(call_args))
             check_call(call_args)
             call_args = ['mv', '~{sample_id}', '~{sample_id}_' + str(i)]
@@ -163,8 +166,7 @@ task run_spaceranger_count {
             elif darkimagestr != '':
                 for i, file in enumerate(darkimagestr.split(';')):
                     local_file = '_' + str(i) + '_' + os.path.basename(file)
-                    call_args = ['gsutil', '-q', 'cp', file, local_file]
-                    # call_args = ['cp', file, local_file]
+                    call_args = ['strato', 'cp', '--backend', '~{backend}', file, local_file]
                     print(' '.join(call_args))
                     check_call(call_args)
                     darkimages.append(local_file)
@@ -222,8 +224,7 @@ task run_spaceranger_count {
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -d -r results/outs "~{output_directory}/~{sample_id}"
-        # cp -r results/outs "~{output_directory}/~{sample_id}"
+        strato sync --backend ~{backend} -m results/outs "~{output_directory}/~{sample_id}"
     }
 
     output {
