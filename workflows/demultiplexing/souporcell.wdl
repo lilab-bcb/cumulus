@@ -40,6 +40,8 @@ workflow souporcell {
         Int preemptible
         # Google cloud zones
         String zones
+        # Backend
+        String backend
     }
 
     if (ref_genotypes_url != 'null') {
@@ -82,7 +84,8 @@ workflow souporcell {
             zones = zones,
             memory = memory,
             disk_space = disk_space,
-            preemptible = preemptible
+            preemptible = preemptible,
+            backend = backend
     }
 
     output {
@@ -199,6 +202,7 @@ task match_donors {
         Int memory
         Int disk_space
         Int preemptible
+        String backend
     }
 
     Float file_size = size([input_rna, souporcell_cluster_tsv, souporcell_genotypes_vcf], "GB")
@@ -230,9 +234,7 @@ task match_donors {
 
         mkdir result
         mv match_donors.log "~{sample_id}"_demux.zarr.zip ~{souporcell_cluster_tsv} ~{souporcell_genotypes_vcf} result/
-        gsutil -q -m rsync -r result "~{output_directory}/~{sample_id}"
-        # mkdir -p "~{output_directory}/~{sample_id}"
-        # cp -r result/* "~{output_directory}/~{sample_id}"
+        strato sync --backend ~{backend} -m result "~{output_directory}/~{sample_id}"
     }
 
     output {

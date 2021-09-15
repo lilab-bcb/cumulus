@@ -40,6 +40,8 @@ workflow demuxEM {
         Int disk_space
         # Number of preemptible tries
         Int preemptible
+        # Backend
+        String backend
     }
 
     call run_demuxEM {
@@ -62,7 +64,8 @@ workflow demuxEM {
             num_cpu = num_cpu,
             memory = memory,
             disk_space = disk_space,
-            preemptible = preemptible
+            preemptible = preemptible,
+            backend = backend
     }
 
     output {
@@ -94,6 +97,7 @@ task run_demuxEM {
         Int memory
         Int disk_space
         Int preemptible
+        String backend
     }
 
     command {
@@ -126,9 +130,7 @@ task run_demuxEM {
 
         mkdir result
         cp "~{sample_id}_demux".zarr.zip "~{sample_id}".out.demuxEM.zarr.zip "~{sample_id}".*.pdf result
-        gsutil -q -m rsync -r result "~{output_directory}/~{sample_id}"
-        # mkdir -p "~{output_directory}/~{sample_id}"
-        # cp result/* "~{output_directory}/~{sample_id}"
+        strato sync --backend ~{backend} -m result "~{output_directory}/~{sample_id}"
     }
 
     output {

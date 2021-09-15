@@ -49,6 +49,8 @@ workflow popscle {
         String docker_registry
         # Popscle version to use
         String popscle_version
+        # Backend
+        String backend
     }
 
 
@@ -74,7 +76,8 @@ workflow popscle {
             memory = memory,
             extra_disk_space = extra_disk_space,
             zones = zones,
-            preemptible = preemptible
+            preemptible = preemptible,
+            backend = backend
     }
 
     output {
@@ -109,6 +112,7 @@ task popscle_task {
         Int extra_disk_space
         Int preemptible
         String zones
+        String backend
     }
 
     Int disk_space = ceil(extra_disk_space + size(input_rna,"GB") + size(input_bam,"GB") + size(ref_genotypes, "GB"))
@@ -164,10 +168,7 @@ task popscle_task {
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -r result "~{output_directory}/~{sample_id}"
-
-        # mkdir -p "~{output_directory}/~{sample_id}"
-        # cp result/* "~{output_directory}/~{sample_id}"
+        strato sync --backend ${backend} -m result "~{output_directory}/~{sample_id}"
     }
 
     output {
