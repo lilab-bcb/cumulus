@@ -40,7 +40,7 @@ workflow demultiplexing {
         # Generate violin plots using gender-specific genes (e.g. Xist). <demuxEM_generate_gender_plot> is a comma-separated list of gene names
         String? demuxEM_generate_gender_plot
         # Reference Index TSV
-        File ref_index_file
+        File ref_index_file = "gs://regev-lab/resources/cellranger/index.tsv"
         # DemuxEM version
         String demuxEM_version = "0.1.6"
         # Number of CPUs used
