@@ -1,14 +1,29 @@
 FROM continuumio/miniconda3:4.7.12
 SHELL ["/bin/bash", "-c"]
 
-RUN apt-get update && \
-    apt-get install --no-install-recommends -y build-essential lsb-release gnupg curl && \
+RUN apt-get update --allow-releaseinfo-change && \
+    apt-get update
+
+RUN apt-get -qq -y install --no-install-recommends \
+        build-essential \
+        curl \
+        wget \
+        gnupg \
+        unzip \
+        python3 \
+        python3-pip \
+        cmake \
+        liblzma-dev \
+        zlib1g-dev \
+        libbz2-dev \
+        libcurl4-openssl-dev \
+        libssl-dev && \
     apt-get -qq -y autoremove && \
     apt-get clean
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
-    apt-get update -y && apt-get install -y google-cloud-sdk=339.0.0-0
+    apt-get update -y && apt-get install -y google-cloud-sdk=354.0.0-0
 
 RUN conda install -c bioconda popscle
 
@@ -27,7 +42,8 @@ RUN pip install --upgrade pip && \
     pip install numba==0.53.1 && \
     pip install argparse==1.4.0 && \
     pip install networkx==2.5.1 && \
-    pip install pegasusio==0.2.10
+    pip install pegasusio==0.2.10 && \
+    pip install stratocumulus==0.1.1
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/demultiplexing/souporcell/extract_barcodes_from_rna.py /software
