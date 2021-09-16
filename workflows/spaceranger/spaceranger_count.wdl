@@ -11,8 +11,13 @@ workflow spaceranger_count {
 
         # A reference genome name or a URL to a tar.gz file
         String genome
+        # Probe set for FFPE samples, choosing from human_probe_v1, mouse_probe_v1 or a user-provided csv file. Default to '', not FFPE
+        String probeset = ""
+
         # Referece index TSV
         File acronym_file
+        # An empty full representing null
+        File null_file
 
         # Brightfield tissue H&E image in .jpg or .tiff format.
         File? image
@@ -60,11 +65,16 @@ workflow spaceranger_count {
         String backend
     }
 
-    Map[String, String] acronym2gsurl = read_map(acronym_file)
+    Map[String, String] acronym2url = read_map(acronym_file)
+    
     # If reference is a url
     Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
+    # Replace name with actual url
+    File genome_file = (if is_url then genome else acronym2url[genome])
 
-    File genome_file = (if is_url then genome else acronym2gsurl[genome])
+    # If replace probset with its corresponding URL for CSV file
+    File probe_file = (if probeset == "" then null_file else (if sub(probeset, "^.+\\.csv$", "CSV") != "CSV" then acronym2url[probeset] else probeset))
+
 
     call run_spaceranger_count {
         input:
@@ -72,6 +82,7 @@ workflow spaceranger_count {
             input_fastqs_directories = input_fastqs_directories,
             output_directory = output_directory,
             genome_file = genome_file,
+            probe_file = probe_file,
             image = image,
             darkimage = darkimage,
             darkimagestr = darkimagestr,
@@ -108,6 +119,7 @@ task run_spaceranger_count {
         String input_fastqs_directories
         String output_directory
         File genome_file
+        File probe_file
         File? image
         Array[File]? darkimage
         String? darkimagestr
@@ -171,6 +183,9 @@ task run_spaceranger_count {
                     check_call(call_args)
                     darkimages.append(local_file)
             return darkimages
+
+        if not_null('~{probe_file}'):
+            call_args.append('--probe-set=~{probe_file}')
 
         if not_null('~{target_panel}'):
             call_args.append('--target-panel=~{target_panel}')

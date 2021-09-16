@@ -22,6 +22,8 @@ workflow spaceranger_workflow {
         # Number of allowed mismatches per index
         Int? mkfastq_barcode_mismatches
 
+        # Referece index TSV
+        File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
         # null_file
         String null_file = "gs://regev-lab/resources/cellranger/null"
 
@@ -32,8 +34,8 @@ workflow spaceranger_workflow {
         # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false. This is also a spaceranger argument.
         Boolean secondary = false
 
-        # Space Ranger version: 1.2.1
-        String spaceranger_version = "1.2.1"
+        # Space Ranger version: 1.3.0
+        String spaceranger_version = "1.3.0"
         # Config version: 0.2
         String config_version = "0.2"
 
@@ -117,15 +119,18 @@ workflow spaceranger_workflow {
                     input_fastqs_directories = sample_row[1],
                     output_directory = output_directory_stripped,
                     genome = sample_row[2],
-                    image = sample_row[3],
-                    darkimagestr = sample_row[4],
-                    colorizedimage = sample_row[5],
-                    slide = sample_row[6],
-                    area = sample_row[7],
-                    slidefile = sample_row[8],
-                    reorient_images = (sample_row[9] == 'true'),
-                    loupe_alignment = sample_row[10],
-                    target_panel = sample_row[11],
+                    probeset = sample_row[3],
+                    acronym_file = acronym_file,
+                    null_file = null_file,
+                    image = sample_row[4],
+                    darkimagestr = sample_row[5],
+                    colorizedimage = sample_row[6],
+                    slide = sample_row[7],
+                    area = sample_row[8],
+                    slidefile = sample_row[9],
+                    reorient_images = (sample_row[10] == 'true'),
+                    loupe_alignment = sample_row[11],
+                    target_panel = sample_row[12],
                     no_bam = no_bam,
                     secondary = secondary,
                     spaceranger_version = spaceranger_version,
@@ -243,7 +248,7 @@ task generate_count_config {
             else:
                 df.loc[df[c].isna(), c] = null_file
 
-        for c in ['DarkImage', 'Slide', 'Area']:
+        for c in ['DarkImage', 'Slide', 'Area', 'ProbeSet']:
             if c not in df.columns:
                 df[c] = ''
             else:
@@ -273,7 +278,7 @@ task generate_count_config {
             else:
                 dirs = df_local['Flowcell'].values # if start from count step
             out_str = df_local['Sample'].iat[0] + '\t' + ','.join(dirs) + '\t' + df_local['Reference'].iat[0]
-            for c in ['Image', 'DarkImage', 'ColorizedImage', 'Slide', 'Area', 'SlideFile', 'ReorientImages', 'LoupeAlignment', 'TargetPanel']:
+            for c in ['ProbeSet', 'Image', 'DarkImage', 'ColorizedImage', 'Slide', 'Area', 'SlideFile', 'ReorientImages', 'LoupeAlignment', 'TargetPanel']:
                 out_str += '\t' + df_local[c].iat[0]
             print(out_str)
         CODE
