@@ -9,6 +9,7 @@ RUN mkdir -p /usr/share/man/man1 && \
         libfftw3-dev \
         default-jdk \
         curl \
+        unzip \
         python3 \
         python3-dev \
         python3-pip
@@ -16,6 +17,11 @@ RUN mkdir -p /usr/share/man/man1 && \
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
     apt-get update -y && apt-get install -y google-cloud-sdk=357.0.0-0
+
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    rm awscliv2.zip
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
@@ -63,7 +69,7 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install pegasuspy==1.4.3 --no-cache-dir && \
     python -m pip install stratocumulus==0.1.1 --no-cache-dir
 
-RUN apt-get -qq -y remove curl gnupg && \
+RUN apt-get -qq -y remove curl gnupg unzip && \
     apt-get -qq -y autoremove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
