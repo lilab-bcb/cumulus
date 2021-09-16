@@ -19,7 +19,7 @@ RUN apt-get update && \
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
-    apt-get update -y && apt-get install -y google-cloud-sdk=339.0.0-0
+    apt-get update -y && apt-get install -y google-cloud-sdk=357.0.0-0
 
 RUN mkdir /software && \
     wget https://github.com/samtools/htslib/releases/download/1.12/htslib-1.12.tar.bz2 && \
@@ -57,7 +57,8 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install numba==0.53.1 --no-cache-dir && \
     python -m pip install argparse==1.4.0 --no-cache-dir && \
     python -m pip install networkx==2.5.1 --no-cache-dir && \
-    python -m pip install pegasusio==0.2.10 --no-cache-dir
+    python -m pip install pegasusio==0.2.10 --no-cache-dir && \
+    python -m pip install stratocumulus==0.1.1 --no-cache-dir
 
 RUN apt-get -qq -y remove curl gnupg wget && \
     apt-get -qq -y autoremove && \

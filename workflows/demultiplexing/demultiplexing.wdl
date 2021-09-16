@@ -1,8 +1,8 @@
 version 1.0
 
-import "demuxEM.wdl" as dem
-import "souporcell.wdl" as soc
-import "popscle.wdl" as psc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/6/plain-WDL/descriptor" as dem
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/6/plain-WDL/descriptor" as soc
+import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/6/plain-WDL/descriptor" as psc
 
 workflow demultiplexing {
     input {
