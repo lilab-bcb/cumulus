@@ -6,11 +6,13 @@ RUN apt-get update && \
     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    apt-get update && apt-get install -y google-cloud-sdk=322.0.0-0
+    apt-get update && apt-get install -y google-cloud-sdk=357.0.0-0
 
 RUN pip3 install pandas && \
     pip3 install packaging
 
+RUN python -m pip install stratocumulus==0.1.1 --no-cache-dir
+ 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
 ADD spaceranger-1.2.1.tar.gz /software

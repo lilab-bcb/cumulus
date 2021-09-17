@@ -57,7 +57,7 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install numba==0.53.1 --no-cache-dir && \
     python -m pip install argparse==1.4.0 --no-cache-dir && \
     python -m pip install networkx==2.5.1 --no-cache-dir && \
-    python -m pip install pegasusio==0.2.10 --no-cache-dir && \
+    python -m pip install pegasusio==0.3.1.post2 --no-cache-dir && \
     python -m pip install stratocumulus==0.1.1 --no-cache-dir
 
 RUN apt-get -qq -y remove curl gnupg wget && \

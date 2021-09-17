@@ -1,7 +1,7 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_mkfastq/versions/2/plain-WDL/descriptor" as srm
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:spaceranger_count/versions/2/plain-WDL/descriptor" as src
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/spaceranger/spaceranger_mkfastq.wdl" as srm
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/spaceranger/spaceranger_count.wdl" as src
 
 workflow spaceranger_workflow {
     input {

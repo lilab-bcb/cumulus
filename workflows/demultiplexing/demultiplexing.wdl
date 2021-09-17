@@ -1,8 +1,8 @@
 version 1.0
 
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:demuxEM/versions/6/plain-WDL/descriptor" as dem
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:souporcell/versions/6/plain-WDL/descriptor" as soc
-import "https://api.firecloud.org/ga4gh/v1/tools/cumulus:popscle/versions/6/plain-WDL/descriptor" as psc
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/demultiplexing/demuxEM.wdl" as dem
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/demultiplexing/souporcell.wdl" as soc
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/demultiplexing/popscle.wdl" as psc
 
 workflow demultiplexing {
     input {

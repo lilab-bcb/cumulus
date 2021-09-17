@@ -11,9 +11,8 @@ RUN apt-get update && \
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
 RUN python -m pip install --upgrade pip --no-cache-dir && \
-    python -m pip install stratocumulus==0.1.1 --no-cache-dir
-
-RUN pip3 install pandas && \
+    python -m pip install stratocumulus==0.1.1 --no-cache-dir && \
+    pip3 install pandas && \
     pip3 install packaging
 
 RUN mkdir /software

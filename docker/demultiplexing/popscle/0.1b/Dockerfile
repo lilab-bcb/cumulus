@@ -2,9 +2,7 @@ FROM continuumio/miniconda3:4.7.12
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update --allow-releaseinfo-change && \
-    apt-get update
-
-RUN apt-get -qq -y install --no-install-recommends \
+    apt-get -qq -y install --no-install-recommends && \
         build-essential \
         curl \
         wget \
@@ -42,7 +40,7 @@ RUN pip install --upgrade pip && \
     pip install numba==0.53.1 && \
     pip install argparse==1.4.0 && \
     pip install networkx==2.5.1 && \
-    pip install pegasusio==0.2.10 && \
+    pip install pegasusio==0.3.1.post2 && \
     pip install stratocumulus==0.1.1
 
 RUN mkdir /software

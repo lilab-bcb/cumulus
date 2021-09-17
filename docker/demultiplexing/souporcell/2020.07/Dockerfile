@@ -60,7 +60,7 @@ RUN conda install -y python==3.6.10 && \
     pip install anndata==0.7.4 && \
     pip install zarr==2.4.0 && \
     pip install networkx==2.5 && \
-    pip install pegasusio==0.2.5.post2 \
+    pip install pegasusio==0.3.1.post2 \
     pip install stratocumulus==0.1.1
 
 RUN cd /opt && \
