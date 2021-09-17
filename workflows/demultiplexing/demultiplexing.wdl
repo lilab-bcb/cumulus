@@ -1,8 +1,8 @@
 version 1.0
 
-import "demuxEM.wdl" as dem
-import "souporcell.wdl" as soc
-import "popscle.wdl" as psc
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/demultiplexing/demuxEM.wdl" as dem
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/demultiplexing/souporcell.wdl" as soc
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/demultiplexing/popscle.wdl" as psc
 
 workflow demultiplexing {
     input {

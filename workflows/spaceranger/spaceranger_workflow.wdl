@@ -1,7 +1,7 @@
 version 1.0
 
-import "spaceranger_mkfastq.wdl" as srm
-import "spaceranger_count.wdl" as src
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/spaceranger/spaceranger_mkfastq.wdl" as srm
+import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/spaceranger/spaceranger_count.wdl" as src
 
 workflow spaceranger_workflow {
     input {
