@@ -2,7 +2,7 @@ FROM continuumio/miniconda3:4.7.12
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update --allow-releaseinfo-change && \
-    apt-get -qq -y install --no-install-recommends && \
+    apt-get -qq -y install --no-install-recommends \
         build-essential \
         curl \
         wget \

@@ -32,7 +32,7 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install seaborn==0.11.1 --no-cache-dir && \
     python -m pip install anndata==0.7.6 --no-cache-dir && \
     python -m pip install zarr==2.8.3 --no-cache-dir && \
-    python -m pip install pegasusio==0.2.12.post1 --no-cache-dir && \
+    python -m pip install pegasusio==0.3.1.post2 --no-cache-dir && \
     python -m pip install demuxEM==0.1.6 --no-cache-dir && \
     python -m pip install stratocumulus==0.1.1 --no-cache-dir
 
