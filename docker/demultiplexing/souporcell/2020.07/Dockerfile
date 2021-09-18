@@ -2,7 +2,7 @@ FROM continuumio/miniconda3:4.6.14
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && apt-get install -y wget build-essential curl libncurses5-dev zlib1g-dev libbz2-dev liblzma-dev git unzip && \
-    apt-get install --no-install-recommends -y lsb-release gnupg && \
+    apt-get install --no-install-recommends -y lsb-release gnupg python3-dev python3-pip && \
     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
@@ -49,7 +49,7 @@ RUN cd /opt && \
 
 ENV PATH=/opt/souporcell:/opt/souporcell/troublet/target/release:$PATH
 
-RUN conda install -y python==3.6.10 && \
+RUN pip install --upgrade pip && \
     pip install numpy==1.19.2 && \
     pip install pandas==1.1.2 && \
     pip install scipy==1.5.2 && \
@@ -60,7 +60,7 @@ RUN conda install -y python==3.6.10 && \
     pip install anndata==0.7.4 && \
     pip install zarr==2.4.0 && \
     pip install networkx==2.5 && \
-    pip install pegasusio==0.3.1.post2 \
+    pip install pegasusio==0.2.12.post1 \
     pip install stratocumulus==0.1.1
 
 RUN cd /opt && \
