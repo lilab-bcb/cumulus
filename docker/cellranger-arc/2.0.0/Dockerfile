@@ -8,8 +8,10 @@ RUN apt-get update && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
     apt-get update && apt-get install -y google-cloud-sdk=338.0.0-0
 
-RUN pip3 install pandas && \
-    pip3 install packaging
+RUN pip3 install --upgrade pip && \
+    pip3 install pandas && \
+    pip3 install packaging && \
+    pip3 install stratocumulus==0.1.1
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
