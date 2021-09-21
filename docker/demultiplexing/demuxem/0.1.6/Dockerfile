@@ -18,12 +18,12 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 
 RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install setuptools==57.0.0 --no-cache-dir && \
-    python -m pip install numpy==1.20.3 --no-cache-dir && \
-    python -m pip install scipy==1.6.3 --no-cache-dir && \
-    python -m pip install pandas==1.2.4 --no-cache-dir && \
+    python -m pip install numpy==1.21.0 --no-cache-dir && \
+    python -m pip install scipy==1.7.0 --no-cache-dir && \
+    python -m pip install pandas==1.2.5 --no-cache-dir && \
     python -m pip install scikit-learn==0.24.2 --no-cache-dir && \
     python -m pip install Cython==0.29.23 --no-cache-dir && \
-    python -m pip install h5py==3.2.1 --no-cache-dir && \
+    python -m pip install h5py==3.3.0 --no-cache-dir && \
     python -m pip install joblib==1.0.1 --no-cache-dir && \
     python -m pip install loompy==3.0.6 --no-cache-dir && \
     python -m pip install matplotlib==3.4.2 --no-cache-dir && \
