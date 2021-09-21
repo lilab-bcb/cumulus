@@ -1,4 +1,4 @@
-FROM continuumio/miniconda3:4.6.14
+FROM continuumio/miniconda3:4.10.3
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && apt-get install -y wget build-essential curl libncurses5-dev zlib1g-dev libbz2-dev liblzma-dev git unzip && \
@@ -9,6 +9,11 @@ RUN apt-get update && apt-get install -y wget build-essential curl libncurses5-d
     apt-get update && apt-get install -y google-cloud-sdk=357.0.0-0 && \
     apt-get -qq -y autoremove && \
     apt-get clean
+
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.2.39.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    rm awscliv2.zip
 
 RUN cd /opt && \
     wget -O minimap2.tar.gz https://github.com/lh3/minimap2/archive/v2.7.tar.gz && \
@@ -49,19 +54,11 @@ RUN cd /opt && \
 
 ENV PATH=/opt/souporcell:/opt/souporcell/troublet/target/release:$PATH
 
-RUN conda install -y python==3.6.10 && \
-    pip install numpy==1.19.2 && \
-    pip install pandas==1.1.2 && \
-    pip install scipy==1.5.2 && \
-    pip install pysam==0.16.0.1 && \
-    pip install pyvcf==0.6.8 && \
-    pip install pystan==2.19.1.1 && \
-    pip install pyfaidx==0.5.9 && \
-    pip install anndata==0.7.4 && \
-    pip install zarr==2.4.0 && \
-    pip install networkx==2.5 && \
-    pip install pegasusio==0.3.1.post2 \
-    pip install stratocumulus==0.1.1
+RUN conda install -y python=3.6.13 && \
+    conda install -y -c conda-forge numpy=1.19.5 pandas=1.1.5 scipy=1.5.3 pystan=2.19.1.1 pyvcf=0.6.8 anndata=0.7.6 zarr=2.8.3 networkx=2.5.1 && \
+    conda install -y -c bioconda pysam=0.16.0.1 pyfaidx=0.6.2 pegasusio=0.2.10
+
+RUN pip install stratocumulus==0.1.1
 
 RUN cd /opt && \
     wget -O htslib.tar.bz2 https://github.com/samtools/htslib/releases/download/1.9/htslib-1.9.tar.bz2 && \
