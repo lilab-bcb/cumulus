@@ -86,7 +86,7 @@ workflow demultiplexing {
         # Grid of alpha to search for [default: "0.1,0.2,0.3,0.4,0.5"]
         String? popscle_alpha
         # Popscle version. Available versions: "2021.05", "0.1b"
-        String popscle_version = "0.1b"
+        String popscle_version = "2021.05"
         # A comma-separated list of donor names for renaming clusters achieved by freemuxlet
         String? popscle_rename_donors
         # Number of CPUs used for popscle per pair
