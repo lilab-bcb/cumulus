@@ -15,7 +15,8 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.2.39.zip" -o "a
 
 RUN pip3 install --upgrade pip && \
     pip3 install pandas==1.2.5 && \
-    pip3 install packaging==21.0
+    pip3 install packaging==21.0 && \
+    pip3 install stratocumulus==0.1.1
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
