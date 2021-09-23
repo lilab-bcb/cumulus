@@ -1,6 +1,6 @@
 version 1.0
 
-import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cumulus/cumulus_tasks.wdl" as tasks
+import "cumulus_tasks.wdl" as tasks
 
 workflow cumulus {
 	input {

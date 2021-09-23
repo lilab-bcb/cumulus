@@ -1,14 +1,14 @@
 version 1.0
 
-import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cellranger/cellranger_mkfastq.wdl" as crm
-import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cellranger/cellranger_count.wdl" as crc
-import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cellranger/cellranger_multi.wdl" as crmulti
-import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cellranger/cellranger_vdj.wdl" as crv
-import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cumulus/cumulus_adt.wdl" as ca
-import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cellranger/cellranger_atac_mkfastq.wdl" as cram
-import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cellranger/cellranger_atac_count.wdl" as crac
-import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cellranger/cellranger_arc_mkfastq.wdl" as crarm
-import "https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cellranger/cellranger_arc_count.wdl" as crarc
+import "cellranger_mkfastq.wdl" as crm
+import "cellranger_count.wdl" as crc
+import "cellranger_multi.wdl" as crmulti
+import "cellranger_vdj.wdl" as crv
+import "../cumulus/cumulus_adt.wdl" as ca
+import "cellranger_atac_mkfastq.wdl" as cram
+import "cellranger_atac_count.wdl" as crac
+import "cellranger_arc_mkfastq.wdl" as crarm
+import "cellranger_arc_count.wdl" as crarc
 
 workflow cellranger_workflow {
     input {
