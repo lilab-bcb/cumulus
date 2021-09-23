@@ -13,10 +13,7 @@ RUN apt-get -qq update && \
 
 RUN pip3 install --upgrade pip --no-cache-dir && \
     pip3 install numpy==1.21.0 --no-cache-dir && \
-    pip3 install pandas==1.2.5 --no-cache-dir && \
-    pip3 install matplotlib==3.4.2 --no-cache-dir && \
-    pip3 install packaging==21.0 --no-cache-dir && \
-    pip3 install stratocumulus==0.1.1 --no-cache-dir
+    pip3 install pandas==1.2.5 --no-cache-dir
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
