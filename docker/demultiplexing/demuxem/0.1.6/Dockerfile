@@ -4,6 +4,7 @@ SHELL ["/bin/bash", "-c"]
 RUN apt-get -qq update && \
     apt-get -qq -y install --no-install-recommends \
         curl \
+        unzip \
         gnupg \
         python3 \
         build-essential \
@@ -13,6 +14,11 @@ RUN apt-get -qq update && \
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
     apt-get update -y && apt-get install -y google-cloud-sdk=357.0.0-0
+
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.2.39.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    rm awscliv2.zip
 
 RUN ln -s /usr/bin/python3 /usr/bin/python
 

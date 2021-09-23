@@ -5,6 +5,7 @@ RUN apt-get update && \
     apt-get -qq -y install --no-install-recommends \
         build-essential \
         curl \
+        unzip \
         wget \
         gnupg \
         unzip \
@@ -20,6 +21,11 @@ RUN apt-get update && \
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
     apt-get update -y && apt-get install -y google-cloud-sdk=357.0.0-0
+
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.2.39.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    rm awscliv2.zip
 
 RUN mkdir /software && \
     wget https://github.com/samtools/htslib/releases/download/1.12/htslib-1.12.tar.bz2 && \
