@@ -146,7 +146,7 @@ task run_cellranger_mkfastq {
                 subprocess.check_call(call_args)
         CODE
 
-        strato --backend "~{backend}" -m -r results/outs "~{output_directory}/~{run_id}_fastqs"
+        strato sync --backend "~{backend}" -m results/outs "~{output_directory}/~{run_id}_fastqs"
 
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError
@@ -155,7 +155,7 @@ task run_cellranger_mkfastq {
                 call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_fastqs/input_samplesheet.csv']
                 print(' '.join(call_args))
                 check_output(call_args)
-                call_args = ['strato', '--backend', '~{backend}', 'rm', '-m', '-r', '~{input_bcl_directory}']
+                call_args = ['strato', 'rm', '--backend', '~{backend}', '-m', '-r', '~{input_bcl_directory}']
                 print(' '.join(call_args))
                 check_call(call_args)
                 print('~{input_bcl_directory} is deleted!')
