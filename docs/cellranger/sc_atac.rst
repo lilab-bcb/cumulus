@@ -150,6 +150,14 @@ Workflow input
 	  - Number of cpus for cellranger-atac count
 	  - 64
 	  - 64
+	* - backend
+	  - Cloud backend for file transfer. Available options:
+
+	  	- "gcp" for Google Cloud;
+	  	- "aws" for Amazon AWS;
+	  	- "local" for local machine.
+	  - "gcp"
+	  - "gcp"
 	* - atac_memory
 	  - Memory string for cellranger-atac count
 	  - "57.6G"
@@ -259,6 +267,14 @@ To aggregate multiple scATAC-Seq samples, follow the instructions below:
 	  - Number of cpus to request for cellranger atac aggr.
 	  - 64
 	  - 64
+	* - backend
+	  - Cloud backend for file transfer. Available options:
+
+	  	- "gcp" for Google Cloud;
+	  	- "aws" for Amazon AWS;
+	  	- "local" for local machine.
+	  - "gcp"
+	  - "gcp"
 	* - memory
 	  - Memory size string for cellranger atac aggr.
 	  - "57.6G"
@@ -280,7 +296,7 @@ To aggregate multiple scATAC-Seq samples, follow the instructions below:
 	  - "quay.io/cumulus"
 	  - "quay.io/cumulus"
 
-3. Check out the output in ``output_directory/aggr_id`` folder, where ``output_directory`` and ``aggr_id`` are the inputs you set in Step 2.
+1. Check out the output in ``output_directory/aggr_id`` folder, where ``output_directory`` and ``aggr_id`` are the inputs you set in Step 2.
 
 
 .. _10x single cell ATAC sample index set names: https://support.10xgenomics.com/single-cell-atac/sequencing/doc/specifications-sample-index-sets-for-single-cell-atac

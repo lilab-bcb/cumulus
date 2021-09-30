@@ -127,9 +127,9 @@ For single-cell multiomics data, ``cellranger_workflow`` takes Illumina outputs 
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/cmo_set.csv"
 	  -
 	* - cellranger_version
-	  - cellranger version, could be 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2
-	  - "6.0.1"
-	  - "6.0.1"
+	  - cellranger version, could be 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2
+	  - "6.1.1"
+	  - "6.1.1"
 	* - cellranger_arc_version
 	  - cellranger-arc version, could be 2.0.0, 1.0.1, 1.0.0
 	  - "2.0.0"
@@ -156,6 +156,14 @@ For single-cell multiomics data, ``cellranger_workflow`` takes Illumina outputs 
 	  - Number of cpus to request for one node for cellranger mkfastq and cellranger vdj
 	  - 32
 	  - 32
+	* - backend
+	  - Cloud backend for file transfer. Available options:
+
+	  	- "gcp" for Google Cloud;
+	  	- "aws" for Amazon AWS;
+	  	- "local" for local machine.
+	  - "gcp"
+	  - "gcp"
 	* - memory
 	  - Memory size string for cellranger/cellranger-arc mkfastq and cellranger vdj
 	  - "120G"

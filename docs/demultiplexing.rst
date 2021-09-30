@@ -141,6 +141,14 @@ global inputs
 	  - Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: ``0.2``, ``0.1``.
 	  - "0.2"
 	  - "0.2"
+	* - backend
+	  - Cloud backend for file transfer. Available options:
+
+	  	- "gcp" for Google Cloud;
+	  	- "aws" for Amazon AWS;
+	  	- "local" for local machine.
+	  - "gcp"
+	  - "gcp"
 	* - zones
 	  - Google cloud zones to consider for execution.
 	  - "us-east1-d us-west1-a us-west1-b"
@@ -224,8 +232,8 @@ souporcell inputs
 	    - ``2020.07``: Based on commitment `0d09fb <https://github.com/wheaton5/souporcell/tree/0d09fbe26d878adb294b536c4f41a7718c0d0f9d>`_ on 2020/07/27.
 
 	    - ``2020.03``: Based on commitment `eeddcd <https://github.com/wheaton5/souporcell/tree/eeddcde5892c5cbf8aba2149f0e77756f830a5ae>`_ on 2020/03/31.
-	  - "2020.07"
-	  - "2020.07"
+	  - "2021.03"
+	  - "2021.03"
 	* - souporcell_num_clusters
 	  - | souporcell parameter. Number of expected clusters when doing clustering.
 	    | **This needs to be set when running souporcell.**
@@ -335,8 +343,8 @@ Popscle inputs
 	    - ``2021.05``: Based on commitment `da70fc7 <https://github.com/statgen/popscle/tree/da70fc78da385ef049e0e890342acfd62842cae0>`_ on 2021/05/05.
 
 	    - ``0.1b``: Based on version `0.1-beta <https://github.com/statgen/popscle/releases/tag/v0.1-beta>`_ released on 2019/10/03.
-	  - "0.1b"
-	  - "0.1b"
+	  - "2021.05"
+	  - "2021.05"
 	* - popscle_num_cpu
 	  - popscle parameter. Number of CPU used by popscle per pair.
 	  - 1

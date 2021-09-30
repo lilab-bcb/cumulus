@@ -96,9 +96,9 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
-		  - "6.0.1"
-		  - "6.0.1"
+		  - cellranger version, could be 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
+		  - "6.1.1"
+		  - "6.1.1"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -115,6 +115,14 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - Number of cpus to request for one node for building indices
 		  - 1
 		  - 1
+		* - backend
+		  - Cloud backend for file transfer. Available options:
+
+		    - "gcp" for Google Cloud;
+		    - "aws" for Amazon AWS;
+		    - "local" for local machine.
+		  - "gcp"
+		  - "gcp"
 		* - memory
 		  - Memory size in GB
 		  - 32
@@ -220,6 +228,14 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 		  - Google cloud zones
 		  - "us-central1-a us-west1-a"
 		  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+		* - backend
+		  - Cloud backend for file transfer. Available options:
+
+		    - "gcp" for Google Cloud;
+		    - "aws" for Amazon AWS;
+		    - "local" for local machine.
+		  - "gcp"
+		  - "gcp"
 		* - memory
 		  - Memory size string for cellranger-atac mkref
 		  - "32G"
@@ -233,7 +249,7 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 		  - 2
 		  - 2
 
-1. Workflow output
+4. Workflow output
 ==================
 
 	.. list-table::
@@ -302,9 +318,9 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
-		  - "6.0.1"
-		  - "6.0.1"
+		  - cellranger version, could be 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
+		  - "6.1.1"
+		  - "6.1.1"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -321,6 +337,14 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - Memory size string for cellranger-atac mkref
 		  - "32G"
 		  - "32G"
+		* - backend
+		  - Cloud backend for file transfer. Available options:
+
+		    - "gcp" for Google Cloud;
+		    - "aws" for Amazon AWS;
+		    - "local" for local machine.
+		  - "gcp"
+		  - "gcp"
 		* - disk_space
 		  - Optional disk space in GB
 		  - 100
@@ -334,7 +358,7 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - 2
 		  - 2
 
-4. Workflow output
+1. Workflow output
 ==================
 
 	.. list-table::

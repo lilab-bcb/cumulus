@@ -162,9 +162,9 @@ global inputs
       - "my_sample"
       -
     * - pegasus_version
-      - Pegasus version to use for analysis. Versions available: ``1.4.0``, ``1.3.0``.
-      - "1.4.0"
-      - "1.4.0"
+      - Pegasus version to use for analysis. Versions available: ``1.4.3``, ``1.4.2``, ``1.4.0``, ``1.3.0``.
+      - "1.4.3"
+      - "1.4.3"
     * - docker_registry
       - Docker registry to use. Options:
 
@@ -177,6 +177,14 @@ global inputs
       - Google cloud zones to consider for execution.
       - "us-east1-d us-west1-a us-west1-b"
       - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+    * - backend
+      - Cloud backend for file transfer. Available options:
+
+        - "gcp" for Google Cloud;
+        - "aws" for Amazon AWS;
+        - "local" for local machine.
+      - "gcp"
+      - "gcp"
     * - num_cpu
       - Number of CPUs per Cumulus job
       - 32
