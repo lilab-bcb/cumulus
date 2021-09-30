@@ -30,8 +30,8 @@ workflow cumulus_adt {
 		String cumulus_feature_barcoding_version
 		# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 		String zones = "us-central1-b"
-                # Backend
-                String backend = "gcp"
+		# Backend
+		String backend = "gcp"
 		# Memory string, e.g. 32G
 		String memory = "32G"
 		# Disk space in GB
