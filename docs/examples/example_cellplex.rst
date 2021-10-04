@@ -27,38 +27,26 @@ In this example, we have the following experiment setting:
 
 * A sample named ``cellplex_gex`` by pooling all RNA data together for sequencing, with index ``SI-TT-A1``;
 * A sample named ``cellplex_barcode`` for hashing data, with index ``SI-NN-A1``;
-* Three samples to perform individual control, respectively (named ``A``, ``B`` and ``C``), with indexes ``SI-TT-A2``, ``SI-TT-A3``, and ``SI-TT-A4``, respectively.
+* Three samples to perform individual control:
 
-Besides, you should also have a CellRanger Multi config file like the following::
+  * Sample ``A`` with index ``SI-TT-A2`` and CMO ID ``CMO_301``,
+  * Sample ``B`` with index ``SI-TT-A3`` and CMO ID ``CMO_302``,
+  * Sample ``C`` with index ``SI-TT-A4`` and CMO ID ``CMO_303``
 
-    [samples],,,
-    sample_id,cmo_ids,description,
-    CP_1_I,CMO_301,CP_1_I
-    CP_1_C,CMO_302,CP_1_C
-    CP_2_I,CMO_303,CP_2_I
-    CP_2_C,CMO_304,CP_2_C
-    CP_3_I,CMO_305,CP_3_I
-    CP_3_C,CMO_306,CP_3_C
+To extract feature barcodes for the hashing data, we need to create a feature barcoding file (say named ``feature_barcode.csv``). Please refer to `10X Multi CMO Reference`_ for the sequence information of these CMO IDs::
 
-which means we have 3 donors for the experiment, with hashing IDs shown by ``cmo_ids``.
-
-We need to create a feature barcoding file (say named ``feature_barcode.csv``) for the gene-count matrix extraction on the hashing data. Please refer to `10X Multi CMO Reference`_ for the sequence information of these CMO IDs::
-
-    ATGAGGAATTCCTGC,CP_1_I
-    CATGCCAATAGAGCG,CP_1_C
-    CCGTCGTCCAAGCAT,CP_2_I
-    AACGTTAATCACTCA,CP_2_C
-    CGCGATATGGTCGGA,CP_3_I
-    AAGATGAGGTCTGTG,CP_3_C
+    ATGAGGAATTCCTGC,A
+    CATGCCAATAGAGCG,B
+    CCGTCGTCCAAGCAT,C
 
 After that, create a sample sheet in CSV format (say named ``cellranger_sample_sheet.csv``) as the following::
 
-    Sample,Reference,Flowcell,DataType,FeatureBarcodeFile
-    cellplex_gex,GRCh38-2020-A,/path/to/flowcell/folder,rna
-    cellplex_barcode,GRCh38-2020-A,/path/to/flowcell/folder,cmo,/path/to/feature_barcode.csv
-    A,GRCh38-2020-A,/path/to/flowcell/folder,rna
-    B,GRCh38-2020-A,/path/to/flowcell/folder,rna
-    C,GRCh38-2020-A,/path/to/flowcell/folder,rna
+    Sample,Reference,Flowcell,Index,DataType,FeatureBarcodeFile
+    cellplex_gex,GRCh38-2020-A,/path/to/flowcell/folder,SI-TT-A1,rna
+    cellplex_barcode,GRCh38-2020-A,/path/to/flowcell/folder,SI-NN-A1,cmo,/path/to/feature_barcode.csv
+    A,GRCh38-2020-A,/path/to/flowcell/folder,SI-TT-A2,rna
+    B,GRCh38-2020-A,/path/to/flowcell/folder,SI-TT-A3,rna
+    C,GRCh38-2020-A,/path/to/flowcell/folder,SI-TT-A4,rna
 
 where
 
@@ -107,7 +95,7 @@ where ``<your-job-ID>`` should be replaced by the actual Cromwell job ID.
 
 When the job is done, you'll get results in ``gs://my-bucket/cellplex/cellranger_output``. It should contain 6 subfolders, each of which is associated with one sample in ``cellranger_sample_sheet.csv``.
 
-2. Demultiplexing
+1. Demultiplexing
 ^^^^^^^^^^^^^^^^^^^
 
 Next, we need to demultiplex the resulting gene-count matrices. In this example, we perform both DemuxEM_ and Souporcell_ methods, respectively.
@@ -144,7 +132,7 @@ where
 * ``GRCh38-2020-A`` is the genome reference used by Souporcell, which should be consistent with your settings in Step 1.
 * ``souporcell_num_clusters`` is to set the number of clusters you expect to see for Souporcell clustering. Since we have 3 donors, so set it to 3.
 
-For details, please refer to `Demultiplexing workflow inputs`.
+For details, please refer to `Demultiplexing workflow inputs`_.
 
 Now submit the demultiplexing job to Cromwell server on Cloud::
 
@@ -157,8 +145,81 @@ where
 
 Similarly, when the submission succeeds, you'll get another job ID for demultiplexing. You can use it to track the job status.
 
+When finished, below are the important output files:
+
+* DemuxEM output: In folder ``gs://my-bucket/cellplex/demux_output/cellplex_demux``,
+
+  * ``cellplex_demux_demux.zarr.zip``: Demultiplexed RNA raw count matrix. This will be used for downstream analysis.
+  * ``cellplex_demux.out.demuxEM.zarr.zip``: This file contains intermediate results for both RNA and hashing count matrices, which is useful for compare with other demultiplexing methods.
+  * DemuxEM plots in PDF format. They are used for estimating the performance of DemuxEM on the data.
+
+* Souporcell output: In folder ``gs://my-bucket/cellplex/demux_output/cellplex_souporcell``,
+
+  * ``cellplex_souporcell_demux.zarr.zip``: Demultiplexed RNA raw count matrix. This will be used for downstream analysis.
+  * ``clusters.tsv``: Inferred droplet type and cluster assignment for each cell barcode.
+  * ``cluster_genotypes.vcf``: Inferred genotypes for each cluster.
+
 3. Interactive Data Analysis
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+You may use `Cumulus workflow`_ to perform the downstream analysis in a batch way.
+Alternatively, you can also download the demultiplexing results from the Cloud bucket to your local machine, and perform the analysis interactively.
+This section introduces how to use Cumulus' analysis module Pegasus to load demultiplexing results, perform quality control (QC), and compare the performance of the two methods.
+
+You'll need to first install `Pegasus`_ in your local Python environment. Also, download the demultiplexed raw counts in ``.zarr.zip`` format mentioned above to your local machine.
+
+3.1. Extract Singlet/Doublet Type and Assignment
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We can load the DemuxEM result, and perform QC by::
+
+    import pegasus as pg
+    data_demuxEM = pg.read_input("cellplex_demux_demux.zarr.zip")
+    pg.qc_metrics(data_demuxEM, min_genes=500, max_genes=6000, mito_prefix='MT-', percent_mito=20)
+    pg.filter_data(data_demuxEM)
+
+where ``qc_metrics`` and ``filter_data`` are Pegasus functions to filter out low quality cells, and keep those with number of genes within range ``[500, 6000)``
+and having expression of mitochondrial genes ``<= 20%``. Please see `Pegasus preprocess tools`_ for details.
+
+And export the cell barcodes along with their singlet/doublet type and assignment as a CSV file by::
+
+    data_demuxEM.obs.to_csv("demuxEM_assignment.csv")
+
+We can also do it similarly for the Souporcell result as above, by reading ``cellplex_souporcell_demux.zarr.zip`` instead.
+
+3.2. Compare the Two Demultiplexing Methods
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+We can compare the performance of DemuxEM and Souporcell by plotting a heatmap showing their singlet/doublet assignment results.
+
+Assume we've already loaded the two results (``data_demuxEM`` for DemuxEM result, ``data_souporcell`` for Souporcell result), and performed QC as in 3.1.
+The following Python code will generate this heatmap in an interactive Python environment (e.g. in a Jupyter notebook)::
+
+    import pandas as pd
+    import matplotlib.pyplot as plt
+    import seaborn as sns
+
+    def extract_assignment(data):
+        assign = data.obs['demux_type'].values.astype('object')
+        idx_singlet = (data.obs['demux_type'] == 'singlet').values
+        assign[idx_singlet] = data.obs.loc[idx_singlet, 'assignment'].values.astype(object)
+        return assign
+
+    assign_demuxEM = extract_assignment(data_demuxEM)
+    assign_souporcell = extract_assignment(data_souporcell)
+
+    df = pd.crosstab(assign_demuxEM, assign_souporcell)
+    df.columns.name = df.index.name = ""
+    ax = plt.gca()
+    ax.xaxis.tick_top()
+    ax = sns.heatmap(df, annot=True, fmt='d', cmap='inferno', ax=ax)
+    plt.tight_layout()
+    plt.gcf().dpi=500
+
+3.3. Downstream Analysis
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+To perform further downstream analysis on the singlets, please refer to `Pegasus tutorials`_.
 
 
 .. _10X Multi CMO Reference: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/multi#cmoreference
@@ -171,3 +232,7 @@ Similarly, when the submission succeeds, you'll get another job ID for demultipl
 .. _Demultiplexing workflow sample sheet format: ../demultiplexing.html#prepare-a-sample-sheet
 .. _Demultiplexing workflow inputs: ../demultiplexing.html#workflow-inputs
 .. _demultiplexing: https://dockstore.org/workflows/github.com/klarman-cell-observatory/cumulus/Demultiplexing
+.. _Cumulus workflow: ../cumulus.html
+.. _Pegasus: https://pegasus.readthedocs.io/en/stable/installation.html
+.. _Pegasus preprocess tools: https://pegasus.readthedocs.io/en/stable/api/index.html#preprocess
+.. _Pegasus tutorials: https://pegasus.readthedocs.io/en/stable/tutorials.html
