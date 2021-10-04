@@ -41,12 +41,12 @@ To extract feature barcodes for the hashing data, we need to create a feature ba
 
 After that, create a sample sheet in CSV format (say named ``cellranger_sample_sheet.csv``) as the following::
 
-    Sample,Reference,Flowcell,Index,DataType,FeatureBarcodeFile
-    cellplex_gex,GRCh38-2020-A,/path/to/flowcell/folder,SI-TT-A1,rna
-    cellplex_barcode,GRCh38-2020-A,/path/to/flowcell/folder,SI-NN-A1,cmo,/path/to/feature_barcode.csv
-    A,GRCh38-2020-A,/path/to/flowcell/folder,SI-TT-A2,rna
-    B,GRCh38-2020-A,/path/to/flowcell/folder,SI-TT-A3,rna
-    C,GRCh38-2020-A,/path/to/flowcell/folder,SI-TT-A4,rna
+    Sample,Reference,Flowcell,Lane,Index,DataType,FeatureBarcodeFile
+    cellplex_gex,GRCh38-2020-A,/path/to/flowcell/folder,*,SI-TT-A1,rna
+    cellplex_barcode,GRCh38-2020-A,/path/to/flowcell/folder,*,SI-NN-A1,cmo,/path/to/feature_barcode.csv
+    A,GRCh38-2020-A,/path/to/flowcell/folder,*,SI-TT-A2,rna
+    B,GRCh38-2020-A,/path/to/flowcell/folder,*,SI-TT-A3,rna
+    C,GRCh38-2020-A,/path/to/flowcell/folder,*,SI-TT-A4,rna
 
 where
 
@@ -95,7 +95,7 @@ where ``<your-job-ID>`` should be replaced by the actual Cromwell job ID.
 
 When the job is done, you'll get results in ``gs://my-bucket/cellplex/cellranger_output``. It should contain 6 subfolders, each of which is associated with one sample in ``cellranger_sample_sheet.csv``.
 
-1. Demultiplexing
+2. Demultiplexing
 ^^^^^^^^^^^^^^^^^^^
 
 Next, we need to demultiplex the resulting gene-count matrices. In this example, we perform both DemuxEM_ and Souporcell_ methods, respectively.
