@@ -112,8 +112,8 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	    | or "gs://user-bucket/starsolo.tar.gz"
 	  -
 	* - **chemistry**
-	  - | Chemistry name. Available options: "tenX_v3" (for 10X V3 chemistry), "tenX_v2" (for 10X V2 chemistry), "DropSeq", "SeqWell" and "custom".
-	    | For "DropSeq" and "SeqWell", CBstart=1, CBlen=12, UMIstart=13, UMIlen=8.
+	  - | Chemistry name. Available options: "tenX_v3" (for 10X V3 chemistry), "tenX_v2" (for 10X V2 chemistry), "DropSeq", "SeqWell", "SlideSeq" and "custom".
+	    | For "DropSeq", "SeqWell" and "SlideSeq", CBstart=1, CBlen=12, UMIstart=13, UMIlen=8.
 	  - "tenX_v3"
 	  -
 	* - **output_directory**
