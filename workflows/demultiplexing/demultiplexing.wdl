@@ -42,7 +42,7 @@ workflow demultiplexing {
         # Reference Index TSV
         File ref_index_file = "gs://regev-lab/resources/cellranger/index.tsv"
         # DemuxEM version
-        String demuxEM_version = "0.1.6"
+        String demuxEM_version = "0.1.7"
         # Number of CPUs used
         Int demuxEM_num_cpu = 8
         # Disk space in GB
