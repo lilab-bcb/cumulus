@@ -108,7 +108,7 @@ Prepare a sample sheet in CSV format (say named ``demux_sample_sheet.csv``) for 
 
     OUTNAME,RNA,TagFile,TYPE
     cellplex_demux,gs://my-bucket/cellplex/cellranger_output/cellplex_gex/raw_feature_bc_matrix.h5,gs://my-buckjet/cellplex/cellranger_output/cellplex_barcode/cellplex_barcode.csv,cell-hashing
-    cellplex_souporcell,gs://gs://my-bucket/cellplex/cellranger_output/cellplex_gex/raw_feature_bc_matrix.h5,gs://my-bucket/cellplex/cellranger_output/cellplex_gex/possorted_genome_bam.bam,genetic-pooling
+    cellplex_souporcell,gs://my-bucket/cellplex/cellranger_output/cellplex_gex/raw_feature_bc_matrix.h5,gs://my-bucket/cellplex/cellranger_output/cellplex_gex/possorted_genome_bam.bam,genetic-pooling
 
 where
 
