@@ -179,7 +179,7 @@ We can load the DemuxEM result, and perform QC by::
     pg.filter_data(data_demuxEM)
 
 where ``qc_metrics`` and ``filter_data`` are Pegasus functions to filter out low quality cells, and keep those with number of genes within range ``[500, 6000)``
-and having expression of mitochondrial genes ``<= 20%``. Please see `Pegasus preprocess tools`_ for details.
+and having expression of mitochondrial genes ``< 20%``. Please see `Pegasus preprocess tools`_ for details.
 
 There are two columns in `data_demuxEM.obs` field related to demultiplexing results:
 
