@@ -181,9 +181,18 @@ We can load the DemuxEM result, and perform QC by::
 where ``qc_metrics`` and ``filter_data`` are Pegasus functions to filter out low quality cells, and keep those with number of genes within range ``[500, 6000)``
 and having expression of mitochondrial genes ``<= 20%``. Please see `Pegasus preprocess tools`_ for details.
 
-And export the cell barcodes along with their singlet/doublet type and assignment as a CSV file by::
+There are two columns in `data_demuxEM.obs` field related to demultiplexing results:
 
-    data_demuxEM.obs.to_csv("demuxEM_assignment.csv")
+* **demux_type**: This column stores the singlet/doublet type of each cell: ``singlet``, ``doublet``, or ``unknown``.
+* **assignment**: This column stores the more detailed assignment of cells regarding samples/donors.
+
+To get the distribution regarding these columns, e.g. *demux_type*::
+
+    data_demuxEM.obs['demux_type'].value_counts()
+
+Besides, you can export the cell barcodes along with their singlet/doublet type and assignment as a CSV file by::
+
+    data_demuxEM.obs[['demux_type', 'assignment']].to_csv("demuxEM_assignment.csv")
 
 We can also do it similarly for the Souporcell result as above, by reading ``cellplex_souporcell_demux.zarr.zip`` instead.
 
