@@ -196,7 +196,7 @@ demuxEM inputs
 	  - "XIST"
 	  -
 	* - demuxEM_version
-	  - demuxEM version to use. Choose from "0.1.6" and "0.1.7".
+	  - demuxEM version to use. Choose from "0.1.7", "0.1.6" and "0.1.5".
 	  - "0.1.7"
 	  - "0.1.7"
 	* - demuxEM_num_cpu
