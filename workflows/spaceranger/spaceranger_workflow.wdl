@@ -60,7 +60,7 @@ workflow spaceranger_workflow {
         # Number of maximum retries when running on AWS
         Int awsMaxRetries = 5
         # Backend
-        String backend = "gcp"
+        String backend
     }
 
     # Output directory, with trailing slashes stripped
