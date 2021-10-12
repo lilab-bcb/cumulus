@@ -33,7 +33,7 @@ Follow the steps below to extract gene-count matrices from SMART-Seq2 data on Te
     ``-m`` means copy in parallel, ``-r`` means copy the directory recursively.
 
 
-#. Create a sample sheet. 
+#. Create a sample sheet.
 
     Please note that the columns in the TSV can be in any order, but that the column names must match the recognized headings.
 
@@ -99,14 +99,14 @@ Please see the description of inputs below. Note that required inputs are shown 
     * - **input_tsv_file**
       - Sample Sheet (contains entity:sample, plate, read1, read2)
       - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.tsv"
-      - 
+      -
     * - **output_directory**
       - Output directory
       - "gs://fc-e0000000-0000-0000-0000-000000000000/smartseq2_output"
       -
     * - **reference**
       - Reference transcriptome to align reads to. Acceptable values:
-      
+
         - Pre-created genome references:
 
           - "GRCh38_ens93filt" for human, genome version is GRCh38, gene annotation is generated using human Ensembl 93 GTF according to `cellranger mkgtf`_;
@@ -116,7 +116,7 @@ Please see the description of inputs below. Note that required inputs are shown 
         - Create a custom genome reference using `smartseq2_create_reference workflow <./smart_seq_2.html#custom-genome>`_, and specify its Google bucket URL here.
       - | "GRCh38_ens93filt", or
         | "gs://fc-e0000000-0000-0000-0000-000000000000/rsem_ref.tar.gz"
-      - 
+      -
     * - aligner
       - Which aligner to use for read alignment. Options are "hisat2-hca", "star" and "bowtie"
       - "star"
@@ -132,7 +132,7 @@ Please see the description of inputs below. Note that required inputs are shown 
     * - docker_registry
       - Docker registry to use. Options:
 
-        - "quay.io/cumulus" for images on Red Hat registry; 
+        - "quay.io/cumulus" for images on Red Hat registry;
 
         - "cumulusprod" for backup images on Docker Hub.
       - "quay.io/cumulus"
@@ -157,10 +157,23 @@ Please see the description of inputs below. Note that required inputs are shown 
       - Disk space for count matrix generation task in GB
       - Integer
       - 10
+    * - backend
+      - Cloud infrastructure backend to use. Available options:
+
+        - "gcp" for Google Cloud;
+        - "aws" for Amazon AWS;
+        - "local" for local machine.
+      - "gcp"
+      - "gcp"
     * - preemptible
-      - Number of preemptible tries
+      - Number of preemptible tries. This works only when *backend* is ``gcp``.
       - 2
       - 2
+    * - awsMaxRetries
+      - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
+      - 5
+      - | 5, if *backend* is ``aws``;
+        | 0, otherwise.
 
 ---------------------------------
 
@@ -217,9 +230,9 @@ The gene-count matrix can be fed directly into **cumulus** for downstream analys
 
 TPM-normalized counts are calculated as follows:
 
-#. Estimate the gene expression levels in TPM using *RSEM*. 
+#. Estimate the gene expression levels in TPM using *RSEM*.
 
-#. Suppose ``c`` reads are achieved for one cell, then calculate TPM-normalized count for gene ``i`` as ``TPM_i / 1e6 * c``. 
+#. Suppose ``c`` reads are achieved for one cell, then calculate TPM-normalized count for gene ``i`` as ``TPM_i / 1e6 * c``.
 
 TPM-normalized counts reflect both the relative expression levels and the cell sequencing depth.
 
@@ -259,14 +272,14 @@ Please see the description of inputs below. Note that required inputs are shown 
       - Default
     * - **fasta**
       - Genome fasta file
-      - | File. 
+      - | File.
         | For example, "gs://fc-e0000000-0000-0000-0000-000000000000/Homo_sapiens.GRCh38.dna.primary_assembly.fa"
-      - 
+      -
     * - **gtf**
       - GTF gene annotation file (e.g. Homo_sapiens.GRCh38.83.gtf)
-      - | File. 
+      - | File.
         | For example, "gs://fc-e0000000-0000-0000-0000-000000000000/Homo_sapiens.GRCh38.83.gtf"
-      - 
+      -
     * - **output_directory**
       - Google bucket url for the output folder
       - "gs://fc-e0000000-0000-0000-0000-000000000000/output_refs"
@@ -280,7 +293,7 @@ Please see the description of inputs below. Note that required inputs are shown 
       - "hisat2-hca"
       - "hisat2-hca"
     * - smartseq2_version
-      - | SMART-Seq2 version to use. 
+      - | SMART-Seq2 version to use.
         | Versions available: 1.1.0.
         | Versions obsoleted: 1.0.0.
       - "1.1.0"
@@ -288,7 +301,7 @@ Please see the description of inputs below. Note that required inputs are shown 
     * - docker_registry
       - Docker registry to use. Options:
 
-        - "quay.io/cumulus" for images on Red Hat registry; 
+        - "quay.io/cumulus" for images on Red Hat registry;
 
         - "cumulusprod" for backup images on Docker Hub.
       - "quay.io/cumulus"
@@ -340,4 +353,3 @@ Outputs
 .. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
 .. _cellranger mkgtf: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/advanced/references
 .. _Terra: https://app.terra.bio/
-

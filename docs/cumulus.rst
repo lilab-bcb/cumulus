@@ -178,7 +178,7 @@ global inputs
       - "us-east1-d us-west1-a us-west1-b"
       - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
     * - backend
-      - Cloud backend for file transfer. Available options:
+      - Cloud infrastructure backend to use. Available options:
 
         - "gcp" for Google Cloud;
         - "aws" for Amazon AWS;
@@ -198,9 +198,14 @@ global inputs
       - 100
       - 100
     * - preemptible
-      - Number of preemptible tries
+      - Number of preemptible tries. This works only when *backend* is ``gcp``.
       - 2
       - 2
+    * - awsMaxRetries
+      - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
+      - 5
+      - | 5, if *backend* is ``aws``;
+        | 0, otherwise.
 
 ---------------------------------
 

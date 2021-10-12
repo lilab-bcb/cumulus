@@ -25,6 +25,10 @@ workflow smartseq2 {
         Float disk_space_multiplier = 11
         # Number of preemptible tries
         Int preemptible = 2
+        # Number of maximum retries when running on AWS
+        Int awsMaxRetries = 5
+        # backend choose from "gcp", "aws", "local"
+        String backend = "gcp"
         # Disk space for count matrix generation task
         Int generate_count_matrix_disk_space = 10
         # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
@@ -68,6 +72,8 @@ workflow smartseq2 {
                     memory = memory,
                     disk_space_multiplier = disk_space_multiplier,
                     preemptible = preemptible,
+                    awsMaxRetries = awsMaxRetries,
+                    backend = backend,
                     docker_registry = docker_registry
             }
         }
@@ -89,6 +95,8 @@ workflow smartseq2 {
                     memory = memory,
                     disk_space_multiplier = disk_space_multiplier,
                     preemptible = preemptible,
+                    awsMaxRetries = awsMaxRetries,
+                    backend = backend,
                     docker_registry = docker_registry
             }
         }
@@ -104,6 +112,8 @@ workflow smartseq2 {
             memory = memory,
             disk_space = generate_count_matrix_disk_space,
             preemptible = preemptible,
+            awsMaxRetries = awsMaxRetries,
+            backend = backend,
             docker_registry = docker_registry
     }
 
@@ -137,6 +147,8 @@ task run_rsem {
         String memory
         Float disk_space_multiplier
         Int preemptible
+        Int awsMaxRetries
+        String backend
         String docker_registry
     }
 
@@ -153,14 +165,11 @@ task run_rsem {
         REFERENCE_NAME="$(basename `ls rsem_ref/*.grp` .grp)"
         rsem-calculate-expression --~{aligner} ~{true="--output-genome-bam" false="" output_genome_bam} ~{true="--star-gzipped-read-file" false="" star_gzipped_read_file} ~{true="--paired-end" false="" defined(read2)} -p ~{num_cpu} --append-names --time ~{read1} ~{default="" read2} rsem_ref/$REFERENCE_NAME ~{sample_name}
 
-        gsutil cp ~{sample_name}.transcript.bam "~{output_directory}"/
-        # mkdir -p "~{output_directory}"
-        # cp ~{sample_name}.transcript.bam "~{output_directory}"/
+        strato cp --backend ~{backend} ~{sample_name}.transcript.bam "~{output_directory}"/
 
         if [ -f ~{sample_name}.genome.bam ]
         then
-            gsutil cp ~{sample_name}.genome.bam "~{output_directory}"/
-            # cp ~{sample_name}.genome.bam "~{output_directory}"/
+            strato cp --backend ~{backend} ~{sample_name}.genome.bam "~{output_directory}"/
         fi
     }
 
@@ -184,6 +193,7 @@ task run_rsem {
         disks: "local-disk " + ceil(size(reference, "GB")*5 + (disk_space_multiplier * (size(read1, "GB") + size(read2, "GB"))) + 1)+ " HDD"
         cpu: num_cpu
         preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
 
@@ -197,6 +207,8 @@ task generate_count_matrix {
         String memory
         Int disk_space
         Int preemptible
+        Int awsMaxRetries
+        String backend
         String docker_registry
     }
 
@@ -205,9 +217,7 @@ task generate_count_matrix {
         export TMPDIR=/tmp
 
         generate_matrix_ss2.py ~{sep=',' gene_results} ~{sep=',' count_results} count_matrix
-        gsutil -m cp -r count_matrix "~{output_directory}"/
-        # mkdir -p "~{output_directory}"
-        # cp -r count_matrix "~{output_directory}"
+        strato sync --backend ~{backend} -m count_matrix "~{output_directory}"/count_matrix
     }
 
     output {
@@ -222,5 +232,6 @@ task generate_count_matrix {
         disks: "local-disk ~{disk_space} HDD"
         cpu: 1
         preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }

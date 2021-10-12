@@ -27,6 +27,8 @@ workflow cumulus {
 		Int disk_space = 100
 		# Number of preemptible tries
 		Int preemptible = 2
+		# Number of maximum retries when running on AWS
+		Int awsMaxRetries = 5
 		# If sample count matrix is in either DGE, mtx, csv, tsv or loom format and there is no Reference column in the csv_file, use default_reference as the reference.
 		String? default_reference
 
@@ -281,6 +283,7 @@ workflow cumulus {
 				memory = memory,
 				disk_space = disk_space,
 				preemptible = preemptible,
+				awsMaxRetries = awsMaxRetries,
 				docker_registry = docker_registry,
 				backend = backend
 		}
@@ -376,6 +379,7 @@ workflow cumulus {
 			memory = memory,
 			disk_space = disk_space,
 			preemptible = preemptible,
+			awsMaxRetries = awsMaxRetries,
 			docker_registry = docker_registry,
 			backend = backend
 	}
@@ -408,6 +412,7 @@ workflow cumulus {
 						memory = memory,
 						disk_space = disk_space,
 						preemptible = preemptible,
+						awsMaxRetries = awsMaxRetries,
 						docker_registry = docker_registry,
 						backend = backend
 				}
@@ -437,6 +442,7 @@ workflow cumulus {
 						memory = memory,
 						disk_space = disk_space,
 						preemptible = preemptible,
+						awsMaxRetries = awsMaxRetries,
 						docker_registry = docker_registry,
 						backend = backend
 				}
@@ -454,6 +460,7 @@ workflow cumulus {
 						disk_space = disk_space,
 						num_cpu = num_cpu,
 						preemptible = preemptible,
+						awsMaxRetries = awsMaxRetries,
 						docker_registry = docker_registry,
 						backend = backend
 				}
@@ -471,6 +478,7 @@ workflow cumulus {
 						memory = memory,
 						disk_space = disk_space,
 						preemptible = preemptible,
+						awsMaxRetries = awsMaxRetries,
 						docker_registry = docker_registry,
 						backend = backend
 				}

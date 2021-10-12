@@ -21,6 +21,8 @@ workflow demultiplexing {
         String docker_registry = "quay.io/cumulus"
         # Number of preemptible tries
         Int preemptible = 2
+        # Number of maximum retries when running on AWS
+        Int awsMaxRetries = 5
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         # Backend
@@ -108,7 +110,9 @@ workflow demultiplexing {
             config_version = config_version,
             docker_registry = docker_registry,
             zones = zones,
-            preemptible = preemptible
+            backend = backend,
+            preemptible = preemptible,
+            awsMaxRetries = awsMaxRetries
     }
 
     if (length(Config.hashing_ids) > 0) {
@@ -134,6 +138,7 @@ workflow demultiplexing {
                     memory = demuxEM_memory,
                     disk_space = demuxEM_disk_space,
                     preemptible = preemptible,
+                    awsMaxRetries = awsMaxRetries,
                     backend = backend
             }
         }
@@ -166,6 +171,7 @@ workflow demultiplexing {
                         memory = souporcell_memory,
                         zones = zones,
                         preemptible = preemptible,
+                        awsMaxRetries = awsMaxRetries,
                         backend = backend
                 }
             }
@@ -194,6 +200,7 @@ workflow demultiplexing {
                         memory = popscle_memory,
                         zones = zones,
                         preemptible = preemptible,
+                        awsMaxRetries = awsMaxRetries,
                         backend = backend
                 }
             }
@@ -212,7 +219,9 @@ task generate_demux_config {
         String config_version
         String docker_registry
         String zones
+        String backend
         Int preemptible
+        Int awsMaxRetries
     }
 
     command {
@@ -266,5 +275,6 @@ task generate_demux_config {
         docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: "~{preemptible}"
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
