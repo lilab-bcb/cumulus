@@ -140,6 +140,10 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	  - Cell barcode white list. Only matters if *chemistry* is "custom".
 	  - gs://my_bucket/my_white_list.txt
 	  -
+	* - star_version
+	  - STAR version to use. Currently only support ``2.7.6a``.
+	  - "2.7.6a"
+	  - "2.7.6a"
 	* - docker_registry
 	  - Docker registry to use:
 
@@ -156,14 +160,14 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	  - Number of CPUs to request for count per sample.
 	  - 32
 	  - 32
+	* - memory
+	  - Memory size string for count per sample.
+	  - "120G"
+	  - "120G"
 	* - disk_space
 	  - Disk space in GB needed for count per sample.
 	  - 500
 	  - 500
-	* - memory
-	  - Memory size in GB needed for count per sample.
-	  - 120
-	  - 120
 	* - backend
 	  - Cloud infrastructure backend to use. Available options:
 
@@ -179,13 +183,7 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	* - awsMaxRetries
 	  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
 	  - 5
-	  - | 5, if *backend* is ``aws``;
-	    | 0, otherwise.
-	* - star_version
-	  - STAR version to use. Currently only support ``2.7.6a``.
-	  - "2.7.6a"
-	  - "2.7.6a"
-
+	  - 5
 
 Workflow outputs
 ^^^^^^^^^^^^^^^^^^^

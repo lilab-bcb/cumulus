@@ -150,14 +150,6 @@ Workflow input
 	  - Number of cpus for cellranger-atac count
 	  - 64
 	  - 64
-	* - backend
-	  - Cloud backend for file transfer. Available options:
-
-	  	- "gcp" for Google Cloud;
-	  	- "aws" for Amazon AWS;
-	  	- "local" for local machine.
-	  - "gcp"
-	  - "gcp"
 	* - atac_memory
 	  - Memory string for cellranger-atac count
 	  - "57.6G"
@@ -170,10 +162,22 @@ Workflow input
 	  - Disk space in GB needed for cellranger-atac count
 	  - 500
 	  - 500
+	* - backend
+	  - Cloud backend for file transfer. Available options:
+
+	  	- "gcp" for Google Cloud;
+	  	- "aws" for Amazon AWS;
+	  	- "local" for local machine.
+	  - "gcp"
+	  - "gcp"
 	* - preemptible
 	  - Number of preemptible tries
 	  - 2
 	  - 2
+	* - awsMaxRetries
+	  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
+	  - 5
+	  - 5
 
 Workflow output
 +++++++++++++++

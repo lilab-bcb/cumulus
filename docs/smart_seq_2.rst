@@ -172,8 +172,7 @@ Please see the description of inputs below. Note that required inputs are shown 
     * - awsMaxRetries
       - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
       - 5
-      - | 5, if *backend* is ``aws``;
-        | 0, otherwise.
+      - 5
 
 ---------------------------------
 
@@ -294,10 +293,9 @@ Please see the description of inputs below. Note that required inputs are shown 
       - "hisat2-hca"
     * - smartseq2_version
       - | SMART-Seq2 version to use.
-        | Versions available: 1.1.0.
-        | Versions obsoleted: 1.0.0.
-      - "1.1.0"
-      - "1.1.0"
+        | Versions available: 1.3.0.
+      - "1.3.0"
+      - "1.3.0"
     * - docker_registry
       - Docker registry to use. Options:
 
@@ -322,10 +320,22 @@ Please see the description of inputs below. Note that required inputs are shown 
       - Disk space in GB
       - Integer
       - If aligner is bowtie2 or hisat2-hca, 40; otherwise 120
+    * - backend
+      - Cloud infrastructure backend to use. Available options:
+
+        - "gcp" for Google Cloud;
+        - "aws" for Amazon AWS;
+        - "local" for local machine.
+      - "gcp"
+      - "gcp"
     * - preemptible
-      - Number of preemptible tries
-      - Integer
+      - Number of preemptible tries. This works only when *backend* is ``gcp``.
       - 2
+      - 2
+    * - awsMaxRetries
+      - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
+      - 5
+      - 5
 
 Outputs
 ^^^^^^^^
@@ -343,8 +353,6 @@ Outputs
     * - monitoring_log
       - File
       - CPU and memory profiling log.
-
-
 
 ---------------------------------
 

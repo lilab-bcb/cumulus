@@ -129,6 +129,10 @@ global inputs
 	  - Only demultiplex cells/nuclei with at least <min_num_genes> expressed genes
 	  - 100
 	  - 100
+	* - zones
+	  - Google cloud zones to consider for execution.
+	  - "us-east1-d us-west1-a us-west1-b"
+	  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 	* - docker_registry
 	  - Docker registry to use. Notice that docker image for Bustools is seperate.
 
@@ -149,10 +153,6 @@ global inputs
 	  	- "local" for local machine.
 	  - "gcp"
 	  - "gcp"
-	* - zones
-	  - Google cloud zones to consider for execution.
-	  - "us-east1-d us-west1-a us-west1-b"
-	  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 	* - preemptible
 	  - Number of maximum preemptible tries allowed. This works only when *backend* is ``gcp``.
 	  - 2
@@ -160,9 +160,7 @@ global inputs
 	* - awsMaxRetries
 	  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
 	  - 5
-	  - | 5, if *backend* is ``aws``;
-	    | 0, otherwise.
-
+	  - 5
 
 demuxEM inputs
 ++++++++++++++++
@@ -209,9 +207,9 @@ demuxEM inputs
 	  - 8
 	  - 8
 	* - demuxEM_memory
-	  - demuxEM parameter. Memory size (integer) in GB needed for demuxEM per pair.
-	  - 10
-	  - 10
+	  - demuxEM parameter. Memory size string for demuxEM per pair.
+	  - "10G"
+	  - "10G"
 	* - demuxEM_disk_space
 	  - demuxEM parameter. Disk space (integer) in GB needed for demuxEM per pair.
 	  - 20
@@ -285,9 +283,9 @@ souporcell inputs
 	  - 32
 	  - 32
 	* - souporcell_memory
-	  - souporcell parameter. Memory size (integer) in GB needed for souporcell per pair.
-	  - 120
-	  - 120
+	  - souporcell parameter. Memory size string for souporcell per pair.
+	  - "120G"
+	  - "120G"
 	* - souporcell_disk_space
 	  - souporcell parameter. Disk space (integer) in GB needed for souporcell per pair.
 	  - 500
@@ -355,9 +353,9 @@ Popscle inputs
 	  - 1
 	  - 1
 	* - popscle_memory
-	  - popscle parameter. Memory size (integer) in GB needed per pair.
-	  - 120
-	  - 120
+	  - popscle parameter. Memory size string per pair.
+	  - "120G"
+	  - "120G"
 	* - popscle_extra_disk_space
 	  - popscle parameter. Extra disk space size (integer) in GB needed for popscle per pair, besides the disk size required to hold input files specified in the sample sheet.
 	  - 100

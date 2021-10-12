@@ -50,6 +50,8 @@ workflow cellranger_multi {
         Int disk_space = 500
         # Number of preemptible tries
         Int preemptible = 2
+        # Max number of retries for AWS instance
+        Int awsMaxRetries = 5
         # Backend
         String backend = "gcp"
     }
@@ -82,6 +84,7 @@ workflow cellranger_multi {
             memory = memory,
             disk_space = disk_space,
             preemptible = preemptible,
+            awsMaxRetries = awsMaxRetries,
             backend = backend
     }
 
@@ -112,6 +115,7 @@ task run_cellranger_multi {
         String memory
         Int disk_space
         Int preemptible
+        Int awsMaxRetries
         String backend
     }
 
@@ -231,7 +235,8 @@ task run_cellranger_multi {
         memory: memory
         bootDiskSizeGb: 12
         disks: "local-disk ~{disk_space} HDD"
-        cpu: "~{num_cpu}"
-        preemptible: "~{preemptible}"
+        cpu: num_cpu
+        preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }

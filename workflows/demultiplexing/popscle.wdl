@@ -35,22 +35,24 @@ workflow popscle {
         # A comma-separated list of donor names for renaming clusters achieved by souporcell
         String? donor_rename
 
+        # Popscle version to use
+        String popscle_version
+        # Which docker registry to use
+        String docker_registry
+
         # # Google cloud zones
         String zones
         # Number of CPUs to request for souporcell per pair
         Int num_cpu
-        # Memory size (integer) in GB needed for souporcell per pair
-        Int memory
+        # Memory size string for souporcell per pair
+        String memory
         # Extra disk space (integer) in GB needed for popscle per pair
         Int extra_disk_space
+
         # Number of preemptible tries
         Int preemptible
         # Number of maximum retries when running on AWS
         Int awsMaxRetries
-        # Which docker registry to use
-        String docker_registry
-        # Popscle version to use
-        String popscle_version
         # Backend
         String backend
     }
@@ -72,8 +74,8 @@ workflow popscle {
             tag_UMI = tag_UMI,
             field = field,
             nsample = nsample,
-            docker_registry = docker_registry,
             popscle_version = popscle_version,
+            docker_registry = docker_registry,
             num_cpu = num_cpu,
             memory = memory,
             extra_disk_space = extra_disk_space,
@@ -108,14 +110,14 @@ task popscle_task {
         String? tag_UMI
         String? donor_rename
 
-        String docker_registry
         String popscle_version
+        String docker_registry
         Int num_cpu
-        Int memory
+        String memory
         Int extra_disk_space
+        String zones
         Int preemptible
         Int awsMaxRetries
-        String zones
         String backend
     }
 
@@ -184,7 +186,7 @@ task popscle_task {
     runtime {
         docker: "~{docker_registry}/popscle:~{popscle_version}"
         zones: zones
-        memory: "~{memory}G"
+        memory: memory
         bootDiskSizeGb: 12
         disks: "local-disk " + disk_space  + " HDD"
         cpu: num_cpu

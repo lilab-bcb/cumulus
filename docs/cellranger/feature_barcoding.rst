@@ -183,14 +183,6 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - Number of cpus to request for one node for cellranger mkfastq
 		  - 32
 		  - 32
-		* - backend
-		  - Cloud backend for file transfer. Available options:
-
-		    - "gcp" for Google Cloud;
-		    - "aws" for Amazon AWS;
-		    - "local" for local machine.
-		  - "gcp"
-		  - "gcp"
 		* - memory
 		  - Memory size string for cellranger mkfastq
 		  - "120G"
@@ -207,10 +199,22 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - Disk space in GB needed for extracting feature count matrix
 		  - 100
 		  - 100
+		* - backend
+		  - Cloud backend for file transfer. Available options:
+
+		    - "gcp" for Google Cloud;
+		    - "aws" for Amazon AWS;
+		    - "local" for local machine.
+		  - "gcp"
+		  - "gcp"
 		* - preemptible
 		  - Number of preemptible tries
 		  - 2
 		  - 2
+		* - awsMaxRetries
+		  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
+		  - 5
+		  - 5
 
 Parameters used for feature count matrix extraction
 +++++++++++++++++++++++++++++++++++++++++++++++++++

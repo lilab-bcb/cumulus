@@ -49,8 +49,8 @@ workflow demultiplexing {
         Int demuxEM_num_cpu = 8
         # Disk space in GB
         Int demuxEM_disk_space = 20
-        # Memory in GB
-        Int demuxEM_memory = 10
+        # Memory size string for demuxEM
+        String demuxEM_memory = "10G"
 
         # For souporcell
         # Number of expected clusters when doing clustering
@@ -69,8 +69,8 @@ workflow demultiplexing {
         Int souporcell_num_cpu = 32
         # Disk space (integer) in GB needed for souporcell per pair
         Int souporcell_disk_space = 500
-        # Memory size (integer) in GB needed for souporcell per pair
-        Int souporcell_memory = 120
+        # Memory size string for souporcell per pair
+        String souporcell_memory = "120G"
 
         # For popscle (demuxlet/freemuxlet)
         # Minimum mapping quality to consider (lower MQ will be ignored) [default: 20]
@@ -93,8 +93,8 @@ workflow demultiplexing {
         String? popscle_rename_donors
         # Number of CPUs used for popscle per pair
         Int popscle_num_cpu = 1
-        # Memory size in GB needed for popscle per pair
-        Int popscle_memory = 120
+        # Memory size string for popscle per pair
+        String popscle_memory = "120G"
         # Extra disk space (integer) in GB needed for popscle per pair
         Int popscle_extra_disk_space = 100
 
@@ -110,9 +110,9 @@ workflow demultiplexing {
             config_version = config_version,
             docker_registry = docker_registry,
             zones = zones,
-            backend = backend,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries
+            awsMaxRetries = awsMaxRetries,
+            backend = backend
     }
 
     if (length(Config.hashing_ids) > 0) {
@@ -131,8 +131,8 @@ workflow demultiplexing {
                     random_state = demuxEM_random_state,
                     generate_diagnostic_plots = demuxEM_generate_diagnostic_plots,
                     generate_gender_plot = demuxEM_generate_gender_plot,
-                    docker_registry = docker_registry,
                     demuxEM_version = demuxEM_version,
+                    docker_registry = docker_registry,
                     zones = zones,
                     num_cpu = demuxEM_num_cpu,
                     memory = demuxEM_memory,
@@ -193,8 +193,8 @@ workflow demultiplexing {
                         alpha = popscle_alpha,
                         nsample = popscle_num_samples,
                         donor_rename = popscle_rename_donors,
-                        docker_registry = docker_registry,
                         popscle_version = popscle_version,
+                        docker_registry = docker_registry,
                         extra_disk_space = popscle_extra_disk_space,
                         num_cpu = popscle_num_cpu,
                         memory = popscle_memory,
@@ -219,9 +219,9 @@ task generate_demux_config {
         String config_version
         String docker_registry
         String zones
-        String backend
         Int preemptible
         Int awsMaxRetries
+        String backend
     }
 
     command {
@@ -274,7 +274,7 @@ task generate_demux_config {
     runtime {
         docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
-        preemptible: "~{preemptible}"
+        preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }

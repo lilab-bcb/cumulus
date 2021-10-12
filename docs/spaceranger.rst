@@ -338,8 +338,7 @@ For spatial data, ``spaceranger_workflow`` takes Illumina outputs and related im
 		* - awsMaxRetries
 		  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
 		  - 5
-		  - | 5, if *backend* is ``aws``;
-		    | 0, otherwise.
+		  - 5
 
 Workflow output
 +++++++++++++++

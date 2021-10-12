@@ -27,10 +27,11 @@ workflow cellranger_vdj {
 
         # cellranger version
         String cellranger_version
+        # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
+        String docker_registry
+
         # Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
         String zones = "us-central1-b"
-        # Backend
-        String backend = "gcp"
         # Number of cpus per cellranger job
         Int num_cpu = 32
         # Memory string, e.g. 120G
@@ -39,9 +40,10 @@ workflow cellranger_vdj {
         Int disk_space = 500
         # Number of preemptible tries
         Int preemptible = 2
-
-        # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-        String docker_registry
+        # Max number of retries for AWS instance
+        Int awsMaxRetries = 5
+        # Backend
+        String backend = "gcp"
     }
 
     Map[String, String] acronym2gsurl = read_map(acronym_file)
@@ -59,12 +61,13 @@ workflow cellranger_vdj {
             denovo = denovo,
             chain = chain,
             cellranger_version = cellranger_version,
+            docker_registry = docker_registry,
             zones = zones,
             num_cpu = num_cpu,
             memory = memory,
             disk_space = disk_space,
             preemptible = preemptible,
-            docker_registry = docker_registry,
+            awsMaxRetries = awsMaxRetries,
             backend = backend
     }
 
@@ -85,12 +88,13 @@ task run_cellranger_vdj {
         Boolean denovo
         String chain
         String cellranger_version
+        String docker_registry
         String zones
         Int num_cpu
         String memory
         Int disk_space
         Int preemptible
-        String docker_registry
+        Int awsMaxRetries
         String backend
     }
 
@@ -139,7 +143,8 @@ task run_cellranger_vdj {
         memory: memory
         bootDiskSizeGb: 12
         disks: "local-disk ~{disk_space} HDD"
-        cpu: "~{num_cpu}"
-        preemptible: "~{preemptible}"
+        cpu: num_cpu
+        preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }

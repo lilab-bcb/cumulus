@@ -28,14 +28,14 @@ workflow starsolo {
         String docker_registry = "quay.io/cumulus"
         # Disk space in GB needed per sample
         Int disk_space = 500
+        # Google cloud zones to consider for execution
+        String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        # Memory size string represent memory needed for count per sample
+        String memory = "120G"
         # Number of maximum preemptible tries allowed
         Int preemptible = 2
         # Number of maximum retries when running on AWS
         Int awsMaxRetries = 5
-        # Google cloud zones to consider for execution
-        String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-        # Memory size in GB needed for count per sample
-        Int memory = 120
         # backend choose from "gcp", "aws", "local"
         String backend = "gcp"
     }
@@ -75,8 +75,6 @@ workflow starsolo {
                     r1_fastqs = generate_count_config.id2r1[sample_id],
                     r2_fastqs = generate_count_config.id2r2[sample_id],
                     chemistry = chemistry,
-                    num_cpu = num_cpu,
-                    star_version = star_version,
                     genome = genome_url,
                     CBstart = CBstart,
                     CBlen = CBlen,
@@ -85,10 +83,12 @@ workflow starsolo {
                     CBwhitelist = CBwhitelist,
                     whitelist = whitelist,
                     output_directory = output_directory_stripped,
+                    star_version = star_version,
                     docker_registry = docker_registry,
-                    disk_space = disk_space,
                     zones = zones,
+                    num_cpu = num_cpu,
                     memory = memory,
+                    disk_space = disk_space,
                     preemptible = preemptible,
                     awsMaxRetries = awsMaxRetries,
                     backend = backend
@@ -106,9 +106,9 @@ workflow starsolo {
 task generate_count_config {
     input {
         File input_tsv_file
-        String docker_registry
         String zones
         String star_version
+        String docker_registry
         Int preemptible
         Int awsMaxRetries
         String backend
@@ -181,7 +181,7 @@ task generate_count_config {
     runtime {
         docker: "~{docker_registry}/starsolo:~{star_version}"
         zones: zones
-        preemptible: "~{preemptible}"
+        preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
@@ -192,7 +192,6 @@ task run_star_solo {
         String r1_fastqs
         String r2_fastqs
         String chemistry
-        Int num_cpu
         File genome
         Int? CBstart
         Int? CBlen
@@ -201,16 +200,16 @@ task run_star_solo {
         File? CBwhitelist
         File? whitelist
         String output_directory
-        String docker_registry
         String star_version
-        Int disk_space
+        String docker_registry
         String zones
-        Int memory
+        Int num_cpu
+        String memory
+        Int disk_space
         Int preemptible
         Int awsMaxRetries
         String backend
     }
-
 
     command {
         set -e
@@ -286,10 +285,10 @@ task run_star_solo {
     runtime {
         docker: "~{docker_registry}/starsolo:~{star_version}"
         zones: zones
-        memory: "~{memory}G"
+        memory: memory
         disks: "local-disk ~{disk_space} HDD"
-        cpu: "~{num_cpu}"
-        preemptible: "~{preemptible}"
+        cpu: num_cpu
+        preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }

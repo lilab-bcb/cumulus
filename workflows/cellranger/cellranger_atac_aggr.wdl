@@ -10,8 +10,6 @@ workflow cellranger_atac_aggr {
         String output_directory
         # Index TSV file
         File acronym_file
-        # Backend
-        String backend = "gcp"
 
         # Keywords or a URL to a tar.gz file
         String genome
@@ -27,6 +25,9 @@ workflow cellranger_atac_aggr {
 
         # 2.0.0, 1.2.0, 1.1.0
         String cellranger_atac_version = "2.0.0"
+        # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
+        String docker_registry = "cumulusprod"
+
         # Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
         String zones = "us-central1-b"
         # Number of cpus per cellranger job
@@ -35,11 +36,13 @@ workflow cellranger_atac_aggr {
         String memory = "57.6G"
         # Disk space in GB
         Int disk_space = 500
+
         # Number of preemptible tries
         Int preemptible = 2
-
-        # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-        String docker_registry = "cumulusprod"
+        # Max number of retries for AWS instance
+        Int awsMaxRetries = 5
+        # Backend
+        String backend = "gcp"
     }
 
     Map[String, String] acronym2gsurl = read_map(acronym_file)
@@ -59,12 +62,13 @@ workflow cellranger_atac_aggr {
             dim_reduce = dim_reduce,
             peaks = peaks,
             cellranger_atac_version = cellranger_atac_version,
+            docker_registry = docker_registry,
             zones = zones,
             num_cpu = num_cpu,
             memory = memory,
             disk_space = disk_space,
             preemptible = preemptible,
-            docker_registry = docker_registry,
+            awsMaxRetries = awsMaxRetries,
             backend = backend
     }
 
@@ -87,12 +91,13 @@ task run_cellranger_atac_aggr {
         String dim_reduce
         File? peaks
         String cellranger_atac_version
+        String docker_registry
         String zones
         Int num_cpu
         String memory
         Int disk_space
         Int preemptible
-        String docker_registry
+        Int awsMaxRetries
         String backend
     }
 
@@ -156,7 +161,8 @@ task run_cellranger_atac_aggr {
         memory: memory
         bootDiskSizeGb: 12
         disks: "local-disk ~{disk_space} HDD"
-        cpu: "~{num_cpu}"
-        preemptible: "~{preemptible}"
+        cpu: num_cpu
+        preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }

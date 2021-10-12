@@ -34,8 +34,8 @@ workflow demuxEM {
         String zones
         # Number of CPUs used
         Int num_cpu
-        # Memory in GB
-        Int memory
+        # Memory size string for demuxEM
+        String memory
         # Disk space in GB
         Int disk_space
         # Number of preemptible tries
@@ -97,7 +97,7 @@ task run_demuxEM {
         String demuxEM_version
         String zones
         Int num_cpu
-        Int memory
+        String memory
         Int disk_space
         Int preemptible
         Int awsMaxRetries
@@ -146,7 +146,7 @@ task run_demuxEM {
     runtime {
         docker: "~{docker_registry}/demuxem:~{demuxEM_version}"
         zones: zones
-        memory: "~{memory}G"
+        memory: memory
         bootDiskSizeGb: 12
         disks: "local-disk ~{disk_space} HDD"
         cpu: num_cpu

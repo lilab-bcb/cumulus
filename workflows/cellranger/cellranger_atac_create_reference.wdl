@@ -3,17 +3,23 @@ version 1.0
 workflow cellranger_atac_create_reference {
     input {
         # Which docker registry to use
-        String docker_registry = "cumulusprod"
+        String docker_registry = "quay.io/cumulus"
         # cellranger-atac version: 2.0.0, 1.2.0, 1.1.0
-        String cellranger_atac_version = '2.0.0'
+        String cellranger_atac_version = "2.0.0"
+
         # Disk space in GB
         Int disk_space = 100
-        # Number of preemptible tries
-        Int preemptible = 2
         # Google cloud zones
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         # Memory string
         String memory = "32G"
+
+        # Number of preemptible tries
+        Int preemptible = 2
+        # Max number of retries for AWS instance
+        Int awsMaxRetries = 5
+        # Backend
+        String backend = "gcp"
 
         # Organism name
         String organism = ""
@@ -30,8 +36,6 @@ workflow cellranger_atac_create_reference {
 
         # Output directory, gs URL
         String output_directory
-        # Backend
-        String backend = "gcp"
     }
 
     # Output directory, with trailing slashes stripped
@@ -42,17 +46,18 @@ workflow cellranger_atac_create_reference {
             docker_registry = docker_registry,
             cellranger_atac_version = cellranger_atac_version,
             disk_space = disk_space,
-            preemptible = preemptible,
             zones = zones,
             memory = memory,
+            preemptible = preemptible,
+            awsMaxRetries = awsMaxRetries,
+            backend = backend,
             organism = organism,
             genome = genome,
             input_fasta = input_fasta,
             input_gtf = input_gtf,
             non_nuclear_contigs = non_nuclear_contigs,
             input_motifs = input_motifs,
-            output_dir = output_directory_stripped,
-            backend = backend
+            output_dir = output_directory_stripped
     }
 
 }
@@ -64,7 +69,10 @@ task run_cellranger_atac_create_reference {
         Int disk_space
         String zones
         String memory
+        
         Int preemptible
+        Int awsMaxRetries
+        String backend
 
         String? organism
         String genome
@@ -74,7 +82,6 @@ task run_cellranger_atac_create_reference {
         File? input_motifs
 
         String output_dir
-        String backend
     }
 
     command {
@@ -113,6 +120,7 @@ task run_cellranger_atac_create_reference {
         memory: memory
         disks: "local-disk ~{disk_space} HDD"
         cpu: 1
-        preemptible: "~{preemptible}"
+        preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
