@@ -14,6 +14,7 @@ task run_cumulus_aggregate_matrices {
 		String backend
 		Int disk_space
 		Int preemptible
+		Int awsMaxRetries
 		String? restrictions
 		String? attributes
 		String? default_reference
@@ -73,6 +74,7 @@ task run_cumulus_aggregate_matrices {
 		disks: "local-disk ~{disk_space} HDD"
 		cpu: 1
 		preemptible: preemptible
+		maxRetries: if backend == "aws" then awsMaxRetries else 0
 	}
 }
 
@@ -89,6 +91,7 @@ task run_cumulus_cluster {
 		Int disk_space
 		String docker_registry
 		Int preemptible
+		Int awsMaxRetries
 		String? channel
 		String? black_list
 		Int? min_genes_before_filtration
@@ -387,6 +390,7 @@ task run_cumulus_cluster {
 		disks: "local-disk ~{disk_space} HDD"
 		cpu: num_cpu
 		preemptible: preemptible
+		maxRetries: if backend == "aws" then awsMaxRetries else 0
 	}
 }
 
@@ -403,6 +407,7 @@ task run_cumulus_cirro_output {
 		Int disk_space
 		Int num_cpu
 		Int preemptible
+		Int awsMaxRetries
 	}
 
 	command {
@@ -439,6 +444,7 @@ task run_cumulus_cirro_output {
 		disks: "local-disk ~{disk_space} HDD"
 		cpu: num_cpu
 		preemptible: preemptible
+		maxRetries: if backend == "aws" then awsMaxRetries else 0
 	}
 }
 
@@ -453,6 +459,7 @@ task run_cumulus_de_analysis {
 		String memory
 		Int disk_space
 		Int preemptible
+		Int awsMaxRetries
 		String backend
 		String? labels
 		Boolean? t_test
@@ -560,6 +567,7 @@ task run_cumulus_de_analysis {
 		disks: "local-disk ~{disk_space} HDD"
 		cpu: num_cpu
 		preemptible: preemptible
+		maxRetries: if backend == "aws" then awsMaxRetries else 0
 	}
 }
 
@@ -573,6 +581,7 @@ task run_cumulus_plot {
 		String memory
 		Int disk_space
 		Int preemptible
+		Int awsMaxRetries
 		String backend
 		String? plot_composition
 		String? plot_tsne
@@ -661,6 +670,7 @@ task run_cumulus_plot {
 		disks: "local-disk ~{disk_space} HDD"
 		cpu: 1
 		preemptible: preemptible
+		maxRetries: if backend == "aws" then awsMaxRetries else 0
 	}
 }
 
@@ -676,6 +686,7 @@ task run_cumulus_scp_output {
 		String backend
 		Int disk_space
 		Int preemptible
+		Int awsMaxRetries
 		String docker_registry
 	}
 
@@ -711,5 +722,6 @@ task run_cumulus_scp_output {
 		disks: "local-disk ~{disk_space} HDD"
 		cpu: 1
 		preemptible: preemptible
+		maxRetries: if backend == "aws" then awsMaxRetries else 0
 	}
 }

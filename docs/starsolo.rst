@@ -164,10 +164,23 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	  - Memory size in GB needed for count per sample.
 	  - 120
 	  - 120
+	* - backend
+	  - Cloud infrastructure backend to use. Available options:
+
+	    - "gcp" for Google Cloud;
+	    - "aws" for Amazon AWS;
+	    - "local" for local machine.
+	  - "gcp"
+	  - "gcp"
 	* - preemptible
-	  - Number of maximum preemptible tries allowed.
+	  - Number of maximum preemptible tries allowed. This works only when *backend* is ``gcp``.
 	  - 2
 	  - 2
+	* - awsMaxRetries
+	  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
+	  - 5
+	  - | 5, if *backend* is ``aws``;
+	    | 0, otherwise.
 	* - star_version
 	  - STAR version to use. Currently only support ``2.7.6a``.
 	  - "2.7.6a"

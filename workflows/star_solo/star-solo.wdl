@@ -30,6 +30,8 @@ workflow starsolo {
         Int disk_space = 500
         # Number of maximum preemptible tries allowed
         Int preemptible = 2
+        # Number of maximum retries when running on AWS
+        Int awsMaxRetries = 5
         # Google cloud zones to consider for execution
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         # Memory size in GB needed for count per sample
@@ -61,6 +63,7 @@ workflow starsolo {
             zones = zones,
             star_version = star_version,
             preemptible = preemptible,
+            awsMaxRetries = awsMaxRetries,
             backend = backend
     }
 
@@ -87,6 +90,7 @@ workflow starsolo {
                     zones = zones,
                     memory = memory,
                     preemptible = preemptible,
+                    awsMaxRetries = awsMaxRetries,
                     backend = backend
             }
         }
@@ -106,6 +110,7 @@ task generate_count_config {
         String zones
         String star_version
         Int preemptible
+        Int awsMaxRetries
         String backend
     }
 
@@ -177,6 +182,7 @@ task generate_count_config {
         docker: "~{docker_registry}/starsolo:~{star_version}"
         zones: zones
         preemptible: "~{preemptible}"
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
 
@@ -201,6 +207,7 @@ task run_star_solo {
         String zones
         Int memory
         Int preemptible
+        Int awsMaxRetries
         String backend
     }
 
@@ -283,5 +290,6 @@ task run_star_solo {
         disks: "local-disk ~{disk_space} HDD"
         cpu: "~{num_cpu}"
         preemptible: "~{preemptible}"
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }

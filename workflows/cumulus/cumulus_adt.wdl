@@ -38,6 +38,8 @@ workflow cumulus_adt {
 		Int disk_space = 100
 		# Number of preemptible tries
 		Int preemptible = 2
+		# Number of maximum retries when running on AWS
+		Int awsMaxRetries = 5
 
 		# Which docker registry to use: quay.io/cumulus (default), or cumulusprod
 		String docker_registry = "quay.io/cumulus"
@@ -65,6 +67,7 @@ workflow cumulus_adt {
 			memory = memory,
 			disk_space = disk_space,
 			preemptible = preemptible,
+			awsMaxRetries = awsMaxRetries,
 			docker_registry = docker_registry,
 			backend = backend
 	}
@@ -92,6 +95,7 @@ task run_generate_count_matrix_ADTs {
 		String memory
 		Int disk_space
 		Int preemptible
+		Int awsMaxRetries
 		String docker_registry
 		String backend
 	}
@@ -166,5 +170,6 @@ task run_generate_count_matrix_ADTs {
 		disks: "local-disk ~{disk_space} HDD"
 		cpu: 1
 		preemptible: "~{preemptible}"
+		maxRetries: if backend == "aws" then awsMaxRetries else 0
 	}
 }

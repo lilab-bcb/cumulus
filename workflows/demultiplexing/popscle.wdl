@@ -45,6 +45,8 @@ workflow popscle {
         Int extra_disk_space
         # Number of preemptible tries
         Int preemptible
+        # Number of maximum retries when running on AWS
+        Int awsMaxRetries
         # Which docker registry to use
         String docker_registry
         # Popscle version to use
@@ -77,6 +79,7 @@ workflow popscle {
             extra_disk_space = extra_disk_space,
             zones = zones,
             preemptible = preemptible,
+            awsMaxRetries = awsMaxRetries,
             backend = backend
     }
 
@@ -111,6 +114,7 @@ task popscle_task {
         Int memory
         Int extra_disk_space
         Int preemptible
+        Int awsMaxRetries
         String zones
         String backend
     }
@@ -185,5 +189,6 @@ task popscle_task {
         disks: "local-disk " + disk_space  + " HDD"
         cpu: num_cpu
         preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }

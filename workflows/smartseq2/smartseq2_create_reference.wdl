@@ -24,6 +24,10 @@ workflow smartseq2_create_reference {
         Int disk_space = (if aligner != "star" then 40 else 120)
         # Number of preemptible tries
         Int preemptible = 2
+        # Number of maximum retries when running on AWS
+        Int awsMaxRetries = 5
+        # backend choose from "gcp", "aws", "local"
+        String backend = "gcp"
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
     }
@@ -41,6 +45,8 @@ workflow smartseq2_create_reference {
             smartseq2_version=smartseq2_version,
             zones=zones,
             preemptible=preemptible,
+            awsMaxRetries = awsMaxRetries,
+            backend = backend,
             cpu=cpu,
             memory=memory,
             disk_space=disk_space,
@@ -58,6 +64,8 @@ task rsem_prepare_reference {
         String smartseq2_version
         String zones
         Int preemptible
+        Int awsMaxRetries
+        String backend
         Int cpu
         String memory
         Int disk_space
@@ -73,9 +81,7 @@ task rsem_prepare_reference {
         rsem-prepare-reference --gtf ~{gtf} --~{aligner} -p ~{cpu} ~{fasta} ~{reference_name}_~{aligner}/rsem_ref
         tar -czf ~{reference_name}_~{aligner}.tar.gz ~{reference_name}_~{aligner}
 
-        gsutil -m cp ~{reference_name}_~{aligner}.tar.gz "~{output_dir}"
-        # mkdir -p "~{output_dir}"
-        # cp ~{reference_name}_~{aligner}.tar.gz "~{output_dir}"
+        strato cp --backend ~{backend} -m ~{reference_name}_~{aligner}.tar.gz "~{output_dir}"/
     }
 
     output {
@@ -88,6 +94,7 @@ task rsem_prepare_reference {
         docker: "~{docker_registry}/smartseq2:~{smartseq2_version}"
         zones: zones
         preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
         cpu: cpu
         memory: memory
     }

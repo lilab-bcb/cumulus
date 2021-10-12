@@ -27,7 +27,7 @@ workflow spaceranger_count {
         String? darkimagestr
         #A color composite of one or more fluorescence image channels saved as a single-page, single-file color .tiff or .jpg.
         File? colorizedimage
-        # Visium slide serial number. 
+        # Visium slide serial number.
         String? slide
         # Visium capture area identifier. Options for Visium are A1, B1, C1, D1.
         String? area
@@ -59,14 +59,16 @@ workflow spaceranger_count {
         String memory = "120G"
         # Disk space in GB
         Int disk_space = 500
-        # Number of preemptible tries 
+        # Number of preemptible tries
         Int preemptible = 2
+        # Number of maximum retries when running on AWS
+        Int awsMaxRetries = 5
         # Backend
         String backend
     }
 
     Map[String, String] acronym2url = read_map(acronym_file)
-    
+
     # If reference is a url
     Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
     # Replace name with actual url
@@ -102,6 +104,7 @@ workflow spaceranger_count {
             memory = memory,
             disk_space = disk_space,
             preemptible = preemptible,
+            awsMaxRetries = awsMaxRetries,
             backend = backend
     }
 
@@ -139,6 +142,7 @@ task run_spaceranger_count {
         String memory
         Int disk_space
         Int preemptible
+        Int awsMaxRetries
         String backend
     }
 
@@ -157,7 +161,7 @@ task run_spaceranger_count {
 
         fastqs = []
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
-            directory = re.sub('/+$', '', directory) # remove trailing slashes 
+            directory = re.sub('/+$', '', directory) # remove trailing slashes
             call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/~{sample_id}', '.']
             print(' '.join(call_args))
             check_call(call_args)
@@ -257,5 +261,6 @@ task run_spaceranger_count {
         disks: "local-disk ~{disk_space} HDD"
         cpu: "~{num_cpu}"
         preemptible: "~{preemptible}"
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }

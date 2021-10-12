@@ -38,6 +38,8 @@ workflow souporcell {
         Int memory
         # Number of preemptible tries
         Int preemptible
+        # Number of maximum retries when running on AWS
+        Int awsMaxRetries
         # Google cloud zones
         String zones
         # Backend
@@ -67,6 +69,8 @@ workflow souporcell {
             disk_space = disk_space,
             memory = memory,
             preemptible = preemptible,
+            awsMaxRetries = awsMaxRetries,
+            backend = backend,
             zones = zones
     }
 
@@ -85,6 +89,7 @@ workflow souporcell {
             memory = memory,
             disk_space = disk_space,
             preemptible = preemptible,
+            awsMaxRetries = awsMaxRetries,
             backend = backend
     }
 
@@ -116,6 +121,8 @@ task run_souporcell {
         Int disk_space
         Int memory
         Int preemptible
+        Int awsMaxRetries
+        String backend
         String zones
     }
 
@@ -183,6 +190,7 @@ task run_souporcell {
         disks: "local-disk ~{disk_space} HDD"
         cpu: "~{num_cpu}"
         preemptible: "~{preemptible}"
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
 
@@ -202,6 +210,7 @@ task match_donors {
         Int memory
         Int disk_space
         Int preemptible
+        Int awsMaxRetries
         String backend
     }
 
@@ -249,5 +258,6 @@ task match_donors {
         memory: "~{memory}G"
         disks: "local-disk ~{disk_space} HDD"
         preemptible: "~{preemptible}"
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }

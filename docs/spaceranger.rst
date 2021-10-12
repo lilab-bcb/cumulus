@@ -282,9 +282,9 @@ For spatial data, ``spaceranger_workflow`` takes Illumina outputs and related im
 		  - false
 		  - false
 		* - spaceranger_version
-		  - spaceranger version, could be 1.2.1
-		  - "1.2.1"
-		  - "1.2.1"
+		  - spaceranger version, could be 1.3.0
+		  - "1.3.0"
+		  - "1.3.0"
 		* - config_version
 		  - config docker version used for processing sample sheets, could be 0.2, 0.1
 		  - "0.2"
@@ -323,10 +323,23 @@ For spatial data, ``spaceranger_workflow`` takes Illumina outputs and related im
 		  - Disk space in GB needed for spaceranger count
 		  - 500
 		  - 500
+		* - backend
+		  - Cloud infrastructure backend to use. Available options:
+
+		    - "gcp" for Google Cloud;
+		    - "aws" for Amazon AWS;
+		    - "local" for local machine.
+		  - "gcp"
+		  - "gcp"
 		* - preemptible
-		  - Number of preemptible tries
+		  - Number of preemptible tries. This works only when *backend* is ``gcp``.
 		  - 2
 		  - 2
+		* - awsMaxRetries
+		  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
+		  - 5
+		  - | 5, if *backend* is ``aws``;
+		    | 0, otherwise.
 
 Workflow output
 +++++++++++++++
