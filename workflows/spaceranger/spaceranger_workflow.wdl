@@ -259,9 +259,9 @@ task generate_count_config {
 
         for c in ['Image', 'ColorizedImage', 'SlideFile', 'LoupeAlignment', 'TargetPanel']:
             if c not in df.columns:
-                df[c] = null_file
+                df[c] = '~{null_file}'
             else:
-                df.loc[df[c].isna(), c] = null_file
+                df.loc[df[c].isna(), c] = '~{null_file}'
 
         for c in ['DarkImage', 'Slide', 'Area', 'ProbeSet']:
             if c not in df.columns:
