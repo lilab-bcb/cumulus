@@ -112,7 +112,7 @@ task run_generate_count_matrix_ADTs {
 		fastqs = []
 
 		ref_data = pd.read_csv('~{acronym_file}', sep = '\t', header = None, names = ['Keyword', 'Path'])
-		idx = ref_data[ref_data[‘Keyword’] == '~{chemistry}'].index.values
+		idx = ref_data[ref_data['Keyword'] == '~{chemistry}'].index.values
 		cell_barcodes = ref_data.at[idx[0],'Path']
 
 		for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
