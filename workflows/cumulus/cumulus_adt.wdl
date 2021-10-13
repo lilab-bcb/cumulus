@@ -28,21 +28,22 @@ workflow cumulus_adt {
 
 		# cumulus_feature_barcoding version
 		String cumulus_feature_barcoding_version
+		# Which docker registry to use: quay.io/cumulus (default), or cumulusprod
+		String docker_registry = "quay.io/cumulus"
+
 		# Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
 		String zones = "us-central1-b"
-		# Backend
-		String backend = "gcp"
 		# Memory string, e.g. 32G
 		String memory = "32G"
 		# Disk space in GB
 		Int disk_space = 100
+
 		# Number of preemptible tries
 		Int preemptible = 2
 		# Number of maximum retries when running on AWS
 		Int awsMaxRetries = 5
-
-		# Which docker registry to use: quay.io/cumulus (default), or cumulusprod
-		String docker_registry = "quay.io/cumulus"
+		# Backend
+		String backend = "gcp"
 	}
 
 	# cell barcodes white list, from 10x genomics, can be either v2 or v3 chemistry
@@ -63,12 +64,12 @@ workflow cumulus_adt {
 			max_mismatch = max_mismatch,
 			min_read_ratio = min_read_ratio,
 			cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
+			docker_registry = docker_registry,
 			zones = zones,
 			memory = memory,
 			disk_space = disk_space,
 			preemptible = preemptible,
 			awsMaxRetries = awsMaxRetries,
-			docker_registry = docker_registry,
 			backend = backend
 	}
 
@@ -91,12 +92,12 @@ task run_generate_count_matrix_ADTs {
 		Int max_mismatch
 		Float min_read_ratio
 		String cumulus_feature_barcoding_version
+		String docker_registry
 		String zones
 		String memory
 		Int disk_space
 		Int preemptible
 		Int awsMaxRetries
-		String docker_registry
 		String backend
 	}
 
@@ -169,7 +170,7 @@ task run_generate_count_matrix_ADTs {
 		bootDiskSizeGb: 12
 		disks: "local-disk ~{disk_space} HDD"
 		cpu: 1
-		preemptible: "~{preemptible}"
+		preemptible: preemptible
 		maxRetries: if backend == "aws" then awsMaxRetries else 0
 	}
 }

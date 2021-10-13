@@ -259,8 +259,8 @@ task run_spaceranger_count {
         memory: memory
         bootDiskSizeGb: 12
         disks: "local-disk ~{disk_space} HDD"
-        cpu: "~{num_cpu}"
-        preemptible: "~{preemptible}"
+        cpu: num_cpu
+        preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }

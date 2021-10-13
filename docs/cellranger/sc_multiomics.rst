@@ -156,14 +156,6 @@ For single-cell multiomics data, ``cellranger_workflow`` takes Illumina outputs 
 	  - Number of cpus to request for one node for cellranger mkfastq and cellranger vdj
 	  - 32
 	  - 32
-	* - backend
-	  - Cloud backend for file transfer. Available options:
-
-	  	- "gcp" for Google Cloud;
-	  	- "aws" for Amazon AWS;
-	  	- "local" for local machine.
-	  - "gcp"
-	  - "gcp"
 	* - memory
 	  - Memory size string for cellranger/cellranger-arc mkfastq and cellranger vdj
 	  - "120G"
@@ -188,10 +180,22 @@ For single-cell multiomics data, ``cellranger_workflow`` takes Illumina outputs 
 	  - Disk space in GB needed for cellranger-arc count
 	  - 700
 	  - 700
+	* - backend
+	  - Cloud backend for file transfer. Available options:
+
+	  	- "gcp" for Google Cloud;
+	  	- "aws" for Amazon AWS;
+	  	- "local" for local machine.
+	  - "gcp"
+	  - "gcp"
 	* - preemptible
 	  - Number of preemptible tries
 	  - 2
 	  - 2
+	* - awsMaxRetries
+	  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
+	  - 5
+	  - 5
 
 Workflow output
 +++++++++++++++

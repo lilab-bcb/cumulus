@@ -14,6 +14,8 @@ workflow smartseq2_create_reference {
         String aligner = "hisat2-hca"
         # Docker version
         String smartseq2_version = "1.3.0"
+        # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
+        String docker_registry = "quay.io/cumulus"
         # Google Cloud Zones
         String zones = "us-central1-b"
         # Number of cpus per job
@@ -28,8 +30,6 @@ workflow smartseq2_create_reference {
         Int awsMaxRetries = 5
         # backend choose from "gcp", "aws", "local"
         String backend = "gcp"
-        # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
-        String docker_registry = "quay.io/cumulus"
     }
 
     # Output directory, with trailing slashes and spaces stripped
@@ -43,14 +43,14 @@ workflow smartseq2_create_reference {
             reference_name = reference_name,
             aligner = aligner,
             smartseq2_version=smartseq2_version,
+            docker_registry=docker_registry,
             zones=zones,
-            preemptible=preemptible,
-            awsMaxRetries = awsMaxRetries,
-            backend = backend,
             cpu=cpu,
             memory=memory,
             disk_space=disk_space,
-            docker_registry=docker_registry
+            preemptible=preemptible,
+            awsMaxRetries = awsMaxRetries,
+            backend = backend
     }
 }
 
@@ -62,14 +62,14 @@ task rsem_prepare_reference {
         String reference_name
         String aligner
         String smartseq2_version
+        String docker_registry
         String zones
-        Int preemptible
-        Int awsMaxRetries
-        String backend
         Int cpu
         String memory
         Int disk_space
-        String docker_registry
+        Int preemptible
+        Int awsMaxRetries
+        String backend
     }
 
     command {
@@ -90,12 +90,12 @@ task rsem_prepare_reference {
     }
 
     runtime {
-        disks: "local-disk " + disk_space + " HDD"
         docker: "~{docker_registry}/smartseq2:~{smartseq2_version}"
         zones: zones
-        preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
         cpu: cpu
         memory: memory
+        disks: "local-disk " + disk_space + " HDD"
+        preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }

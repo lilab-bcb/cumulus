@@ -3,22 +3,43 @@ version 1.0
 workflow cellranger_create_reference {
     # Output directory, gs URL
     input {
+        # Output directory, gs URL
         String output_directory
+
+        # A sample sheet in CSV format allows users to specify more than 1 genomes to build references (e.g. human and mouse). If a sample sheet is provided, input_fasta, input_gtf, and attributes will be ignored.
         File? input_sample_sheet
+        # Input gene annotation file in either GTF or GTF.gz format
         String? input_gtf
+        # Input genome reference in either FASTA or FASTA.gz format
         String? input_fasta
+        # Genome reference name. New reference will be stored in a folder named genome
         String? genome
+        # A list of key:value pairs separated by ;. If this option is not None, cellranger mkgtf will be called to filter the user-provided GTF file. See 10x filter with mkgtf for more details
         String? attributes
+        # If we want to build pre-mRNA references, in which we use full length transcripts as exons in the annotation file. We follow 10x build Cell Ranger compatible pre-mRNA Reference Package to build pre-mRNA references
         Boolean pre_mrna = false
+        # reference version string
         String? ref_version
 
-        String docker_registry = "cumulusprod"
-        String cellranger_version = '4.0.0'
+        # Which docker registry to use
+        String docker_registry = "quay.io/cumulus"
+        # 6.1.1, 6.0.2, 6.0.1
+        String cellranger_version = "6.1.1"
+
+        # Disk space in GB
         Int disk_space = 100
-        Int preemptible = 2
+        # Google cloud zones
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        # Number of CPUs
         Int num_cpu = 32
-        Int memory = 32
+        # Memory string
+        String memory = "32G"
+
+        # Number of preemptible tries
+        Int preemptible = 2
+        # Max number of retries for AWS instance
+        Int awsMaxRetries = 5
+        # Backend
         String backend = "gcp"
     }
 
@@ -34,8 +55,10 @@ workflow cellranger_create_reference {
             attributes = attributes,
             docker_registry = docker_registry,
             cellranger_version = cellranger_version,
+            zones = zones,
             preemptible = preemptible,
-            zones = zones
+            awsMaxRetries = awsMaxRetries,
+            backend = backend
     }
 
     scatter (filt_gtf_row in generate_create_reference_config.filt_gtf_input) {
@@ -49,7 +72,9 @@ workflow cellranger_create_reference {
                 disk_space = disk_space,
                 zones = zones,
                 memory = memory,
-                preemptible = preemptible
+                preemptible = preemptible,
+                awsMaxRetries = awsMaxRetries,
+                backend = backend
         }
     }
 
@@ -69,6 +94,7 @@ workflow cellranger_create_reference {
             num_cpu = num_cpu,
             zones = zones,
             preemptible = preemptible,
+            awsMaxRetries = awsMaxRetries,
             backend = backend
     }
 }
@@ -84,8 +110,10 @@ task generate_create_reference_config {
         String? attributes
         String cellranger_version
         String docker_registry
-        Int preemptible
         String zones
+        Int preemptible
+        Int awsMaxRetries
+        String backend
     }
 
     command {
@@ -134,6 +162,7 @@ task generate_create_reference_config {
         docker: "~{docker_registry}/cellranger:~{cellranger_version}"
         zones: zones
         preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
 
@@ -147,8 +176,10 @@ task run_filter_gtf {
         String cellranger_version
         Int disk_space
         String zones
-        Int memory
+        String memory
         Int preemptible
+        Int awsMaxRetries
+        String backend
     }
 
     command {
@@ -211,6 +242,7 @@ task run_filter_gtf {
         disks: "local-disk ~{disk_space} HDD"
         cpu: 1
         preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
 
@@ -226,10 +258,11 @@ task run_cellranger_mkref {
         String docker_registry
         String cellranger_version
         Int disk_space
-        Int preemptible
         String zones
         Int num_cpu
         Int memory
+        Int preemptible
+        Int awsMaxRetries
         String backend
     }
 
@@ -282,9 +315,10 @@ task run_cellranger_mkref {
     runtime {
         docker: "~{docker_registry}/cellranger:~{cellranger_version}"
         zones: zones
-        memory: "~{memory}G"
+        memory: memory
         disks: "local-disk ~{disk_space} HDD"
         cpu: num_cpu
         preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }

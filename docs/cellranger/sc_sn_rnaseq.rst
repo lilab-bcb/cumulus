@@ -206,14 +206,6 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  - Number of cpus to request for one node for cellranger mkfastq and cellranger count
 		  - 32
 		  - 32
-		* - backend
-		  - Cloud backend for file transfer. Available options:
-
-		    - "gcp" for Google Cloud;
-		    - "aws" for Amazon AWS;
-		    - "local" for local machine.
-		  - "gcp"
-		  - "gcp"
 		* - memory
 		  - Memory size string for cellranger mkfastq and cellranger count
 		  - "120G"
@@ -226,10 +218,22 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  - Disk space in GB needed for cellranger count
 		  - 500
 		  - 500
+		* - backend
+		  - Cloud backend for file transfer. Available options:
+
+		    - "gcp" for Google Cloud;
+		    - "aws" for Amazon AWS;
+		    - "local" for local machine.
+		  - "gcp"
+		  - "gcp"
 		* - preemptible
 		  - Number of preemptible tries
 		  - 2
 		  - 2
+		* - awsMaxRetries
+		  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
+		  - 5
+		  - 5
 
 Workflow output
 +++++++++++++++

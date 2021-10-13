@@ -30,18 +30,18 @@ workflow souporcell {
         String souporcell_version
         # Which docker registry to use
         String docker_registry
+        # Google cloud zones
+        String zones
         # Number of CPUs to request for souporcell per pair
         Int num_cpu
         # Disk space (integer) in GB needed for souporcell per pair
         Int disk_space
-        # Memory size (integer) in GB needed for souporcell per pair
-        Int memory
+        # Memory size string for souporcell per pair
+        String memory
         # Number of preemptible tries
         Int preemptible
         # Number of maximum retries when running on AWS
         Int awsMaxRetries
-        # Google cloud zones
-        String zones
         # Backend
         String backend
     }
@@ -65,13 +65,13 @@ workflow souporcell {
             num_clusters = num_clusters,
             version = souporcell_version,
             docker_registry = docker_registry,
+            zones = zones,
             num_cpu = num_cpu,
             disk_space = disk_space,
             memory = memory,
             preemptible = preemptible,
             awsMaxRetries = awsMaxRetries,
-            backend = backend,
-            zones = zones
+            backend = backend
     }
 
     call match_donors {
@@ -114,16 +114,16 @@ task run_souporcell {
         Boolean de_novo_mode
         Int min_num_genes
         Int num_clusters
-        String version
 
+        String version
         String docker_registry
+        String zones
         Int num_cpu
         Int disk_space
-        Int memory
+        String memory
         Int preemptible
         Int awsMaxRetries
         String backend
-        String zones
     }
 
     command {
@@ -186,10 +186,10 @@ task run_souporcell {
     runtime {
         docker: "~{docker_registry}/souporcell:~{version}"
         zones: zones
-        memory: "~{memory}G"
+        memory: memory
         disks: "local-disk ~{disk_space} HDD"
-        cpu: "~{num_cpu}"
-        preemptible: "~{preemptible}"
+        cpu: num_cpu
+        preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
@@ -204,10 +204,10 @@ task match_donors {
         File? ref_genotypes
         String? donor_rename
 
-        String docker_registry
         String version
+        String docker_registry
         String zones
-        Int memory
+        String memory
         Int disk_space
         Int preemptible
         Int awsMaxRetries
@@ -255,9 +255,9 @@ task match_donors {
     runtime {
         docker: "~{docker_registry}/souporcell:~{version}"
         zones: zones
-        memory: "~{memory}G"
+        memory: memory
         disks: "local-disk ~{disk_space} HDD"
-        preemptible: "~{preemptible}"
+        preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }

@@ -9,12 +9,13 @@ task run_cumulus_aggregate_matrices {
 		String output_directory
 		String output_name
 		String pegasus_version
+		String docker_registry
 		String zones
 		String memory
-		String backend
 		Int disk_space
 		Int preemptible
 		Int awsMaxRetries
+		String backend
 		String? restrictions
 		String? attributes
 		String? default_reference
@@ -22,7 +23,6 @@ task run_cumulus_aggregate_matrices {
 		String? remap_singlets
 		String? subset_singlets
 		Int? minimum_number_of_genes
-		String docker_registry
 	}
 
 	command {
@@ -84,14 +84,14 @@ task run_cumulus_cluster {
 		String output_directory
 		String output_name
 		String pegasus_version
+		String docker_registry
 		String zones
-		String backend
 		Int num_cpu
 		String memory
 		Int disk_space
-		String docker_registry
 		Int preemptible
 		Int awsMaxRetries
+		String backend
 		String? channel
 		String? black_list
 		Int? min_genes_before_filtration
@@ -399,15 +399,15 @@ task run_cumulus_cirro_output {
 		File input_h5ad
 		String output_directory
 		String output_name
-		String docker_registry
 		String pegasus_version
+		String docker_registry
 		String zones
 		String memory
-		String backend
 		Int disk_space
 		Int num_cpu
 		Int preemptible
 		Int awsMaxRetries
+		String backend
 	}
 
 	command {
@@ -454,6 +454,7 @@ task run_cumulus_de_analysis {
 		String output_directory
 		String output_name
 		String pegasus_version
+		String docker_registry
 		String zones
 		Int num_cpu
 		String memory
@@ -475,7 +476,6 @@ task run_cumulus_de_analysis {
 		Boolean? remove_ribo
 		Float? min_gain
 		Int? random_state
-		String docker_registry
 	}
 
 	Boolean is_url = defined(organism) && sub(select_first([organism]), "^.+\\.json", "URL") == "URL"
@@ -577,6 +577,7 @@ task run_cumulus_plot {
 		String output_directory
 		String output_name
 		String pegasus_version
+		String docker_registry
 		String zones
 		String memory
 		Int disk_space
@@ -592,7 +593,6 @@ task run_cumulus_plot {
 		String? plot_citeseq_umap
 		String? plot_nmf
 		Int nmf_n
-		String docker_registry
 	}
 
 	command {
@@ -681,13 +681,13 @@ task run_cumulus_scp_output {
 		String output_name
 		Boolean output_dense
 		String pegasus_version
+		String docker_registry
 		String zones
 		String memory
-		String backend
 		Int disk_space
 		Int preemptible
 		Int awsMaxRetries
-		String docker_registry
+		String backend
 	}
 
 	command {

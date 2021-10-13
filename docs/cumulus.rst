@@ -161,6 +161,10 @@ global inputs
       - This is the name of subdirectory for the current sample; and all output files within the subdirectory will have this string as the common filename prefix.
       - "my_sample"
       -
+    * - default_reference
+      - If sample count matrix is in either DGE, mtx, csv, tsv or loom format and there is no Reference column in the csv_file, use default_reference as the reference string.
+      - "GRCh38"
+      - 
     * - pegasus_version
       - Pegasus version to use for analysis. Versions available: ``1.4.3``, ``1.4.2``, ``1.4.0``, ``1.3.0``.
       - "1.4.3"
@@ -177,14 +181,6 @@ global inputs
       - Google cloud zones to consider for execution.
       - "us-east1-d us-west1-a us-west1-b"
       - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-    * - backend
-      - Cloud infrastructure backend to use. Available options:
-
-        - "gcp" for Google Cloud;
-        - "aws" for Amazon AWS;
-        - "local" for local machine.
-      - "gcp"
-      - "gcp"
     * - num_cpu
       - Number of CPUs per Cumulus job
       - 32
@@ -197,6 +193,14 @@ global inputs
       - Total disk space in GB
       - 100
       - 100
+    * - backend
+      - Cloud infrastructure backend to use. Available options:
+
+        - "gcp" for Google Cloud;
+        - "aws" for Amazon AWS;
+        - "local" for local machine.
+      - "gcp"
+      - "gcp"
     * - preemptible
       - Number of preemptible tries. This works only when *backend* is ``gcp``.
       - 2
@@ -204,8 +208,7 @@ global inputs
     * - awsMaxRetries
       - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
       - 5
-      - | 5, if *backend* is ``aws``;
-        | 0, otherwise.
+      - 5
 
 ---------------------------------
 

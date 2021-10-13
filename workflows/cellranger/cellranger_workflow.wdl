@@ -137,6 +137,8 @@ workflow cellranger_workflow {
 
         # Number of preemptible tries
         Int preemptible = 2
+        # Max number of retries for AWS instance
+        Int awsMaxRetries = 5
     }
 
     # Output directory, with trailing slashes stripped
@@ -150,9 +152,11 @@ workflow cellranger_workflow {
             input:
                 input_csv_file = input_csv_file,
                 config_version = config_version,
+                docker_registry = docker_registry_stripped,
                 zones = zones,
                 preemptible = preemptible,
-                docker_registry = docker_registry_stripped
+                awsMaxRetries = awsMaxRetries,
+                backend = backend
         }
 
         if (length(generate_bcl_csv.bcl_csv_rna) > 0) {
@@ -175,6 +179,7 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible,
+                        awsMaxRetries = awsMaxRetries,
                         backend = backend
                 }
             }
@@ -200,6 +205,7 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible,
+                        awsMaxRetries = awsMaxRetries,
                         backend = backend
                 }
             }
@@ -225,6 +231,7 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible,
+                        awsMaxRetries = awsMaxRetries,
                         backend = backend
                 }
             }
@@ -240,9 +247,11 @@ workflow cellranger_workflow {
                 fastq_dirs_atac = cellranger_atac_mkfastq.output_fastqs_flowcell_directory,
                 fastq_dirs_arc = cellranger_arc_mkfastq.output_fastqs_flowcell_directory,
                 config_version = config_version,
+                docker_registry = docker_registry_stripped,
                 zones = zones,
                 preemptible = preemptible,
-                docker_registry = docker_registry_stripped
+                awsMaxRetries = awsMaxRetries,
+                backend = backend
         }
 
         if (length(generate_count_config.sample_ids) > 0) {
@@ -262,12 +271,13 @@ workflow cellranger_workflow {
                         force_cells = force_cells,
                         expect_cells = expect_cells,
                         cellranger_version = cellranger_version,
+                        docker_registry = docker_registry_stripped,
                         zones = zones,
                         num_cpu = num_cpu,
                         memory = memory,
                         disk_space = count_disk_space,
                         preemptible = preemptible,
-                        docker_registry = docker_registry_stripped,
+                        awsMaxRetries = awsMaxRetries,
                         backend = backend
                 }
             }
@@ -277,9 +287,11 @@ workflow cellranger_workflow {
                     summaries = cellranger_count.output_metrics_summary,
                     sample_ids = cellranger_count.output_count_directory,
                     config_version = config_version,
+                    docker_registry = docker_registry_stripped,
                     zones = zones,
                     preemptible = preemptible,
-                    docker_registry = docker_registry_stripped
+                    awsMaxRetries = awsMaxRetries,
+                    backend = backend
             }
         }
 
@@ -295,12 +307,13 @@ workflow cellranger_workflow {
                         denovo = vdj_denovo,
                         chain = vdj_chain,
                         cellranger_version = cellranger_version,
+                        docker_registry = docker_registry_stripped,
                         zones = zones,
                         num_cpu = num_cpu,
                         memory = memory,
                         disk_space = vdj_disk_space,
                         preemptible = preemptible,
-                        docker_registry = docker_registry_stripped,
+                        awsMaxRetries = awsMaxRetries,
                         backend = backend
                 }
             }
@@ -310,9 +323,11 @@ workflow cellranger_workflow {
                     summaries = cellranger_vdj.output_metrics_summary,
                     sample_ids = cellranger_vdj.output_vdj_directory,
                     config_version = config_version,
+                    docker_registry = docker_registry_stripped,
                     zones = zones,
                     preemptible = preemptible,
-                    docker_registry = docker_registry_stripped
+                    awsMaxRetries = awsMaxRetries,
+                    backend = backend
             }
         }
 
@@ -330,11 +345,12 @@ workflow cellranger_workflow {
                         max_mismatch = max_mismatch,
                         min_read_ratio = min_read_ratio,
                         cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
+                        docker_registry = docker_registry_stripped,
                         zones = zones,
                         memory = feature_memory,
                         disk_space = feature_disk_space,
                         preemptible = preemptible,
-                        docker_registry = docker_registry_stripped,
+                        awsMaxRetries = awsMaxRetries,
                         backend = backend
                 }
             }
@@ -353,12 +369,13 @@ workflow cellranger_workflow {
                         dim_reduce = atac_dim_reduce,
                         peaks = atac_peaks,
                         cellranger_atac_version = cellranger_atac_version,
+                        docker_registry = docker_registry_stripped,
                         zones = zones,
                         num_cpu = atac_num_cpu,
                         memory = atac_memory,
                         disk_space = atac_disk_space,
                         preemptible = preemptible,
-                        docker_registry = docker_registry_stripped,
+                        awsMaxRetries = awsMaxRetries,
                         backend = backend
                 }
             }
@@ -368,9 +385,11 @@ workflow cellranger_workflow {
                     summaries = cellranger_atac_count.output_metrics_summary,
                     sample_ids = cellranger_atac_count.output_count_directory,
                     config_version = config_version,
+                    docker_registry = docker_registry_stripped,
                     zones = zones,
                     preemptible = preemptible,
-                    docker_registry = docker_registry_stripped
+                    awsMaxRetries = awsMaxRetries,
+                    backend = backend
             }
         }
 
@@ -393,6 +412,7 @@ workflow cellranger_workflow {
                         memory = arc_memory,
                         disk_space = arc_disk_space,
                         preemptible = preemptible,
+                        awsMaxRetries = awsMaxRetries,
                         backend = backend
                 }
             }
@@ -402,9 +422,11 @@ workflow cellranger_workflow {
                     summaries = cellranger_arc_count.output_metrics_summary,
                     sample_ids = cellranger_arc_count.output_count_directory,
                     config_version = config_version,
+                    docker_registry = docker_registry_stripped,
                     zones = zones,
                     preemptible = preemptible,
-                    docker_registry = docker_registry_stripped
+                    awsMaxRetries = awsMaxRetries,
+                    backend = backend
             }
         }
 
@@ -433,6 +455,7 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = count_disk_space,
                         preemptible = preemptible,
+                        awsMaxRetries = awsMaxRetries,
                         backend = backend
                 }
             }
@@ -456,12 +479,13 @@ workflow cellranger_workflow {
                         force_cells = force_cells,
                         expect_cells = expect_cells,
                         cellranger_version = cellranger_version,
+                        docker_registry = docker_registry_stripped,
                         zones = zones,
                         num_cpu = num_cpu,
                         memory = memory,
                         disk_space = count_disk_space,
                         preemptible = preemptible,
-                        docker_registry = docker_registry_stripped,
+                        awsMaxRetries = awsMaxRetries,
                         backend = backend
                 }
             }
@@ -471,9 +495,11 @@ workflow cellranger_workflow {
                     summaries = cellranger_count_fbc.output_metrics_summary,
                     sample_ids = cellranger_count_fbc.output_count_directory,
                     config_version = config_version,
+                    docker_registry = docker_registry_stripped,
                     zones = zones,
                     preemptible = preemptible,
-                    docker_registry = docker_registry_stripped
+                    awsMaxRetries = awsMaxRetries,
+                    backend = backend
             }
         }
     }
@@ -487,9 +513,11 @@ task generate_bcl_csv {
     input {
         File input_csv_file
         String config_version
+        String docker_registry
         String zones
         Int preemptible
-        String docker_registry
+        Int awsMaxRetries
+        String backend
     }
 
     command {
@@ -558,7 +586,8 @@ task generate_bcl_csv {
     runtime {
         docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
-        preemptible: "~{preemptible}"
+        preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
 
@@ -570,9 +599,11 @@ task generate_count_config {
         Array[String]? fastq_dirs_atac
         Array[String]? fastq_dirs_arc
         String config_version
+        String docker_registry
         String zones
         Int preemptible
-        String docker_registry
+        Int awsMaxRetries
+        String backend
     }
 
     command {
@@ -796,7 +827,8 @@ task generate_count_config {
     runtime {
         docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
-        preemptible: "~{preemptible}"
+        preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
 
@@ -805,9 +837,11 @@ task collect_summaries {
         Array[File] summaries
         Array[String] sample_ids
         String config_version
+        String docker_registry
         String zones
         Int preemptible
-        String docker_registry
+        Int awsMaxRetries
+        String backend
     }
 
     command {
@@ -839,6 +873,7 @@ task collect_summaries {
     runtime {
         docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
-        preemptible: "~{preemptible}"
+        preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }

@@ -10,11 +10,14 @@ workflow smartseq2 {
         String reference
         # Align reads with 'aligner': hisat2-hca, star, bowtie2 (default: hisat2-hca)
         String aligner = "hisat2-hca"
-
         # Convert transcript BAM file into genome BAM file
         Boolean output_genome_bam = false
+
         # smartseq2 version, default to "1.3.0"
         String smartseq2_version = "1.3.0"
+        # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
+        String docker_registry = "quay.io/cumulus"
+
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         # Number of cpus per job
@@ -23,16 +26,15 @@ workflow smartseq2 {
         String memory = (if aligner != "star" then "3.60G" else "32G")
         # factor to multiply size of R1 and R2 by for RSEM
         Float disk_space_multiplier = 11
+        # Disk space for count matrix generation task
+        Int generate_count_matrix_disk_space = 10
+
         # Number of preemptible tries
         Int preemptible = 2
         # Number of maximum retries when running on AWS
         Int awsMaxRetries = 5
         # backend choose from "gcp", "aws", "local"
         String backend = "gcp"
-        # Disk space for count matrix generation task
-        Int generate_count_matrix_disk_space = 10
-        # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-        String docker_registry = "quay.io/cumulus"
     }
 
     # Output directory, with trailing slashes and spaces stripped
@@ -65,16 +67,16 @@ workflow smartseq2 {
                     sample_name = data_table[pos][0] + "." + data_table[pos][1],
                     aligner = aligner,
                     output_genome_bam = output_genome_bam,
-                    smartseq2_version = smartseq2_version,
                     output_directory = output_directory,
+                    smartseq2_version = smartseq2_version,
+                    docker_registry = docker_registry,
                     zones = zones,
                     num_cpu = num_cpu,
                     memory = memory,
                     disk_space_multiplier = disk_space_multiplier,
                     preemptible = preemptible,
                     awsMaxRetries = awsMaxRetries,
-                    backend = backend,
-                    docker_registry = docker_registry
+                    backend = backend
             }
         }
 
@@ -88,16 +90,16 @@ workflow smartseq2 {
                     sample_name = data_table[pos][0] + "." + data_table[pos][1],
                     aligner = aligner,
                     output_genome_bam = output_genome_bam,
-                    smartseq2_version = smartseq2_version,
                     output_directory = output_directory,
+                    smartseq2_version = smartseq2_version,
+                    docker_registry = docker_registry,
                     zones = zones,
                     num_cpu = num_cpu,
                     memory = memory,
                     disk_space_multiplier = disk_space_multiplier,
                     preemptible = preemptible,
                     awsMaxRetries = awsMaxRetries,
-                    backend = backend,
-                    docker_registry = docker_registry
+                    backend = backend
             }
         }
     }
@@ -108,13 +110,13 @@ workflow smartseq2 {
             count_results = flatten([select_all(run_rsem_se.rsem_cnt), select_all(run_rsem_pe.rsem_cnt)]),
             output_directory = output_directory,
             smartseq2_version = smartseq2_version,
+            docker_registry = docker_registry,
             zones = zones,
             memory = memory,
             disk_space = generate_count_matrix_disk_space,
             preemptible = preemptible,
             awsMaxRetries = awsMaxRetries,
-            backend = backend,
-            docker_registry = docker_registry
+            backend = backend
     }
 
     output {
@@ -140,8 +142,9 @@ task run_rsem {
         Boolean output_genome_bam
         String sample_name
         String aligner
-        String smartseq2_version
         String output_directory
+        String smartseq2_version
+        String docker_registry
         String zones
         Int num_cpu
         String memory
@@ -149,7 +152,6 @@ task run_rsem {
         Int preemptible
         Int awsMaxRetries
         String backend
-        String docker_registry
     }
 
     Boolean is_star = aligner == "star"
@@ -203,13 +205,13 @@ task generate_count_matrix {
         Array[File] count_results
         String output_directory
         String smartseq2_version
+        String docker_registry
         String zones
         String memory
         Int disk_space
         Int preemptible
         Int awsMaxRetries
         String backend
-        String docker_registry
     }
 
     command {

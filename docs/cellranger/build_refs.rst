@@ -115,6 +115,14 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - Number of cpus to request for one node for building indices
 		  - 1
 		  - 1
+		* - memory
+		  - Memory size string for cellranger mkref
+		  - "32G"
+		  - "32G"
+		* - disk_space
+		  - Optional disk space in GB
+		  - 100
+		  - 100
 		* - backend
 		  - Cloud backend for file transfer. Available options:
 
@@ -123,18 +131,14 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		    - "local" for local machine.
 		  - "gcp"
 		  - "gcp"
-		* - memory
-		  - Memory size in GB
-		  - 32
-		  - 32
-		* - disk_space
-		  - Optional disk space in GB
-		  - 100
-		  - 100
 		* - preemptible
 		  - Number of preemptible tries
 		  - 2
 		  - 2
+		* - awsMaxRetries
+		  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
+		  - 5
+		  - 5
 
 5. Workflow output
 ==================
@@ -228,14 +232,6 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 		  - Google cloud zones
 		  - "us-central1-a us-west1-a"
 		  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-		* - backend
-		  - Cloud backend for file transfer. Available options:
-
-		    - "gcp" for Google Cloud;
-		    - "aws" for Amazon AWS;
-		    - "local" for local machine.
-		  - "gcp"
-		  - "gcp"
 		* - memory
 		  - Memory size string for cellranger-atac mkref
 		  - "32G"
@@ -244,10 +240,22 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 		  - Optional disk space in GB
 		  - 100
 		  - 100
+		* - backend
+		  - Cloud backend for file transfer. Available options:
+
+		    - "gcp" for Google Cloud;
+		    - "aws" for Amazon AWS;
+		    - "local" for local machine.
+		  - "gcp"
+		  - "gcp"
 		* - preemptible
 		  - Number of preemptible tries
 		  - 2
 		  - 2
+		* - awsMaxRetries
+		  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
+		  - 5
+		  - 5
 
 4. Workflow output
 ==================
@@ -334,9 +342,13 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - "us-central1-a us-west1-a"
 		  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		* - memory
-		  - Memory size string for cellranger-atac mkref
+		  - Memory size string for cellranger mkvdjref
 		  - "32G"
 		  - "32G"
+		* - disk_space
+		  - Optional disk space in GB
+		  - 100
+		  - 100
 		* - backend
 		  - Cloud backend for file transfer. Available options:
 
@@ -345,18 +357,14 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		    - "local" for local machine.
 		  - "gcp"
 		  - "gcp"
-		* - disk_space
-		  - Optional disk space in GB
-		  - 100
-		  - 100
-		* - count_disk_space
-		  - Disk space in GB needed for cellranger count
-		  - 500
-		  - 500
 		* - preemptible
 		  - Number of preemptible tries
 		  - 2
 		  - 2
+		* - awsMaxRetries
+		  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
+		  - 5
+		  - 5
 
 1. Workflow output
 ==================

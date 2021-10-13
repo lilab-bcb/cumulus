@@ -17,8 +17,6 @@ workflow cumulus {
 		String docker_registry = "quay.io/cumulus"
 		# Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-		# Backend
-		String backend = "gcp"
 		# Number of cpus per cumulus job
 		Int num_cpu = 32
 		# Memory size string
@@ -26,10 +24,14 @@ workflow cumulus {
 		# Total disk space
 		Int disk_space = 100
 		# Number of preemptible tries
+
+		# Backend
+		String backend = "gcp"
 		Int preemptible = 2
 		# Number of maximum retries when running on AWS
 		Int awsMaxRetries = 5
-		# If sample count matrix is in either DGE, mtx, csv, tsv or loom format and there is no Reference column in the csv_file, use default_reference as the reference.
+
+		# If sample count matrix is in either DGE, mtx, csv, tsv or loom format and there is no Reference column in the csv_file, use default_reference as the reference string.
 		String? default_reference
 
 
@@ -279,12 +281,12 @@ workflow cumulus {
 				subset_singlets = subset_singlets,
 				minimum_number_of_genes = minimum_number_of_genes,
 				pegasus_version = pegasus_version,
+				docker_registry = docker_registry,
 				zones = zones,
 				memory = memory,
 				disk_space = disk_space,
 				preemptible = preemptible,
 				awsMaxRetries = awsMaxRetries,
-				docker_registry = docker_registry,
 				backend = backend
 		}
 	}
@@ -374,13 +376,13 @@ workflow cumulus {
 			citeseq_umap = citeseq_umap,
 			citeseq_umap_exclude = citeseq_umap_exclude,
 			pegasus_version = pegasus_version,
+			docker_registry = docker_registry,
 			zones = zones,
 			num_cpu = num_cpu,
 			memory = memory,
 			disk_space = disk_space,
 			preemptible = preemptible,
 			awsMaxRetries = awsMaxRetries,
-			docker_registry = docker_registry,
 			backend = backend
 	}
 
@@ -438,12 +440,12 @@ workflow cumulus {
 						plot_nmf = plot_nmf,
 						nmf_n = nmf_n,
 						pegasus_version = pegasus_version,
+						docker_registry = docker_registry,
 						zones = zones,
 						memory = memory,
 						disk_space = disk_space,
 						preemptible = preemptible,
 						awsMaxRetries = awsMaxRetries,
-						docker_registry = docker_registry,
 						backend = backend
 				}
 			}
@@ -455,13 +457,13 @@ workflow cumulus {
 						output_directory = output_directory_stripped + '/' + output_name,
 						output_name = focus_prefix,
 						pegasus_version = pegasus_version,
+						docker_registry = docker_registry,
 						zones = zones,
 						memory = memory,
 						disk_space = disk_space,
 						num_cpu = num_cpu,
 						preemptible = preemptible,
 						awsMaxRetries = awsMaxRetries,
-						docker_registry = docker_registry,
 						backend = backend
 				}
 			}
@@ -474,12 +476,12 @@ workflow cumulus {
 						output_name = focus_prefix,
 						output_dense = output_dense,
 						pegasus_version = pegasus_version,
+						docker_registry = docker_registry,
 						zones = zones,
 						memory = memory,
 						disk_space = disk_space,
 						preemptible = preemptible,
 						awsMaxRetries = awsMaxRetries,
-						docker_registry = docker_registry,
 						backend = backend
 				}
 			}

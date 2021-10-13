@@ -140,14 +140,6 @@ For scIR-seq data, ``cellranger_workflow`` takes Illumina outputs as input and r
 	  - Number of cpus to request for one node for cellranger mkfastq and cellranger vdj
 	  - 32
 	  - 32
-	* - backend
-	  - Cloud backend for file transfer. Available options:
-
-	  	- "gcp" for Google Cloud;
-	  	- "aws" for Amazon AWS;
-	  	- "local" for local machine.
-	  - "gcp"
-	  - "gcp"
 	* - memory
 	  - Memory size string for cellranger mkfastq and cellranger vdj
 	  - "120G"
@@ -160,10 +152,23 @@ For scIR-seq data, ``cellranger_workflow`` takes Illumina outputs as input and r
 	  - Disk space in GB needed for cellranger vdj
 	  - 500
 	  - 500
+	* - backend
+	  - Cloud backend for file transfer. Available options:
+
+	  	- "gcp" for Google Cloud;
+	  	- "aws" for Amazon AWS;
+	  	- "local" for local machine.
+	  - "gcp"
+	  - "gcp"
 	* - preemptible
 	  - Number of preemptible tries
 	  - 2
 	  - 2
+	* - awsMaxRetries
+	  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
+	  - 5
+	  - 5
+
 
 Workflow output
 +++++++++++++++

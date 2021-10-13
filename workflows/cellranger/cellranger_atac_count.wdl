@@ -37,6 +37,8 @@ workflow cellranger_atac_count {
         Int disk_space = 500
         # Number of preemptible tries
         Int preemptible = 2
+        # Max number of retries for AWS instance
+        Int awsMaxRetries = 5
         # Backend
         String backend = "gcp"
     }
@@ -57,12 +59,13 @@ workflow cellranger_atac_count {
             dim_reduce = dim_reduce,
             peaks = peaks,
             cellranger_atac_version = cellranger_atac_version,
+            docker_registry = docker_registry,
             zones = zones,
             num_cpu = num_cpu,
             memory = memory,
             disk_space = disk_space,
             preemptible = preemptible,
-            docker_registry = docker_registry,
+            awsMaxRetries = awsMaxRetries,
             backend = backend
     }
 
@@ -84,12 +87,13 @@ task run_cellranger_atac_count {
         String? dim_reduce
         File? peaks
         String cellranger_atac_version
+        String docker_registry
         String zones
         Int num_cpu
         String memory
         Int disk_space
         Int preemptible
-        String docker_registry
+        Int awsMaxRetries
         String backend
     }
 
@@ -144,7 +148,8 @@ task run_cellranger_atac_count {
         memory: memory
         bootDiskSizeGb: 12
         disks: "local-disk ~{disk_space} HDD"
-        cpu: "~{num_cpu}"
-        preemptible: "~{preemptible}"
+        cpu: num_cpu
+        preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
