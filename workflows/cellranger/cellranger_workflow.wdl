@@ -346,6 +346,7 @@ workflow cellranger_workflow {
                         min_read_ratio = min_read_ratio,
                         cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
                         docker_registry = docker_registry_stripped,
+                        acronym_file = acronym_file, 
                         zones = zones,
                         memory = feature_memory,
                         disk_space = feature_disk_space,
