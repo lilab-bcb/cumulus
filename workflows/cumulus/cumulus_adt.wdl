@@ -17,9 +17,9 @@ workflow cumulus_adt {
 
 		# feature barcodes in csv format
 		File feature_barcode_file
-                
-                # Resource
-                File resource_path
+
+		# Index TSV file
+		File acronym_file
 
 		# scaffold sequence for Perturb-seq, default is "", which for Perturb-seq means barcode starts at position 0 of read 2
 		String scaffold_sequence = ""
@@ -49,10 +49,6 @@ workflow cumulus_adt {
 		String backend = "gcp"
 	}
 
-	# cell barcodes white list, from 10x genomics, can be either v2 or v3 chemistry
-	File cell_barcode_file = (if chemistry == "SC3Pv3" then resource_path+"/3M-february-2018.txt.gz" else resource_path+"/737K-august-2016.txt.gz")
-
-
 	call run_generate_count_matrix_ADTs {
 		input:
 			sample_id = sample_id,
@@ -60,7 +56,7 @@ workflow cumulus_adt {
 			output_directory = output_directory,
 			chemistry = chemistry,
 			data_type = data_type,
-			cell_barcodes = cell_barcode_file,
+			acronym_file = acronym_file,
 			feature_barcodes = feature_barcode_file,
 			scaffold_sequence = scaffold_sequence,
 			max_mismatch = max_mismatch,
@@ -88,8 +84,8 @@ task run_generate_count_matrix_ADTs {
 		String output_directory
 		String chemistry
 		String data_type
-		File cell_barcodes
 		File feature_barcodes
+		File acronym_file
 		String scaffold_sequence
 		Int max_mismatch
 		Float min_read_ratio
@@ -111,13 +107,17 @@ task run_generate_count_matrix_ADTs {
 		python <<CODE
 		import re
 		from subprocess import check_call
+		import pandas as pd
 
 		fastqs = []
+
+		ref_data = pd.read_csv('~{acronym_file}', sep = '\t', header = None, names = ['Keyword', 'Path'])
+		idx = ref_data[ref_data[‘Keyword’] == '~{chemistry}'].index.values
+		cell_barcodes = ref_data.at[idx[0],'Path']
+
 		for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
 			directory = re.sub('/+$', '', directory) # remove trailing slashes
-			# call_args = ['gsutil', '-q', '-m', 'cp', '-r', directory + '/~{sample_id}', '.']
-			call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/~{sample_id}', '.']
-			# call_args = ['cp', '-r', directory + '/~{sample_id}', '.']
+			call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/~{sample_id}/', '.']
 			print(' '.join(call_args))
 			check_call(call_args)
 			call_args = ['mv', '~{sample_id}', '~{sample_id}_' + str(i)]
@@ -125,7 +125,7 @@ task run_generate_count_matrix_ADTs {
 			check_call(call_args)
 			fastqs.append('~{sample_id}_' + str(i))
 
-		call_args = ['generate_count_matrix_ADTs', '~{cell_barcodes}', '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
+		call_args = ['generate_count_matrix_ADTs', cell_barcodes, '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
 		if '~{data_type}' == 'crispr':
 			call_args.extend(['--feature', 'crispr', '--scaffold-sequence', '~{scaffold_sequence}'])
 			if '~{chemistry}' != 'SC3Pv3':
