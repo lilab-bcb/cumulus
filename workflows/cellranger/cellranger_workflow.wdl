@@ -82,8 +82,8 @@ workflow cellranger_workflow {
         # CMO set CSV file, delaring CMO constructs and associated barcodes
         File? cmo_set
 
-        # Index TSV file
-        File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
+        # Resource 
+        String resource_path = "gs://regev-lab/resources/cellranger"
 
         # 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
         String cellranger_version = "6.1.1"
@@ -146,6 +146,8 @@ workflow cellranger_workflow {
 
     String docker_registry_stripped = sub(docker_registry, "/+$", "")
     String mkfastq_docker_registry_stripped = sub(mkfastq_docker_registry, "/+$", "")
+
+    File acronym_file = resource_path + "/index.tsv"
 
     if (run_mkfastq) {
         call generate_bcl_csv {
@@ -346,7 +348,7 @@ workflow cellranger_workflow {
                         min_read_ratio = min_read_ratio,
                         cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
                         docker_registry = docker_registry_stripped,
-                        acronym_file = acronym_file, 
+                        resource_path = resource_path, 
                         zones = zones,
                         memory = feature_memory,
                         disk_space = feature_disk_space,

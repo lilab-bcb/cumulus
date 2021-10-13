@@ -18,8 +18,8 @@ workflow cumulus_adt {
 		# feature barcodes in csv format
 		File feature_barcode_file
                 
-                # Acronym file
-                File acronym_file
+                # Resource
+                File resource_path
 
 		# scaffold sequence for Perturb-seq, default is "", which for Perturb-seq means barcode starts at position 0 of read 2
 		String scaffold_sequence = ""
@@ -50,7 +50,7 @@ workflow cumulus_adt {
 	}
 
 	# cell barcodes white list, from 10x genomics, can be either v2 or v3 chemistry
-	File cell_barcode_file = (if chemistry == "SC3Pv3" then "3M-february-2018.txt.gz" else "737K-august-2016.txt.gz")
+	File cell_barcode_file = (if chemistry == "SC3Pv3" then resource_path+"/3M-february-2018.txt.gz" else resource_path+"/737K-august-2016.txt.gz")
 
 
 	call run_generate_count_matrix_ADTs {
