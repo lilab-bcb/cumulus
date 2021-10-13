@@ -64,7 +64,6 @@ workflow cumulus_adt {
 			feature_barcodes = feature_barcode_file,
 			scaffold_sequence = scaffold_sequence,
 			max_mismatch = max_mismatch,
-                        acronym_file = acronym_file,
 			min_read_ratio = min_read_ratio,
 			cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
 			docker_registry = docker_registry,
@@ -91,7 +90,6 @@ task run_generate_count_matrix_ADTs {
 		String data_type
 		File cell_barcodes
 		File feature_barcodes
-                File acronym_file
 		String scaffold_sequence
 		Int max_mismatch
 		Float min_read_ratio
@@ -127,10 +125,7 @@ task run_generate_count_matrix_ADTs {
 			check_call(call_args)
 			fastqs.append('~{sample_id}_' + str(i))
 
-                prefix_ref = os.path.dirname(os.path.abspath(acronym_file))
-                cell_barcodes = os.path.join(prefix_ref,'~{cell_barcodes}')
-
-		call_args = ['generate_count_matrix_ADTs', cell_barcodes, '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
+		call_args = ['generate_count_matrix_ADTs', '~{cell_barcodes}', '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
 		if '~{data_type}' == 'crispr':
 			call_args.extend(['--feature', 'crispr', '--scaffold-sequence', '~{scaffold_sequence}'])
 			if '~{chemistry}' != 'SC3Pv3':
