@@ -125,7 +125,7 @@ task run_generate_count_matrix_ADTs {
 			check_call(call_args)
 			fastqs.append('~{sample_id}_' + str(i))
 
-		call_args = ['strato', 'cp', '--backend', '-m', '~{backend}', cell_barcodes, '.']
+		call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', cell_barcodes, '.']
 		print(' '.join(call_args))
 		check_call(call_args)
 
