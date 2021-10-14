@@ -117,7 +117,7 @@ task run_generate_count_matrix_ADTs {
 
 		for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
 			directory = re.sub('/+$', '', directory) # remove trailing slashes
-			call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/~{sample_id}/', '.']
+			call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/~{sample_id}/', './~{sample_id}/']
 			print(' '.join(call_args))
 			check_call(call_args)
 			######
