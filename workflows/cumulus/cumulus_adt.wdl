@@ -108,6 +108,7 @@ task run_generate_count_matrix_ADTs {
 		import re
 		from subprocess import check_call
 		import pandas as pd
+		import os
 
 		fastqs = []
 
