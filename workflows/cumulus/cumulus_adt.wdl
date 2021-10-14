@@ -120,6 +120,14 @@ task run_generate_count_matrix_ADTs {
 			call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/~{sample_id}/', '.']
 			print(' '.join(call_args))
 			check_call(call_args)
+			######
+			call_args = ['pwd']
+			print(' '.join(call_args))
+			check_call(call_args)
+			call_args = ['ls']
+			print(' '.join(call_args))
+			check_call(call_args)
+			######
 			call_args = ['mv', '~{sample_id}', '~{sample_id}_' + str(i)]
 			print(' '.join(call_args))
 			check_call(call_args)
