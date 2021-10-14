@@ -50,7 +50,7 @@ workflow cumulus_adt {
 	}
 
 	Map[String, String] acronym2gsurl = read_map(acronym_file)
-	File cell_barcodes = acronym2gsurl[chemistry] 
+	File cell_barcode_file = acronym2gsurl[chemistry] 
 
 	call run_generate_count_matrix_ADTs {
 		input:
