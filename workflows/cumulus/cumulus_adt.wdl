@@ -123,7 +123,7 @@ task run_generate_count_matrix_ADTs {
 			check_call(call_args)
 			fastqs.append('~{sample_id}_' + str(i))
 
-		call_args = ['generate_count_matrix_ADTs', cell_barcodes_file, '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
+		call_args = ['generate_count_matrix_ADTs', '~{cell_barcodes}', '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
 		if '~{data_type}' == 'crispr':
 			call_args.extend(['--feature', 'crispr', '--scaffold-sequence', '~{scaffold_sequence}'])
 			if '~{chemistry}' != 'SC3Pv3':
