@@ -120,20 +120,17 @@ task run_generate_count_matrix_ADTs {
 			call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/~{sample_id}/', './~{sample_id}/']
 			print(' '.join(call_args))
 			check_call(call_args)
-			######
-			call_args = ['pwd']
-			print(' '.join(call_args))
-			check_call(call_args)
-			call_args = ['ls']
-			print(' '.join(call_args))
-			check_call(call_args)
-			######
 			call_args = ['mv', '~{sample_id}', '~{sample_id}_' + str(i)]
 			print(' '.join(call_args))
 			check_call(call_args)
 			fastqs.append('~{sample_id}_' + str(i))
 
-		call_args = ['generate_count_matrix_ADTs', cell_barcodes, '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
+                call_args = ['strato', 'cp', '--backend', '-m', '~{backend}', cell_barcodes, '.']
+                print(' '.join(call_args))
+                check_call(call_args)
+                
+                cell_barcodes_file = os.path.basename(cell_barcodes)
+		call_args = ['generate_count_matrix_ADTs', cell_barcodes_file, '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
 		if '~{data_type}' == 'crispr':
 			call_args.extend(['--feature', 'crispr', '--scaffold-sequence', '~{scaffold_sequence}'])
 			if '~{chemistry}' != 'SC3Pv3':
