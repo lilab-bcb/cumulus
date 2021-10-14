@@ -49,6 +49,9 @@ workflow cumulus_adt {
 		String backend = "gcp"
 	}
 
+	Map[String, String] acronym2gsurl = read_map(acronym_file)
+	File cell_barcodes = acronym2gsurl[chemistry] 
+
 	call run_generate_count_matrix_ADTs {
 		input:
 			sample_id = sample_id,
@@ -56,7 +59,7 @@ workflow cumulus_adt {
 			output_directory = output_directory,
 			chemistry = chemistry,
 			data_type = data_type,
-			acronym_file = acronym_file,
+			cell_barcodes = cell_barcode_file,
 			feature_barcodes = feature_barcode_file,
 			scaffold_sequence = scaffold_sequence,
 			max_mismatch = max_mismatch,
@@ -84,8 +87,8 @@ task run_generate_count_matrix_ADTs {
 		String output_directory
 		String chemistry
 		String data_type
+		File cell_barcodes
 		File feature_barcodes
-		File acronym_file
 		String scaffold_sequence
 		Int max_mismatch
 		Float min_read_ratio
@@ -107,14 +110,8 @@ task run_generate_count_matrix_ADTs {
 		python <<CODE
 		import re
 		from subprocess import check_call
-		import pandas as pd
-		import os
 
 		fastqs = []
-
-		ref_data = pd.read_csv('~{acronym_file}', sep = '\t', header = None, names = ['Keyword', 'Path'])
-		idx = ref_data[ref_data['Keyword'] == '~{chemistry}'].index.values
-		cell_barcodes = ref_data.at[idx[0],'Path']
 
 		for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
 			directory = re.sub('/+$', '', directory) # remove trailing slashes
@@ -126,11 +123,6 @@ task run_generate_count_matrix_ADTs {
 			check_call(call_args)
 			fastqs.append('~{sample_id}_' + str(i))
 
-		call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', cell_barcodes, '.']
-		print(' '.join(call_args))
-		check_call(call_args)
-
-		cell_barcodes_file = os.path.basename(cell_barcodes)
 		call_args = ['generate_count_matrix_ADTs', cell_barcodes_file, '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
 		if '~{data_type}' == 'crispr':
 			call_args.extend(['--feature', 'crispr', '--scaffold-sequence', '~{scaffold_sequence}'])
@@ -153,10 +145,7 @@ task run_generate_count_matrix_ADTs {
 			filter_chimeric_reads ~{data_type} ~{feature_barcodes} "~{sample_id}.stat.csv.gz" ~{min_read_ratio} ~{sample_id}
 		fi
 
-		#gsutil -m cp "~{sample_id}".*csv* "~{output_directory}/~{sample_id}/"
 		strato cp --backend ~{backend} -m "~{sample_id}".*csv* "~{output_directory}/~{sample_id}/"
-		# mkdir -p "~{output_directory}/~{sample_id}"
-		# cp -f "~{sample_id}".*csv* "~{output_directory}/~{sample_id}/"
 
 		if [ -f "~{sample_id}".umi_count.pdf ]
 		then
