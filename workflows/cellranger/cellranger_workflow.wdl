@@ -148,7 +148,6 @@ workflow cellranger_workflow {
     String mkfastq_docker_registry_stripped = sub(mkfastq_docker_registry, "/+$", "")
 
     Map[String, String] acronym2gsurl = read_map(acronym_file)
-    File null_file = acronym2gsurl["null_file"]
 
     if (run_mkfastq) {
         call generate_bcl_csv {
@@ -255,7 +254,7 @@ workflow cellranger_workflow {
                 preemptible = preemptible,
                 awsMaxRetries = awsMaxRetries,
                 backend = backend,
-                null_file = null_file
+                null_file = acronym2gsurl["null_file"]
         }
 
         if (length(generate_count_config.sample_ids) > 0) {
