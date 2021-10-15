@@ -57,3 +57,4 @@ SC3Pv2	gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
 fiveprime	gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
 SC5P-PE	gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
 SC5P-R2	gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
+null_file	gs://regev-lab/resources/cellranger/null

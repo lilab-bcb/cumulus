@@ -83,7 +83,7 @@ workflow cellranger_workflow {
         File? cmo_set
 
         # Index TSV file 
-        File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
+        File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"        
 
         # 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
         String cellranger_version = "6.1.1"
@@ -146,6 +146,9 @@ workflow cellranger_workflow {
 
     String docker_registry_stripped = sub(docker_registry, "/+$", "")
     String mkfastq_docker_registry_stripped = sub(mkfastq_docker_registry, "/+$", "")
+
+    Map[String, String] acronym2gsurl = read_map(acronym_file)
+    null_file = acronym2gsurl["null_file"]
 
     if (run_mkfastq) {
         call generate_bcl_csv {
@@ -251,7 +254,8 @@ workflow cellranger_workflow {
                 zones = zones,
                 preemptible = preemptible,
                 awsMaxRetries = awsMaxRetries,
-                backend = backend
+                backend = backend,
+                null_file = null_file
         }
 
         if (length(generate_count_config.sample_ids) > 0) {
@@ -605,6 +609,7 @@ task generate_count_config {
         Int preemptible
         Int awsMaxRetries
         String backend
+        File null_file
     }
 
     command {
@@ -617,8 +622,6 @@ task generate_count_config {
         import sys
         import pandas as pd
         from collections import defaultdict
-
-        null_file = 'gs://regev-lab/resources/cellranger/null' # null file
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
 
@@ -708,7 +711,7 @@ task generate_count_config {
                         if datatype in ['adt', 'citeseq', 'hashing', 'cmo', 'crispr']:
                             print("Please specify one feature barcode file for sample " + sample_id + "!", file = sys.stderr)
                             sys.exit(1)
-                        feature_barcode_file = null_file
+                        feature_barcode_file = '~{null_file}'
 
                 if 'Link' in df_local: # if multiomics
                     if df_local['Link'].unique().size > 1:
@@ -721,7 +724,7 @@ task generate_count_config {
                         link2sample[link].extend([sample_id] * size)
                         link2dir[link].extend(list(dirs))
                         link2dt[link].extend([datatype] * size)
-                        if feature_barcode_file == null_file:
+                        if feature_barcode_file == '~{null_file}':
                             feature_barcode_file = 'null'
                         link2fbf[link].extend([feature_barcode_file] * size)
                         if reference != 'null':
