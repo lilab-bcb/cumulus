@@ -609,7 +609,7 @@ task generate_count_config {
         Int preemptible
         Int awsMaxRetries
         String backend
-        File null_file
+        String null_file
     }
 
     command {
@@ -622,9 +622,6 @@ task generate_count_config {
         import sys
         import pandas as pd
         from collections import defaultdict
-
-        backend 'gcp':
-            null_file = 'gs://regev-lab/resources/cellranger/null'
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
 
