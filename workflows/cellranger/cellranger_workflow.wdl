@@ -85,9 +85,6 @@ workflow cellranger_workflow {
         # Index TSV file 
         File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
 
-        # Null file
-        File null_file = "gs://regev-lab/resources/cellranger/null"
-
         # 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
         String cellranger_version = "6.1.1"
         # 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0
@@ -149,6 +146,9 @@ workflow cellranger_workflow {
 
     String docker_registry_stripped = sub(docker_registry, "/+$", "")
     String mkfastq_docker_registry_stripped = sub(mkfastq_docker_registry, "/+$", "")
+
+    Map[String, String] acronym2gsurl = read_map(acronym_file)  
+    String null_file = acronym2gsurl["null_file"]
 
     if (run_mkfastq) {
         call generate_bcl_csv {
@@ -622,6 +622,9 @@ task generate_count_config {
         import sys
         import pandas as pd
         from collections import defaultdict
+
+        backend 'gcp':
+            null_file = 'gs://regev-lab/resources/cellranger/null'
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
 
