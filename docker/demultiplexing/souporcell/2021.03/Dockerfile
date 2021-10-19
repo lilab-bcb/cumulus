@@ -39,8 +39,7 @@ ENV PATH=/opt/bedtools2/bin:$PATH
 ENV CARGO_HOME=/opt/.cargo
 ENV RUSTUP_HOME=/opt/.cargo
 
-RUN cd /opt && \
-    bash -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y'
+RUN bash -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y'
 
 ENV PATH=/opt/.cargo/bin:$PATH
 
