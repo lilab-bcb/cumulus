@@ -39,9 +39,12 @@ ENV PATH=/opt/bedtools2/bin:$PATH
 ENV CARGO_HOME=/opt/.cargo
 ENV RUSTUP_HOME=/opt/.cargo
 
-RUN bash -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y'
+RUN cd /opt && \
+    bash -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y'
 
 ENV PATH=/opt/.cargo/bin:$PATH
+
+RUN ls /opt/.cargo/bin
 
 RUN cd /opt && \
     wget https://github.com/wheaton5/souporcell/archive/1bd9f11d70eaee6ac14713de09c377c285ca2787.zip -O souporcell.zip && \
@@ -59,7 +62,7 @@ RUN conda install -y python=3.6.13 && \
     conda install -y -c conda-forge numpy=1.19.5 pandas=1.1.5 scipy=1.5.3 pyvcf=0.6.8 pystan=2.19.1.1 anndata=0.7.6 zarr=2.8.3 networkx=2.5.1 && \
     conda install -y -c bioconda pysam=0.16.0.1 pyfaidx=0.6.2 pegasusio=0.2.10
 
-RUN pip install stratocumulus==0.1.1
+RUN pip install stratocumulus==0.1.2
 
 RUN cd /opt && \
     wget -O htslib.tar.bz2 https://github.com/samtools/htslib/releases/download/1.9/htslib-1.9.tar.bz2 && \
