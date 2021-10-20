@@ -120,8 +120,8 @@ Workflow input
 	  - Choose the algorithm for dimensionality reduction prior to clustering and tsne: "lsa", "plsa", or "pca"
 	  - "lsa"
 	  - "lsa"
-	* - atac_peaks
-	  - A 3-column BED file of peaks to override cellranger atac peak caller. Peaks must be sorted by position and not contain overlapping peaks; comment lines beginning with `#` are allowed
+	* - peaks
+	  - A 3-column BED file of peaks to override cellranger atac peak caller. Peaks must be sorted by position and not contain overlapping peaks; comment lines beginning with ``#`` are allowed
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/common_peaks.bed"
 	  -
 	* - cellranger_atac_version

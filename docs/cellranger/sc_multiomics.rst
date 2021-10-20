@@ -114,10 +114,30 @@ For single-cell multiomics data, ``cellranger_workflow`` takes Illumina outputs 
 	  - Turn this option on to also count reads mapping to intronic regions. With this option, users do not need to use pre-mRNA references. Note that if this option is set, cellranger_version must be >= 5.0.0. This option is used by *cellranger multi* and *cellranger count*.
 	  - false
 	  - false
+	* - arc_gex_exclude_introns
+	  - | Disable counting of intronic reads. In this mode, only reads that are exonic and compatible with annotated splice junctions in the reference are counted.
+	    | **Note:** using this mode will reduce the UMI counts in the feature-barcode matrix.
+	  - false
+	  - false
 	* - no_bam
 	  - Turn this option on to disable BAM file generation. This option is only available if cellranger_version >= 5.0.0. This option is used by *cellranger-arc count*, *cellranger multi* and *cellranger count*.
 	  - false
 	  - false
+	* - arc_min_atac_count
+	  - | Cell caller override to define the minimum number of ATAC transposition events in peaks (ATAC counts) for a cell barcode.
+	    | **Note:** this input must be specified in conjunction with ``arc_min_gex_count`` input.
+	    | With both inputs set, a barcode is defined as a cell if it contains at least ``arc_min_atac_count`` ATAC counts AND at least ``arc_min_gex_count`` GEX UMI counts.
+	  - 100
+	  -
+	* - arc_min_gex_count
+	  - | Cell caller override to define the minimum number of GEX UMI counts for a cell barcode.
+	    | **Note:** this input must be specified in conjunction with ``arc_min_atac_count``. See the description of ``arc_min_atac_count`` input for details.
+	  - 200
+	  -
+	* - peaks
+	  - A 3-column BED file of peaks to override cellranger arc peak caller. Peaks must be sorted by position and not contain overlapping peaks; comment lines beginning with ``#`` are allowed
+	  - "gs://fc-e0000000-0000-0000-0000-000000000000/common_peaks.bed"
+	  -
 	* - secondary
 	  - Perform Cell Ranger secondary analysis (dimensionality reduction, clustering, etc.). This option is used by *cellranger multi* and *cellranger count*.
 	  - false

@@ -19,8 +19,22 @@ workflow cellranger_arc_count {
         # Index TSV file
         File acronym_file
 
-        # If generate bam outputs
+        # Disable counting of intronic reads. In this mode, only reads that are exonic and compatible with annotated splice junctions in the reference are counted.
+        # Note: using this mode will reduce the UMI counts in the feature-barcode matrix
+        Boolean gex_exclude_introns = false
+        # Do not generate bam files
         Boolean no_bam = false
+        # Cell caller override: define the minimum number of ATAC transposition events in peaks (ATAC counts) for a cell barcode.
+        # Note: this option must be specified in conjunction with `min-gex-count`.
+        # With `--min-atac-count=X` and `--min-gex-count=Y` a barcode is defined as a cell if it contains at least X ATAC counts AND at least Y GEX UMI counts
+        Int? min_atac_count
+        # Cell caller override: define the minimum number of GEX UMI counts for a cell barcode.
+        # Note: this option must be specified in conjunction with `min-atac-count`.
+        # With `--min-atac-count=X` and `--min-gex-count=Y` a barcode is defined as a cell if it contains at least X ATAC counts AND at least Y GEX UMI counts
+        Int? min_gex_count
+        # Override peak caller: specify peaks to use in downstream analyses from supplied 3-column BED file.
+        # The supplied peaks file must be sorted by position and not contain overlapping peaks; comment lines beginning with `#` are allowed
+        File? peaks
 
         # CellRanger ARC version
         String cellranger_arc_version
@@ -57,7 +71,11 @@ workflow cellranger_arc_count {
             input_data_types = input_data_types,
             output_directory = output_directory,
             genome_file = genome_file,
+            gex_exclude_introns = gex_exclude_introns,
             no_bam = no_bam,
+            min_atac_count = min_atac_count,
+            min_gex_count = min_gex_count,
+            peaks = peaks,
             cellranger_arc_version = cellranger_arc_version,
             docker_registry = docker_registry,
             zones = zones,
@@ -84,7 +102,11 @@ task run_cellranger_arc_count {
         String input_data_types
         String output_directory
         File genome_file
+        Boolean gex_exclude_introns
         Boolean no_bam
+        Int? min_atac_count
+        Int? min_gex_count
+        File? peaks
         String cellranger_arc_version
         String docker_registry
         String zones
@@ -124,8 +146,16 @@ task run_cellranger_arc_count {
                 fout.write(os.path.abspath(fastqs) + ',' + samples[i] + ',' + ('Gene Expression' if data_types[i] == 'rna' else 'Chromatin Accessibility') + '\n')
 
         call_args = ['cellranger-arc', 'count', '--id=results', '--libraries=libraries.csv', '--reference=genome_dir', '--jobmode=local']
-        if '~{no_bam}' is 'true':
+        if '~{gex_exclude_introns}' == 'true':
+            call_args.append('--gex-exclude-introns')
+        if '~{no_bam}' == 'true':
             call_args.append('--no-bam')
+        if '~{min_atac_count}' != '':
+            call_args.extend(['--min-atac-count', '~{min_atac_count}'])
+        if '~{min_gex_count}' != '':
+            call_args.extend(['--min-gex-count', '~{min_gex_count}'])
+        if '~{peaks}' != '':
+            call_args.extend(['--peaks', '~{peaks}'])
         print(' '.join(call_args))
         check_call(call_args)
         CODE

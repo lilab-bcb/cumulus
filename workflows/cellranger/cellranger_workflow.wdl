@@ -75,7 +75,16 @@ workflow cellranger_workflow {
         # For atac, choose the algorithm for dimensionality reduction prior to clustering and tsne: 'lsa' (default), 'plsa', or 'pca'.
         String? atac_dim_reduce = "lsa"
         # A BED file to override peak caller
-        File? atac_peaks
+        File? peaks
+
+        # For arc
+
+        # Disable counting of intronic reads.
+        Boolean arc_gex_exclude_introns = false
+        # Cell caller override: define the minimum number of ATAC transposition events in peaks (ATAC counts) for a cell barcode.
+        Int? arc_min_atac_count
+        # Cell caller override: define the minimum number of GEX UMI counts for a cell barcode.
+        Int? arc_min_gex_count
 
         # For multi
 
@@ -367,7 +376,7 @@ workflow cellranger_workflow {
                         acronym_file = acronym_file,
                         force_cells = force_cells,
                         dim_reduce = atac_dim_reduce,
-                        peaks = atac_peaks,
+                        peaks = peaks,
                         cellranger_atac_version = cellranger_atac_version,
                         docker_registry = docker_registry_stripped,
                         zones = zones,
@@ -404,7 +413,11 @@ workflow cellranger_workflow {
                         output_directory = output_directory_stripped,
                         acronym_file = acronym_file,
                         genome = generate_count_config.sample2genome[link_id],
+                        gex_exclude_introns = arc_gex_exclude_introns,
                         no_bam = no_bam,
+                        min_atac_count = arc_min_atac_count,
+                        min_gex_count = arc_min_gex_count,
+                        peaks = peaks,
                         cellranger_arc_version = cellranger_arc_version,
                         docker_registry = docker_registry_stripped,
                         zones = zones,
