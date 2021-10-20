@@ -43,8 +43,6 @@ RUN bash -c 'curl https://sh.rustup.rs -sSf | sh -s -- -y'
 
 ENV PATH=/opt/.cargo/bin:$PATH
 
-RUN ls /opt/.cargo/bin
-
 RUN cd /opt && \
     wget https://github.com/wheaton5/souporcell/archive/1bd9f11d70eaee6ac14713de09c377c285ca2787.zip -O souporcell.zip && \
     unzip souporcell.zip && \
