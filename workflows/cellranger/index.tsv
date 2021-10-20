@@ -52,3 +52,9 @@ GRCh38_and_SARSCoV2	gs://regev-lab/resources/cellranger/GRCh38_and_SARSCoV2.tar.
 GRCh38_premrna_and_SARSCoV2	gs://regev-lab/resources/cellranger/GRCh38premrna_and_SARSCoV2.tar.gz
 human_probe_v1	gs://regev-lab/resources/cellranger/Visium_Human_Transcriptome_Probe_Set_v1.0_GRCh38-2020-A.csv
 mouse_probe_v1	gs://regev-lab/resources/cellranger/Visium_Mouse_Transcriptome_Probe_Set_v1.0_mm10-2020-A.csv
+SC3Pv3	gs://regev-lab/resources/cellranger/3M-february-2018.txt.gz
+SC3Pv2	gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz	
+fiveprime	gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
+SC5P-PE	gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
+SC5P-R2	gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
+null_file	gs://regev-lab/resources/cellranger/null

@@ -40,7 +40,7 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install zarr==2.8.3 --no-cache-dir && \
     python -m pip install pegasusio==0.3.1.post2 --no-cache-dir && \
     python -m pip install demuxEM==0.1.7 --no-cache-dir && \
-    python -m pip install stratocumulus==0.1.1 --no-cache-dir
+    python -m pip install stratocumulus==0.1.2 --no-cache-dir
 
 RUN apt-get -qq -y remove curl gnupg && \
     apt-get -qq -y autoremove && \
