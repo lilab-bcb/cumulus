@@ -366,7 +366,7 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - 5
 		  - 5
 
-1. Workflow output
+4. Workflow output
 ==================
 
 	.. list-table::

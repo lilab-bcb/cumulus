@@ -198,6 +198,11 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		    See :ref:`bcl2fastq-docker` for making your own registry.
 		  - "gcr.io/broad-cumulus"
 		  - "gcr.io/broad-cumulus"
+		* - acronym_file
+		  - | The link/path of an index file in TSV format for fetching preset genome references, chemistry whitelists, etc. by their names.
+		    | Set an GS URI if *backend* is ``gcp``; an S3 URI for ``aws`` backend; an absolute file path for ``local`` backend.
+		  - "s3://xxxx/index.tsv"
+		  - "gs://regev-lab/resources/cellranger/index.tsv"
 		* - zones
 		  - Google cloud zones
 		  - "us-central1-a us-west1-a"
