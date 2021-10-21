@@ -1,3 +1,8 @@
+Version 1.5.1 `September 15, 2021`
+------------------------------------
+
+* Fix the issue of WDLs after Terra platform updates the Cromwell engine.
+
 Version 1.5.0 `July 20, 2021`
 ------------------------------
 
