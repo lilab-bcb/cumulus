@@ -60,7 +60,7 @@ Then type the following command in your terminal
 
 and follow the pop-up instructions to set up your Google cloud account.
 
-Run Terra workflows via ``alto run``
+Run Terra workflows
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 **alto run** runs a Terra method. Features:
@@ -72,6 +72,12 @@ Run Terra workflows via ``alto run``
 - Creates or uses an existing workspace.
 
 - Uses the latest version of a method unless the method version is specified.
+
+**alto cromwell run** runs on a chosen backend. Features:
+
+- Uploads local files/directories in your inputs to an appropriate location depending on backend chosen and updates the file paths to point to the bucket information.
+
+- Uses the method parameter to pull in appropriate worflow to import and run.   
 
 Options
 +++++++
@@ -106,8 +112,8 @@ Required options are in bold.
       - | Disable Terra cache calling
 
 
-Example
-++++++++
+#. Example run on Terra
++++++++++++++++++++++++++
 
 This example shows how to use ``alto run`` to run cellranger_workflow to extract gene-count matrices from sequencing output.
 
@@ -153,5 +159,31 @@ If for any reason, your job failed. You could rerun it without uploading files a
 
 because ``inputs_updated.json`` is the updated version of ``inputs.json`` with all local paths being replaced by their corresponding Google bucket URLs after uploading.
 
+#. Example import of any Cumulus workflow 
+++++++++++++++++++++++++++++++++++++++++++
+
+This example shows how to use ``alto cromwell run`` to run demultiplexing workflow on any backend.
+
+#. Prepare your sample sheet ``demux_sample_sheet.csv`` as the following::
+
+     OUTNAME,RNA,TagFile,TYPE
+     sample_1,gs://exp/data_1/raw_feature_bc_matrix.h5,gs://exp/data_1/sample_1_ADT.csv,cell-hashing
+     sample_2,gs://exp/data_2/raw_feature_bc_matrix.h5,gs://exp/data_3/possorted_genome_bam.bam,genetic-pooling
+
+#. Prepare your JSON input file ``cumulus_inputs.json`` for cellranger_workflow::
+
+     {
+        "demultiplexing.input_sample_sheet" : "demux_sample_sheet.csv",
+        "demultiplexing.output_directory" : "gs://url/outputs",
+        "demultiplexing.zones" : "us-west1-a us-west1-b us-west1-c",
+        "demultiplexing.genome" : "GRCh38-2020-A"
+     }
+
+   where ``gs://url/outputs`` is the folder on Google bucket of your workspace to hold output.
+
+#. Run the following command to kick off your run on a chosen backend::
+
+    alto cromwell run -s 10.10.10.10 -p 3000 -m broadinstitute:cumulus:Demultiplexing:master \
+                      -i cumulus_inputs.json --no-ssl-verify
 
 .. _conda: https://docs.conda.io/en/latest/miniconda.html
