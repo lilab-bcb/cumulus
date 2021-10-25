@@ -60,24 +60,18 @@ Then type the following command in your terminal
 
 and follow the pop-up instructions to set up your Google cloud account.
 
-Run Terra workflows
+Run workflows on Terra
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-**alto run** runs a Terra method. Features:
+**alto terra run** submits workflows to Terra for execution. Features:
 
 - Uploads local files/directories in your inputs to a Google Cloud bucket updates the file paths to point to the Google Cloud bucket.
 
-   Your sample sheet can point to local file paths. In this case, ``alto run`` will take care of uploading directories smartly (e.g. only upload necessary files in BCL folders) and modifying the sample sheet to point to a Google Cloud bucket.
+   Your sample sheet can point to local file paths. In this case, ``alto terra run`` will take care of uploading directories smartly (e.g. only upload necessary files in BCL folders) and modifying the sample sheet to point to a Google Cloud bucket.
 
 - Creates or uses an existing workspace.
 
 - Uses the latest version of a method unless the method version is specified.
-
-**alto cromwell run** runs on a chosen backend. Features:
-
-- Uploads local files/directories in your inputs to an appropriate location depending on backend chosen and updates the file paths to point to the bucket information.
-
-- Uses the method parameter to pull in appropriate worflow to import and run.   
 
 Options
 +++++++
@@ -111,11 +105,10 @@ Required options are in bold.
     * - | \\-\\-no-cache
       - | Disable Terra cache calling
 
-
-#. Example run on Terra
+Example run on Terra
 +++++++++++++++++++++++++
 
-This example shows how to use ``alto run`` to run cellranger_workflow to extract gene-count matrices from sequencing output.
+This example shows how to use ``alto terra run`` to run cellranger_workflow to extract gene-count matrices from sequencing output.
 
 #. Prepare your sample sheet ``example_sample_sheet.csv`` as the following::
 
@@ -146,20 +139,62 @@ This example shows how to use ``alto run`` to run cellranger_workflow to extract
 
 #. Run the following command to kick off your Terra workflow::
 
-    alto run -m cumulus/cellranger_workflow -i inputs.json -w myworkspace_namespace/myworkspace_name -o inputs_updated.json
+    alto terra run -m cumulus/cellranger_workflow -i inputs.json -w myworkspace_namespace/myworkspace_name -o inputs_updated.json
 
    where ``myworkspace_namespace/myworkspace_name`` should be replaced by your workspace namespace and name.
 
 
-Upon success, ``alto run`` returns a URL pointing to the submitted Terra job for you to monitor.
+Upon success, ``alto terra run`` returns a URL pointing to the submitted Terra job for you to monitor.
 
 If for any reason, your job failed. You could rerun it without uploading files again via the following command::
 
-    alto run -m cumulus/cellranger_workflow -i inputs_updated.json -w myworkspace_namespace/myworkspace_name
+    alto terra run -m cumulus/cellranger_workflow -i inputs_updated.json -w myworkspace_namespace/myworkspace_name
 
 because ``inputs_updated.json`` is the updated version of ``inputs.json`` with all local paths being replaced by their corresponding Google bucket URLs after uploading.
 
-#. Example import of any Cumulus workflow 
+
+Run workflows on a Cromwell server
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+**alto cromwell run** submits WDL jobs to a Cromwell server for execution. Features:
+
+- Uploads local files/directories in your inputs to an appropriate location depending on backend chosen and updates the file paths to point to the bucket information.
+
+- Uses the method parameter to pull in appropriate worflow to import and run.
+
+Options
++++++++
+
+Required options are in bold.
+
+.. list-table::
+    :widths: 5 20
+    :header-rows: 1
+
+    * - Name
+      - Description
+    * - | **-s <SERVER>**
+        | **\\-\\-server <SERVER>**
+      - | Server hostname or IP address.
+    * - | -p <PORT>
+        | \\-\\-port <PORT>
+      - | Port number for Cromwell service. The default port is 8000.
+    * - | **-m <METHOD_STR>**
+        | **\\-\\-method <METHOD_STR>**
+      - | Workflow name from Dockstore, with name specified as organization:collection:name:version (eg. broadinstitute:cumulus:cumulus:1.5.0). The default version would be used if version is omitted.
+    * - | **-i <INPUT>**
+        | **\\-\\-input <INPUT>**
+      - | Path to a local JSON file specifying workflow inputs.
+    * - | **-o <updated_json>**
+        | **\\-\\-upload <INPUT>**
+      - | Upload files/directories to the workspace cloud bucket and output updated input json (with local path replaced by cloud bucket urls) to <updated_json>.
+    * - | **-b <[s3|gs]://<bucket-name>/<bucket-folder>>**
+        | **\\-\\-bucket <[s3|gs]://<bucket-name>/<bucket-folder>>**
+      - | Cloud bucket folder for uploading local input data. Start with 's3://' if an AWS S3 bucket is used, 'gs://' for a Google bucket. Must be specified when '-o' option is used.
+    * - | \\-\\-no-ssl-verify
+      - | Disable SSL verification for web requests. Not recommended for general usage, but can be useful for intra-networks which don't support SSL verification. 
+
+Example import of any Cumulus workflow 
 ++++++++++++++++++++++++++++++++++++++++++
 
 This example shows how to use ``alto cromwell run`` to run demultiplexing workflow on any backend.
@@ -176,6 +211,7 @@ This example shows how to use ``alto cromwell run`` to run demultiplexing workfl
         "demultiplexing.input_sample_sheet" : "demux_sample_sheet.csv",
         "demultiplexing.output_directory" : "gs://url/outputs",
         "demultiplexing.zones" : "us-west1-a us-west1-b us-west1-c",
+        "demultiplexing.backend" : "gcp",
         "demultiplexing.genome" : "GRCh38-2020-A"
      }
 
@@ -184,6 +220,6 @@ This example shows how to use ``alto cromwell run`` to run demultiplexing workfl
 #. Run the following command to kick off your run on a chosen backend::
 
     alto cromwell run -s 10.10.10.10 -p 3000 -m broadinstitute:cumulus:Demultiplexing:master \
-                      -i cumulus_inputs.json --no-ssl-verify
+                      -i cumulus_inputs.json
 
 .. _conda: https://docs.conda.io/en/latest/miniconda.html

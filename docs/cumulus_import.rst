@@ -1,33 +1,25 @@
 Import workflows to Terra
 ------------------------------------
 
-Import from Dockstore to Terra
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Cumulus workflows are hosted on Dockstore_ under the organization of Broad Institute of MIT and Harvard.
 
-1. Cumulus workflows are hosted on Dockstore_ under organization of Broad Institute of MIT and Harvard. Select "Cumulus Workflows" in Dockstore. 
-
-.. image:: images/select_workflow.png
-   :scale: 60 %
-   :align: center
-
-2. For purpose of illustration, we will describe process of importing Demultiplexing workflow in Terra. Click on View button beside "github.com/klarman-cell-observatory/cumulus/Demultiplexing".
+1. The following page lists the `Cumulus collection of workflows`_. For purpose of illustration, we will describe process of importing Demultiplexing workflow in Terra. Click on View button beside "github.com/klarman-cell-observatory/cumulus/Demultiplexing".
 
 .. image:: images/demult_workflow.png
    :scale: 60 %
    :align: center
 
-3. Switch version using the Versions tab. In "Git Reference column" select the appropriate version to import into Terra. 
+3. Switch version using the Versions tab. In "Git Reference column" select the appropriate version to import into Terra. Then Launch with Terra (illustrated below).
 
-.. image:: images/version_selection.png
+.. image:: images/version_selection_launch_terra.png
+   :scale: 50 %
+   :align: center
+
+3. Optionally rename the workflow and select a workspace on Terra where you have access to execute workflows and click IMPORT. This will take you to Terra from where you can launch the workflow by providing required inputs.
+
+.. image:: images/workflow_name.png
    :scale: 60 %
    :align: center
 
-4. Then Launch with Terra (illustrated below).
-
-.. image:: images/launch_terra.png
-   :scale: 60 %
-   :align: center
-
-5. Type in an appropriate "Workflow Name" & Select a workspace on Terra where you have access to execute workflows.
-
-.. _Dockstore: https://dockstore.org/organizations/BroadInstitute 
+.. _Dockstore: https://dockstore.org/
+.. _Cumulus collection of workflows: https://dockstore.org/organizations/BroadInstitute/collections/Cumulus 
