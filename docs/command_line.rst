@@ -176,8 +176,8 @@ Required options are in bold.
     * - | **-s <SERVER>**
         | **\\-\\-server <SERVER>**
       - | Server hostname or IP address.
-    * - | **-p <PORT>**
-        | **\\-\\-port <PORT>**
+    * - | -p <PORT>
+        | \\-\\-port <PORT>
       - | Port number for Cromwell service. The default port is 8000.
     * - | **-m <METHOD_STR>**
         | **\\-\\-method <METHOD_STR>**
