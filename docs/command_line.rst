@@ -88,7 +88,7 @@ Required options are in bold.
         | **\\-\\-method <METHOD>**
       - | Specify a Terra workflow *<METHOD>* to use.
         | *<METHOD>* is of format *Namespace/Name* (e.g. ``cumulus/cellranger_workflow``).
-        | A snapshot version number can optionally be specified (e.g. ``cumulus/cellranger_workflow/4``); otherwise the latest snapshot of the method is used.
+        | Workflow name. The workflow can come from either Dockstore or Broad Methods Repository. If it comes from Dockstore, specify the name as organization:collection:name:version (e.g. broadinstitute:cumulus:cumulus:1.5.0) and the default version would be used if version is omitted. If it comes from Broad Methods Repository, specify the name as namespace/name/version (e.g. cumulus/cumulus/43) and the latest snapshot would be used if version is omitted.
     * - | **-w <WORKSPACE>**
         | **\\-\\-workspace <WORKSPACE>**
       - | Specify which Terra workspace *<WORKSPACE>* to use.
@@ -176,8 +176,8 @@ Required options are in bold.
     * - | **-s <SERVER>**
         | **\\-\\-server <SERVER>**
       - | Server hostname or IP address.
-    * - | -p <PORT>
-        | \\-\\-port <PORT>
+    * - | **-p <PORT>**
+        | **\\-\\-port <PORT>**
       - | Port number for Cromwell service. The default port is 8000.
     * - | **-m <METHOD_STR>**
         | **\\-\\-method <METHOD_STR>**
@@ -185,11 +185,11 @@ Required options are in bold.
     * - | **-i <INPUT>**
         | **\\-\\-input <INPUT>**
       - | Path to a local JSON file specifying workflow inputs.
-    * - | **-o <updated_json>**
-        | **\\-\\-upload <INPUT>**
+    * - | -o <updated_json>
+        | \\-\\-upload <INPUT>
       - | Upload files/directories to the workspace cloud bucket and output updated input json (with local path replaced by cloud bucket urls) to <updated_json>.
-    * - | **-b <[s3|gs]://<bucket-name>/<bucket-folder>>**
-        | **\\-\\-bucket <[s3|gs]://<bucket-name>/<bucket-folder>>**
+    * - | -b <[s3|gs]://<bucket-name>/<bucket-folder>>
+        | \\-\\-bucket <[s3|gs]://<bucket-name>/<bucket-folder>>
       - | Cloud bucket folder for uploading local input data. Start with 's3://' if an AWS S3 bucket is used, 'gs://' for a Google bucket. Must be specified when '-o' option is used.
     * - | \\-\\-no-ssl-verify
       - | Disable SSL verification for web requests. Not recommended for general usage, but can be useful for intra-networks which don't support SSL verification. 
