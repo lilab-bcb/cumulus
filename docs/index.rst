@@ -13,6 +13,7 @@
    :maxdepth: 1
    :hidden:
 
+   cumulus_import
    cellranger/index
    spaceranger
    starsolo
