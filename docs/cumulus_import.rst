@@ -12,7 +12,7 @@ Cumulus workflows are hosted on Dockstore_ under the organization of Broad Insti
 2. Switch version using the Versions tab. In "Git Reference column", you can optionally select the appropriate version to import into Terra or use the default. Then Launch with Terra (illustrated below).
 
 .. image:: images/version_selection_launch_terra.png
-   :scale: 40 %
+   :scale: 45 %
    :align: center
 
 3. Optionally rename the workflow and select a workspace on Terra where you have access to execute workflows and click IMPORT. This will take you to Terra from where you can launch the workflow by providing required inputs.
