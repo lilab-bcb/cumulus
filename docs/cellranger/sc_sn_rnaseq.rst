@@ -192,7 +192,7 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  	- "cumulusprod" for backup images on Docker Hub.
 		  - "quay.io/cumulus"
 		  - "quay.io/cumulus"
-		* - cellranger_mkfastq_docker_registry
+		* - mkfastq_docker_registry
 		  - Docker registry to use for ``cellranger mkfastq``.
 		    Default is the registry to which only Broad users have access.
 		    See :ref:`bcl2fastq-docker` for making your own registry.
