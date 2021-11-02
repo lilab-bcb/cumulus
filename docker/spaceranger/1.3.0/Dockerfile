@@ -6,7 +6,7 @@ RUN apt-get update && \
     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    apt-get update && apt-get install -y google-cloud-sdk=357.0.0-0
+    apt-get update && apt-get install -y google-cloud-sdk=362.0.0-0
 
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.2.39.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
@@ -18,7 +18,7 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install pandas==1.2.5 --no-cache-dir && \
     python -m pip install packaging==21.0 --no-cache-dir && \
-    python -m pip install stratocumulus==0.1.1 --no-cache-dir
+    python -m pip install stratocumulus==0.1.2 --no-cache-dir
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
