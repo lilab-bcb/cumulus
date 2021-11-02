@@ -93,7 +93,11 @@ task run_spaceranger_mkfastq {
         import pandas as pd
         import subprocess
 
-        mkfastq_args = ['spaceranger', 'mkfastq', '--id=results', '--run=~{run_id}', '--csv=~{input_csv_file}', '--jobmode=local', '--qc']
+        from packaging import version
+
+        mkfastq_args = ['spaceranger', 'mkfastq', '--id=results', '--run=~{run_id}', '--csv=~{input_csv_file}', '--jobmode=local']
+        if version.parse("~{spaceranger_version}") < version.parse("1.3.0"):
+            mkfastq_args.append('--qc')
         barcode_mismatches = '~{barcode_mismatches}'
         if barcode_mismatches != '':
             mkfastq_args += ['--barcode-mismatches', barcode_mismatches]
