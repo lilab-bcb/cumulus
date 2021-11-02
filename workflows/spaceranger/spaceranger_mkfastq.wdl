@@ -84,7 +84,7 @@ task run_spaceranger_mkfastq {
         set -e
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
-        strato cp --backend ~{backend} -m -r ~{input_bcl_directory} .
+        strato sync --backend ~{backend} -m ~{input_bcl_directory} ~{run_id}
 
         python <<CODE
         import os
