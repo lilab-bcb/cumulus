@@ -206,8 +206,6 @@ task run_cellranger_count {
                 try:
                     check_call(call_args)
                 except subprocess.CalledProcessError:
-                    if not os.path.exists('~{sample_id}' + "_" + str(i)):
-                        os.mkdir('~{sample_id}' + "_" + str(i))
                     call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , '~{sample_id}' + "_" + str(i)]
                     check_call(call_args)
                            
