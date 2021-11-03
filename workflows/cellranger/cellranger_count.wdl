@@ -137,6 +137,7 @@ task run_cellranger_count {
         import os
         import sys
         from subprocess import check_call
+        import subprocess
         from packaging import version
 
         samples = data_types = fbfs = None
