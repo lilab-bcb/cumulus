@@ -27,6 +27,8 @@ workflow demultiplexing {
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         # Backend
         String backend = "gcp"
+        # Reference Index TSV
+        File ref_index_file = "gs://regev-lab/resources/cellranger/index.tsv"
 
         # For demuxEM
         # The Dirichlet prior concentration parameter (alpha) on samples. An alpha value < 1.0 will make the prior sparse. [default: 0.0]
@@ -41,8 +43,6 @@ workflow demultiplexing {
         Boolean demuxEM_generate_diagnostic_plots = true
         # Generate violin plots using gender-specific genes (e.g. Xist). <demuxEM_generate_gender_plot> is a comma-separated list of gene names
         String? demuxEM_generate_gender_plot
-        # Reference Index TSV
-        File ref_index_file = "gs://regev-lab/resources/cellranger/index.tsv"
         # DemuxEM version
         String demuxEM_version = "0.1.7"
         # Number of CPUs used

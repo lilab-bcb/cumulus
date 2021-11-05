@@ -153,6 +153,10 @@ global inputs
 	  	- "local" for local machine.
 	  - "gcp"
 	  - "gcp"
+	* - ref_index_file
+	  - The link/path of an index file in TSV format for fetching preset genome references, chemistry whitelists, etc. by their names. Set an GS URI if backend is ``gcp``; an S3 URI for ``aws`` backend; an absolute file path for ``local`` backend.
+	  - "s3://xxxx/index.tsv"
+	  - "gs://regev-lab/resources/cellranger/index.tsv"
 	* - preemptible
 	  - Number of maximum preemptible tries allowed. This works only when *backend* is ``gcp``.
 	  - 2
