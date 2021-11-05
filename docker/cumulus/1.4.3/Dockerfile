@@ -62,7 +62,7 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install harmony-pytorch==0.1.6 --no-cache-dir && \
     python -m pip install cirrocumulus==1.1.17.post1 --no-cache-dir && \
     python -m pip install annoy==1.17.0 --no-cache-dir && \
-    python -m pip install pegasusio==0.3.1.post2 --no-cache-dir && \
+    python -m pip install pegasusio==0.4.1 --no-cache-dir && \
     python -m pip install demuxEM==0.1.6 --no-cache-dir && \
     python -m pip install forceatlas2-python==1.1 --no-cache-dir && \
     python -m pip install nmf-torch==0.1.1 --no-cache-dir && \

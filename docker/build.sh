@@ -44,8 +44,8 @@ REGISTRY=$1
 
 if [ "$build" = true ]
 then
-    echo "docker build -t ${DOCKER} ."
-    docker build -t "${DOCKER}" .
+    echo "docker build -t ${DOCKER} --pull ."
+    docker build -t "${DOCKER}" --pull .
 fi
 
 if [ "$push" = true ]
