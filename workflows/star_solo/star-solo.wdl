@@ -26,6 +26,8 @@ workflow starsolo {
         String star_version = "2.7.6a"
         # Docker registry, default to quay.io/cumulus
         String docker_registry = "quay.io/cumulus"
+        File ref_index_file = "gs://regev-lab/resources/count_tools/ref_index.tsv"
+        File whitelist_index_file = "gs://regev-lab/resources/count_tools/whitelist_index.tsv"
         # Disk space in GB needed per sample
         Int disk_space = 500
         # Google cloud zones to consider for execution
@@ -43,13 +45,11 @@ workflow starsolo {
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
-    File ref_index_file = if backend == "gcp" then "gs://regev-lab/resources/count_tools/ref_index.tsv" else (if backend == "aws" then "AWS URL" else "ref_index.tsv")
-    Map[String, String] ref_index2gsurl = read_map(ref_index_file)
-    String genome_url = if sub(genome, "^gs://.*", "gs://")=="gs://" then genome else ref_index2gsurl[genome] + '/starsolo.tar.gz' # Need to modify for AWS etc.
+    Map[String, String] ref_index2url = read_map(ref_index_file)
+    String genome_url = if sub(genome, "^(gs|s3)://.*", "URL")=="URL" then genome else ref_index2url[genome] + '/starsolo.tar.gz'
 
-    File wl_index_file = if backend == "gcp" then "gs://regev-lab/resources/count_tools/whitelist_index.tsv" else (if backend == "aws" then "AWS URL" else "whitelist_index.tsv")
-    Map[String, String] wl_index2gsurl = read_map(wl_index_file)
-    String whitelist_url = wl_index2gsurl[chemistry]
+    Map[String, String] wl_index2url = read_map(whitelist_index_file)
+    String whitelist_url = wl_index2url[chemistry]
 
     if (whitelist_url != 'null') {
         File whitelist = whitelist_url
