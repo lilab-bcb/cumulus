@@ -24,8 +24,6 @@ workflow spaceranger_workflow {
 
         # Referece index TSV
         File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
-        # null_file
-        String null_file = "gs://regev-lab/resources/cellranger/null"
 
         # For spaceranger count
 
@@ -68,6 +66,9 @@ workflow spaceranger_workflow {
 
     String docker_registry_stripped = sub(docker_registry, "/+$", "")
     String mkfastq_docker_registry_stripped = sub(mkfastq_docker_registry, "/+$", "")
+
+    Map[String, String] acronym2gsurl = read_map(acronym_file)
+    String null_file = acronym2gsurl["null_file"]
 
     if (run_mkfastq) {
         call generate_bcl_csv {
@@ -128,7 +129,6 @@ workflow spaceranger_workflow {
                     genome = sample_row[2],
                     probeset = sample_row[3],
                     acronym_file = acronym_file,
-                    null_file = null_file,
                     image = sample_row[4],
                     darkimagestr = sample_row[5],
                     colorizedimage = sample_row[6],
