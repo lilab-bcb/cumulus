@@ -26,7 +26,9 @@ workflow starsolo {
         String star_version = "2.7.6a"
         # Docker registry, default to quay.io/cumulus
         String docker_registry = "quay.io/cumulus"
+        # Reference Index TSV
         File ref_index_file = "gs://regev-lab/resources/count_tools/ref_index.tsv"
+        # Whitelist Index TSV
         File whitelist_index_file = "gs://regev-lab/resources/count_tools/whitelist_index.tsv"
         # Disk space in GB needed per sample
         Int disk_space = 500
