@@ -223,7 +223,7 @@ task run_spaceranger_count {
                 call_args.append('--slidefile=~{slidefile}')
 
         if '~{reorient_images}' is 'true':
-            call_args.append('--reorient_images')
+            call_args.append('--reorient-images')
         if not_null('~{loupe_alignment}'):
             if not has_image:
                 print("image option must be set if loupe_alignment is set!", file = sys.stderr)
