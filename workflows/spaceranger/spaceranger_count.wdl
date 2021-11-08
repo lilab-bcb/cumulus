@@ -163,11 +163,14 @@ task run_spaceranger_count {
         fastqs = []
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
             directory = re.sub('/+$', '', directory) # remove trailing slashes
-            call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', '~{sample_id}_' + str(i)]
-            print(' '.join(call_args))
             try:
+                call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}']
+                print(' '.join(call_args))
                 check_call(call_args)
-            except subprocess.CalledProcessError:
+                call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', '~{sample_id}_' + str(i)]
+                print(' '.join(call_args))
+                check_call(call_args)
+            except subprocess.CalledProcessError:    
                 call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , '~{sample_id}' + "_" + str(i)]
                 check_call(call_args)    
             fastqs.append('~{sample_id}_' + str(i))
