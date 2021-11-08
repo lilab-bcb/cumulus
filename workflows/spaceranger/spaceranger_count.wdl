@@ -16,8 +16,6 @@ workflow spaceranger_count {
 
         # Referece index TSV
         File acronym_file
-        # An empty full representing null
-        File null_file
 
         # Brightfield tissue H&E image in .jpg or .tiff format.
         File? image
@@ -68,6 +66,7 @@ workflow spaceranger_count {
     }
 
     Map[String, String] acronym2url = read_map(acronym_file)
+    File null_file = acronym2url["null_file"]
 
     # If reference is a url
     Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
@@ -224,7 +223,7 @@ task run_spaceranger_count {
                 call_args.append('--slidefile=~{slidefile}')
 
         if '~{reorient_images}' is 'true':
-            call_args.append('--reorient_images')
+            call_args.append('--reorient-images')
         if not_null('~{loupe_alignment}'):
             if not has_image:
                 print("image option must be set if loupe_alignment is set!", file = sys.stderr)
