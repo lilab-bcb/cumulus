@@ -158,7 +158,6 @@ task run_spaceranger_count {
         import re
         import sys
         from subprocess import check_call, CalledProcessError
-        import subprocess
 
         fastqs = []
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
