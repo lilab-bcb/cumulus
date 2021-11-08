@@ -109,7 +109,7 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		* - SlideFile
 		  - Slide layout file indicating capture spot and fiducial spot positions. Only required if internet access is not available.
 		* - ReorientImages
-		  - Use with automatic image alignment to specify that images may not be in canonical orientation with the hourglass in the top left corner of the image. The automatic fiducial alignment will attempt to align any rotation or mirroring of the image.
+		  - **Valid values**: ``true`` or ``false``. Use with automatic image alignment to specify that images may not be in canonical orientation with the hourglass in the top left corner of the image. The automatic fiducial alignment will attempt to align any rotation or mirroring of the image.
 		* - LoupeAlignment
 		  - Alignment file produced by the manual Loupe alignment step. Image column must be supplied in this case.
 		* - TargetPanel
