@@ -136,8 +136,7 @@ task run_cellranger_count {
         import re
         import os
         import sys
-        from subprocess import check_call
-        import subprocess
+        from subprocess import check_call, CalledProcessError
         from packaging import version
 
         samples = data_types = fbfs = None
@@ -200,15 +199,20 @@ task run_cellranger_count {
         else:
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
-                call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/' + '~{sample_id}', './' + '~{sample_id}']
-                print(' '.join(call_args))
-
+                target = '~{sample_id}' + "_" + str(i)
                 try:
+                    call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
+                    print(' '.join(call_args))
                     check_call(call_args)
-                except subprocess.CalledProcessError:
-                    call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , '~{sample_id}' + "_" + str(i)]
+                    call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]
+                    print(' '.join(call_args))
                     check_call(call_args)
-                           
+                except CalledProcessError:
+                    if not os.path.exists(target):
+                        os.mkdir(target)
+                    call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
+                    print(' '.join(call_args))
+                    check_call(call_args)                           
                 call_args = ['mv', '~{sample_id}', '~{sample_id}_' + str(i)]
                 print(' '.join(call_args))
                 check_call(call_args)
