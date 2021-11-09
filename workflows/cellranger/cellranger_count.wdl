@@ -199,7 +199,7 @@ task run_cellranger_count {
         else:
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
-                target = '~{sample_id}' + "_" + str(i)
+                target = '~{sample_id}'
                 try:
                     call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
                     print(' '.join(call_args))
