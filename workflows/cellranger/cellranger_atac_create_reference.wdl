@@ -60,6 +60,10 @@ workflow cellranger_atac_create_reference {
             output_dir = output_directory_stripped
     }
 
+    output {
+        File output_reference = run_cellranger_atac_create_reference.output_reference
+    }
+
 }
 
 task run_cellranger_atac_create_reference {
@@ -69,7 +73,7 @@ task run_cellranger_atac_create_reference {
         Int disk_space
         String zones
         String memory
-        
+
         Int preemptible
         Int awsMaxRetries
         String backend
