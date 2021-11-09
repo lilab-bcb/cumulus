@@ -1,7 +1,6 @@
 version 1.0
 
 workflow cellranger_create_reference {
-    # Output directory, gs URL
     input {
         # Output directory, gs URL
         String output_directory
@@ -96,6 +95,10 @@ workflow cellranger_create_reference {
             preemptible = preemptible,
             awsMaxRetries = awsMaxRetries,
             backend = backend
+    }
+
+    output {
+        File output_reference = run_cellranger_mkref.output_reference
     }
 }
 
@@ -308,7 +311,7 @@ task run_cellranger_mkref {
     }
 
     output {
-        String output_reference = "~{output_dir}/~{output_genome}.tar.gz"
+        File output_reference = "~{output_genome}.tar.gz"
         File monitoringLog = "monitoring.log"
     }
 

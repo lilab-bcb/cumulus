@@ -53,6 +53,10 @@ workflow cellranger_vdj_create_reference {
             genome = genome,
             ref_version = ref_version
     }
+
+    output {
+        File output_reference = run_cellranger_vdj_create_reference.output_reference
+    }
 }
 
 task run_cellranger_vdj_create_reference {
