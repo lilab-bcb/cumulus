@@ -26,7 +26,7 @@ workflow cellranger_atac_aggr {
         # 2.0.0, 1.2.0, 1.1.0
         String cellranger_atac_version = "2.0.0"
         # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-        String docker_registry = "cumulusprod"
+        String docker_registry = "quay.io/cumulus"
 
         # Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
         String zones = "us-central1-b"
@@ -74,9 +74,8 @@ workflow cellranger_atac_aggr {
 
     output {
         String output_aggr_directory = run_cellranger_atac_aggr.output_aggr_directory
-        String output_metrics_summary = run_cellranger_atac_aggr.output_metrics_summary
-        String output_web_summary = run_cellranger_atac_aggr.output_web_summary
-        File monitoringLog = run_cellranger_atac_aggr.monitoringLog
+        File output_metrics_summary = run_cellranger_atac_aggr.output_metrics_summary
+        File output_web_summary = run_cellranger_atac_aggr.output_web_summary
     }
 }
 
@@ -150,8 +149,8 @@ task run_cellranger_atac_aggr {
 
     output {
         String output_aggr_directory = "~{output_directory}/~{aggr_id}"
-        String output_metrics_summary = "~{output_directory}/~{aggr_id}/summary.csv"
-        String output_web_summary = "~{output_directory}/~{aggr_id}/web_summary.html"
+        File output_metrics_summary = "results/outs/summary.csv"
+        File output_web_summary = "results/outs/web_summary.html"
         File monitoringLog = "monitoring.log"
     }
 
