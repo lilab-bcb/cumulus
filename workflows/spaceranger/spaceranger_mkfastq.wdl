@@ -150,7 +150,7 @@ task run_spaceranger_mkfastq {
                 check_call(call_args)
                 print('~{input_bcl_directory} is deleted!')
             except CalledProcessError:
-                print("Failed to delete BCL directory from Google bucket.")
+                print("Failed to delete BCL directory.")
         CODE
     }
 

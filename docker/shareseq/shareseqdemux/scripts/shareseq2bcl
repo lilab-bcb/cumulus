@@ -1,0 +1,64 @@
+#!/usr/bin/env python
+
+import pandas as pd
+from sys import argv, exit
+from datetime import date
+
+
+if len(argv) != 4:
+    print("Usage: shareseq2bcl input.csv bclfolder output.csv")
+    exit(0)
+
+### input shareseq format
+### Lane,Sample,Index
+### 1,sample_rna,A3
+
+### output csv is BCL format
+
+def get_number_of_lanes(bcl_folder: str) -> int:
+    import xml.etree.ElementTree as ET
+    
+    for node in ET.parse(f"{bcl_folder}/RunInfo.xml").iter():
+        if node.tag == 'FlowcellLayout':
+            return int(node.attrib['LaneCount'])
+    
+    return -1
+
+
+def parse_lane_string(lane_string: str, num_lanes: int) -> list:
+    if lane_string == "*":
+        return list(range(1, num_lanes+1))
+
+    res = []
+    items = lane_string.split(':')
+    for val in items:
+        if val.find('-') >= 0:
+            nums = val.split('-')
+            assert len(nums) == 2
+            res.extend(list(range(int(nums[0]), int(nums[1])+1)))
+        else:
+            res.append(int(val))
+
+    return res
+
+
+df = pd.read_csv(argv[1], header=0)
+num_lanes = get_number_of_lanes(argv[2])
+assert num_lanes > 0
+idx_table = pd.read_csv('/indices/shareseq_sample_index.csv', header=None, index_col=0)
+
+with open(argv[3], 'w') as fout:
+    fout.write("[Header]\n")
+    fout.write(f"Date,{date.today().strftime('%Y-%m-%d')}\n")
+    fout.write(f"Workflow,ShareSeqDemux\n")
+    fout.write("\n")
+
+    fout.write("[Data]\n")
+    fout.write("Lane,Sample_ID,index2\n")
+
+    for i, row in df.iterrows():
+        sample_id = row['Sample']
+        index2 = idx_table.loc[row['Index']].values[0]
+        lanes = parse_lane_string(str(row['Lane']), num_lanes)
+        for lane in lanes:
+            fout.write(f"{lane},{sample_id},{index2}\n")
