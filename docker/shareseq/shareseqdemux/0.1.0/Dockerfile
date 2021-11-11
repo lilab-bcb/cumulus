@@ -22,12 +22,16 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/scripts/shareseq2bcl /software
 
 ADD bcl2fastq2-v2-20-0-linux-x86-64.zip /software/
 RUN unzip -d /software/ /software/bcl2fastq2-v2-20-0-linux-x86-64.zip && alien -i /software/bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm && rm -f /software/bcl2fastq2-v2*
 
 RUN mkdir /indices
-ADD shareseq_sample_index.csv shareseq_round1.csv shareseq_round2.csv shareseq_round3.csv /indices/
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/indices/shareseq_sample_index.csv /indices/
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/indices/shareseq_round1.csv /indices/
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/indices/shareseq_round2.csv /indices/
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/indices/shareseq_round3.csv /indices/
 
 RUN apt-get -qq -y remove alien curl gnupg python3-pip unzip && \
     apt-get -qq -y autoremove && \
