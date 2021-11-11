@@ -18,7 +18,7 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install pandas==1.2.5 --no-cache-dir && \
     python -m pip install packaging==21.0 --no-cache-dir && \
-    python -m pip install stratocumulus==0.1.2 --no-cache-dir
+    python -m pip install stratocumulus==0.1.3 --no-cache-dir
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
