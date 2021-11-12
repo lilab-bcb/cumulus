@@ -95,7 +95,7 @@ task run_shareseq_mkfastq {
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError
 
-        call_args = ['bcl2fastq', '-o', '_out', '--sample-sheet' ,'_bcl_sample_sheet.csv', '--create-fastq-for-index-reads']
+        call_args = ['bcl2fastq', '-o', '_out', '--sample-sheet' ,'_bcl_sample_sheet.csv', '--runfolder-dir', '~{run_id}', '--create-fastq-for-index-reads']
         if '~{barcode_mismatches}' != '':
             call_args.apppend('--barcode-mismatches ~{barcode_mismatches}')
         if '~{use_bases_mask}' != '':
