@@ -88,6 +88,9 @@ task run_shareseq_mkfastq {
         monitor_script.sh > monitoring.log &
         strato sync --backend "~{backend}" -m ~{input_bcl_directory} ~{run_id}
         shareseq2bcl ~{input_csv_file} ~{run_id} _bcl_sample_sheet.csv
+        
+        echo "this is the file being written"
+        cat _bcl_sample_sheet.csv
 
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError
