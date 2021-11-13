@@ -38,8 +38,7 @@ RUN apt-get -qq -y remove alien curl gnupg python3-pip unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
 
-RUN chmod a+rx /software/monitor_script.sh
-RUN chmod a+rx /software/shareseq2bcl
+RUN chmod a+rx /software/monitor_script.sh /software/shareseq2bcl
 
 ENV PATH=/software:$PATH
 ENV TMPDIR=/tmp
