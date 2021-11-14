@@ -128,7 +128,7 @@ task run_cellranger_arc_count {
         python <<CODE
         import re
         import os
-        from subprocess import check_call
+        from subprocess import check_call, CalledProcessError
 
         samples = '~{input_samples}'.split(',')
         data_types = '~{input_data_types}'.split(',')
@@ -136,14 +136,19 @@ task run_cellranger_arc_count {
             fout.write('fastqs,sample,library_type\n')
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
-                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/' + samples[i], '.']
-                print(' '.join(call_args))
-                check_call(call_args)
-                fastqs = samples[i] + '_' + str(i)
-                call_args = ['mv', samples[i], fastqs]
-                print(' '.join(call_args))
-                check_call(call_args)
-                fout.write(os.path.abspath(fastqs) + ',' + samples[i] + ',' + ('Gene Expression' if data_types[i] == 'rna' else 'Chromatin Accessibility') + '\n')
+                target = samples[i] + '_' + str(i)
+                try:
+                    call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/' + samples[i]]
+                    print(' '.join(call_args))
+                    check_call(call_args)
+                    call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/' + samples[i], target]
+                    print(' '.join(call_args))
+                    check_call(call_args)
+                except CalledProcessError:
+                    if not os.path.exists(target):
+                        os.mkdir(target)
+                    call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/', samples[i] + '_S*_L*_*_001.fastq.gz' , target]    
+                fout.write(os.path.abspath(target) + ',' + samples[i] + ',' + ('Gene Expression' if data_types[i] == 'rna' else 'Chromatin Accessibility') + '\n')
 
         call_args = ['cellranger-arc', 'count', '--id=results', '--libraries=libraries.csv', '--reference=genome_dir', '--jobmode=local']
         if '~{gex_exclude_introns}' == 'true':

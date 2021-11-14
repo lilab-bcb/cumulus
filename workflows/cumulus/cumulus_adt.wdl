@@ -111,13 +111,13 @@ task run_generate_count_matrix_ADTs {
         python <<CODE
         import re
         from subprocess import check_call, CalledProcessError
-        import os
+        import os, CalledProcessError
 
         fastqs = []
         
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
             directory = re.sub('/+$', '', directory) # remove trailing slashes
-            target = '~{sample_id}'
+            target = '~{sample_id}_' + str(i)
             try:
                 call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
                 print(' '.join(call_args))
@@ -131,10 +131,7 @@ task run_generate_count_matrix_ADTs {
                 call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
                 print(' '.join(call_args))    
                 check_call(call_args)
-            call_args = ['mv', '~{sample_id}', '~{sample_id}_' + str(i)]
-            print(' '.join(call_args))
-            check_call(call_args)
-            fastqs.append('~{sample_id}_' + str(i))
+            fastqs.append(target)
 
         call_args = ['generate_count_matrix_ADTs', '~{cell_barcodes}', '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
         if '~{data_type}' == 'crispr':
