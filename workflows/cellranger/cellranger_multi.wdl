@@ -130,7 +130,7 @@ task run_cellranger_multi {
         import re
         import os
         import sys
-        from subprocess import check_call
+        from subprocess import check_call, CalledProcessError
 
         samples = '~{input_samples}'.split(',')
         data_types = '~{input_data_types}'.split(',')
@@ -187,13 +187,20 @@ task run_cellranger_multi {
             fout.write('\n[libraries]\nfastq_id,fastqs,feature_types\n')
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
-                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/' + samples[i], '.']
-                print(' '.join(call_args))
-                check_call(call_args)
-                fastqs = samples[i] + '_' + str(i)
-                call_args = ['mv', samples[i], fastqs]
-                print(' '.join(call_args))
-                check_call(call_args)
+                target = samples[i] + "_" + str(i)
+                try:
+                    call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/' + samples[i]]
+                    print(' '.join(call_args))
+                    check_call(call_args)
+                    call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/' + samples[i], target]
+                    print(' '.join(call_args))
+                    check_call(call_args)
+                except CalledProcessError:
+                    if not os.path.exists(target):
+                        os.mkdir(target)
+                    call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/' + samples[i] + '_S*_L*_*_001.fastq.gz' , target]
+                    print(' '.join(call_args))
+                    check_call(call_args)
                 feature_type = ''
                 if data_types[i] == 'rna':
                     feature_type = 'Gene Expression'
@@ -206,7 +213,7 @@ task run_cellranger_multi {
                 if feature_type == '':
                     print("Do not expect " + data_types[i] + " in a cellranger multi run!", file = sys.stderr)
                     sys.exit(1)
-                fout.write(samples[i] + ',' + os.path.abspath(fastqs) + ',' +  feature_type + '\n')
+                fout.write(samples[i] + ',' + os.path.abspath(target) + ',' +  feature_type + '\n')
 
             if cmo_file == '':
                 print("Cannot locate a CMO sample file!", file = sys.stderr)
