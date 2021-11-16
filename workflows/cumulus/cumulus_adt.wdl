@@ -111,7 +111,7 @@ task run_generate_count_matrix_ADTs {
         python <<CODE
         import re
         from subprocess import check_call, CalledProcessError
-        import os, CalledProcessError
+        import os
 
         fastqs = []
         
