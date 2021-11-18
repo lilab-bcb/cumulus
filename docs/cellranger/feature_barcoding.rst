@@ -1,4 +1,4 @@
-``cellranger_workflow`` can extract feature-barcode count matrices in CSV format for feature barcoding assays such as *cell and nucleus hashing*, *CITE-seq*, and *Perturb-seq*. For cell and nucleus hashing as well as CITE-seq, the feature refers to antibody. For Perturb-seq, the feature refers to guide RNA. Please follow the instructions below to configure ``cellranger_workflow``.
+``cellranger_workflow`` can extract feature-barcode count matrices in CSV format for feature barcoding assays such as *cell and nucleus hashing*, *CellPlex*, *CITE-seq*, and *Perturb-seq*. For cell and nucleus hashing as well as CITE-seq, the feature refers to antibody. For Perturb-seq, the feature refers to guide RNA. Please follow the instructions below to configure ``cellranger_workflow``.
 
 Prepare feature barcode files
 +++++++++++++++++++++++++++++
@@ -55,8 +55,12 @@ Sample sheet
 
 		* - Chemistry
 		  - Explanation
+		* - **auto**
+		  - Default. This is an alias for Single Cell 3' v3 (SC3Pv3)
+		* - **threeprime**
+		  - This is another alias for Single Cell 3' v3.
 		* - **SC3Pv3**
-		  - Single Cell 3′ v3 (default).
+		  - Single Cell 3′ v3.
 		* - **SC3Pv2**
 		  - Single Cell 3′ v2
 		* - **fiveprime**
@@ -68,7 +72,7 @@ Sample sheet
 
 #. *DataType* column.
 
-	Put **adt** here if the assay is CITE-seq, cell or nucleus hashing. Put **crispr** here if Perturb-seq.
+	Put **citeseq** if CITE-seq, **hashing** if cell or nucleus hashing, **cmo** if CellPlex, **adt** if a mix of hashing and Cite-seq, and **crispr** here if Perturb-seq.
 
 #. *FetureBarcodeFile* column.
 
