@@ -95,11 +95,11 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 			| **vdj** refers to V(D)J data (*cellranger vdj*),
 			| **citeseq** refers to CITE-Seq tag data,
 			| **hashing** refers to cell-hashing or nucleus-hashing tag data,
+			| **adt**, which refers to either *citeseq* and/or *hashing*. If hashing and citeseq reads are pooled under a same sample index, users can consider use **adt**,
 			| **cmo** refers to cell multiplexing oligos used in 10x Genomics' CellPlex assay,
 			| **crispr** refers to Perturb-seq guide tag data,
 			| **atac** refers to scATAC-Seq data (*cellranger-atac count*),
 			| This column is optional and the default data type is *rna*.
-			| **adt**, which refers to either *citeseq* or *hashing*, is obsoleted. For compatibility reasons, users can still use this data type. But it will be removed in future releases.
 		* - FeatureBarcodeFile
 		  -
 		  	| Google bucket urls pointing to feature barcode files for *rna*, *citeseq*, *hashing*, *cmo* and *crispr* data.
