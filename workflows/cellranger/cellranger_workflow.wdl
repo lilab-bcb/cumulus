@@ -91,7 +91,7 @@ workflow cellranger_workflow {
         # CMO set CSV file, delaring CMO constructs and associated barcodes
         File? cmo_set
 
-        # Index TSV file 
+        # Index TSV file
         File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
 
         # 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
@@ -156,7 +156,7 @@ workflow cellranger_workflow {
     String docker_registry_stripped = sub(docker_registry, "/+$", "")
     String mkfastq_docker_registry_stripped = sub(mkfastq_docker_registry, "/+$", "")
 
-    Map[String, String] acronym2gsurl = read_map(acronym_file)  
+    Map[String, String] acronym2gsurl = read_map(acronym_file)
     String null_file = acronym2gsurl["null_file"]
 
     if (run_mkfastq) {
@@ -359,7 +359,7 @@ workflow cellranger_workflow {
                         min_read_ratio = min_read_ratio,
                         cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
                         docker_registry = docker_registry_stripped,
-                        acronym_file = acronym_file, 
+                        acronym_file = acronym_file,
                         zones = zones,
                         memory = feature_memory,
                         disk_space = feature_disk_space,
@@ -653,7 +653,7 @@ task generate_count_config {
 
         for idx, row in df.iterrows():
             row['Flowcell'] = re.sub('/+$', '', row['Flowcell'])
-            if row['DataType'] not in ['rna', 'vdj', 'adt', 'citeseq', 'cmo', 'crispr', 'atac']:
+            if row['DataType'] not in ['rna', 'vdj', 'adt', 'citeseq', 'cmo', 'crispr', 'atac', 'hashing']:
                 print("Unknown DataType " + row['DataType'] + " is detected!", file = sys.stderr)
                 sys.exit(1)
             if re.search('[^a-zA-Z0-9_-]', row['Sample']) is not None:

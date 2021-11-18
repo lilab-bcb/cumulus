@@ -176,13 +176,20 @@ task run_cellranger_count {
                 fout.write('fastqs,sample,library_type\n')
                 for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                     directory = re.sub('/+$', '', directory) # remove trailing slashes
-                    call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/' + samples[i], './' + samples[i]]
-                    print(' '.join(call_args))
-                    check_call(call_args)
-                    fastqs = samples[i] + '_' + str(i)
-                    call_args = ['mv', samples[i], fastqs]
-                    print(' '.join(call_args))
-                    check_call(call_args)
+                    target = samples[i] + "_" + str(i)
+                    try:
+                        call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/' + samples[i]]
+                        print(' '.join(call_args))
+                        check_call(call_args)
+                        call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/' + samples[i], target]
+                        print(' '.join(call_args))
+                        check_call(call_args)
+                    except CalledProcessError:
+                        if not os.path.exists(target):
+                            os.mkdir(target)
+                        call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/' + samples[i] + '_S*_L*_*_001.fastq.gz' , target]
+                        print(' '.join(call_args))
+                        check_call(call_args)
                     feature_type = ''
                     if data_types[i] == 'rna':
                         feature_type = 'Gene Expression'
@@ -195,11 +202,11 @@ task run_cellranger_count {
                     if feature_type == '':
                         print("Do not expect " + data_types[i] + " in a cellranger count (Feature Barcode) run!", file = sys.stderr)
                         sys.exit(1)
-                    fout.write(os.path.abspath(fastqs) + ',' + samples[i] + ',' + feature_type + '\n')
+                    fout.write(os.path.abspath(target) + ',' + samples[i] + ',' + feature_type + '\n')
         else:
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
-                target = '~{sample_id}'
+                target = '~{sample_id}_' + str(i)
                 try:
                     call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
                     print(' '.join(call_args))
@@ -213,10 +220,7 @@ task run_cellranger_count {
                     call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
                     print(' '.join(call_args))
                     check_call(call_args)                           
-                call_args = ['mv', '~{sample_id}', '~{sample_id}_' + str(i)]
-                print(' '.join(call_args))
-                check_call(call_args)
-                fastqs_dirs.append('~{sample_id}_' + str(i))
+                fastqs_dirs.append(target)
 
         call_args = ['cellranger', 'count', '--id=results', '--transcriptome=genome_dir', '--chemistry=~{chemistry}', '--jobmode=local']
 

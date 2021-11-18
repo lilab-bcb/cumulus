@@ -131,23 +131,6 @@ task run_cellranger_atac_mkfastq {
         with open("output_fastqs_flowcell_directory.txt", "w") as fout:
             flowcell = [name for name in os.listdir('results/outs/fastq_path') if name != 'Reports' and name != 'Stats' and os.path.isdir('results/outs/fastq_path/' + name)][0]
             fout.write('~{output_directory}/~{run_id}_atacfastqs/fastq_path/' + flowcell + '\n')
-
-        prefix = 'results/outs/fastq_path/' + flowcell + '/'
-        df = pd.read_csv('~{input_csv_file}', header = 0)
-        for sample_id in df['Sample'].unique():
-            dir_name = prefix + sample_id
-            if os.path.exists(dir_name):
-                continue
-            call_args = ['mkdir', '-p', dir_name]
-            subprocess.check_call(call_args)
-            files = glob.glob(dir_name + '_S*_L*_*_001.fastq.gz')
-            if len(files) == 0:
-                print("Warning: cannot extract any reads for sample " + sample_id + "!")
-            else:
-                call_args = ['mv']
-                call_args.extend(files)
-                call_args.append(dir_name);
-                subprocess.check_call(call_args)
         CODE
 
         strato sync --backend ~{backend} -m results/outs "~{output_directory}/~{run_id}_atacfastqs"
