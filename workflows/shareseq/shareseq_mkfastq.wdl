@@ -88,7 +88,7 @@ task run_shareseq_mkfastq {
         monitor_script.sh > monitoring.log &
         strato sync --backend ~{backend} -m ~{input_bcl_directory} ~{run_id}
         shareseq2bcl ~{input_csv_file} ~{run_id} _bcl_sample_sheet.csv
-        bcl2fastq -o _out -R ~{run_id} --sample-sheet _bcl_sample_sheet.csv --create-fastq-for-index-reads ~{"--barcode-mismatches " + barcode_mismatches} --use-bases-mask ~{default="Y*,n*,I*,Y*" use_bases_mask}
+        bcl2fastq -o _out -R ~{run_id} --sample-sheet _bcl_sample_sheet.csv --create-fastq-for-index-reads ~{"--barcode-mismatches " + barcode_mismatches} --use-bases-mask ~{default="Y*,Y*,I*,Y*" use_bases_mask}
         strato sync --backend ~{backend} -m _out ~{output_directory}/~{run_id}_fastqs
 
         python <<CODE
