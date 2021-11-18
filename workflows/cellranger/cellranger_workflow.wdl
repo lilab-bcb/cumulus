@@ -762,7 +762,7 @@ task generate_count_config {
                         print("Detected multiple chemistry strings for sample " + sample_id + "!", file = sys.stderr)
                         sys.exit(1)
                     chemistry = df_local['Chemistry'].iat[0]
-                    if chemistry == 'auto' and datatype in ['adt', 'citeseq', 'hashing', 'cmo', 'crispr']:
+                    if (chemistry in ['auto', 'threeprime']) and (datatype in ['adt', 'citeseq', 'hashing', 'cmo', 'crispr']):
                         chemistry = 'SC3Pv3' # default is different
                     foo4.write(sample_id + '\t' + chemistry + '\n')
                     n_chem += 1
