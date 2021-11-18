@@ -86,27 +86,13 @@ task run_shareseq_mkfastq {
         set -e
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
-        strato sync --backend "~{backend}" -m ~{input_bcl_directory} ~{run_id}
+        strato sync --backend ~{backend} -m ~{input_bcl_directory} ~{run_id}
         shareseq2bcl ~{input_csv_file} ~{run_id} _bcl_sample_sheet.csv
-        
-        echo "this is the file being written"
-        cat _bcl_sample_sheet.csv
+        bcl2fastq -o _out -R ~{run_id} --sample-sheet _bcl_sample_sheet.csv --create-fastq-for-index-reads ~{"--barcode-mismatches " + barcode_mismatches} --use-bases-mask ~{default="Y*,Y*,I*,Y*" use_bases_mask}
+        strato sync --backend ~{backend} -m _out ~{output_directory}/~{run_id}_fastqs
 
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError
-
-        call_args = ['bcl2fastq', '-o', '_out', '--sample-sheet' ,'_bcl_sample_sheet.csv', '--runfolder-dir', '~{run_id}', '--create-fastq-for-index-reads']
-        if '~{barcode_mismatches}' != '':
-            call_args.apppend('--barcode-mismatches ~{barcode_mismatches}')
-        if '~{use_bases_mask}' != '':
-            call_args.apppend('--use-bases-mask ~{use_bases_mask}')
-        print(' '.join(call_args))
-        check_call(call_args)
-
-        call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', '_out', '~{output_directory}/~{run_id}_fastqs']
-        print(' '.join(call_args))
-        check_call(call_args)
-
         if '~{delete_input_bcl_directory}' is 'true':
             try:
                 call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_fastqs/input_samplesheet.csv']
