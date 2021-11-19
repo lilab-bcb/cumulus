@@ -110,7 +110,7 @@ task run_generate_count_matrix_ADTs {
 
         python <<CODE
         import re
-        from subprocess import check_call, CalledProcessError
+        from subprocess import check_call, CalledProcessError, STDOUT, DEVNULL
         import os
 
         fastqs = []
@@ -121,7 +121,7 @@ task run_generate_count_matrix_ADTs {
             try:
                 call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
                 print(' '.join(call_args))
-                check_call(call_args)
+                check_call(call_args, stderr=STDOUT, stdout=DEVNULL)
                 call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]
                 print(' '.join(call_args))
                 check_call(call_args)

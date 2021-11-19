@@ -108,7 +108,7 @@ task run_cellranger_vdj {
         python <<CODE
         import re
         import os
-        from subprocess import check_call, CalledProcessError
+        from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
 
         fastqs = []
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
@@ -117,7 +117,7 @@ task run_cellranger_vdj {
             try:
                 call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
                 print(' '.join(call_args))
-                check_call(call_args)
+                check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
                 call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/~{sample_id}', target]
                 print(' '.join(call_args))
                 check_call(call_args)

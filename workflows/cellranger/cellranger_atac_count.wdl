@@ -107,7 +107,7 @@ task run_cellranger_atac_count {
         python <<CODE
         import re
         import os
-        from subprocess import check_call, CalledProcessError
+        from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
         from packaging import version
         
         fastqs = []
@@ -117,7 +117,7 @@ task run_cellranger_atac_count {
             try:
                 call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
                 print(' '.join(call_args))
-                check_call(call_args)
+                check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
                 call_args = ['strato', 'cp', '--backend','~{backend}','-r', '-m', directory + '/~{sample_id}', target]
                 print(' '.join(call_args))
                 check_call(call_args)
