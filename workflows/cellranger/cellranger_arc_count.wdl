@@ -128,7 +128,7 @@ task run_cellranger_arc_count {
         python <<CODE
         import re
         import os
-        from subprocess import check_call, CalledProcessError
+        from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
 
         samples = '~{input_samples}'.split(',')
         data_types = '~{input_data_types}'.split(',')
@@ -140,7 +140,7 @@ task run_cellranger_arc_count {
                 try:
                     call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/' + samples[i]]
                     print(' '.join(call_args))
-                    check_call(call_args)
+                    check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
                     call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/' + samples[i], target]
                     print(' '.join(call_args))
                     check_call(call_args)

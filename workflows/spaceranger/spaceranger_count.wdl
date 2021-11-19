@@ -156,7 +156,7 @@ task run_spaceranger_count {
         import os
         import re
         import sys
-        from subprocess import check_call, CalledProcessError
+        from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
 
         fastqs = []
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
@@ -165,7 +165,7 @@ task run_spaceranger_count {
             try:
                 call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
                 print(' '.join(call_args))
-                check_call(call_args)
+                check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
                 call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]
                 print(' '.join(call_args))
                 check_call(call_args)
