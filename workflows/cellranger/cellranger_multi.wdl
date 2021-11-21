@@ -130,7 +130,7 @@ task run_cellranger_multi {
         import re
         import os
         import sys
-        from subprocess import check_call, CalledProcessError
+        from subprocess import check_call, CalledProcessError, STDOUT, DEVNULL
 
         samples = '~{input_samples}'.split(',')
         data_types = '~{input_data_types}'.split(',')
@@ -191,7 +191,7 @@ task run_cellranger_multi {
                 try:
                     call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/' + samples[i]]
                     print(' '.join(call_args))
-                    check_call(call_args)
+                    check_call(call_args, stderr=STDOUT, stdout=DEVNULL)
                     call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/' + samples[i], target]
                     print(' '.join(call_args))
                     check_call(call_args)
