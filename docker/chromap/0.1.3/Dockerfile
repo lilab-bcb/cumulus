@@ -1,8 +1,8 @@
-FROM continuumio/miniconda3:4.10.3
+FROM debian:buster-slim
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
-    apt-get install -y wget build-essential curl git unzip && \
+    apt-get install -y wget build-essential curl unzip wget zlib1g-dev && \
     apt-get install --no-install-recommends -y lsb-release gnupg && \
     export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
     echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
@@ -16,9 +16,20 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.2.39.zip" -o "a
     ./aws/install && \
     rm awscliv2.zip
 
-RUN conda install -y -c bioconda -c conda-forge chromap
+RUN mkdir /software && \
+    wget https://github.com/haowenz/chromap/archive/refs/tags/v0.1.3.zip && \
+    unzip v0.1.3.zip && \
+    rm v0.1.3.zip && \
+    mv chromap-0.1.3 /software/ && \
+    cd /software/chromap-0.1.3 && \
+    make
 
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /opt
-RUN chmod a+rx /opt/monitor_script.sh
+RUN apt-get -qq -y remove curl gnupg unzip wget && \
+    apt-get -qq -y autoremove && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
+ 
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+RUN chmod a+rx /software/monitor_script.sh
 
-ENV PATH=/opt/vartrix:/opt:$PATH
+ENV PATH=/software/chromap-0.1.3:$PATH
