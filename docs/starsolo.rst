@@ -20,9 +20,7 @@ Prepare input data and import workflow
 2. Import ``star_solo``
 +++++++++++++++++++++++
 
-	Import *star_solo* workflow to your workspace.
-
-	See the Terra documentation for `adding a workflow`_. The *star_solo* workflow is under ``Broad Methods Repository`` with name "**cumulus/star_solo**".
+	Import *star_solo* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose workflow **github.com/klarman-cell-observatory/cumulus/STAR-Solo** to import.
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *star_solo* workflow in the drop-down menu.
 
@@ -237,6 +235,6 @@ We've built the following snRNA-seq references for users' convenience:
 		  - Mouse, introns included, built from mm10 cellranger reference 2020-A, GENCODE vM23/Ensembl 98 gene annotation, treating annotated transcripts as exons
 
 
-.. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
+.. _Import workflows to Terra: ./cumulus_import.html
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
 .. _genome reference: ./starsolo.html#prebuilt-genome-references

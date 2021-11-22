@@ -20,9 +20,7 @@ Prepare input data and import workflow
 2. Import ``demultiplexing``
 ++++++++++++++++++++++++++++++
 
-Import *demultiplexing* workflow to your workspace.
-
-	See the Terra documentation for `adding a workflow`_. The *demultiplexing* workflow is under ``Broad Methods Repository`` with name "**cumulus/demultiplexing**".
+	Import *demultiplexing* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/klarman-cell-observatory/cumulus/Demultiplexing** to import.
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *demultiplexing* workflow in the drop-down menu.
 
@@ -469,7 +467,7 @@ Results are in ``data$obs['demux_type']``, ``data$obs['assignment']``, and simil
 
 
 .. _cellranger_workflow tutorial: ./cellranger/index.html
-.. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
+.. _Import workflows to Terra: ./cumulus_import.html
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
 .. _genome reference: ./cellranger/index.html#sample-sheet
 .. _souporcell: https://github.com/wheaton5/souporcell
