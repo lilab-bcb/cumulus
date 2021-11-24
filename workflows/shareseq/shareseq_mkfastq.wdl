@@ -88,16 +88,37 @@ task run_shareseq_mkfastq {
         monitor_script.sh > monitoring.log &
         strato sync --backend ~{backend} -m ~{input_bcl_directory} ~{run_id}
         shareseq2bcl ~{input_csv_file} ~{run_id} _bcl_sample_sheet.csv
-        bcl2fastq -o _out -R ~{run_id} --sample-sheet _bcl_sample_sheet.csv --create-fastq-for-index-reads ~{"--barcode-mismatches " + barcode_mismatches} --use-bases-mask ~{default="Y*,Y*,I*,Y*" use_bases_mask}
+        bcl2fastq -o _out -R ~{run_id} --sample-sheet _bcl_sample_sheet.csv ~{"--barcode-mismatches " + barcode_mismatches} --use-bases-mask ~{default="Y*,Y*,I*,Y*" use_bases_mask}
         strato sync --backend ~{backend} -m _out ~{output_directory}/~{run_id}_fastqs
 
+        mkdir -p _out_reorg
+
         python <<CODE
-        from subprocess import check_call, check_output, CalledProcessError
+        import pandas as pd
+        from subprocess import check_call
+
+        df = pd.read_csv('~{input_csv_file}', header=0)
+        for i, row in df.iterrows():
+            call_args = ['shareseq_reorg_barcodes', '/indices/shareseq_barcode_index.csv', '/indices/shareseq_flanking_sequence.csv', row['Sample'], row['Type'], '_out', '_out_reorg']
+            print(' '.join(call_args))
+            check_call(call_args)
+        CODE
+
+        strato sync --backend ~{backend} -m _out_reorg ~{output_directory}/~{run_id}_fastqs_reorg
+
+        python <<CODE
+        from subprocess import check_call, CalledProcessError
         if '~{delete_input_bcl_directory}' is 'true':
             try:
-                call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_fastqs/input_samplesheet.csv']
+                call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_fastqs/']
                 print(' '.join(call_args))
-                check_output(call_args)
+                check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
+                call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_fastqs_reorg/']
+                print(' '.join(call_args))
+                check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
+            except CalledProcessError:
+                print("Either demultiplexing or reorganizing did not complete. Stop to delete BCL directory.")                
+            try:
                 call_args = ['strato', 'rm', '--backend', '~{backend}', '-m', '-r', '~{input_bcl_directory}']
                 print(' '.join(call_args))
                 check_call(call_args)
@@ -109,6 +130,7 @@ task run_shareseq_mkfastq {
 
     output {
         String output_fastqs_directory = "~{output_directory}/~{run_id}_fastqs"
+        String output_fastqs_reorg_directory = "~{output_directory}/~{run_id}_fastqs_reorg"
         File monitoringLog = "monitoring.log"
     }
 

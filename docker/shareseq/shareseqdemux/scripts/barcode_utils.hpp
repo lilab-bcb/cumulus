@@ -12,11 +12,12 @@
 #include "gzip_utils.hpp"
 
 struct ValueType {
-	int item_id;
+	int item_id; // item_id is negative if multiple barcodes with the same n_mis exist
 	char n_mis; // number of mismatches
+	bool collision; // true if multiple barcodes can reach this status within max_mismatch threshold
 
-	ValueType() : item_id(-1), n_mis(0) {}
-	ValueType(int item_id, char n_mis) : item_id(item_id), n_mis(n_mis) {}
+	ValueType() : item_id(-1), n_mis(0), collision(false) {}
+	ValueType(int item_id, char n_mis, bool collision = false) : item_id(item_id), n_mis(n_mis), collision(collision) {}
 };
 
 typedef std::unordered_map<uint64_t, ValueType> HashType;
@@ -94,20 +95,21 @@ std::string binary_to_barcode(uint64_t binary_id, int len) {
 	return barcode;
 }
 
-inline bool insert(HashType& index_dict, uint64_t key, ValueType&& value) {
+inline void insert(HashType& index_dict, uint64_t key, ValueType&& value) {
 	std::pair<HashIterType, bool> ret;
 	ret = index_dict.insert(std::make_pair(key, value));
-	if (ret.second) return true;
+	if (ret.second) return;
 	if (ret.first->second.n_mis == 0 && value.n_mis == 0) {
-		printf("Cumulus identified two identical barcodes! Please check your barcode file.\n");
+		printf("Identified two identical barcodes! Please check your barcode file.\n");
 		exit(-1);
 	}
-	if (ret.first->second.n_mis == 0 || value.n_mis == 0) {
-		printf("Mismatch value is too large. Please decrease the number of mismatches allowed.\n");
-		exit(-1);
+	ret.first->second.collision = true;
+	if (ret.first->second.n_mis > value.n_mis) {
+		ret.first->second.item_id = value.item_id;
+		ret.first->second.n_mis = value.n_mis;
+	} else if (ret.first->second.n_mis == value.n_mis && ret.first->second.item_id >= 0) {
+		ret.first->second.item_id = -ret.first->second.item_id-1;
 	}
-	ret.first->second.item_id = -1;
-	return false;
 }
 
 inline void mutate_index_one_mismatch(HashType& index_dict, std::string& barcode, int item_id) {
@@ -137,7 +139,7 @@ inline void mutate_index(HashType& index_dict, uint64_t binary_id, int len, int 
 	}
 }
 
-void parse_sample_sheet(const char* sample_sheet_file, int& n_barcodes, int& barcode_len, HashType& index_dict, std::vector<std::string>& index_names, int max_mismatch = 1) {
+void parse_sample_sheet(const char* sample_sheet_file, int& n_barcodes, int& barcode_len, HashType& index_dict, std::vector<std::string>& index_names, std::vector<std::string>& index_seqs, int max_mismatch) {
 	iGZipFile fin(sample_sheet_file);
 	std::string line, index_name, index_seq;
 	std::size_t pos;
@@ -146,6 +148,7 @@ void parse_sample_sheet(const char* sample_sheet_file, int& n_barcodes, int& bar
 	barcode_len = 0;
 	index_dict.clear();
 	index_names.clear();
+	index_seqs.clear();
 	while (fin.getline(line)) {
 		if (line.empty()) continue;
 
@@ -161,15 +164,22 @@ void parse_sample_sheet(const char* sample_sheet_file, int& n_barcodes, int& bar
 		else mutate_index(index_dict, barcode_to_binary(index_seq), index_seq.length(), n_barcodes, max_mismatch, 0, 0);
 		
 		index_names.push_back(index_name);
+		index_seqs.push_back(index_seq);
 		++n_barcodes;
 	}
 	fin.close();
 	printf("%s is parsed. n_barcodes = %d, and barcode_len = %d.\n", sample_sheet_file, n_barcodes, barcode_len);
 
-	int n_amb = 0;
+	int n_good = 0, n_collision = 0, n_amb = 0, n_tot;
 	for (auto&& kv : index_dict) 
 		if (kv.second.item_id < 0) ++n_amb;
-	printf("In the index, %d out of %d items are ambigious, ratio = %.2f.\n", n_amb, (int)index_dict.size(), n_amb * 1.0 / index_dict.size());
+		else if (kv.second.collision) ++ n_collision;
+		else ++n_good;
+	n_tot = n_good + n_collision + n_amb;
+	printf("In the index space with at most %d mismatches:\n", max_mismatch);
+	printf("    %d sequences can be uniquely assigned to a barcode, percentage = %.2f%%;\n", n_good, n_good * 100.0 / n_tot);
+	printf("    %d sequences can be assigned to a barcode due to minimal number of mismatches, percentage = %.2f%%;\n", n_collision, n_collision * 100.0 / n_tot);
+	printf("    %d sequences cannot be assigned to a barcode because it reaches out to multiple barcodes with the same number of mismatches , percentage = %.2f%%;\n", n_amb, n_amb * 100.0 / n_tot);
 }
 
 #endif 
