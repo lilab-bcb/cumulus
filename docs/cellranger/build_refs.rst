@@ -8,9 +8,7 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 1. Import ``cellranger_create_reference``
 ==============================================
 
-	Import *cellranger_create_reference* workflow to your workspace.
-
-	See the Terra documentation for `adding a workflow`_. The *cellranger_workflow* workflow is under ``Broad Methods Repository`` with name "**cumulus/cellranger_create_reference**".
+	Import *cellranger_create_reference* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/kalarman-cell-observatory/cumulus/Cellranger_create_reference** to import.
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cellranger_create_reference* workflow in the drop-down menu.
 
@@ -164,9 +162,7 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 1. Import ``cellranger_atac_create_reference``
 ==============================================
 
-	Import *cellranger_atac_create_reference* workflow to your workspace.
-
-	See the Terra documentation for `adding a workflow`_. The *cellranger_workflow* workflow is under ``Broad Methods Repository`` with name "**cumulus/cellranger_atac_create_reference**".
+	Import *cellranger_atac_create_reference* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/klarman-cell-observatory/cumulus/Cellranger_atac_create_reference** to import.
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cellranger_atac_create_reference* workflow in the drop-down menu.
 
@@ -281,9 +277,7 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 1. Import ``cellranger_vdj_create_reference``
 ==============================================
 
-	Import *cellranger_vdj_create_reference* workflow to your workspace.
-
-	See the Terra documentation for `adding a workflow`_. The *cellranger_workflow* workflow is under ``Broad Methods Repository`` with name "**cumulus/cellranger_vdj_create_reference**".
+	Import *cellranger_vdj_create_reference* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/klarman-cell-observatory/cumulus/Cellranger_vdj_create_reference** to import.
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cellranger_vdj_create_reference* workflow in the drop-down menu.
 
@@ -381,6 +375,6 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - Gzipped reference folder with name *genome.tar.gz*. We will also store a copy of the gzipped tarball under **output_directory** specified in the input.
 
 
-.. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
+.. _Import workflows to Terra: ../cumulus_import.html
 .. _10x filter with mkgtf: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/advanced/references#mkgtf
 .. _10x build Cell Ranger compatible pre-mRNA Reference Package: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/advanced/references#premrna

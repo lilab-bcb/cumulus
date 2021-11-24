@@ -48,7 +48,7 @@ You are free to add any other columns and these columns will be used in selectin
 
 #. Import *cumulus* workflow to your workspace.
 
-    See the Terra documentation for `adding a workflow`_. The *cumulus* workflow is under ``Broad Methods Repository`` with name "**cumulus/cumulus**".
+    Import by following instructions in `Import workflows to Terra`_. You should choose **github.com/klarman-cell-observatory/cumulus/Cumulus** for import.
 
     Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cumulus* workflow in the drop-down menu.
 
@@ -164,7 +164,7 @@ global inputs
     * - default_reference
       - If sample count matrix is in either DGE, mtx, csv, tsv or loom format and there is no Reference column in the csv_file, use default_reference as the reference string.
       - "GRCh38"
-      - 
+      -
     * - pegasus_version
       - Pegasus version to use for analysis. Versions available: ``1.4.3``, ``1.4.2``, ``1.4.0``, ``1.3.0``.
       - "1.4.3"
@@ -1198,7 +1198,7 @@ Follow `Pegasus plotting tutorial`_ for visualizing your data in Python.
 .. _anndata: https://anndata.readthedocs.io/en/latest/
 .. _Cirrocumulus: https://cirrocumulus.readthedocs.io/en/latest/
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
-.. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
+.. _Import workflows to Terra: ./cumulus_import.html
 .. _Terra: https://app.terra.bio/
 .. _Single Cell Portal: https://portals.broadinstitute.org/single_cell
 .. _global inputs: ./cumulus.html#global-inputs

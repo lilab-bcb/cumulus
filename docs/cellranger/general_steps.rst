@@ -3,9 +3,7 @@ This section mainly considers jobs starting from BCL files. If your job starts w
 1. Import ``cellranger_workflow``
 +++++++++++++++++++++++++++++++++
 
-	Import *cellranger_workflow* workflow to your workspace.
-
-	See the Terra documentation for `adding a workflow`_. The *cellranger_workflow* workflow is under ``Broad Methods Repository`` with name "**cumulus/cellranger_workflow**".
+	Import *cellranger_workflow* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose workflow **github.com/kalarman-cell-observatory/cumulus/CellRanger** to import.
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cellranger_workflow* workflow in the drop-down menu.
 
@@ -180,5 +178,5 @@ Sometimes, users might want to perform demultiplexing locally and only run the c
 
 
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
-.. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
+.. _Import workflows to Terra: ../cumulus_import.html
 .. _file naming conventions: https://kb.10xgenomics.com/hc/en-us/articles/115003802691-How-do-I-prepare-Sequence-Read-Archive-SRA-data-from-NCBI-for-Cell-Ranger-
