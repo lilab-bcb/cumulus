@@ -4,7 +4,7 @@ workflow shareseq_mkfastq {
     input {
         # Input BCL directory, gs url
         String input_bcl_directory
-        # 3 column CSV file (Lane, Sample, Index)
+        # 4 column CSV file (Lane, Sample, Index, Type)
         File input_csv_file
         # Shareseq output directory, gs url
         String output_directory
@@ -116,15 +116,15 @@ task run_shareseq_mkfastq {
                 call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_fastqs_reorg/']
                 print(' '.join(call_args))
                 check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
+                try:
+                    call_args = ['strato', 'rm', '--backend', '~{backend}', '-m', '-r', '~{input_bcl_directory}']
+                    print(' '.join(call_args))
+                    check_call(call_args)
+                    print('~{input_bcl_directory} is deleted!')
+                except CalledProcessError:
+                    print("Failed to delete BCL directory.")
             except CalledProcessError:
                 print("Either demultiplexing or reorganizing did not complete. Stop to delete BCL directory.")                
-            try:
-                call_args = ['strato', 'rm', '--backend', '~{backend}', '-m', '-r', '~{input_bcl_directory}']
-                print(' '.join(call_args))
-                check_call(call_args)
-                print('~{input_bcl_directory} is deleted!')
-            except CalledProcessError:
-                print("Failed to delete BCL directory.")
         CODE
     }
 
