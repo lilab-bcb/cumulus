@@ -93,7 +93,7 @@ task run_chromap_create_reference {
         if '~{mini_win_size}' !=  '':
             call_args.extend(['-w','~{mini_win_size}'])
 
-        call_args.extend(['-r', '~{input_fasta}', '-o ref.index'])
+        call_args.extend(['-r', '~{input_fasta}', '-o', 'ref.index'])
         print(' '.join(call_args))
         check_call(call_args)    
         CODE
