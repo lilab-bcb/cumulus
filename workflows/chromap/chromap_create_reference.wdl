@@ -81,10 +81,12 @@ task run_chromap_create_reference {
         set -e
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
+        
+        mkdir -p ~{genome}
 
         python <<CODE
         from subprocess import check_call, CalledProcessError
-        import sys
+        import os
 
         call_args = ['chromap', '-i']
 
@@ -93,13 +95,16 @@ task run_chromap_create_reference {
         if '~{mini_win_size}' !=  '':
             call_args.extend(['-w','~{mini_win_size}'])
 
-        call_args.extend(['-r', '~{input_fasta}', '-o', 'ref.index'])
+        call_args.extend(['-r', '~{input_fasta}', '-o', '~{genome}/ref.index'])
         print(' '.join(call_args))
         check_call(call_args)    
         CODE
-
-        strato cp --backend ~{backend} -m ref.index ~{output_dir}
-        tar -czf ~{genome}.tar.gz ~{output_dir}
+        
+        strato cp --backend ~{backend} -m ~{output_dir}/genome.fa ~{genome}
+        tar -czf ~{genome}.tar.gz ~{genome}
+        strato cp --backend ~{backend} -m ~{genome}.tar.gz "~{output_dir}"
+        strato rm ~{output_dir}/genome.fa
+        
     }
 
     output {
