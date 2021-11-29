@@ -98,7 +98,6 @@ task run_chromap_create_reference {
         check_call(call_args)    
         CODE
 
-        strato cp --backend ~{backend} -m input_fasta ~{output_dir}
         strato cp --backend ~{backend} -m ref.index ~{output_dir}
         tar -czf ~{genome}.tar.gz ~{output_dir}
     }
