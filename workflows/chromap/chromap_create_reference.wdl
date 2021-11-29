@@ -102,9 +102,8 @@ task run_chromap_create_reference {
         
         mv ~{input_fasta} ~{genome}/
         tar -czf ~{genome}.tar.gz ~{genome}
-        strato cp --backend ~{backend} -m ~{genome}.tar.gz "~{output_dir}"
-        strato rm ~{output_dir}/genome.fa
-
+        strato cp --backend ~{backend} -m ~{genome}.tar.gz ~{output_dir}
+        strato rm --backend ~{backend} ~{output_dir}/genome.fa
     }
 
     output {
