@@ -84,26 +84,26 @@ task run_chromap_create_reference {
         
         mkdir -p ~{genome}
         
-        #python <<CODE
-        #from subprocess import check_call, CalledProcessError
-        #import os
+        python <<CODE
+        from subprocess import check_call
+        import os
 
-        #call_args = ['chromap', '-i']
+        call_args = ['chromap', '-i']
 
-        #if '~{kmer}' !=  '':
-        #    call_args.extend(['-k','~{kmer}'])
-        #if '~{mini_win_size}' !=  '':
-        #    call_args.extend(['-w','~{mini_win_size}'])
+        if '~{kmer}' !=  '':
+            call_args.extend(['-k','~{kmer}'])
+        if '~{mini_win_size}' !=  '':
+            call_args.extend(['-w','~{mini_win_size}'])
 
-        #call_args.extend(['-r', '~{input_fasta}', '-o', '~{genome}/ref.index'])
-        #print(' '.join(call_args))
-        #check_call(call_args)    
-        #CODE
+        call_args.extend(['-r', '~{input_fasta}', '-o', '~{genome}/ref.index'])
+        print(' '.join(call_args))
+        check_call(call_args)    
+        CODE
         
         mv ~{input_fasta} ~{genome}/
         tar -czf ~{genome}.tar.gz ~{genome}
         strato cp --backend ~{backend} -m ~{genome}.tar.gz "~{output_dir}"
-        #strato rm ~{output_dir}/genome.fa
+        strato rm ~{output_dir}/genome.fa
 
     }
 
