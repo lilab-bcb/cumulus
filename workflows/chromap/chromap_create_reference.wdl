@@ -84,6 +84,7 @@ task run_chromap_create_reference {
 
         python <<CODE
         from subprocess import check_call, CalledProcessError
+        import sys
 
         call_args = ['chromap', '-i']
 
@@ -94,14 +95,6 @@ task run_chromap_create_reference {
 
         call_args.extend(['-r', '~{input_fasta}', '-o ref.index'])
         print(' '.join(call_args))
-
-        try:
-            call_args = ['strato', 'exists', '--backend', '~{backend}', '~{input_fasta}']
-            print(' '.join(call_args))
-            check_call(call_args)
-        except CalledProcessError:
-            print('Input genome fasta does not exist '+ '~{input_fasta}', file = sys.stderr)
-
         check_call(call_args)    
         CODE
 

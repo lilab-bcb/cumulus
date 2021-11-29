@@ -37,4 +37,5 @@ RUN apt-get -qq -y remove curl gnupg unzip wget && \
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
 RUN chmod a+rx /software/monitor_script.sh
 
-ENV PATH=/software/chromap-0.1.3:$PATH
+ENV PATH=/software:/software/chromap-0.1.3:$PATH
+ENV TMPDIR=/tmp
