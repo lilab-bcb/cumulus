@@ -113,7 +113,7 @@ task run_cellranger_vdj_create_reference {
         CODE
 
         tar -czf ~{genome}.tar.gz ~{genome}
-        strato cp --backend ~{backend} -m ~{genome}.tar.gz "~{output_dir}"
+        strato cp --backend ~{backend} -m ~{genome}.tar.gz "~{output_dir}"/
     }
 
     output {
