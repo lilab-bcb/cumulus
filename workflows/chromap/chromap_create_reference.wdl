@@ -50,8 +50,7 @@ workflow chromap_create_reference {
             genome = genome,
             kmer = kmer,
             mini_win_size = mini_win_size,
-            input_fasta = input_fasta,
-            
+            input_fasta = input_fasta,           
             output_dir = output_directory_stripped
     }
 
