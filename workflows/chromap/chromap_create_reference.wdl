@@ -78,8 +78,6 @@ task run_chromap_create_reference {
         String output_dir
     }
 
-    String input_fasta_basename = basename(input_fasta)
-
     command {
         set -e
         export TMPDIR=/tmp
@@ -91,8 +89,7 @@ task run_chromap_create_reference {
         
         mv ~{input_fasta} ~{genome}/ref.fa
         tar -czf ~{genome}.tar.gz ~{genome}
-        strato cp --backend ~{backend} -m ~{genome}.tar.gz ~{output_dir}
-        strato rm --backend ~{backend} ~{output_dir}/~{input_fasta_basename}
+        strato cp --backend ~{backend} -m ~{genome}.tar.gz "~{output_dir}"/
     }
 
     output {
