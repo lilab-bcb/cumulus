@@ -4,7 +4,7 @@ workflow chromap_create_reference {
     input {
         # Which docker registry to use
         String docker_registry = "quay.io/cumulus"
-        # cellranger-atac version: 2.0.0, 1.2.0, 1.1.0
+        # chromap version
         String chromap_version = "0.1.3"
 
         # Disk space in GB
@@ -21,16 +21,16 @@ workflow chromap_create_reference {
         # Backend
         String backend = "gcp"
 
-        # Genome name
+        # Genome name, the reference package will be named as genome.tar.gz
         String genome
-        # GSURL for input fasta file
+        # URL for input fasta file
         File input_fasta
         # Kmer
         Int? kmer
         # Minimum window size
         Int? mini_win_size
         
-        # Output directory, gs URL
+        # Output directory, URL
         String output_directory
     }
 
@@ -51,6 +51,7 @@ workflow chromap_create_reference {
             kmer = kmer,
             mini_win_size = mini_win_size,
             input_fasta = input_fasta,
+            
             output_dir = output_directory_stripped
     }
 
@@ -77,33 +78,21 @@ task run_chromap_create_reference {
         String output_dir
     }
 
+    String input_fasta_basename = basename(input_fasta)
+
     command {
         set -e
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
         
         mkdir -p ~{genome}
+
+        chromap -i ~{"-k" + kmer} ~{"-w" + mini_win_size} -r ~{input_fasta} -o ~{genome}/ref.index
         
-        python <<CODE
-        from subprocess import check_call
-        import os
-
-        call_args = ['chromap', '-i']
-
-        if '~{kmer}' !=  '':
-            call_args.extend(['-k','~{kmer}'])
-        if '~{mini_win_size}' !=  '':
-            call_args.extend(['-w','~{mini_win_size}'])
-
-        call_args.extend(['-r', '~{input_fasta}', '-o', '~{genome}/ref.index'])
-        print(' '.join(call_args))
-        check_call(call_args)    
-        CODE
-        
-        mv ~{input_fasta} ~{genome}/
+        mv ~{input_fasta} ~{genome}/ref.fa
         tar -czf ~{genome}.tar.gz ~{genome}
         strato cp --backend ~{backend} -m ~{genome}.tar.gz ~{output_dir}
-        strato rm --backend ~{backend} ~{output_dir}/genome.fa
+        strato rm --backend ~{backend} ~{output_dir}/~{input_fasta_basename}
     }
 
     output {
