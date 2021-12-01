@@ -50,7 +50,7 @@ workflow chromap_mapping {
         # Perform Tn5 shift, only when --SAM is NOT set
         Boolean? tn5_shift
         # Low memory (use for big datasets)
-        Boolean? low_mem
+        Boolean low_mem = true
         # Max Hamming distance allowed to correct a barcode, max allowed 2 
         Int? bc_error_threshold
         # Min probability to correct a barcode 
@@ -171,7 +171,7 @@ task chromap {
             String docker_registry
             String zones
             Int num_cpu
-            Int memory
+            String memory
             Int disk_space
             Int preemptible
             Int awsMaxRetries
