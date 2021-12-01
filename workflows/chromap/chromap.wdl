@@ -186,12 +186,13 @@ task chromap {
         tar xf ~{genome_file} -C genome_dir --strip-components 1   
 
         python <<CODE
+        import re
         import os
         from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
         
         fastqs = []
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
-            directory = sub('/+$', '', directory) # remove trailing slashes
+            directory = re.sub('/+$', '', directory) # remove trailing slashes
             target = '~{sample_id}_' + str(i)
             try:
                 call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
