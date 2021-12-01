@@ -219,9 +219,9 @@ task chromap {
                      '-2', read2_fq]
 
         if '~{preset}' == 'atac':
-            call_args.extend['-b', index_fq]
+            call_args.extend(['-b', index_fq])
             if '~{barcode_whitelist}' != '':
-                call_args.extend['--barcode-whitelist', '~{barcode_whitelist}']
+                call_args.extend(['--barcode-whitelist', '~{barcode_whitelist}'])
 
         if '~{output_format}' not in ['BED','BEDPE','TagAlign']:
             print('Choose output formats from BED, BEDPE or TagAlign. User chosen format ' +  '~{output_format}' + ' not available.' , file = sys.stderr)
