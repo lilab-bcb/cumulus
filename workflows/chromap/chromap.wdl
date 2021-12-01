@@ -186,10 +186,8 @@ task chromap {
         tar xf ~{genome_file} -C genome_dir --strip-components 1   
 
         python <<CODE
-        from re import match, sub
         import os
         from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
-        from packaging import version
         
         fastqs = []
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
