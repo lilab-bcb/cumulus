@@ -239,17 +239,17 @@ task chromap {
                 call_args.extend(["--BED", '-o', out_file]) 
 
         if '~{max_edit_dist}' != '':
-            call_args.append('-e', '~{max_edit_dist}')
+            call_args.extend(['-e', '~{max_edit_dist}'])
         if '~{num_minimizer}' != '':
-            call_args.append('-s', '~{num_minimizer}')
+            call_args.extend(['-s', '~{num_minimizer}'])
         if '~{ignore_minimizer_times}' != '':
-            call_args.append('-f', '~{ignore_minimizer_times}')
+            call_args.extend(['-f', '~{ignore_minimizer_times}'])
         if '~{max_insert}' != '':
-            call_args.append('-l', '~{max_insert}')
+            call_args.extend(['-l', '~{max_insert}'])
         if '~{mapq}' != '':
-            call_args.append('-q', '~{mapq}')
+            call_args.extend(['-q', '~{mapq}'])
         if '~{min_read_length}' != '':
-            call_args.append('--min-read-length', '~{min_read_length}')
+            call_args.extend(['--min-read-length', '~{min_read_length}'])
         if '~{trim_adaptors}':
             call_args.append('--trim-adapters')
         if '~{remove_pcr_duplicates}':
@@ -263,15 +263,15 @@ task chromap {
         if '~{low_mem}':
             call_args.append('--low-mem')
         if '~{bc_error_threshold}' != '':
-            call_args.append('--bc-error-threshold', '~{bc_error_threshold}')
+            call_args.extend(['--bc-error-threshold', '~{bc_error_threshold}'])
         if '~{bc_probability_threshold}' != '':
-            call_args.append('--bc-probability-threshold, '~{bc_probability_threshold}')
+            call_args.extend(['--bc-probability-threshold', '~{bc_probability_threshold}'])
         if '~{threads}' != '':
-            call_args.append('--threads', '~{threads}')
+            call_args.extend(['--threads', '~{threads}'])
         if '~{chr_order}' != '':
-            call_args.append('--chr-order', '~{chr_order}')
+            call_args.extend(['--chr-order', '~{chr_order}'])
         if '~{pairs_natural_chr_order}' != '':
-            call_args.append('--pairs-natural-chr-order', '~{pairs_natural_chr_order}')
+            call_args.extend(['--pairs-natural-chr-order', '~{pairs_natural_chr_order}'])
 
         print(' '.join(call_args))
         check_call(call_args)
