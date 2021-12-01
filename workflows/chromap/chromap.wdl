@@ -207,7 +207,7 @@ task chromap {
                 call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
                 print(' '.join(call_args))
                 check_call(call_args)
-            fl=os.listdir(target)      
+            fl = [os.path.abspath(os.path.join(target,i)) for i in os.listdir(target)]     
             fastqs.extend(fl)
         
         read1_fq = ",".join(list(filter(lambda k: '_~{read1}_' in k, fastqs)))
