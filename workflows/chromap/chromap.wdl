@@ -6,9 +6,9 @@ workflow chromap_mapping {
         String chromap_version = "0.1.3"
         # Sample ID
         String sample_id
-        # A comma-separated list of input FASTQs directories (gs urls)
+        # A comma-separated list of input FASTQs directories (urls)
         String input_fastqs_directories
-        # Output directory, gs URL
+        # Output directory, URL
         String output_directory
 
         # Keywords or a URL to a tar.gz file
