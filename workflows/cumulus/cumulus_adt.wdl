@@ -17,12 +17,12 @@ workflow cumulus_adt {
 
         # feature barcodes in csv format
         File feature_barcode_file
-        
+
         # Index TSV file
         File acronym_file
 
-        # Barcode start position at Read 2 (0-based coordinate)
-        Int? barcode_pos
+        # Barcode start position at Read 2 (0-based coordinate) for CRISPR
+        Int? crispr_barcode_pos
         # scaffold sequence for CRISPR, default is ""
         String? scaffold_sequence
 
@@ -64,7 +64,7 @@ workflow cumulus_adt {
             data_type = data_type,
             cell_barcodes = cell_barcode_file,
             feature_barcodes = feature_barcode_file,
-            barcode_pos = barcode_pos,
+            crispr_barcode_pos = crispr_barcode_pos,
             scaffold_sequence = scaffold_sequence,
             max_mismatch = max_mismatch,
             min_read_ratio = min_read_ratio,
@@ -93,7 +93,7 @@ task run_generate_count_matrix_ADTs {
         String data_type
         File cell_barcodes
         File feature_barcodes
-        Int? barcode_pos
+        Int? crispr_barcode_pos
         String? scaffold_sequence
         Int max_mismatch
         Float min_read_ratio
@@ -118,7 +118,7 @@ task run_generate_count_matrix_ADTs {
         import os
 
         fastqs = []
-        
+
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
             directory = re.sub('/+$', '', directory) # remove trailing slashes
             target = '~{sample_id}_' + str(i)
@@ -133,7 +133,7 @@ task run_generate_count_matrix_ADTs {
                 if not os.path.exists(target):
                     os.mkdir(target)
                 call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
-                print(' '.join(call_args))    
+                print(' '.join(call_args))
                 check_call(call_args)
             fastqs.append(target)
 
@@ -142,6 +142,8 @@ task run_generate_count_matrix_ADTs {
             call_args.extend(['--feature', 'crispr'])
             if '~{scaffold_sequence}' != '':
                 call_args.extend(['--scaffold-sequence', '~{scaffold_sequence}'])
+            if '~{crispr_barcode_pos}' != '':
+                call_args.extend(['--barcode-pos', '~{crispr_barcode_pos}'])
         else:
             call_args.extend(['--feature', 'antibody'])
             if '~{data_type}' == 'cmo':
@@ -150,8 +152,6 @@ task run_generate_count_matrix_ADTs {
             call_args.extend(['--max-mismatch-cell', '0', '--umi-length', '12'])
         else:
             call_args.extend(['--max-mismatch-cell', '1', '--umi-length', '10'])
-        if '~{barcode_pos}' != '':
-            call_args.extend(['--barcode-pos', '~{barcode_pos}'])
         print(' '.join(call_args))
         check_call(call_args)
         CODE

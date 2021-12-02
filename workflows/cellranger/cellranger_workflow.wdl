@@ -63,8 +63,8 @@ workflow cellranger_workflow {
 
         # For extracting ADT count
 
-        # Barcode start position at Read 2 (0-based coordinate)
-        Int? barcode_pos
+        # Barcode start position at Read 2 (0-based coordinate) for CRISPR
+        Int? crispr_barcode_pos
         # scaffold sequence for CRISPR, default is ""
         String? scaffold_sequence
         # maximum hamming distance in feature barcodes
@@ -356,7 +356,7 @@ workflow cellranger_workflow {
                         chemistry = generate_count_config.sample2chemistry[sample_id],
                         data_type = generate_count_config.sample2datatype[sample_id],
                         feature_barcode_file = generate_count_config.sample2fbf[sample_id],
-                        barcode_pos = barcode_pos,
+                        crispr_barcode_pos = crispr_barcode_pos,
                         scaffold_sequence = scaffold_sequence,
                         max_mismatch = max_mismatch,
                         min_read_ratio = min_read_ratio,
