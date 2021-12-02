@@ -63,8 +63,10 @@ workflow cellranger_workflow {
 
         # For extracting ADT count
 
-        # scaffold sequence for Perturb-seq, default is "", which for Perturb-seq means barcode starts at position 0 of read 2
-        String scaffold_sequence = ""
+        # Barcode start position at Read 2 (0-based coordinate)
+        Int? barcode_pos
+        # scaffold sequence for CRISPR, default is ""
+        String? scaffold_sequence
         # maximum hamming distance in feature barcodes
         Int max_mismatch = 3
         # minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for data type crispr
@@ -96,8 +98,8 @@ workflow cellranger_workflow {
 
         # 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
         String cellranger_version = "6.1.1"
-        # 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0
-        String cumulus_feature_barcoding_version = "0.6.0"
+        # 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0
+        String cumulus_feature_barcoding_version = "0.7.0"
         # 2.0.0, 1.2.0, 1.1.0
         String cellranger_atac_version = "2.0.0"
         # 2.0.0, 1.0.1, 1.0.0
@@ -354,6 +356,7 @@ workflow cellranger_workflow {
                         chemistry = generate_count_config.sample2chemistry[sample_id],
                         data_type = generate_count_config.sample2datatype[sample_id],
                         feature_barcode_file = generate_count_config.sample2fbf[sample_id],
+                        barcode_pos = barcode_pos,
                         scaffold_sequence = scaffold_sequence,
                         max_mismatch = max_mismatch,
                         min_read_ratio = min_read_ratio,

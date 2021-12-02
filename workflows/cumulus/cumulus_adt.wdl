@@ -21,8 +21,10 @@ workflow cumulus_adt {
         # Index TSV file
         File acronym_file
 
-        # scaffold sequence for Perturb-seq, default is "", which for Perturb-seq means barcode starts at position 0 of read 2
-        String scaffold_sequence = ""
+        # Barcode start position at Read 2 (0-based coordinate)
+        Int? barcode_pos
+        # scaffold sequence for CRISPR, default is ""
+        String? scaffold_sequence
 
         # maximum hamming distance in feature barcodes
         Int max_mismatch = 3
@@ -62,6 +64,7 @@ workflow cumulus_adt {
             data_type = data_type,
             cell_barcodes = cell_barcode_file,
             feature_barcodes = feature_barcode_file,
+            barcode_pos = barcode_pos,
             scaffold_sequence = scaffold_sequence,
             max_mismatch = max_mismatch,
             min_read_ratio = min_read_ratio,
@@ -90,7 +93,8 @@ task run_generate_count_matrix_ADTs {
         String data_type
         File cell_barcodes
         File feature_barcodes
-        String scaffold_sequence
+        Int? barcode_pos
+        String? scaffold_sequence
         Int max_mismatch
         Float min_read_ratio
         String cumulus_feature_barcoding_version
@@ -135,9 +139,9 @@ task run_generate_count_matrix_ADTs {
 
         call_args = ['generate_count_matrix_ADTs', '~{cell_barcodes}', '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
         if '~{data_type}' == 'crispr':
-            call_args.extend(['--feature', 'crispr', '--scaffold-sequence', '~{scaffold_sequence}'])
-            if '~{chemistry}' != 'SC3Pv3':
-                call_args.append('--no-match-tso')
+            call_args.extend(['--feature', 'crispr'])
+            if '~{scaffold_sequence}' != '':
+                call_args.extend(['--scaffold-sequence', '~{scaffold_sequence}'])
         else:
             call_args.extend(['--feature', 'antibody'])
             if '~{data_type}' == 'cmo':
@@ -146,6 +150,8 @@ task run_generate_count_matrix_ADTs {
             call_args.extend(['--max-mismatch-cell', '0', '--umi-length', '12'])
         else:
             call_args.extend(['--max-mismatch-cell', '1', '--umi-length', '10'])
+        if '~{barcode_pos}' != '':
+            call_args.extend(['--barcode-pos', '~{barcode_pos}'])
         print(' '.join(call_args))
         check_call(call_args)
         CODE
