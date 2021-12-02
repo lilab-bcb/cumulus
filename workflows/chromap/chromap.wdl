@@ -234,7 +234,7 @@ task chromap {
                 out_file = 'aln.bedpe'
                 call_args.extend(["--BEDPE", '-o', out_file])
             else:
-                out_file = "aln.bed"
+                out_file = 'aln.bed'
                 call_args.extend(["--BED", '-o', out_file]) 
 
         if '~{max_edit_dist}' != '':
@@ -275,7 +275,7 @@ task chromap {
         print(' '.join(call_args))
         check_call(call_args)
 
-        call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', out_file, '~{output_directory}/~{sample_id}']
+        call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', out_file, '~{output_directory}/~{sample_id}/']
         print(' '.join(call_args))
         check_call(call_args)
 
