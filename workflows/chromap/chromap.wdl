@@ -233,6 +233,9 @@ task chromap {
             elif '~{output_format}' == 'BEDPE':
                 out_file = 'aln.bedpe'
                 call_args.extend(["--BEDPE", '-o', out_file])
+            elif '~{output_format}' == 'SAM':
+                out_file = 'aln.sam'
+                call_args.extend(["--SAM", '-o', out_file])
             else:
                 out_file = 'aln.bed'
                 call_args.extend(["--BED", '-o', out_file]) 
