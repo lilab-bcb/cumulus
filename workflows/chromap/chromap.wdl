@@ -189,6 +189,7 @@ task chromap {
         import re
         import os
         from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
+        import sys
         
         fastqs = []
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
@@ -223,7 +224,7 @@ task chromap {
             if '~{barcode_whitelist}' != '':
                 call_args.extend(['--barcode-whitelist', '~{barcode_whitelist}'])
 
-        if '~{output_format}' not in ['BED','BEDPE','TagAlign']:
+        if '~{output_format}' not in ['BED','BEDPE','TagAlign','SAM']:
             print('Choose output formats from BED, BEDPE or TagAlign. User chosen format ' +  '~{output_format}' + ' not available.' , file = sys.stderr)
             sys.exit(1)
         else:
