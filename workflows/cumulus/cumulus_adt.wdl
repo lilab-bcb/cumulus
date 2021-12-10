@@ -144,6 +144,8 @@ task run_generate_count_matrix_ADTs {
                 call_args.extend(['--scaffold-sequence', '~{scaffold_sequence}'])
             if '~{crispr_barcode_pos}' != '':
                 call_args.extend(['--barcode-pos', '~{crispr_barcode_pos}'])
+            if '~{chemistry}' == 'SC3Pv3' and '~{crispr_barcode_pos}' == '' and '~{scaffold_sequence}' == '':
+                call_args.append('--convert-cell-barcode')
         else:
             call_args.extend(['--feature', 'antibody'])
             if '~{data_type}' == 'cmo':
@@ -164,9 +166,7 @@ task run_generate_count_matrix_ADTs {
 
         if [ -f "~{sample_id}".umi_count.pdf ]
         then
-            # gsutil cp "~{sample_id}".umi_count.pdf "~{output_directory}/~{sample_id}/"
             strato cp --backend ~{backend} "~{sample_id}".umi_count.pdf "~{output_directory}/~{sample_id}/"
-            # cp -f "~{sample_id}".umi_count.pdf "~{output_directory}/~{sample_id}/"
         fi
     }
 
