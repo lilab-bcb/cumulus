@@ -58,9 +58,9 @@ Sample sheet
 		* - **auto**
 		  - Default. This is an alias for Single Cell 3' v3 (SC3Pv3)
 		* - **threeprime**
-		  - This is another alias for Single Cell 3' v3.
+		  - This is another alias for Single Cell 3' v3
 		* - **SC3Pv3**
-		  - Single Cell 3′ v3.
+		  - Single Cell 3′ v3
 		* - **SC3Pv2**
 		  - Single Cell 3′ v2
 		* - **fiveprime**
@@ -72,7 +72,26 @@ Sample sheet
 
 #. *DataType* column.
 
-	Put **citeseq** if CITE-seq, **hashing** if cell or nucleus hashing, **cmo** if CellPlex, **adt** if a mix of hashing and Cite-seq, and **crispr** here if Perturb-seq.
+	The following keywords are accepted for *DataType* column:
+
+	.. list-table::
+		:widths: 5 20
+		:header-rows: 1
+
+		* - DataType
+		  - Explanation
+		* - **citeseq**
+		  - CITE-seq
+		* - **hashing** 
+		  - Cell or nucleus hashing
+		* - **cmo**
+		  - CellPlex
+		* - **adt**
+		  - Used for a mix of hashing and Cite-seq
+		* - **crispr**
+		  - | Perturb-seq/CROP-seq
+		    | If neither *crispr_barcode_pos* nor *scaffold_sequence* (see Workflow input) is set, **crispr** refers to 10x CRISPR assays. If in addition *Chemistry* is set to be **SC3Pv3** or its aliases, Cumulus automatically complement the middle two bases to convert 10x feature barcoding cell barcodes back to 10x RNA cell barcodes.
+		    | Otherwise, **crispr** refers to non 10x CRISPR assays, such as CROP-Seq. In this case, we assume feature barcoding cell barcodes are the same as the RNA cell barcodes and no cell barcode convertion will be conducted.
 
 #. *FetureBarcodeFile* column.
 
