@@ -17,9 +17,9 @@ workflow chromap_mapping {
         File acronym_file
         
         # Read1
-        String? read1
+        String read1
         # Read2
-        String? read2
+        String read2
         # Barcode 
         String? barcode
         # Barcode whitelist
@@ -66,7 +66,7 @@ workflow chromap_mapping {
         # Output mappings not in whitelist
         Boolean? output_mappings_not_in_whitelist
         # Output format; choices bed, tagalign, sam, pairs
-        String output_format = "BED"
+        String output_format = "bed"
 
         # Customized chromsome order
         File? chr_order
@@ -84,7 +84,7 @@ workflow chromap_mapping {
         Int disk_space = 500
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
-        # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        # Google cloud zones, default to "us-central1-b"
         String zones = "us-central1-b"
         # Backend
         String backend = "gcp"
