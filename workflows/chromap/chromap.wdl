@@ -17,26 +17,31 @@ workflow chromap_mapping {
         File acronym_file
         
         # Read1
-        String read1 =  "R1"
+        String? read1
         # Read2
-        String read2 =  "R2"
-        # Barcode file
-        String barcode_idx = "I1"
-
-        # Preset option
-        String preset = "atac"
+        String? read2
+        # Barcode 
+        String? barcode
         # Barcode whitelist
         File? barcode_whitelist
+        # Read format
+        String? read_format
+
+        # Preset option; available options: chip, hic, atac 
+        String? preset
+
+        # Allow split alignments
+        Boolean? split_alignment
         # Max edit distance
-        Int? max_edit_dist
+        Int? max_edit_dist_e
         # Min number of minimizers
-        Int? num_minimizer
-        # Ignore minimizers occuring these many times
-        Int? ignore_minimizer_times 
+        Int? min_num_minimizer_s
+        # INT1[,INT2] Skip minimizers occuring > INT1 [500] times. INT2 [1000] is the threshold for a second round of seeding.
+        String? ignore_minimizer_times_f
         # Max insert size, only for paired-end read mapping
-        Int? max_insert
+        Int? max_insert_size_l
         # Min MAPQ in range [0, 60] for mappings to be output [30]
-        Int? mapq
+        Int? min_mapq_q
         # Skip mapping the reads of length less than Min read length
         Int? min_read_length
         # Trim adapters on 3’. This only works for paired-end reads. 
@@ -50,24 +55,28 @@ workflow chromap_mapping {
         # Perform Tn5 shift, only when --SAM is NOT set
         Boolean? tn5_shift
         # Low memory (use for big datasets)
-        Boolean low_mem = true
+        Boolean? low_mem
         # Max Hamming distance allowed to correct a barcode, max allowed 2 
         Int? bc_error_threshold
         # Min probability to correct a barcode 
         Float? bc_probability_threshold
         # Num of threads for mapping
-        Int? threads
+        Int? num_threads_t
+
+        # Output mappings not in whitelist
+        Boolean? output_mappings_not_in_whitelist
+        # Output format; choices bed, tagalign, sam, pairs
+        String output_format = "BED"
 
         # Customized chromsome order
         File? chr_order
-        # Output format
-        String output_format = "BED"
+
         
         #Natural chromosome order for pairs flipping
         File? pairs_natural_chr_order
 
         # Number of cpus per chromap job
-        Int num_cpu = 1
+        Int num_cpu = 32
         # Memory string, e.g. 57.6G
         String memory = "50G"
 
@@ -76,7 +85,7 @@ workflow chromap_mapping {
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-        String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        String zones = "us-central1-b"
         # Backend
         String backend = "gcp"
         # Number of preemptible tries
@@ -97,19 +106,22 @@ workflow chromap_mapping {
             chromap_version = chromap_version,
             read1 = read1,
             read2 = read2,
-            barcode_idx = barcode_idx,
+            barcode = barcode,
             sample_id = sample_id,
             output_directory = output_directory_stripped,
             input_fastqs_directories = input_fastqs_directories,
             genome_file = genome_file,
+            output_mappings_not_in_whitelist = output_mappings_not_in_whitelist,
             output_format = output_format,
+            read_format = read_format,
             preset = preset,
             barcode_whitelist = barcode_whitelist,
-            max_edit_dist = max_edit_dist,
-            num_minimizer = num_minimizer,
-            ignore_minimizer_times = ignore_minimizer_times,
-            max_insert = max_insert,
-            mapq = mapq,
+            split_alignment = split_alignment,
+            max_edit_dist_e = max_edit_dist_e,
+            min_num_minimizer_s = min_num_minimizer_s,
+            ignore_minimizer_times_f = ignore_minimizer_times_f,
+            max_insert_size_l = max_insert_size_l,
+            min_mapq_q = min_mapq_q,
             min_read_length = min_read_length,
             trim_adaptors = trim_adaptors,
             remove_pcr_duplicates = remove_pcr_duplicates,
@@ -119,7 +131,7 @@ workflow chromap_mapping {
             low_mem = low_mem,
             bc_error_threshold = bc_error_threshold,
             bc_probability_threshold = bc_probability_threshold,
-            threads = threads,
+            num_threads_t = num_threads_t,
             chr_order = chr_order,
             pairs_natural_chr_order = pairs_natural_chr_order,
             disk_space = disk_space,
@@ -141,21 +153,24 @@ workflow chromap_mapping {
 task chromap {
     input {
             String chromap_version
-            String read1
-            String read2
-            String barcode_idx
+            String? read1
+            String? read2
+            String? barcode
             String sample_id
             String output_directory
             String input_fastqs_directories
             File genome_file
-            String preset
+            String? preset
             File? barcode_whitelist
+            Boolean? output_mappings_not_in_whitelist
             String? output_format
-            Int? max_edit_dist
-            Int? num_minimizer
-            Int? ignore_minimizer_times
-            Int? max_insert
-            Int? mapq
+            String? read_format
+            Boolean? split_alignment
+            Int? max_edit_dist_e
+            Int? min_num_minimizer_s
+            String? ignore_minimizer_times_f
+            Int? max_insert_size_l
+            Int? min_mapq_q
             Int? min_read_length
             Boolean? trim_adaptors
             Boolean? remove_pcr_duplicates
@@ -165,7 +180,7 @@ task chromap {
             Boolean? low_mem
             Int? bc_error_threshold
             Float? bc_probability_threshold
-            Int? threads
+            Int? num_threads_t
             File? chr_order
             File? pairs_natural_chr_order
             String docker_registry
@@ -213,7 +228,7 @@ task chromap {
         
         read1_fq = ",".join(list(filter(lambda k: '_~{read1}_' in k, fastqs)))
         read2_fq = ",".join(list(filter(lambda k: '_~{read2}_' in k, fastqs)))
-        index_fq = ",".join(list(filter(lambda k: '_~{barcode_idx}_' in k, fastqs)))
+        index_fq = ",".join(list(filter(lambda k: '_~{barcode}_' in k, fastqs)))
 
         call_args = ['chromap', '--preset', '~{preset}', '-r', 'genome_dir/ref.fa', 
                      '-x', 'genome_dir/ref.index', '-1', read1_fq, 
@@ -241,16 +256,21 @@ task chromap {
                 out_file = 'aln.bed'
                 call_args.extend(["--BED", '-o', out_file]) 
 
-        if '~{max_edit_dist}' != '':
-            call_args.extend(['-e', '~{max_edit_dist}'])
-        if '~{num_minimizer}' != '':
-            call_args.extend(['-s', '~{num_minimizer}'])
-        if '~{ignore_minimizer_times}' != '':
-            call_args.extend(['-f', '~{ignore_minimizer_times}'])
-        if '~{max_insert}' != '':
-            call_args.extend(['-l', '~{max_insert}'])
-        if '~{mapq}' != '':
-            call_args.extend(['-q', '~{mapq}'])
+        if '~{output_mappings_not_in_whitelist}':
+            call_args.append('--output-mappings-not-in-whitelist')
+
+        if '~{split_alignment}':
+            call_args.append('--split-alignment')        
+        if '~{max_edit_dist_e}' != '':
+            call_args.extend(['-e', '~{max_edit_dist_e}'])
+        if '~{min_num_minimizer_s}' != '':
+            call_args.extend(['-s', '~{min_num_minimizer_s}'])
+        if '~{ignore_minimizer_times_f}' != '':
+            call_args.extend(['-f', '~{ignore_minimizer_times_f}'])
+        if '~{max_insert_size_l}' != '':
+            call_args.extend(['-l', '~{max_insert_size_l}'])
+        if '~{min_mapq_q}' != '':
+            call_args.extend(['-q', '~{min_mapq_q}'])
         if '~{min_read_length}' != '':
             call_args.extend(['--min-read-length', '~{min_read_length}'])
         if '~{trim_adaptors}':
@@ -261,6 +281,8 @@ task chromap {
             call_args.append('--remove-pcr-duplicates-at-bulk-level')
         if '~{remove_pcr_duplicates_at_cell_level}':
             call_args.append('--remove-pcr-duplicates-at-cell-level')
+        if '~{read_format}' != '':
+            call_args.append('--read-format', '~{read_format}')
         if '~{tn5_shift}':
             call_args.append('--Tn5-shift')
         if '~{low_mem}':
@@ -269,8 +291,8 @@ task chromap {
             call_args.extend(['--bc-error-threshold', '~{bc_error_threshold}'])
         if '~{bc_probability_threshold}' != '':
             call_args.extend(['--bc-probability-threshold', '~{bc_probability_threshold}'])
-        if '~{threads}' != '':
-            call_args.extend(['--threads', '~{threads}'])
+        if '~{num_threads_t}' != '':
+            call_args.extend(['--threads', '~{num_threads_t}'])
         if '~{chr_order}' != '':
             call_args.extend(['--chr-order', '~{chr_order}'])
         if '~{pairs_natural_chr_order}' != '':
