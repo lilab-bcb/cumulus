@@ -153,8 +153,8 @@ workflow chromap_mapping {
 task chromap {
     input {
             String chromap_version
-            String? read1
-            String? read2
+            String read1
+            String read2
             String? barcode
             String sample_id
             String output_directory
