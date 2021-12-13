@@ -305,6 +305,8 @@ task chromap {
         check_call(call_args)
 
         call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', out_file, '~{output_directory}/~{sample_id}/']
+        call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', translated_out_file , '~{output_directory}/~{sample_id}/']
+        
         print(' '.join(call_args))
         check_call(call_args)
 
