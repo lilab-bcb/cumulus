@@ -234,6 +234,10 @@ task chromap {
                      '-x', 'genome_dir/ref.index', '-1', read1_fq, 
                      '-2', read2_fq]
 
+        if '~{preset}' not in ['atac','hic','chip']:
+            print('Choose from following preset options only: atac, chip or hic.')
+            sys.exit(1)
+
         if '~{preset}' == 'atac':
             if index_fq:
                 call_args.extend(['-b', index_fq])
@@ -242,17 +246,23 @@ task chromap {
             if '~{barcode_whitelist}' != '':
                 call_args.extend(['--barcode-whitelist', '~{barcode_whitelist}'])
             out_file_suffix = '.bed'
-        elif '~{preset}' == 'chip':
+        if '~{preset}' == 'chip':
             out_file_suffix = '.bed'
-        elif '~{preset}' == 'hic':
+        if '~{preset}' == 'hic':
             call_args.append('--split-alignment')   
             out_file_suffix = '.pairs'
+
+        if '~{output_format}' in ['bed','TagAlign','sam'] and '~{output_format}' != '':
+            if '~{output_format}' == 'TagAlign':
+                call_args.append('--TagAlign')
+            if '~{output_format}' == 'bed':
+                call_args.append('--BED')
+            if '~{output_format}' == 'sam':
+                call_args.append('--SAM')                
+            out_file_suffix = '.' + '~{output_format}' 
         else:
-            if '~{output_format}' in ['bed','TagAlign','sam'] and '~{output_format}' != '':
-                out_file_suffix = '.' + '~{output_format}' 
-            else:
-                print('Choose output formats from bed, TagAlign or sam. User chosen format ' +  '~{output_format}' + ' not available.' , file = sys.stderr)
-                sys.exit(1)
+            print('Choose output formats from bed, TagAlign or sam. User chosen format ' +  '~{output_format}' + ' not available.' , file = sys.stderr)
+            sys.exit(1)
 
         out_file = '~{sample_id}' + out_file_suffix
 
