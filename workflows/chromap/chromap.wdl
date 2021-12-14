@@ -32,6 +32,8 @@ workflow chromap_mapping {
         # Preset option; available options: chip, hic, atac 
         String preset = "atac"
 
+        # Split alignment
+        Boolean? split_alignment
         # Max edit distance
         Int? max_edit_dist_e
         # Min number of minimizers
@@ -70,8 +72,7 @@ workflow chromap_mapping {
 
         # Customized chromsome order
         File? chr_order
-
-        
+       
         #Natural chromosome order for pairs flipping
         File? pairs_natural_chr_order
 
@@ -117,6 +118,7 @@ workflow chromap_mapping {
             preset = preset,
             barcode_whitelist = barcode_whitelist,
             barcode_translate = barcode_translate,
+            split_alignment = split_alignment,
             max_edit_dist_e = max_edit_dist_e,
             min_num_minimizer_s = min_num_minimizer_s,
             ignore_minimizer_times_f = ignore_minimizer_times_f,
@@ -166,6 +168,7 @@ task chromap {
             Boolean? output_mappings_not_in_whitelist
             String? output_format
             String? read_format
+            Boolean? split_alignment
             Int? max_edit_dist_e
             Int? min_num_minimizer_s
             String? ignore_minimizer_times_f
@@ -269,6 +272,9 @@ task chromap {
         if '~{output_mappings_not_in_whitelist}':
             call_args.append('--output-mappings-not-in-whitelist')
      
+        if '~{split_alignment}':
+            call_args.extend(['--split-alignment'])
+
         if '~{max_edit_dist_e}' != '':
             call_args.extend(['-e', '~{max_edit_dist_e}'])
         if '~{min_num_minimizer_s}' != '':
