@@ -251,8 +251,7 @@ task chromap {
             out_file_suffix = '.bed'
         if '~{preset}' == 'chip':
             out_file_suffix = '.bed'
-        if '~{preset}' == 'hic':
-            call_args.append('--split-alignment')   
+        if '~{preset}' == 'hic': 
             out_file_suffix = '.pairs'
 
         if '~{output_format}' in ['bed','TagAlign','sam'] and '~{output_format}' != '':
