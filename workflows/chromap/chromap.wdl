@@ -26,12 +26,12 @@ workflow chromap_mapping {
         File? barcode_whitelist
         # Read format
         String? read_format
+        # Replace barcode
+        File? barcode_translate
 
         # Preset option; available options: chip, hic, atac 
-        String? preset
+        String preset = "atac"
 
-        # Allow split alignments
-        Boolean? split_alignment
         # Max edit distance
         Int? max_edit_dist_e
         # Min number of minimizers
@@ -66,7 +66,7 @@ workflow chromap_mapping {
         # Output mappings not in whitelist
         Boolean? output_mappings_not_in_whitelist
         # Output format; choices bed, tagalign, sam, pairs
-        String output_format = "bed"
+        String? output_format
 
         # Customized chromsome order
         File? chr_order
@@ -116,7 +116,7 @@ workflow chromap_mapping {
             read_format = read_format,
             preset = preset,
             barcode_whitelist = barcode_whitelist,
-            split_alignment = split_alignment,
+            barcode_translate = barcode_translate,
             max_edit_dist_e = max_edit_dist_e,
             min_num_minimizer_s = min_num_minimizer_s,
             ignore_minimizer_times_f = ignore_minimizer_times_f,
@@ -162,10 +162,10 @@ task chromap {
             File genome_file
             String? preset
             File? barcode_whitelist
+            File? barcode_translate
             Boolean? output_mappings_not_in_whitelist
             String? output_format
             String? read_format
-            Boolean? split_alignment
             Int? max_edit_dist_e
             Int? min_num_minimizer_s
             String? ignore_minimizer_times_f
@@ -235,32 +235,30 @@ task chromap {
                      '-2', read2_fq]
 
         if '~{preset}' == 'atac':
-            call_args.extend(['-b', index_fq])
+            if index_fq:
+                call_args.extend(['-b', index_fq])
+            if '~{barcode_translate}' != '':
+                call_args.extend(['--barcode-translate', '~{barcode_translate}'])
             if '~{barcode_whitelist}' != '':
                 call_args.extend(['--barcode-whitelist', '~{barcode_whitelist}'])
-
-        if '~{output_format}' not in ['BED','BEDPE','TagAlign','SAM']:
-            print('Choose output formats from BED, BEDPE or TagAlign. User chosen format ' +  '~{output_format}' + ' not available.' , file = sys.stderr)
-            sys.exit(1)
+            out_file_suffix = '.bed'
+        elif '~{preset}' == 'chip':
+            out_file_suffix = '.bed'
+        elif '~{preset}' == 'hic':
+            call_args.append('--split-alignment')   
+            out_file_suffix = '.pairs'
         else:
-            if '~{output_format}' == 'TagAlign':
-                out_file = 'aln.tagAlign'
-                call_args.extend(['--TagAlign', '-o', out_file])
-            elif '~{output_format}' == 'BEDPE':
-                out_file = 'aln.bedpe'
-                call_args.extend(["--BEDPE", '-o', out_file])
-            elif '~{output_format}' == 'SAM':
-                out_file = 'aln.sam'
-                call_args.extend(["--SAM", '-o', out_file])
+            if '~{output_format}' in ['bed','TagAlign','sam'] and '~{output_format}' != '':
+                out_file_suffix = '.' + '~{output_format}' 
             else:
-                out_file = 'aln.bed'
-                call_args.extend(["--BED", '-o', out_file]) 
+                print('Choose output formats from bed, TagAlign or sam. User chosen format ' +  '~{output_format}' + ' not available.' , file = sys.stderr)
+                sys.exit(1)
+
+        out_file = '~{sample_id}' + out_file_suffix
 
         if '~{output_mappings_not_in_whitelist}':
             call_args.append('--output-mappings-not-in-whitelist')
-
-        if '~{split_alignment}':
-            call_args.append('--split-alignment')        
+     
         if '~{max_edit_dist_e}' != '':
             call_args.extend(['-e', '~{max_edit_dist_e}'])
         if '~{min_num_minimizer_s}' != '':
