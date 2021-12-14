@@ -17,20 +17,22 @@ workflow chromap_mapping {
         File acronym_file
         
         # Read1
-        String? read1
+        String read1
         # Read2
-        String? read2
+        String read2
         # Barcode 
         String? barcode
         # Barcode whitelist
         File? barcode_whitelist
         # Read format
         String? read_format
+        # Replace barcode
+        File? barcode_translate
 
         # Preset option; available options: chip, hic, atac 
-        String? preset
+        String preset = "atac"
 
-        # Allow split alignments
+        # Split alignment
         Boolean? split_alignment
         # Max edit distance
         Int? max_edit_dist_e
@@ -66,12 +68,11 @@ workflow chromap_mapping {
         # Output mappings not in whitelist
         Boolean? output_mappings_not_in_whitelist
         # Output format; choices bed, tagalign, sam, pairs
-        String output_format = "BED"
+        String? output_format
 
         # Customized chromsome order
         File? chr_order
-
-        
+       
         #Natural chromosome order for pairs flipping
         File? pairs_natural_chr_order
 
@@ -84,7 +85,7 @@ workflow chromap_mapping {
         Int disk_space = 500
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
-        # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        # Google cloud zones, default to "us-central1-b"
         String zones = "us-central1-b"
         # Backend
         String backend = "gcp"
@@ -116,6 +117,7 @@ workflow chromap_mapping {
             read_format = read_format,
             preset = preset,
             barcode_whitelist = barcode_whitelist,
+            barcode_translate = barcode_translate,
             split_alignment = split_alignment,
             max_edit_dist_e = max_edit_dist_e,
             min_num_minimizer_s = min_num_minimizer_s,
@@ -153,8 +155,8 @@ workflow chromap_mapping {
 task chromap {
     input {
             String chromap_version
-            String? read1
-            String? read2
+            String read1
+            String read2
             String? barcode
             String sample_id
             String output_directory
@@ -162,6 +164,7 @@ task chromap {
             File genome_file
             String? preset
             File? barcode_whitelist
+            File? barcode_translate
             Boolean? output_mappings_not_in_whitelist
             String? output_format
             String? read_format
@@ -234,36 +237,43 @@ task chromap {
                      '-x', 'genome_dir/ref.index', '-1', read1_fq, 
                      '-2', read2_fq]
 
+        if '~{preset}' not in ['atac','hic','chip']:
+            print('Choose from following preset options only: atac, chip or hic.')
+            sys.exit(1)
+
         if '~{preset}' == 'atac':
-            call_args.extend(['-b', index_fq])
+            if index_fq:
+                call_args.extend(['-b', index_fq])
+            if '~{barcode_translate}' != '':
+                call_args.extend(['--barcode-translate', '~{barcode_translate}'])
             if '~{barcode_whitelist}' != '':
                 call_args.extend(['--barcode-whitelist', '~{barcode_whitelist}'])
+            out_file_suffix = '.bed'
+        if '~{preset}' == 'chip':
+            out_file_suffix = '.bed'
+        if '~{preset}' == 'hic': 
+            out_file_suffix = '.pairs'
 
-        if '~{output_format}' not in ['BED','BEDPE','TagAlign','SAM']:
-            print('Choose output formats from BED, BEDPE or TagAlign. User chosen format ' +  '~{output_format}' + ' not available.' , file = sys.stderr)
-            sys.exit(1)
-        else:
+        if '~{output_format}' in ['bed','TagAlign','sam'] and '~{output_format}' != '':
             if '~{output_format}' == 'TagAlign':
-                out_file = 'aln.tagAlign'
-                call_args.extend(['--TagAlign', '-o', out_file])
-            elif '~{output_format}' == 'BEDPE':
-                out_file = 'aln.bedpe'
-                call_args.extend(["--BEDPE", '-o', out_file])
-            elif '~{output_format}' == 'SAM':
-                out_file = 'aln.sam'
-                call_args.extend(["--SAM", '-o', out_file])
-            else:
-                out_file = 'aln.bed'
-                call_args.extend(["--BED", '-o', out_file]) 
+                call_args.append('--TagAlign')
+            if '~{output_format}' == 'bed':
+                call_args.append('--BED')
+            if '~{output_format}' == 'sam':
+                call_args.append('--SAM')                
+            out_file_suffix = '.' + '~{output_format}' 
+        else:
+            print('Choose output formats from bed, TagAlign or sam. User chosen format ' +  '~{output_format}' + ' not available.' , file = sys.stderr)
+            sys.exit(1)
 
-        translated_out_file = 'aln_translated_barcodes.bed'
-        call_args.extend(['--barcode-translate', translated_out_file]
-        
+        out_file = '~{sample_id}' + out_file_suffix
+
         if '~{output_mappings_not_in_whitelist}':
             call_args.append('--output-mappings-not-in-whitelist')
-
+     
         if '~{split_alignment}':
-            call_args.append('--split-alignment')        
+            call_args.extend(['--split-alignment'])
+
         if '~{max_edit_dist_e}' != '':
             call_args.extend(['-e', '~{max_edit_dist_e}'])
         if '~{min_num_minimizer_s}' != '':
@@ -305,8 +315,6 @@ task chromap {
         check_call(call_args)
 
         call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', out_file, '~{output_directory}/~{sample_id}/']
-        call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', translated_out_file , '~{output_directory}/~{sample_id}/']
-        
         print(' '.join(call_args))
         check_call(call_args)
 
