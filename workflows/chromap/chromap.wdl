@@ -261,10 +261,7 @@ task chromap {
                 call_args.append('--BED')
             if '~{output_format}' == 'sam':
                 call_args.append('--SAM')                
-            out_file_suffix = '.' + '~{output_format}' 
-        else:
-            print('Choose output formats from bed, TagAlign or sam. User chosen format ' +  '~{output_format}' + ' not available.' , file = sys.stderr)
-            sys.exit(1)
+            out_file_suffix = '.' + '~{output_format}'
 
         out_file = '~{sample_id}' + out_file_suffix
 
