@@ -77,7 +77,7 @@ workflow chromap_mapping {
         File? pairs_natural_chr_order
 
         # Number of cpus per chromap job
-        Int num_cpu = 1
+        Int num_cpu = 32
         # Memory string, e.g. 57.6G
         String memory = "50G"
 
