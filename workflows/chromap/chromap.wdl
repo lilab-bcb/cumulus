@@ -79,7 +79,7 @@ workflow chromap_mapping {
         # Number of cpus per chromap job
         Int num_cpu = 32
         # Memory string, e.g. 57.6G
-        String memory = "50G"
+        String memory = "80G"
 
         # Disk space in GB
         Int disk_space = 500
@@ -223,7 +223,7 @@ task chromap {
             except CalledProcessError:
                 if not os.path.exists(target):
                     os.mkdir(target)
-                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
+                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz', target]
                 print(' '.join(call_args))
                 check_call(call_args)
             fl = [os.path.abspath(os.path.join(target,i)) for i in os.listdir(target)]     
@@ -242,7 +242,7 @@ task chromap {
             sys.exit(1)
 
         if '~{preset}' == 'atac':
-            if index_fq:
+            if index_fq != '':
                 call_args.extend(['-b', index_fq])
             if '~{barcode_translate}' != '':
                 call_args.extend(['--barcode-translate', '~{barcode_translate}'])
