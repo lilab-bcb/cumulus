@@ -265,7 +265,7 @@ task chromap {
 
         out_file = '~{sample_id}' + out_file_suffix
         call_args.extend(['-o',out_file])
-        
+
         if '~{output_mappings_not_in_whitelist}':
             call_args.append('--output-mappings-not-in-whitelist')
      
@@ -335,4 +335,3 @@ task chromap {
         maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
-
