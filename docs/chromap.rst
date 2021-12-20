@@ -8,7 +8,7 @@ This ``chromap`` workflow aligns and preprocesses FASTQ data using Chromap.
 Workflow inputs
 ^^^^^^^^^^^^^^^^^^
 
-Below are inputs for *chromap* workflow. Notice that required inputs are in bold.
+Below are inputs for *chromap* workflow. Notice that required inputs are in bold. Options described with [chromap option -...] refer directly to Chromap options and are mentioned in `Chromap's manual`_. 
 
 .. list-table::
 	:widths: 5 20 10 5
@@ -28,7 +28,7 @@ Below are inputs for *chromap* workflow. Notice that required inputs are in bold
 		- String. Pre-built `genome reference`_.
 
 		- Google bucket URL of a custom reference, must be a ``.tar.gz`` file.
-	  - | "GRCh38",
+	  - | "GRCh38_chromap_v0.1.3",
 	    | or "gs://user-bucket/chromap.tar.gz"
 	  -
 	* - **input_fastqs_directories**
@@ -45,24 +45,27 @@ Below are inputs for *chromap* workflow. Notice that required inputs are in bold
 	  - "s3://xxxx/index.tsv" or "gs://xxxx/index.tsv"
 	  -
 	* - preset
-	  - | This option applies multiple options at the same time.
-	    | It should be applied before other options because options applied later will overwrite the values set by --preset. Available STR are:
+          - | [chromap option -\\-preset]
+	    | This option applies multiple options at the same time.
+	    | It should be applied before other options because options applied later will overwrite the values set by -\\-preset. Available STR are:
             | chip
-            | Mapping ChIP-seq reads (-l 2000 --remove-pcr-duplicates --low-mem --BED).
+            | Mapping ChIP-seq reads (-l 2000 -\\-remove-pcr-duplicates -\\-low-mem -\\-BED).
             | atac
-            | Mapping ATAC-seq/scATAC-seq reads (-l 2000 --remove-pcr-duplicates --low-mem --trim-adapters --Tn5-shift --remove-pcr-duplicates-at-cell-level --BED).
+            | Mapping ATAC-seq/scATAC-seq reads (-l 2000 -\\-remove-pcr-duplicates -\\-low-mem -\\-trim-adapters -\\-Tn5-shift -\\-remove-pcr-duplicates-at-cell-level -\\-BED).
             | hic
-            | Mapping Hi-C reads (-e 4 -q 1 --low-mem --split-alignment --pairs).
+            | Mapping Hi-C reads (-e 4 -q 1 -\\-low-mem -\\-split-alignment -\\-pairs).
 	  - | "atac"
             | or "hic"
             | or "chip"
           - "atac"
 	* - barcode_whitelist
-	  - Cell barcode whitelist file. This is supposed to be a txt file where each line is a whitelisted barcode.
+	  - | [chromap option -\\-barcode-whitelist] 
+            | Cell barcode whitelist file. This is supposed to be a txt file where each line is a whitelisted barcode.
 	  - 
 	  -
 	* - barcode_translate
-	  - Barcode translation file. 
+	  - | [chromap option -\\-barcode-translate] 
+            | Barcode translation file. 
 	  - 
 	  -
 	* - read1
@@ -78,67 +81,73 @@ Below are inputs for *chromap* workflow. Notice that required inputs are in bold
 	  - "I1"
 	  - "I1"
         * - read_format
-          - Format for read files and barcode files
+          - [chromap option -\\-read-format] Format for read files and barcode files
           - "r1:0:-1,bc:0:-1"
           - "r1:0:-1,bc:0:-1"
         * - chromap_version
 	  - Chromap version to use. Currently only support ``0.1.3``.
 	  - "0.1.3"
-          - 
+          - "0.1.3"
 	* - split_alignment
-	  - Allow split alignments. This option should be set only when mapping Hi-C reads.
+	  - [chromap option -\\-split-alignment] Allow split alignments. This option should be set only when mapping Hi-C reads.
 	  - False 
           - 
 	* - max_edit_dist_e
-	  - Max edit distance allowed to map a read.
+	  - [chromap option -e] Max edit distance allowed to map a read.
 	  - 8
           - 8
 	* - min_num_minimizer_s
-	  - Min number of minimizers required to map a read.
+	  - [chromap option -s] Min number of minimizers required to map a read.
 	  - 2
           - 2
 	* - ignore_minimizer_times_f
-	  - Skip minimizers occuring > INT1 [500] times. INT2 [1000] is the threshold for a second round of seeding.
+	  - [chromap option -f] Skip minimizers occuring > INT1 [500] times. INT2 [1000] is the threshold for a second round of seeding.
 	  - "500,1000"
           - "500,1000"
 	* - max_insert_size_l
-	  - Max insert size, only for paired-end read mapping.
+	  - [chromap option -l] Max insert size, only for paired-end read mapping.
 	  - 1000
           - 1000
 	* - min_mapq_q
-	  - Min MAPQ in range [0, 60] for mappings to be output.
+	  - [chromap option -q] Min MAPQ in range [0, 60] for mappings to be output.
 	  - 30
           - 30
 	* - min_read_length
-	  - Skip mapping the reads of length less than Min read length.
+	  - [chromap option -\\-min-read-length] Skip mapping the reads of length less than Min read length.
 	  - 30
           - 30
 	* - trim_adaptors
-	  - | Try to trim adapters on 3’. This only works for paired-end reads. 
+	  - | [chromap option -\\-trim-adapters]
+            | Try to trim adapters on 3’. This only works for paired-end reads. 
             | When the fragment length indicated by the read pair is less than the length of the reads, 
             | the two mates are overlapped with each other. Then the regions outside the overlap are regarded as adapters and trimmed.
 	  - True
           - 
 	* - remove_pcr_duplicates
-	  - Remove PCR duplicates.
+	  - | [chromap option -\\-remove-pcr-duplicates] 
+            | Remove PCR duplicates.
 	  - True
           - 
 	* - remove_pcr_duplicates_at_bulk_level
-	  - Remove PCR duplicates at bulk level for single cell data.
+	  - | [chromap option -\\-remove-pcr-duplicates-at-bulk-level] 
+            | Remove PCR duplicates at bulk level for single cell data.
 	  - False
           - 
 	* - remove_pcr_duplicates_at_cell_level
-	  - Chromap version to use. Currently only support ``0.1.3``.
-	  - "0.1.3"
-          - True
+	  - | [chromap option -\\-remove-pcr-duplicates-at-cell-level] 
+            | Remove PCR duplicates at cell level for single cell data.
+	  - False
+          - 
 	* - tn5_shift
-	  - | Perform Tn5 shift. When this option is turned on, 
+          - | [chromap option -\\-Tn5-shift]
+	    | Perform Tn5 shift. When this option is turned on, 
             | the forward mapping start positions are increased by 4bp and the reverse 
             | mapping end positions are decreased by 5bp. Note that this works only when --SAM is NOT set.
 	  - True
           -
 	* - low_mem
-	  - | Use low memory mode. When this option is set, 
+          - | [chromap option -\\-low-mem]
+	    | Use low memory mode. When this option is set, 
             | multiple temporary intermediate mapping files might be 
             | generated on disk and they are merged at the end of processing to reduce memory usage. 
             | When this is NOT set, all the mapping results are kept in the memory before 
@@ -146,34 +155,38 @@ Below are inputs for *chromap* workflow. Notice that required inputs are in bold
 	  - True
           -
 	* - bc_error_threshold
-	  - Max Hamming distance allowed to correct a barcode. Max allowed 2.
+          - | [chromap option -\\-bc-error-threshold]
+	    | Max Hamming distance allowed to correct a barcode. Max allowed 2.
 	  - 1
           - 1
 	* - bc_probability_threshold
-	  - Min probability to correct a barcode.
+          - | [chromap option -\\-bc-probability-threshold]
+	    | Min probability to correct a barcode.
 	  - 0.9
           - 0.9
 	* - num_threads_t
-	  - Num of threads for mapping.
+          - | [chromap option -t]
+	    | Num of threads for mapping.
 	  - 1
           - 1
 	* - output_mappings_not_in_whitelist
-	  - Output mappings with barcode not in the whitelist.
+          - | [chromap option -\\-output-mappings-not-in-whitelist]
+	    | Output mappings with barcode not in the whitelist.
 	  - 
           -
 	* - output_format
-	  - Output format.
-	  - | bed
-            | tagalign 
-            | sam 
-            | pairs
+	  - | Output format. The following formats are available:
+            | bed, tagalign, sam, pairs
+	  - "bed"
           - 
 	* - chr_order
-	  - File with customized chromsome order.
+          - | [chromap option -\\-chr-order]
+	    | File with customized chromsome order.
 	  - 
           -
 	* - pairs_natural_chr_order
-	  - File with natural chromosome order for pairs flipping.
+	  - | [chromap option -\\-pairs-natural-chr-order]
+            | File with natural chromosome order for pairs flipping.
 	  - 
           -
 	* - docker_registry
@@ -187,7 +200,7 @@ Below are inputs for *chromap* workflow. Notice that required inputs are in bold
 	* - zones
 	  - Google cloud zones to consider for execution.
 	  - "us-east1-d us-west1-a us-west1-b"
-	  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+	  - "us-central1-b"
 	* - num_cpu
 	  - Number of CPUs to request for count per sample.
 	  - 32
@@ -254,4 +267,5 @@ We've built the following chromap references for users' convenience:
 		  - Human GRCh38, comparable to cellranger reference mm10-2020-A_arc_v2.0.0
 
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
+.. _Chromap's manual: https://zhanghaowen.com/chromap/chromap.html
 .. _genome reference: ./chromap.html#prebuilt-genome-references
