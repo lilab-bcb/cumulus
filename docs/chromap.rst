@@ -266,6 +266,5 @@ We've built the following chromap references for users' convenience:
 		* - **mm10_chromap_v0.1.3**
 		  - Human GRCh38, comparable to cellranger reference mm10-2020-A_arc_v2.0.0
 
-.. _gsutil: https://cloud.google.com/storage/docs/gsutil
 .. _Chromap's manual: https://zhanghaowen.com/chromap/chromap.html
 .. _genome reference: ./chromap.html#prebuilt-genome-references
