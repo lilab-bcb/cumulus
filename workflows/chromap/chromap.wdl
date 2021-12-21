@@ -231,7 +231,7 @@ task chromap {
         
         read1_fq = ",".join(sorted(list(filter(lambda k: '_~{read1}_' in k, fastqs))))
         read2_fq = ",".join(sorted(list(filter(lambda k: '_~{read2}_' in k, fastqs))))
-        index_fq = ",".join(sorted(list(filter(lambda k: '_~{barcode}_' in k, fastqs)))
+        index_fq = ",".join(sorted(list(filter(lambda k: '_~{barcode}_' in k, fastqs))))
 
         call_args = ['chromap', '--preset', '~{preset}', '-r', 'genome_dir/ref.fa', 
                      '-x', 'genome_dir/ref.index', '-1', read1_fq, 
