@@ -198,7 +198,7 @@ Below are inputs for *chromap* workflow. Notice that required inputs are in bold
 	  - "us-central1-b"
 	* - num_cpu
 	  - | [chromap option -t]
-            | Number of CPUs to request for count per sample.
+            | Number of CPUs to request for mapping per sample.
 	  - 32
 	  - 32
 	* - memory
