@@ -198,16 +198,16 @@ Below are inputs for *chromap* workflow. Notice that required inputs are in bold
 	  - "us-central1-b"
 	* - num_cpu
 	  - Number of CPUs to request for mapping, setting chromap option -t.
-	  - 32
-	  - 32
+	  - 8
+	  - 8
 	* - memory
 	  - Memory size string for count per sample.
-	  - "80G"
-	  -
+	  - "64G"
+	  - "64G"
 	* - disk_space
 	  - Disk space in GB needed for count per sample.
-	  - 500
-	  - 500
+	  - 200
+	  - 200
 	* - backend
 	  - Cloud infrastructure backend to use. Available options:
 
