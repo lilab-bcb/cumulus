@@ -75,12 +75,12 @@ workflow chromap_mapping {
         File? pairs_natural_chr_order
 
         # Number of cpus per chromap job
-        Int num_cpu = 32
-        # Memory string, e.g. 57.6G
-        String memory = "80G"
+        Int num_cpu = 8
+        # Memory string
+        String memory = "64G"
 
         # Disk space in GB
-        Int disk_space = 500
+        Int disk_space = 200
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
         # Google cloud zones, default to "us-central1-b"
