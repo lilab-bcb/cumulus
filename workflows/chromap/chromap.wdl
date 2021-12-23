@@ -62,8 +62,6 @@ workflow chromap_mapping {
         Int? bc_error_threshold
         # Min probability to correct a barcode 
         Float? bc_probability_threshold
-        # Num of threads for mapping
-        Int? num_threads_t
 
         # Output mappings not in whitelist
         Boolean? output_mappings_not_in_whitelist
@@ -133,7 +131,6 @@ workflow chromap_mapping {
             low_mem = low_mem,
             bc_error_threshold = bc_error_threshold,
             bc_probability_threshold = bc_probability_threshold,
-            num_threads_t = num_threads_t,
             chr_order = chr_order,
             pairs_natural_chr_order = pairs_natural_chr_order,
             disk_space = disk_space,
@@ -183,7 +180,6 @@ task chromap {
             Boolean? low_mem
             Int? bc_error_threshold
             Float? bc_probability_threshold
-            Int? num_threads_t
             File? chr_order
             File? pairs_natural_chr_order
             String docker_registry
@@ -254,13 +250,15 @@ task chromap {
         if '~{preset}' == 'hic': 
             out_file_suffix = '.pairs'
 
-        if '~{output_format}' in ['bed','TagAlign','sam'] and '~{output_format}' != '':
-            if '~{output_format}' == 'TagAlign':
+        if '~{output_format}' in ['bed','tagalign','sam','pairs'] and '~{output_format}' != '':
+            if '~{output_format}' == 'tagalign':
                 call_args.append('--TagAlign')
             if '~{output_format}' == 'bed':
                 call_args.append('--BED')
             if '~{output_format}' == 'sam':
-                call_args.append('--SAM')                
+                call_args.append('--SAM')
+            if '~{output_format}' == 'pairs':
+                call_args.append('--pairs')                  
             out_file_suffix = '.' + '~{output_format}'
 
         out_file = '~{sample_id}' + out_file_suffix
@@ -302,8 +300,8 @@ task chromap {
             call_args.extend(['--bc-error-threshold', '~{bc_error_threshold}'])
         if '~{bc_probability_threshold}' != '':
             call_args.extend(['--bc-probability-threshold', '~{bc_probability_threshold}'])
-        if '~{num_threads_t}' != '':
-            call_args.extend(['--threads', '~{num_threads_t}'])
+        if '~{num_cpu}' != '':
+            call_args.extend(['--threads', '~{num_cpu}'])
         if '~{chr_order}' != '':
             call_args.extend(['--chr-order', '~{chr_order}'])
         if '~{pairs_natural_chr_order}' != '':
