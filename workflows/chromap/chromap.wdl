@@ -301,7 +301,7 @@ task chromap {
         if '~{bc_probability_threshold}' != '':
             call_args.extend(['--bc-probability-threshold', '~{bc_probability_threshold}'])
         if '~{num_cpu}' != '':
-            call_args.extend(['--threads', '~{num_cpu}'])
+            call_args.extend(['-t', '~{num_cpu}'])
         if '~{chr_order}' != '':
             call_args.extend(['--chr-order', '~{chr_order}'])
         if '~{pairs_natural_chr_order}' != '':
