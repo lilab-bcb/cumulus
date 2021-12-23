@@ -85,9 +85,9 @@ Below are inputs for *chromap* workflow. Notice that required inputs are in bold
           - "r1:0:-1,bc:0:-1"
           - "r1:0:-1,bc:0:-1"
         * - chromap_version
-	  - Chromap version to use. Currently only support ``0.1.3``.
-	  - "0.1.3"
-          - "0.1.3"
+	  - Chromap version to use. Currently only support ``0.1.4``.
+	  - "0.1.4"
+          - "0.1.4"
 	* - split_alignment
 	  - [chromap option -\\-split-alignment] Allow split alignments. This option should be set only when mapping Hi-C reads.
 	  - False 
@@ -164,11 +164,6 @@ Below are inputs for *chromap* workflow. Notice that required inputs are in bold
 	    | Min probability to correct a barcode.
 	  - 0.9
           - 0.9
-	* - num_threads_t
-          - | [chromap option -t]
-	    | Num of threads for mapping.
-	  - 1
-          - 1
 	* - output_mappings_not_in_whitelist
           - | [chromap option -\\-output-mappings-not-in-whitelist]
 	    | Output mappings with barcode not in the whitelist.
@@ -202,7 +197,8 @@ Below are inputs for *chromap* workflow. Notice that required inputs are in bold
 	  - "us-east1-d us-west1-a us-west1-b"
 	  - "us-central1-b"
 	* - num_cpu
-	  - Number of CPUs to request for count per sample.
+	  - | [chromap option -t]
+            | Number of CPUs to request for count per sample.
 	  - 32
 	  - 32
 	* - memory
