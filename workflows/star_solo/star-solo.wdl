@@ -61,7 +61,7 @@ workflow starsolo {
         String output_directory
         # Number of CPUs to request per sample
         Int num_cpu = 32
-        # STAR version to use. Currently support: 2.7.9a, 2.7.6a.
+        # STAR version to use. Currently support: 2.7.9a
         String star_version = "2.7.9a"
         # Docker registry, default to quay.io/cumulus
         String docker_registry = "quay.io/cumulus"

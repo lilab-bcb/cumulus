@@ -158,16 +158,19 @@ task run_starsolo {
             fetch_and_rename_fastq(r1_list[i], 'R1_'+str(i)+file_ext)
             fetch_and_rename_fastq(r2_list[i], 'R2_'+str(i)+file_ext)
 
-        call_args = ['STAR', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}', '--outSAMtype', 'BAM', 'SortedByCoordinate', '--clipAdapterType', 'CellRanger4', '--outFilterScoreMin', '30']
+        call_args = ['STAR', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}']
 
         if '~{preset}' in ['tenX_v2', 'tenX_v3']:
-            call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBmatchWLtype', '1MM_multi_Nbase_pseudocounts', '--soloUMIfiltering', 'MultiGeneUMI_CR', '--soloUMIdedup', '1MM_CR'])
+            call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBmatchWLtype', '1MM_multi_Nbase_pseudocounts', '--soloUMIfiltering', 'MultiGeneUMI_CR', \
+                              '--soloUMIdedup', '1MM_CR', '--clipAdapterType', 'CellRanger4', '--outFilterScoreMin', '30', \
+                              '--outSAMtype', 'BAM SortedByCoordinate', '--outSAMattributes', 'CR UR CY UY CB UB'])
             if '~{preset}' == 'tenX_v3':
                 call_args.extend(['--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '12'])
             elif '~{preset}' == 'tenX_v2':
                 call_args.extend(['--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '10'])
         elif '~{preset}' in ['SeqWell', 'DropSeq']:
-            call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBwhitelist', 'None', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8'])
+            call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBwhitelist', 'None', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8', \
+                              '--outSAMtype', 'BAM SortedByCoordinate', '--outSAMattributes', 'CR UR CY UY CB UB'])
 
         if file_ext == '.fastq.gz':
             call_args.extend(['--readFilesCommand', 'zcat'])
