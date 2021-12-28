@@ -171,6 +171,8 @@ task run_starsolo {
         elif '~{preset}' in ['SeqWell', 'DropSeq']:
             call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBwhitelist', 'None', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8', \
                               '--outSAMtype', 'BAM SortedByCoordinate', '--outSAMattributes', 'CR UR CY UY CB UB'])
+        else:
+            call_args.extend(['--outSAMtype', 'BAM Unsorted'])
 
         if file_ext == '.fastq.gz':
             call_args.extend(['--readFilesCommand', 'zcat'])
