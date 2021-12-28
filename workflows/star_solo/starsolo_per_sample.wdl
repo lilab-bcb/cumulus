@@ -168,8 +168,6 @@ task run_starsolo {
                 call_args.extend(['--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '10'])
         elif '~{preset}' in ['SeqWell', 'DropSeq']:
             call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBwhitelist', 'None', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8'])
-        elif '~{preset}' == 'custom':
-            call_args.extend(['--soloCBstart', '~{soloCBstart}', '--soloCBlen', '~{soloCBlen}', '--soloUMIstart', '~{soloUMIstart}', '--soloUMIlen', '~{soloUMIlen}'])
 
         if file_ext == '.fastq.gz':
             call_args.extend(['--readFilesCommand', 'zcat'])
