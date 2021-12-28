@@ -1,6 +1,6 @@
 version 1.0
 
-task run_starsolo_per_sample {
+workflow starsolo_per_sample {
     input {
         String sample_id
         String r1_fastqs
@@ -28,7 +28,94 @@ task run_starsolo_per_sample {
         String? soloMultiMappers
         String? soloUMIdedup
         String? soloUMIfiltering
-        String? soloOutFileNames
+        String? soloCellFilter
+        String? soloOutFormatFeaturesGeneField3
+        String docker_registry
+        String star_version
+        String zones
+        String memory
+        Int num_cpu
+        Int disk_space
+        Int preemptible
+        Int awsMaxRetries
+        String backend
+    }
+
+    call run_starsolo {
+        input:
+            sample_id = sample_id,
+            r1_fastqs = r1_fastqs,
+            r2_fastqs = r2_fastqs,
+            preset = preset,
+            genome = genome,
+            output_directory = output_directory,
+            soloType = soloType,
+            soloCBwhitelist = soloCBwhitelist,
+            soloCBstart = soloCBstart,
+            soloCBlen = soloCBlen,
+            soloUMIstart = soloUMIstart,
+            soloUMIlen = soloUMIlen,
+            soloBarcodeReadLength = soloBarcodeReadLength,
+            soloBarcodeMate = soloBarcodeMate,
+            soloCBposition = soloCBposition,
+            soloUMIposition = soloUMIposition,
+            soloAdapterSequence =soloAdapterSequence,
+            soloAdapterMismatchesNmax = soloAdapterMismatchesNmax,
+            soloCBmatchWLtype = soloCBmatchWLtype,
+            soloInputSAMattrBarcodeSeq = soloInputSAMattrBarcodeSeq,
+            soloInputSAMattrBarcodeQual = soloInputSAMattrBarcodeQual,
+            soloStrand = soloStrand,
+            soloFeatures = soloFeatures,
+            soloMultiMappers = soloMultiMappers,
+            soloUMIdedup = soloUMIdedup,
+            soloUMIfiltering = soloUMIfiltering,
+            soloCellFilter = soloCellFilter,
+            soloOutFormatFeaturesGeneField3 = soloOutFormatFeaturesGeneField3,
+            docker_registry = docker_registry,
+            version = star_version,
+            zones = zones,
+            memory = memory,
+            num_cpu = num_cpu,
+            disk_space = disk_space,
+            preemptible = preemptible,
+            awsMaxRetries = awsMaxRetries,
+            backend = backend
+    }
+
+    output {
+        File monitoringLog = run_starsolo.monitoringLog
+        String output_folder = run_starsolo.output_folder
+    }
+}
+
+task run_starsolo {
+    input {
+        String sample_id
+        String r1_fastqs
+        String r2_fastqs
+        String? preset
+        File genome
+        String output_directory
+        String? soloType
+        File? soloCBwhitelist
+        Int? soloCBstart
+        Int? soloCBlen
+        Int? soloUMIstart
+        Int? soloUMIlen
+        Int? soloBarcodeReadLength
+        Int? soloBarcodeMate
+        String? soloCBposition
+        String? soloUMIposition
+        String? soloAdapterSequence
+        Int? soloAdapterMismatchesNmax
+        String? soloCBmatchWLtype
+        String? soloInputSAMattrBarcodeSeq
+        String? soloInputSAMattrBarcodeQual
+        String? soloStrand
+        String? soloFeatures
+        String? soloMultiMappers
+        String? soloUMIdedup
+        String? soloUMIfiltering
         String? soloCellFilter
         String? soloOutFormatFeaturesGeneField3
         String docker_registry

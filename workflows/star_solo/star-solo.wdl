@@ -1,6 +1,6 @@
 version 1.0
 
-import "starsolo_per_sample.wdl" as stps
+import "starsolo_per_sample.wdl" as star_ps
 
 workflow starsolo {
     input {
@@ -53,8 +53,6 @@ workflow starsolo {
         String? soloUMIdedup
         # type of UMI filtering (for reads uniquely mapping to genes)
         String? soloUMIfiltering
-        # file names for STARsolo output
-        String? soloOutFileNames
         # cell filtering type and parameters
         String? soloCellFilter
         # field 3 in the Gene features.tsv file. If "-", then no 3rd field is output.
@@ -106,7 +104,7 @@ workflow starsolo {
 
     if (length(generate_count_config.sample_ids) > 0) {
         scatter (sample_id in generate_count_config.sample_ids) {
-            call stps.run_starsolo_per_sample as run_starsolo_per_sample {
+            call star_ps.starsolo_per_sample as starsolo_per_sample {
                 input:
                     sample_id = sample_id,
                     r1_fastqs = generate_count_config.id2r1[sample_id],
@@ -133,12 +131,11 @@ workflow starsolo {
                     soloMultiMappers = soloMultiMappers,
                     soloUMIdedup = soloUMIdedup,
                     soloUMIfiltering = soloUMIfiltering,
-                    soloOutFileNames = soloOutFileNames,
                     soloCellFilter = soloCellFilter,
                     soloOutFormatFeaturesGeneField3 = soloOutFormatFeaturesGeneField3,
                     output_directory = output_directory_stripped,
                     docker_registry = docker_registry,
-                    version = star_version,
+                    star_version = star_version,
                     zones = zones,
                     num_cpu = num_cpu,
                     memory = memory,
@@ -149,7 +146,6 @@ workflow starsolo {
             }
         }
     }
-
 
     output {
         String output_folder = output_directory
