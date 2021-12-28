@@ -8,56 +8,56 @@ workflow starsolo {
         File input_tsv_file
         # Genome reference
         String genome
-        # Chemistry, choosing from tenX_v3 (for 10X V3 chemistry), tenX_v2 (for 10X V2 chemistry), DropSeq, SeqWell and custom
-        String chemistry
+        # Preset options, choosing from tenX_v3 (for 10X V3 chemistry), tenX_v2 (for 10X V2 chemistry), DropSeq, SeqWell and custom
+        String preset
         # Cell barcode start position (1-based coordinate)
-        Int? CBstart
+        Int? soloCBstart
         # Cell barcode length
-        Int? CBlen
+        Int? soloCBlen
         # UMI start position (1-based coordinate)
-        Int? UMIstart
+        Int? soloUMIstart
         # UMI length
-        Int? UMIlen
+        Int? soloUMIlen
         # Cell barcode white list
-        File? CBwhitelist
+        File? soloCBwhitelist
         # Length of the barcode read
-        Int? BarcodeReadLength
+        Int? soloBarcodeReadLength
         # Identifies which read mate contains the barcode (CB+UMI) sequence
-        Int? BarcodeMate
+        Int? soloBarcodeMate
         # position of Cell Barcode(s) on the barcode read. Presently only works with --soloType CB_UMI_Complex, and barcodes are assumed to be on Read2.
-        Int? CBposition
+        Int? soloCBposition
         # position of the UMI on the barcode read, same as CBposition
-        Int? UMIposition
+        Int? soloUMIposition
         # adapter sequence to anchor barcodes.
-        String? adapterSequence
+        String? soloAdapterSequence
         # maximum number of mismatches allowed in adapter sequence.
-        Int? adapterMismatchesNmax
+        Int? soloAdapterMismatchesNmax
         # matching the Cell Barcodes to the WhiteList
-        String? CBmatchWLtype
+        String? soloCBmatchWLtype
         # when inputting reads from a SAM file (--readsFileType SAM SE/PE), these SAM attributes mark the barcode sequence (in proper order).
         # For instance, for 10X CellRanger or STARsolo BAMs, use --soloInputSAMattrBarcodeSeq CR UR .
         # This parameter is required when running STARsolo with input from SAM.
-        String? inputSAMattrBarcodeSeq
+        String? soloInputSAMattrBarcodeSeq
         # when inputting reads from a SAM file (--readsFileType SAM SE/PE), these SAM attributes mark the barcode qualities (in proper order).
         # For instance, for 10X CellRanger or STARsolo BAMs, use --soloInputSAMattrBarcodeQual CY UY .
         # If this parameter is '-' (default), the quality 'H' will be assigned to all bases.
-        String? inputSAMattrBarcodeQual
+        String? soloInputSAMattrBarcodeQual
         # strandedness of the solo libraries
-        String? strand
+        String? soloStrand
         # genomic features for which the UMI counts per Cell Barcode are collected
-        String? features
+        String? soloFeatures
         # counting method for reads mapping to multiple genes
-        String? multiMappers
+        String? soloMultiMappers
         # type of UMI deduplication (collapsing) algorithm
-        String? UMIdedup
+        String? soloUMIdedup
         # type of UMI filtering (for reads uniquely mapping to genes)
-        String? UMIfiltering
+        String? soloUMIfiltering
         # file names for STARsolo output
-        String? outFileNames
+        String? soloOutFileNames
         # cell filtering type and parameters
-        String? cellFilter
+        String? soloCellFilter
         # field 3 in the Gene features.tsv file. If "-", then no 3rd field is output.
-        String? outFormatFeaturesGeneField3
+        String? soloOutFormatFeaturesGeneField3
         # URL of output directory
         String output_directory
         # Number of CPUs to request per sample
@@ -91,7 +91,7 @@ workflow starsolo {
     String genome_url = if sub(genome, "^(gs|s3)://.*", "URL")=="URL" then genome else ref_index2url[genome] + '/starsolo.tar.gz'
 
     Map[String, String] wl_index2url = read_map(whitelist_index_file)
-    String whitelist_url = wl_index2url[chemistry]
+    String whitelist_url = wl_index2url[preset]
 
     if (whitelist_url != 'null') {
         File preset_whitelist = whitelist_url
@@ -116,31 +116,31 @@ workflow starsolo {
                     sample_id = sample_id,
                     r1_fastqs = generate_count_config.id2r1[sample_id],
                     r2_fastqs = generate_count_config.id2r2[sample_id],
-                    chemistry = chemistry,
+                    preset = preset,
                     genome = genome_url,
-                    CBstart = CBstart,
-                    CBlen = CBlen,
-                    UMIstart = UMIstart,
-                    UMIlen = UMIlen,
-                    CBwhitelist = CBwhitelist,
+                    soloCBstart = soloCBstart,
+                    soloCBlen = soloCBlen,
+                    soloUMIstart = soloUMIstart,
+                    soloUMIlen = soloUMIlen,
+                    soloCBwhitelist = soloCBwhitelist,
                     preset_whitelist = preset_whitelist,
-                    BarcodeReadLength = BarcodeReadLength,
-                    BarcodeMate = BarcodeMate,
-                    CBposition = CBposition,
-                    UMIposition = UMIposition,
-                    adapterSequence = adapterSequence,
-                    adapterMismatchesNmax = adapterMismatchesNmax,
-                    CBmatchWLtype = CBmatchWLtype,
-                    inputSAMattrBarcodeSeq = inputSAMattrBarcodeSeq,
-                    inputSAMattrBarcodeQual = inputSAMattrBarcodeQual,
-                    strand = strand,
-                    features = features,
-                    multiMappers = multiMappers,
-                    UMIdedup = UMIdedup,
-                    UMIfiltering = UMIfiltering,
-                    outFileNames = outFileNames,
-                    cellFilter = cellFilter,
-                    outFormatFeaturesGeneField3 = outFormatFeaturesGeneField3,
+                    soloBarcodeReadLength = soloBarcodeReadLength,
+                    soloBarcodeMate = soloBarcodeMate,
+                    soloCBposition = soloCBposition,
+                    soloUMIposition = soloUMIposition,
+                    soloAdapterSequence = soloAdapterSequence,
+                    soloAdapterMismatchesNmax = soloAdapterMismatchesNmax,
+                    soloCBmatchWLtype = soloCBmatchWLtype,
+                    soloInputSAMattrBarcodeSeq = soloInputSAMattrBarcodeSeq,
+                    soloInputSAMattrBarcodeQual = soloInputSAMattrBarcodeQual,
+                    soloStrand = soloStrand,
+                    soloFeatures = soloFeatures,
+                    soloMultiMappers = soloMultiMappers,
+                    soloUMIdedup = soloUMIdedup,
+                    soloUMIfiltering = soloUMIfiltering,
+                    soloOutFileNames = soloOutFileNames,
+                    soloCellFilter = soloCellFilter,
+                    soloOutFormatFeaturesGeneField3 = soloOutFormatFeaturesGeneField3,
                     output_directory = output_directory_stripped,
                     docker_registry = docker_registry,
                     version = star_version,

@@ -5,33 +5,33 @@ task run_starsolo_per_sample {
         String sample_id
         String r1_fastqs
         String r2_fastqs
-        String chemistry
+        String preset
         File genome
         String output_directory
-        String solo_type
+        String soloType
         File? preset_whitelist
-        File? CBwhitelist
-        Int? CBstart
-        Int? CBlen
-        Int? UMIstart
-        Int? UMIlen
-        Int? BarcodeReadLength
-        Int? BarcodeMate
-        Int? CBposition
-        Int? UMIposition
-        String? adapterSequence
-        Int? adapterMismatchesNmax
-        String? CBmatchWLtype
-        String? inputSAMattrBarcodeSeq
-        String? inputSAMattrBarcodeQual
-        String? strand
-        String? features
-        String? multiMappers
-        String? UMIdedup
-        String? UMIfiltering
-        String? outFileNames
-        String? cellFilter
-        String? outFormatFeaturesGeneField3
+        File? soloCBwhitelist
+        Int? soloCBstart
+        Int? soloCBlen
+        Int? soloUMIstart
+        Int? soloUMIlen
+        Int? soloBarcodeReadLength
+        Int? soloBarcodeMate
+        Int? soloCBposition
+        Int? soloUMIposition
+        String? soloAdapterSequence
+        Int? soloAdapterMismatchesNmax
+        String? soloCBmatchWLtype
+        String? soloInputSAMattrBarcodeSeq
+        String? soloInputSAMattrBarcodeQual
+        String? soloStrand
+        String? soloFeatures
+        String? soloMultiMappers
+        String? soloUMIdedup
+        String? soloUMIfiltering
+        String? soloOutFileNames
+        String? soloCellFilter
+        String? soloOutFormatFeaturesGeneField3
         String docker_registry
         String version
         String zones
@@ -72,25 +72,25 @@ task run_starsolo_per_sample {
             fetch_and_rename_fastq(r1_list[i], 'R1_'+str(i)+file_ext)
             fetch_and_rename_fastq(r2_list[i], 'R2_'+str(i)+file_ext)
 
-        call_args = ['STAR', '--soloType', '~{solo_type}', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}', '--outSAMtype', 'BAM', 'SortedByCoordinate', '--clipAdapterType', 'CellRanger4', '--outFilterScoreMin', '30']
+        call_args = ['STAR', '--soloType', '~{soloType}', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}', '--outSAMtype', 'BAM', 'SortedByCoordinate', '--clipAdapterType', 'CellRanger4', '--outFilterScoreMin', '30']
 
         white_list = 'None'
         if '~{preset_whitelist}' != '':
             white_list = '~{preset_whitelist}'
         else:
-            if '~{chemistry}' == 'custom' and '~{CBwhitelist}' != '':
-                white_list = '~{CBwhitelist}'
+            if '~{preset}' == 'custom' and '~{soloCBwhitelist}' != '':
+                white_list = '~{soloCBwhitelist}'
 
-        if '~{chemistry}' in ['tenX_v2', 'tenX_v3']:
-            call_args.extend(['--soloCBmatchWLtype', '1MM_multi_Nbase_pseudocounts', '--soloUMIfiltering', 'MultiGeneUMI_CR', '--soloUMIdedup', '1MM_CR'])
-            if '~{chemistry}' == 'tenX_v3':
+        if '~{preset}' in ['tenX_v2', 'tenX_v3']:
+            call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBmatchWLtype', '1MM_multi_Nbase_pseudocounts', '--soloUMIfiltering', 'MultiGeneUMI_CR', '--soloUMIdedup', '1MM_CR'])
+            if '~{preset}' == 'tenX_v3':
                 call_args.extend(['--soloCBwhitelist', white_list, '--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '12'])
-            elif '~{chemistry}' == 'tenX_v2':
+            elif '~{preset}' == 'tenX_v2':
                 call_args.extend(['--soloCBwhitelist', white_list, '--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '10'])
-        elif '~{chemistry}' in ['SeqWell', 'DropSeq']:
-            call_args.extend(['--soloCBwhitelist', 'None', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8'])
-        elif '~{chemistry}' == 'custom':
-            call_args.extend(['--soloCBwhitelist', white_list, '--soloCBstart', '~{CBstart}', '--soloCBlen', '~{CBlen}', '--soloUMIstart', '~{UMIstart}', '--soloUMIlen', '~{UMIlen}'])
+        elif '~{preset}' in ['SeqWell', 'DropSeq']:
+            call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBwhitelist', 'None', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8'])
+        elif '~{preset}' == 'custom':
+            call_args.extend(['--soloCBwhitelist', white_list, '--soloCBstart', '~{soloCBstart}', '--soloCBlen', '~{soloCBlen}', '--soloUMIstart', '~{soloUMIstart}', '--soloUMIlen', '~{soloUMIlen}'])
 
         if file_ext == '.fastq.gz':
             call_args.extend(['--readFilesCommand', 'zcat'])
@@ -101,50 +101,60 @@ task run_starsolo_per_sample {
         call_args.extend(['--readFilesIn', set_up_readfiles('R2_', len(r2_list), file_ext), set_up_readfiles('R1_', len(r1_list), file_ext)])
         call_args.extend(['--outFileNamePrefix', 'result/~{sample_id}_'])
 
-        if '~{BarcodeReadLength}' != '':
-            call_args.extend(['--soloBarcodeReadLength', '~{BarcodeReadLength}'])
-        if '~{BarcodeMate}' != '':
-            call_args.extend(['--soloBarcodeMate', '~{BarcodeMate}'])
-        if '~{solo_type}' == 'CB_UMI_Complex':
-            if '~{CBposition}' != '':
-                call_args.extend(['--soloCBposition'] + '~{CBposition}'.split(','))
-            if '~{UMIposition}' != '':
-                call_args.extend(['--soloUMIposition', '~{UMIposition}'])
-        if '~{adapterSequence}' != '':
-            call_args.extend(['--soloAdapterSequence', '~{adapterSequence}'])
-        if '~{adapterMismatchesNmax}' != '':
-            call_args.extend(['--soloAdapterMismatchesNmax', '~{adapterMismatchesNmax}'])
-        if '~{CBmatchWLtype}' != '':
-            call_args.extend(['--soloCBmatchWLtype', '~{CBmatchWLtype}'])
-        if '~{inputSAMattrBarcodeSeq}' != '':
-            call_args.extend(['--soloInputSAMattrBarcodeSeq'] + '~{inputSAMattrBarcodeSeq}'.split(','))
-        if '~{inputSAMattrBarcodeQual}' != '':
-            call_args.extend(['--soloInputSAMattrBarcodeQual'] + '~{inputSAMattrBarcodeQual}'.split(','))
-        if '~{strand}' != '':
-            call_args.extend(['--soloStrand', '~{strand}'])
-        if '~{features}' != '':
-            feature_list = '~{features}'.split(',')
+        if '~{soloType}' != '':
+            call_args.extend(['--soloType', '~{soloType}'])
+        if '~{soloCBstart}' != '':
+            call_args.extend(['--soloCBstart', '~{soloCBstart}'])
+        if '~{soloCBlen}' != '':
+            call_args.extend(['--soloCBlen', '~{soloCBlen}'])
+        if '~{soloUMIstart}' != '':
+            call_args.extend(['--soloUMIstart', '~{soloUMIstart}'])
+        if '~{soloUMIlen}' != '':
+            call_args.extend(['--soloUMIlen', '~{soloUMIlen}'])
+        if '~{soloBarcodeReadLength}' != '':
+            call_args.extend(['--soloBarcodeReadLength', '~{soloBarcodeReadLength}'])
+        if '~{soloBarcodeMate}' != '':
+            call_args.extend(['--soloBarcodeMate', '~{soloBarcodeMate}'])
+        if '~{soloType}' == 'CB_UMI_Complex':
+            if '~{soloCBposition}' != '':
+                call_args.extend(['--soloCBposition'] + '~{soloCBposition}'.split(','))
+            if '~{soloUMIposition}' != '':
+                call_args.extend(['--soloUMIposition', '~{soloUMIposition}'])
+        if '~{soloAdapterSequence}' != '':
+            call_args.extend(['--soloAdapterSequence', '~{soloAdapterSequence}'])
+        if '~{soloAdapterMismatchesNmax}' != '':
+            call_args.extend(['--soloAdapterMismatchesNmax', '~{soloAdapterMismatchesNmax}'])
+        if '~{soloCBmatchWLtype}' != '':
+            call_args.extend(['--soloCBmatchWLtype', '~{soloCBmatchWLtype}'])
+        if '~{soloInputSAMattrBarcodeSeq}' != '':
+            call_args.extend(['--soloInputSAMattrBarcodeSeq'] + '~{soloInputSAMattrBarcodeSeq}'.split(','))
+        if '~{soloInputSAMattrBarcodeQual}' != '':
+            call_args.extend(['--soloInputSAMattrBarcodeQual'] + '~{soloInputSAMattrBarcodeQual}'.split(','))
+        if '~{soloStrand}' != '':
+            call_args.extend(['--soloStrand', '~{soloStrand}'])
+        if '~{soloFeatures}' != '':
+            feature_list = '~{soloFeatures}'.split(',')
             if ('Velocyto' in feature_list) and ('Gene' not in feature_list):
                 feature_list.append('Gene')
-            call_args.extend(['--soloFeatures'] + '~{features}'.split(','))
-        if '~{multiMappers}' != '':
-            call_args.extend(['--soloMultiMappers'] + '~{multiMappers}'.split(','))
-        if '~{UMIdedup}' != '':
-            call_args.extend(['--soloUMIdedup'] + '~{UMIdedup}'.split(','))
-        if '~{UMIfiltering}' != '':
-            call_args.extend(['--soloUMIfiltering'] + '~{UMIfiltering}'.split(','))
-        if '~{outFileNames}' != '':
-            call_args.extend(['--soloOutFileNames'] + '~{outFileNames}'.split(','))
-        if '~{cellFilter}' != '':
-            call_args.extend(['--soloCellFilter'] + '~{cellFilter}'.split(','))
-        if '~{outFormatFeaturesGeneField3}' != '':
-            call_args.extend(['--soloOutFormatFeaturesGeneField3'] + '~{outFormatFeaturesGeneField3}'.split(','))
+            call_args.extend(['--soloFeatures'] + feature_list)
+        if '~{soloMultiMappers}' != '':
+            call_args.extend(['--soloMultiMappers'] + '~{soloMultiMappers}'.split(','))
+        if '~{soloUMIdedup}' != '':
+            call_args.extend(['--soloUMIdedup'] + '~{soloUMIdedup}'.split(','))
+        if '~{soloUMIfiltering}' != '':
+            call_args.extend(['--soloUMIfiltering'] + '~{soloUMIfiltering}'.split(','))
+        if '~{soloOutFileNames}' != '':
+            call_args.extend(['--soloOutFileNames'] + '~{soloOutFileNames}'.split(','))
+        if '~{soloCellFilter}' != '':
+            call_args.extend(['--soloCellFilter'] + '~{soloCellFilter}'.split(','))
+        if '~{soloOutFormatFeaturesGeneField3}' != '':
+            call_args.extend(['--soloOutFormatFeaturesGeneField3'] + '~{soloOutFormatFeaturesGeneField3}'.split(','))
 
         print(' '.join(call_args))
         check_call(call_args)
         CODE
 
-        strato sync --backend ~{backend} result "~{output_directory}/~{sample_id}"
+        strato sync --backend ~{backend} -m result "~{output_directory}/~{sample_id}"
     }
 
     output {
