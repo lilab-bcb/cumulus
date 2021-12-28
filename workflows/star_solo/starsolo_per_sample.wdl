@@ -166,16 +166,16 @@ task run_starsolo {
         if '~{preset}' in ['tenX_v2', 'tenX_v3']:
             call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBmatchWLtype', '1MM_multi_Nbase_pseudocounts', '--soloUMIfiltering', 'MultiGeneUMI_CR', \
                               '--soloUMIdedup', '1MM_CR', '--clipAdapterType', 'CellRanger4', '--outFilterScoreMin', '30', \
-                              '--outSAMtype', 'BAM SortedByCoordinate', '--outSAMattributes', 'CR UR CY UY CB UB'])
+                              '--outSAMtype', 'BAM', 'SortedByCoordinate', '--outSAMattributes', 'CR UR CY UY CB UB'])
             if '~{preset}' == 'tenX_v3':
                 call_args.extend(['--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '12'])
             elif '~{preset}' == 'tenX_v2':
                 call_args.extend(['--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '10'])
         elif '~{preset}' in ['SeqWell', 'DropSeq']:
             call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBwhitelist', 'None', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8', \
-                              '--outSAMtype', 'BAM SortedByCoordinate', '--outSAMattributes', 'CR UR CY UY CB UB'])
+                              '--outSAMtype', 'BAM', 'SortedByCoordinate', '--outSAMattributes', 'CR UR CY UY CB UB'])
         else:
-            call_args.extend(['--outSAMtype', 'BAM Unsorted'])
+            call_args.extend(['--outSAMtype', 'BAM', 'Unsorted'])
 
         if file_ext == '.fastq.gz':
             call_args.extend(['--readFilesCommand', 'zcat'])
@@ -187,7 +187,7 @@ task run_starsolo {
         call_args.extend(['--outFileNamePrefix', 'result/~{sample_id}_'])
 
         if '~{outSAMtype}' != '':
-            call_args.extend(['--outSAMtype', '~{outSAMtype}'])
+            call_args.extend(['--outSAMtype'] + '~{outSAMtype}'.split(' '))
         if '~{soloType}' != '':
             call_args.extend(['--soloType', '~{soloType}'])
         if '~{soloCBwhitelist}' != '':
