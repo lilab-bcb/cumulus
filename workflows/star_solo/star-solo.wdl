@@ -1,5 +1,7 @@
 version 1.0
 
+import "starsolo_per_sample.wdl" as stps
+
 workflow starsolo {
     input {
         # Input TSV sample sheet describing metadata of each sample
@@ -18,12 +20,50 @@ workflow starsolo {
         Int? UMIlen
         # Cell barcode white list
         File? CBwhitelist
+        # Length of the barcode read
+        Int? BarcodeReadLength
+        # Identifies which read mate contains the barcode (CB+UMI) sequence
+        Int? BarcodeMate
+        # position of Cell Barcode(s) on the barcode read. Presently only works with --soloType CB_UMI_Complex, and barcodes are assumed to be on Read2.
+        Int? CBposition
+        # position of the UMI on the barcode read, same as CBposition
+        Int? UMIposition
+        # adapter sequence to anchor barcodes.
+        String? adapterSequence
+        # maximum number of mismatches allowed in adapter sequence.
+        Int? adapterMismatchesNmax
+        # matching the Cell Barcodes to the WhiteList
+        String? CBmatchWLtype
+        # when inputting reads from a SAM file (--readsFileType SAM SE/PE), these SAM attributes mark the barcode sequence (in proper order).
+        # For instance, for 10X CellRanger or STARsolo BAMs, use --soloInputSAMattrBarcodeSeq CR UR .
+        # This parameter is required when running STARsolo with input from SAM.
+        String? inputSAMattrBarcodeSeq
+        # when inputting reads from a SAM file (--readsFileType SAM SE/PE), these SAM attributes mark the barcode qualities (in proper order).
+        # For instance, for 10X CellRanger or STARsolo BAMs, use --soloInputSAMattrBarcodeQual CY UY .
+        # If this parameter is '-' (default), the quality 'H' will be assigned to all bases.
+        String? inputSAMattrBarcodeQual
+        # strandedness of the solo libraries
+        String? strand
+        # genomic features for which the UMI counts per Cell Barcode are collected
+        String? features
+        # counting method for reads mapping to multiple genes
+        String? multiMappers
+        # type of UMI deduplication (collapsing) algorithm
+        String? UMIdedup
+        # type of UMI filtering (for reads uniquely mapping to genes)
+        String? UMIfiltering
+        # file names for STARsolo output
+        String? outFileNames
+        # cell filtering type and parameters
+        String? cellFilter
+        # field 3 in the Gene features.tsv file. If "-", then no 3rd field is output.
+        String? outFormatFeaturesGeneField3
         # URL of output directory
         String output_directory
         # Number of CPUs to request per sample
         Int num_cpu = 32
-        # STAR version to use. Currently only support 2.7.6a
-        String star_version = "2.7.6a"
+        # STAR version to use. Currently support: 2.7.9a, 2.7.6a.
+        String star_version = "2.7.9a"
         # Docker registry, default to quay.io/cumulus
         String docker_registry = "quay.io/cumulus"
         # Reference Index TSV
@@ -54,7 +94,7 @@ workflow starsolo {
     String whitelist_url = wl_index2url[chemistry]
 
     if (whitelist_url != 'null') {
-        File whitelist = whitelist_url
+        File preset_whitelist = whitelist_url
     }
 
 
@@ -71,7 +111,7 @@ workflow starsolo {
 
     if (length(generate_count_config.sample_ids) > 0) {
         scatter (sample_id in generate_count_config.sample_ids) {
-            call run_star_solo {
+            call stps.run_starsolo_per_sample as run_starsolo_per_sample {
                 input:
                     sample_id = sample_id,
                     r1_fastqs = generate_count_config.id2r1[sample_id],
@@ -83,10 +123,27 @@ workflow starsolo {
                     UMIstart = UMIstart,
                     UMIlen = UMIlen,
                     CBwhitelist = CBwhitelist,
-                    whitelist = whitelist,
+                    preset_whitelist = preset_whitelist,
+                    BarcodeReadLength = BarcodeReadLength,
+                    BarcodeMate = BarcodeMate,
+                    CBposition = CBposition,
+                    UMIposition = UMIposition,
+                    adapterSequence = adapterSequence,
+                    adapterMismatchesNmax = adapterMismatchesNmax,
+                    CBmatchWLtype = CBmatchWLtype,
+                    inputSAMattrBarcodeSeq = inputSAMattrBarcodeSeq,
+                    inputSAMattrBarcodeQual = inputSAMattrBarcodeQual,
+                    strand = strand,
+                    features = features,
+                    multiMappers = multiMappers,
+                    UMIdedup = UMIdedup,
+                    UMIfiltering = UMIfiltering,
+                    outFileNames = outFileNames,
+                    cellFilter = cellFilter,
+                    outFormatFeaturesGeneField3 = outFormatFeaturesGeneField3,
                     output_directory = output_directory_stripped,
-                    star_version = star_version,
                     docker_registry = docker_registry,
+                    version = star_version,
                     zones = zones,
                     num_cpu = num_cpu,
                     memory = memory,
@@ -183,113 +240,6 @@ task generate_count_config {
     runtime {
         docker: "~{docker_registry}/starsolo:~{star_version}"
         zones: zones
-        preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
-    }
-}
-
-task run_star_solo {
-    input {
-        String sample_id
-        String r1_fastqs
-        String r2_fastqs
-        String chemistry
-        File genome
-        Int? CBstart
-        Int? CBlen
-        Int? UMIstart
-        Int? UMIlen
-        File? CBwhitelist
-        File? whitelist
-        String output_directory
-        String star_version
-        String docker_registry
-        String zones
-        Int num_cpu
-        String memory
-        Int disk_space
-        Int preemptible
-        Int awsMaxRetries
-        String backend
-    }
-
-    command {
-        set -e
-        export TMPDIR=/tmp
-        monitor_script.sh > monitoring.log &
-
-        mkdir genome_ref
-        tar -zxf "~{genome}" -C genome_ref --strip-components 1
-        rm "~{genome}"
-
-        mkdir result
-
-        python <<CODE
-        import os
-        from subprocess import check_call
-
-        r1_list = '~{r1_fastqs}'.split(',')
-        r2_list = '~{r2_fastqs}'.split(',')
-        assert len(r1_list) == len(r2_list)
-
-        def rename_fastq(in_file, out_file):
-            call_args = ['gsutil', '-q', '-m', 'cp', in_file, out_file]
-            # call_args = ['cp', in_file, out_file]
-            print(' '.join(call_args))
-            check_call(call_args)
-
-        for i in range(len(r1_list)):
-            file_ext = '.fastq.gz' if os.path.splitext(r1_list[i])[-1] == '.gz' else '.fastq'
-            rename_fastq(r1_list[i], 'R1_'+str(i)+file_ext)
-            rename_fastq(r2_list[i], 'R2_'+str(i)+file_ext)
-
-        call_args = ['STAR', '--soloType', 'CB_UMI_Simple', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}', '--outSAMtype', 'BAM', 'Unsorted', '--outSAMheaderHD', '\\@HD', 'VN:1.4', 'SO:unsorted']
-
-        white_list = 'None'
-        if '~{whitelist}' != '':
-            white_list = '~{whitelist}'
-        else:
-            if '~{chemistry}' == 'custom' and '~{CBwhitelist}' != '':
-                white_list = '~{CBwhitelist}'
-
-        if '~{chemistry}' == 'tenX_v3':
-            call_args.extend(['--soloCBwhitelist', white_list, '--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '12'])
-        elif '~{chemistry}' == 'tenX_v2':
-            call_args.extend(['--soloCBwhitelist', white_list, '--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '10'])
-        elif '~{chemistry}' in ['SeqWell', 'DropSeq']:
-            call_args.extend(['--soloCBwhitelist', 'None', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8'])
-        elif '~{chemistry}' == 'custom':
-            call_args.extend(['--soloCBwhitelist', white_list, '--soloCBstart', '~{CBstart}', '--soloCBlen', '~{CBlen}', '--soloUMIstart', '~{UMIstart}', '--soloUMIlen', '~{UMIlen}'])
-
-        if file_ext == '.fastq.gz':
-            call_args.extend(['--readFilesCommand', 'zcat'])
-
-        def set_up_readfiles(prefix, n_files, f_ext):
-            return ','.join([prefix+str(n)+f_ext for n in range(n_files)])
-
-        call_args.extend(['--readFilesIn', set_up_readfiles('R2_', len(r2_list), file_ext), set_up_readfiles('R1_', len(r1_list), file_ext)])
-        call_args.extend(['--outFileNamePrefix', 'result/~{sample_id}_'])
-
-        print(' '.join(call_args))
-        check_call(call_args)
-        CODE
-
-        gsutil -q -m rsync -r result "~{output_directory}/~{sample_id}"
-        # mkdir -p "~{output_directory}/~{sample_id}"
-        # cp -r result/* "~{output_directory}/~{sample_id}"
-    }
-
-    output {
-        File monitoringLog = 'monitoring.log'
-        String output_folder = '~{output_directory}/~{sample_id}'
-    }
-
-    runtime {
-        docker: "~{docker_registry}/starsolo:~{star_version}"
-        zones: zones
-        memory: memory
-        disks: "local-disk ~{disk_space} HDD"
-        cpu: num_cpu
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
