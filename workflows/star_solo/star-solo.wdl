@@ -11,6 +11,7 @@ workflow starsolo {
         # Preset options, choosing from tenX_v3 (for 10X V3 chemistry), tenX_v2 (for 10X V2 chemistry), DropSeq, SeqWell and custom
         String preset = ""
         # Cell barcode start position (1-based coordinate)
+        String? outSAMtype
         String? soloType
         Int? soloCBstart
         # Cell barcode length
@@ -111,6 +112,7 @@ workflow starsolo {
                     r2_fastqs = generate_count_config.id2r2[sample_id],
                     preset = preset,
                     genome = genome_url,
+                    outSAMtype = outSAMtype,
                     soloType = soloType,
                     soloCBstart = soloCBstart,
                     soloCBlen = soloCBlen,

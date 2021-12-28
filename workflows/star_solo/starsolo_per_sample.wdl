@@ -8,6 +8,7 @@ workflow starsolo_per_sample {
         String? preset
         File genome
         String output_directory
+        String? outSAMtype
         String? soloType
         File? soloCBwhitelist
         Int? soloCBstart
@@ -49,6 +50,7 @@ workflow starsolo_per_sample {
             preset = preset,
             genome = genome,
             output_directory = output_directory,
+            outSAMtype = outSAMtype,
             soloType = soloType,
             soloCBwhitelist = soloCBwhitelist,
             soloCBstart = soloCBstart,
@@ -96,6 +98,7 @@ task run_starsolo {
         String? preset
         File genome
         String output_directory
+        String? outSAMtype
         String? soloType
         File? soloCBwhitelist
         Int? soloCBstart
@@ -183,6 +186,8 @@ task run_starsolo {
         call_args.extend(['--readFilesIn', set_up_readfiles('R2_', len(r2_list), file_ext), set_up_readfiles('R1_', len(r1_list), file_ext)])
         call_args.extend(['--outFileNamePrefix', 'result/~{sample_id}_'])
 
+        if '~{outSAMtype}' != '':
+            call_args.extend(['--outSAMtype', '~{outSAMtype}'])
         if '~{soloType}' != '':
             call_args.extend(['--soloType', '~{soloType}'])
         if '~{soloCBwhitelist}' != '':
