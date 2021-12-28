@@ -9,8 +9,9 @@ workflow starsolo {
         # Genome reference
         String genome
         # Preset options, choosing from tenX_v3 (for 10X V3 chemistry), tenX_v2 (for 10X V2 chemistry), DropSeq, SeqWell and custom
-        String preset
+        String preset = ""
         # Cell barcode start position (1-based coordinate)
+        String? soloType
         Int? soloCBstart
         # Cell barcode length
         Int? soloCBlen
@@ -25,9 +26,9 @@ workflow starsolo {
         # Identifies which read mate contains the barcode (CB+UMI) sequence
         Int? soloBarcodeMate
         # position of Cell Barcode(s) on the barcode read. Presently only works with --soloType CB_UMI_Complex, and barcodes are assumed to be on Read2.
-        Int? soloCBposition
+        String? soloCBposition
         # position of the UMI on the barcode read, same as CBposition
-        Int? soloUMIposition
+        String? soloUMIposition
         # adapter sequence to anchor barcodes.
         String? soloAdapterSequence
         # maximum number of mismatches allowed in adapter sequence.
@@ -91,12 +92,6 @@ workflow starsolo {
     String genome_url = if sub(genome, "^(gs|s3)://.*", "URL")=="URL" then genome else ref_index2url[genome] + '/starsolo.tar.gz'
 
     Map[String, String] wl_index2url = read_map(whitelist_index_file)
-    String whitelist_url = wl_index2url[preset]
-
-    if (whitelist_url != 'null') {
-        File preset_whitelist = whitelist_url
-    }
-
 
     call generate_count_config {
         input:
@@ -118,12 +113,12 @@ workflow starsolo {
                     r2_fastqs = generate_count_config.id2r2[sample_id],
                     preset = preset,
                     genome = genome_url,
+                    soloType = soloType,
                     soloCBstart = soloCBstart,
                     soloCBlen = soloCBlen,
                     soloUMIstart = soloUMIstart,
                     soloUMIlen = soloUMIlen,
-                    soloCBwhitelist = soloCBwhitelist,
-                    preset_whitelist = preset_whitelist,
+                    soloCBwhitelist = if soloCBwhitelist != '' then soloCBwhitelist else wl_index2url[preset],
                     soloBarcodeReadLength = soloBarcodeReadLength,
                     soloBarcodeMate = soloBarcodeMate,
                     soloCBposition = soloCBposition,
