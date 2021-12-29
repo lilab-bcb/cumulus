@@ -2,9 +2,12 @@ version 1.0
 
 workflow starsolo_per_sample {
     input {
+        # Sample ID
         String sample_id
-        String r1_fastqs
-        String r2_fastqs
+        # A comma-separated list of input FASTQs directories (local paths or URIs)
+        String input_fastqs_directories
+        String r1_fastq_pattern
+        String r2_fastq_pattern
         String? preset
         File genome
         String output_directory
@@ -45,8 +48,9 @@ workflow starsolo_per_sample {
     call run_starsolo {
         input:
             sample_id = sample_id,
-            r1_fastqs = r1_fastqs,
-            r2_fastqs = r2_fastqs,
+            input_fastqs_directories = input_fastqs_directories,
+            r1_fastq_pattern = r1_fastq_pattern,
+            r2_fastq_pattern = r2_fastq_pattern,
             preset = preset,
             genome = genome,
             output_directory = output_directory,
@@ -93,8 +97,9 @@ workflow starsolo_per_sample {
 task run_starsolo {
     input {
         String sample_id
-        String r1_fastqs
-        String r2_fastqs
+        String input_fastqs_directories
+        String r1_fastq_pattern
+        String r2_fastq_pattern
         String? preset
         File genome
         String output_directory
@@ -145,24 +150,48 @@ task run_starsolo {
 
         python <<CODE
         import os, re
-        from subprocess import check_call
+        from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
+
+        def set_up_input_fastq_files(l, folder, pattern):
+            file_list = [f for f in os.listdir(folder) if re.match(".*" + re.sub('\\*', '.*', pattern), f)]
+            file_list.sort()
+            for f in file_list:
+                l.append(folder + '/' + f)
+
+        r1_list = list()
+        r2_list = list()
+        for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
+            directory = re.sub('/+$', '', directory) # remove trailing slashes
+            target = "~{sample_id}_" + str(i)
+            try:
+                call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}']
+                print(' '.join(call_args))
+                check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
+                call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]
+                print(' '.join(call_args))
+                check_call(call_args)
+
+                set_up_input_fastq_files(r1_list, target, '~{r1_fastq_pattern}')
+                set_up_input_fastq_files(r2_list, target, '~{r2_fastq_pattern}')
+
+            except CalledProcessError:
+                if not os.path.exists(target):
+                    os.mkdir(target)
+                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{r1_fastq_pattern}' , target + '/']
+                print(' '.join(call_args))
+                check_call(call_args)
+                set_up_input_fastq_files(r1_list, target, '~{r1_fastq_pattern}')
+
+                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{r2_fastq_pattern}' , target + '/']
+                print(' '.join(call_args))
+                check_call(call_args)
+                set_up_input_fastq_files(r2_list, target, '~{r2_fastq_pattern}')
+
+        assert len(r1_list) == len(r2_list)
+        file_ext = '.fastq.gz' if os.path.splitext("~{r1_fastq_pattern}")[-1] == '.gz' else '.fastq'
 
         def remove_extra_space(s):
             return re.sub(' +', ' ', s.strip())
-
-        r1_list = '~{r1_fastqs}'.split(',')
-        r2_list = '~{r2_fastqs}'.split(',')
-        assert len(r1_list) == len(r2_list)
-
-        def fetch_and_rename_fastq(in_file, out_file):
-            call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', in_file, out_file]
-            print(' '.join(call_args))
-            check_call(call_args)
-
-        for i in range(len(r1_list)):
-            file_ext = '.fastq.gz' if os.path.splitext(r1_list[i])[-1] == '.gz' else '.fastq'
-            fetch_and_rename_fastq(r1_list[i], 'R1_'+str(i)+file_ext)
-            fetch_and_rename_fastq(r2_list[i], 'R2_'+str(i)+file_ext)
 
         call_args = ['STAR', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}']
 
@@ -183,10 +212,7 @@ task run_starsolo {
         if file_ext == '.fastq.gz':
             call_args.extend(['--readFilesCommand', 'zcat'])
 
-        def set_up_readfiles(prefix, n_files, f_ext):
-            return ','.join([prefix+str(n)+f_ext for n in range(n_files)])
-
-        call_args.extend(['--readFilesIn', set_up_readfiles('R2_', len(r2_list), file_ext), set_up_readfiles('R1_', len(r1_list), file_ext)])
+        call_args.extend(['--readFilesIn', ','.join(r2_list), ','.join(r1_list)])
         call_args.extend(['--outFileNamePrefix', 'result/~{sample_id}_'])
 
         if '~{outSAMtype}' != '':
@@ -194,7 +220,13 @@ task run_starsolo {
         if '~{soloType}' != '':
             call_args.extend(['--soloType', '~{soloType}'])
         if '~{soloCBwhitelist}' != '':
-            call_args.extend(['--soloCBwhitelist'] + remove_extra_space('~{soloCBwhitelist}').split(' '))
+            wl_list = list()
+            for whitelist_file in remove_extra_space('~{soloCBwhitelist}').split(' '):
+                if os.path.splitext(whitelist_file)[-1] == '.gz':
+                    wl_list.append("<(zcat " + whitelist_file + ")")
+                else:
+                    wl_list.append(whitelist_file)
+            call_args.extend(['--soloCBwhitelist'] + wl_list)
         if '~{soloCBstart}' != '':
             call_args.extend(['--soloCBstart', '~{soloCBstart}'])
         if '~{soloCBlen}' != '':
