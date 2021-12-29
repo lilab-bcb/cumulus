@@ -150,10 +150,11 @@ task run_starsolo {
 
         python <<CODE
         import os, re
+        from fnmatch import fnmatch
         from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
 
         def set_up_input_fastq_files(l, folder, pattern):
-            file_list = [f for f in os.listdir(folder) if re.match(".*" + re.sub('\\*', '.*', pattern), f)]
+            file_list = [f for f in os.listdir(folder) if fnmatch(f, "*" + pattern)]
             file_list.sort()
             for f in file_list:
                 l.append(folder + '/' + f)
@@ -220,13 +221,14 @@ task run_starsolo {
         if '~{soloType}' != '':
             call_args.extend(['--soloType', '~{soloType}'])
         if '~{soloCBwhitelist}' != '':
-            wl_list = list()
-            for whitelist_file in remove_extra_space('~{soloCBwhitelist}').split(' '):
-                if os.path.splitext(whitelist_file)[-1] == '.gz':
-                    wl_list.append("<(zcat " + whitelist_file + ")")
-                else:
-                    wl_list.append(whitelist_file)
-            call_args.extend(['--soloCBwhitelist'] + wl_list)
+            fn_tup = os.path.splitext("~{soloCBwhitelist}")
+            if fn_tup[1] == '.gz':
+                with open(fn_tup[0], 'w') as fp:
+                    check_call(['zcat', "~{soloCBwhitelist}"], stdout=fp)
+                whitelist_file = fn_tup[0]
+            else:
+                whitelist_file = '~{soloCBwhitelist}'
+            call_args.extend(['--soloCBwhitelist', whitelist_file])
         if '~{soloCBstart}' != '':
             call_args.extend(['--soloCBstart', '~{soloCBstart}'])
         if '~{soloCBlen}' != '':
