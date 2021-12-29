@@ -144,8 +144,11 @@ task run_starsolo {
         mkdir result
 
         python <<CODE
-        import os
+        import os, re
         from subprocess import check_call
+
+        def remove_extra_space(s):
+            return re.sub(' +', ' ', s.strip())
 
         r1_list = '~{r1_fastqs}'.split(',')
         r2_list = '~{r2_fastqs}'.split(',')
@@ -166,14 +169,14 @@ task run_starsolo {
         if '~{preset}' in ['tenX_v2', 'tenX_v3']:
             call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBmatchWLtype', '1MM_multi_Nbase_pseudocounts', '--soloUMIfiltering', 'MultiGeneUMI_CR', \
                               '--soloUMIdedup', '1MM_CR', '--clipAdapterType', 'CellRanger4', '--outFilterScoreMin', '30', \
-                              '--outSAMtype', 'BAM', 'SortedByCoordinate', '--outSAMattributes', 'CR UR CY UY CB UB'])
+                              '--outSAMtype', 'BAM', 'SortedByCoordinate', '--outSAMattributes', 'CR', 'UR', 'CY', 'UY', 'CB', 'UB'])
             if '~{preset}' == 'tenX_v3':
                 call_args.extend(['--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '12'])
             elif '~{preset}' == 'tenX_v2':
                 call_args.extend(['--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '10'])
         elif '~{preset}' in ['SeqWell', 'DropSeq']:
             call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBwhitelist', 'None', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8', \
-                              '--outSAMtype', 'BAM', 'SortedByCoordinate', '--outSAMattributes', 'CR UR CY UY CB UB'])
+                              '--outSAMtype', 'BAM', 'SortedByCoordinate', '--outSAMattributes', 'CR', 'UR', 'CY', 'UY', 'CB', 'UB'])
         else:
             call_args.extend(['--outSAMtype', 'BAM', 'Unsorted'])
 
@@ -187,11 +190,11 @@ task run_starsolo {
         call_args.extend(['--outFileNamePrefix', 'result/~{sample_id}_'])
 
         if '~{outSAMtype}' != '':
-            call_args.extend(['--outSAMtype'] + '~{outSAMtype}'.split(' '))
+            call_args.extend(['--outSAMtype'] + remove_extra_space('~{outSAMtype}').split(' '))
         if '~{soloType}' != '':
             call_args.extend(['--soloType', '~{soloType}'])
         if '~{soloCBwhitelist}' != '':
-            call_args.extend(['--soloCBwhitelist', '~{soloCBwhitelist}'])
+            call_args.extend(['--soloCBwhitelist'] + remove_extra_space('~{soloCBwhitelist}').split(' '))
         if '~{soloCBstart}' != '':
             call_args.extend(['--soloCBstart', '~{soloCBstart}'])
         if '~{soloCBlen}' != '':
@@ -206,9 +209,9 @@ task run_starsolo {
             call_args.extend(['--soloBarcodeMate', '~{soloBarcodeMate}'])
         if '~{soloType}' == 'CB_UMI_Complex':
             if '~{soloCBposition}' != '':
-                call_args.extend(['--soloCBposition', '~{soloCBposition}'])
+                call_args.extend(['--soloCBposition'] + remove_extra_space('~{soloCBposition}').split(' '))
             if '~{soloUMIposition}' != '':
-                call_args.extend(['--soloUMIposition', '~{soloUMIposition}'])
+                call_args.extend(['--soloUMIposition'] + remove_extra_space('~{soloUMIposition}').split(' '))
         if '~{soloAdapterSequence}' != '':
             call_args.extend(['--soloAdapterSequence', '~{soloAdapterSequence}'])
         if '~{soloAdapterMismatchesNmax}' != '':
@@ -216,26 +219,26 @@ task run_starsolo {
         if '~{soloCBmatchWLtype}' != '':
             call_args.extend(['--soloCBmatchWLtype', '~{soloCBmatchWLtype}'])
         if '~{soloInputSAMattrBarcodeSeq}' != '':
-            call_args.extend(['--soloInputSAMattrBarcodeSeq', '~{soloInputSAMattrBarcodeSeq}'])
+            call_args.extend(['--soloInputSAMattrBarcodeSeq'] + remove_extra_space('~{soloInputSAMattrBarcodeSeq}').split(' '))
         if '~{soloInputSAMattrBarcodeQual}' != '':
-            call_args.extend(['--soloInputSAMattrBarcodeQual', '~{soloInputSAMattrBarcodeQual}'])
+            call_args.extend(['--soloInputSAMattrBarcodeQual'] + remove_extra_space('~{soloInputSAMattrBarcodeQual}').split(' '))
         if '~{soloStrand}' != '':
             call_args.extend(['--soloStrand', '~{soloStrand}'])
         if '~{soloFeatures}' != '':
-            feature_list = '~{soloFeatures}'.split(' ')
+            feature_list = remove_extra_space('~{soloFeatures}').split(' ')
             if ('Velocyto' in feature_list) and ('Gene' not in feature_list):
                 feature_list.append('Gene')
-            call_args.extend(['--soloFeatures'] + ' '.join(feature_list))
+            call_args.extend(['--soloFeatures'] + feature_list)
         if '~{soloMultiMappers}' != '':
-            call_args.extend(['--soloMultiMappers', '~{soloMultiMappers}'])
+            call_args.extend(['--soloMultiMappers'] + remove_extra_space('~{soloMultiMappers}').split(' '))
         if '~{soloUMIdedup}' != '':
-            call_args.extend(['--soloUMIdedup', '~{soloUMIdedup}'])
+            call_args.extend(['--soloUMIdedup'] + remove_extra_space('~{soloUMIdedup}').split(' '))
         if '~{soloUMIfiltering}' != '':
-            call_args.extend(['--soloUMIfiltering', '~{soloUMIfiltering}'])
+            call_args.extend(['--soloUMIfiltering'] + remove_extra_space('~{soloUMIfiltering}').split(' '))
         if '~{soloCellFilter}' != '':
-            call_args.extend(['--soloCellFilter', '~{soloCellFilter}'])
+            call_args.extend(['--soloCellFilter'] + remove_extra_space('~{soloCellFilter}').split(' '))
         if '~{soloOutFormatFeaturesGeneField3}' != '':
-            call_args.extend(['--soloOutFormatFeaturesGeneField3', '~{soloOutFormatFeaturesGeneField3}'])
+            call_args.extend(['--soloOutFormatFeaturesGeneField3'] + remove_extra_space('~{soloOutFormatFeaturesGeneField3}').split(' '))
 
         print(' '.join(call_args))
         check_call(call_args)
