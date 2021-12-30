@@ -66,11 +66,11 @@ task run_starsolo_create_reference {
         monitor_script.sh > monitoring.log &
 
         STAR --runMode genomeGenerate --runThreadN ~{num_cpu} --genomeDir . --genomeFastaFiles ~{input_fasta} --sjdbGTFfile ~{input_gtf} --genomeSAindexNbases 14 --genomeChrBinNbits 18
-        tar -czf ~{genome}.tar.gz starsolo-ref
+        tar -czf ~{genome}-starsolo.tar.gz starsolo-ref
     }
 
     output {
-        File output_reference = "~{genome}.tar.gz"
+        File output_reference = "~{genome}-starsolo.tar.gz"
         File monitoringLog = "monitoring.log"
     }
 
