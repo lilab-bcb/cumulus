@@ -4,3 +4,8 @@ GRCh38	gs://regev-lab/resources/count_tools/GRCh38
 mm10	gs://regev-lab/resources/count_tools/mm10
 GRCh38-2020-A-premrna	gs://regev-lab/resources/count_tools/GRCh38-2020-A-premrna
 mm10-2020-A-premrna	gs://regev-lab/resources/count_tools/mm10-2020-A-premrna
+tenX_v3	gs://regev-lab/resources/count_tools/3M-february-2018.txt
+tenX_v2	gs://regev-lab/resources/count_tools/737K-august-2016.txt
+DropSeq	null
+SeqWell	null
+SlideSeq	null

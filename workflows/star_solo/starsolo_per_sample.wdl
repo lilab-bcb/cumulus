@@ -6,11 +6,12 @@ workflow starsolo_per_sample {
         String sample_id
         # A comma-separated list of input FASTQs directories (local paths or URIs)
         String input_fastqs_directories
+        String assay
+        String genome
         String r1_fastq_pattern
         String r2_fastq_pattern
-        String? preset
-        File genome
         String output_directory
+        File acronym_file
         String? outSAMtype
         String? soloType
         File? soloCBwhitelist
@@ -45,18 +46,23 @@ workflow starsolo_per_sample {
         String backend
     }
 
+    Map[String, String] acronym2uri = read_map(acronym_file)
+    File genome_file = if sub(genome, "^.+\\.(tgz|gz)$", "PATH") == "PATH" then genome else acronym2uri[genome] + '/starsolo.tar.gz'
+
+    String whitelist_uri = if assay != 'custom' then acronym2uri[assay] else 'null'
+
     call run_starsolo {
         input:
             sample_id = sample_id,
             input_fastqs_directories = input_fastqs_directories,
             r1_fastq_pattern = r1_fastq_pattern,
             r2_fastq_pattern = r2_fastq_pattern,
-            preset = preset,
-            genome = genome,
+            assay = assay,
+            genome = genome_file,
             output_directory = output_directory,
             outSAMtype = outSAMtype,
             soloType = soloType,
-            soloCBwhitelist = soloCBwhitelist,
+            soloCBwhitelist = if whitelist_uri != 'null' then whitelist_uri else soloCBwhitelist,
             soloCBstart = soloCBstart,
             soloCBlen = soloCBlen,
             soloUMIstart = soloUMIstart,
@@ -100,7 +106,7 @@ task run_starsolo {
         String input_fastqs_directories
         String r1_fastq_pattern
         String r2_fastq_pattern
-        String? preset
+        String assay
         File genome
         String output_directory
         String? outSAMtype
@@ -196,16 +202,16 @@ task run_starsolo {
 
         call_args = ['STAR', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}']
 
-        if '~{preset}' in ['tenX_v2', 'tenX_v3']:
+        if '~{assay}' in ['tenX_v2', 'tenX_v3']:
             call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBmatchWLtype', '1MM_multi_Nbase_pseudocounts', '--soloUMIfiltering', 'MultiGeneUMI_CR', \
                               '--soloUMIdedup', '1MM_CR', '--clipAdapterType', 'CellRanger4', '--outFilterScoreMin', '30', \
                               '--outSAMtype', 'BAM', 'SortedByCoordinate', '--outSAMattributes', 'CR', 'UR', 'CY', 'UY', 'CB', 'UB'])
-            if '~{preset}' == 'tenX_v3':
+            if '~{assay}' == 'tenX_v3':
                 call_args.extend(['--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '12'])
-            elif '~{preset}' == 'tenX_v2':
+            elif '~{assay}' == 'tenX_v2':
                 call_args.extend(['--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '10'])
-        elif '~{preset}' in ['SeqWell', 'DropSeq']:
-            call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBwhitelist', 'None', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8', \
+        elif '~{assay}' in ['SeqWell', 'DropSeq']:
+            call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8', \
                               '--outSAMtype', 'BAM', 'SortedByCoordinate', '--outSAMattributes', 'CR', 'UR', 'CY', 'UY', 'CB', 'UB'])
         else:
             call_args.extend(['--outSAMtype', 'BAM', 'Unsorted'])
@@ -220,6 +226,7 @@ task run_starsolo {
             call_args.extend(['--outSAMtype'] + remove_extra_space('~{outSAMtype}').split(' '))
         if '~{soloType}' != '':
             call_args.extend(['--soloType', '~{soloType}'])
+
         if '~{soloCBwhitelist}' != '':
             fn_tup = os.path.splitext("~{soloCBwhitelist}")
             if fn_tup[1] == '.gz':
@@ -229,6 +236,9 @@ task run_starsolo {
             else:
                 whitelist_file = '~{soloCBwhitelist}'
             call_args.extend(['--soloCBwhitelist', whitelist_file])
+        else:
+            call_args.extend(['--soloCBwhitelist', 'None'])
+
         if '~{soloCBstart}' != '':
             call_args.extend(['--soloCBstart', '~{soloCBstart}'])
         if '~{soloCBlen}' != '':

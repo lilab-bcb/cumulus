@@ -1,15 +1,15 @@
 version 1.0
 
-import "starsolo_per_sample.wdl" as star_ps
+import "starsolo_per_sample.wdl" as sps
 
 workflow starsolo {
     input {
-        # Input TSV sample sheet describing metadata of each sample
-        File input_tsv_file
-        # Genome reference
-        String genome
-        # Preset options, choosing from tenX_v3 (for 10X V3 chemistry), tenX_v2 (for 10X V2 chemistry), DropSeq, SeqWell and custom
-        String preset = ""
+        # Input CSV sample sheet describing metadata of each sample
+        File input_csv_file
+        # URL of output directory
+        String output_directory
+        String r1_fastq_pattern = "_S*_L*_R1_001.fastq.gz"
+        String r2_fastq_pattern = "_S*_L*_R2_001.fastq.gz"
         # Cell barcode start position (1-based coordinate)
         String? outSAMtype
         String? soloType
@@ -58,8 +58,6 @@ workflow starsolo {
         String? soloCellFilter
         # field 3 in the Gene features.tsv file. If "-", then no 3rd field is output.
         String? soloOutFormatFeaturesGeneField3
-        # URL of output directory
-        String output_directory
         # Number of CPUs to request per sample
         Int num_cpu = 32
         # STAR version to use. Currently support: 2.7.9a
@@ -67,9 +65,7 @@ workflow starsolo {
         # Docker registry, default to quay.io/cumulus
         String docker_registry = "quay.io/cumulus"
         # Reference Index TSV
-        File ref_index_file = "gs://regev-lab/resources/count_tools/ref_index.tsv"
-        # Whitelist Index TSV
-        File whitelist_index_file = "gs://regev-lab/resources/count_tools/whitelist_index.tsv"
+        File acronym_file = "gs://regev-lab/resources/count_tools/index.tsv"
         # Disk space in GB needed per sample
         Int disk_space = 500
         # Google cloud zones to consider for execution
@@ -87,14 +83,14 @@ workflow starsolo {
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
-    Map[String, String] ref_index2url = read_map(ref_index_file)
-    String genome_url = if sub(genome, "^(gs|s3)://.*", "URL")=="URL" then genome else ref_index2url[genome] + '/starsolo.tar.gz'
+    #Map[String, String] ref_index2url = read_map(ref_index_file)
+    #String genome_url = if sub(genome, "^(gs|s3)://.*", "URL")=="URL" then genome else ref_index2url[genome] + '/starsolo.tar.gz'
 
-    Map[String, String] wl_index2url = read_map(whitelist_index_file)
+    #Map[String, String] wl_index2url = read_map(whitelist_index_file)
 
     call generate_count_config {
         input:
-            input_tsv_file = input_tsv_file,
+            input_csv_file = input_csv_file,
             docker_registry = docker_registry,
             zones = zones,
             star_version = star_version,
@@ -105,20 +101,22 @@ workflow starsolo {
 
     if (length(generate_count_config.sample_ids) > 0) {
         scatter (sample_id in generate_count_config.sample_ids) {
-            call star_ps.starsolo_per_sample as starsolo_per_sample {
+            call sps.starsolo_per_sample as starsolo_per_sample {
                 input:
                     sample_id = sample_id,
-                    r1_fastqs = generate_count_config.id2r1[sample_id],
-                    r2_fastqs = generate_count_config.id2r2[sample_id],
-                    preset = preset,
-                    genome = genome_url,
+                    input_fastqs_directories = generate_count_config.sample2dir[sample_id],
+                    genome = generate_count_config.sample2genome[sample_id],
+                    assay = generate_count_config.sample2assay[sample_id],
+                    acronym_file = acronym_file,
+                    r1_fastq_pattern = r1_fastq_pattern,
+                    r2_fastq_pattern = r2_fastq_pattern,
                     outSAMtype = outSAMtype,
                     soloType = soloType,
                     soloCBstart = soloCBstart,
                     soloCBlen = soloCBlen,
                     soloUMIstart = soloUMIstart,
                     soloUMIlen = soloUMIlen,
-                    soloCBwhitelist = if soloCBwhitelist != '' then soloCBwhitelist else wl_index2url[preset],
+                    soloCBwhitelist = soloCBwhitelist,
                     soloBarcodeReadLength = soloBarcodeReadLength,
                     soloBarcodeMate = soloBarcodeMate,
                     soloCBposition = soloCBposition,
@@ -157,7 +155,7 @@ workflow starsolo {
 
 task generate_count_config {
     input {
-        File input_tsv_file
+        File input_csv_file
         String zones
         String star_version
         String docker_registry
@@ -171,11 +169,11 @@ task generate_count_config {
         export TMPDIR=/tmp
 
         python <<CODE
-        import re
+        import re, sys
         import pandas as pd
         from subprocess import check_call
 
-        df = pd.read_csv('~{input_tsv_file}', sep = '\t', header = 0, dtype = str, index_col = False)
+        df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
         for c in df.columns:
             df[c] = df[c].str.strip()
 
@@ -185,49 +183,42 @@ task generate_count_config {
             print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &')
             sys.exit(1)
 
-        with open('sample_ids.txt', 'w') as fo1, open('sample_r1.tsv', 'w') as fo2, open('sample_r2.tsv', 'w') as fo3:
-            for idx, row in df.iterrows():
-                fo1.write(row['Sample'] + '\n')
+        for idx, row in df.iterrows():
+            row['Location'] = re.sub('/+$', '', row['Location'])
+            if re.search('[^a-zA-Z0-9_-]', row['Sample']) is not None:
+                print('Sample must contain only alphanumeric characters, hyphens, and underscores.', file = sys.stderr)
+                print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &', file = sys.stderr)
+                sys.exit(1)
 
-                if 'Flowcells' in df.columns: # Fetch R1 and R2 fastqs automatically.
-                    input_dir_list = list(map(lambda x: x.strip(), row['Flowcells'].split(',')))
-                    r1_list = []
-                    r2_list = []
-                    for directory in input_dir_list:
-                        directory = re.sub('/+$', '', directory)
+        with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2, open('sample2genome.txt', 'w') as fo3, open('sample2assay.txt', 'w'):
+            for sample_id in df['Sample'].unique():
+                df_local = df.loc[df['Sample'] == sample_id]
 
-                        call_args = ['gsutil', 'ls', directory]
-                        # call_args = ['ls', directory]
-                        with open('list_dir.txt', 'w') as tmp_fo:
-                            check_call(call_args, stdout=tmp_fo)
+                dirs = df_local['Location'].values
 
-                        with open('list_dir.txt', 'r') as tmp_fin:
-                            f_list = tmp_fin.readlines()
-                            f_list = list(map(lambda s: s.strip(), f_list))
+                if df_local['Reference'].unique().size > 1:
+                    print("Detected multiple references for sample " + sample_id + "!", file = sys.stderr)
+                    sys.exit(1)
+                reference = df_local['Reference'].iat[0]
 
-                        r1_files = [f for f in f_list if re.match('.*_R1_.*.fastq.gz', f)]
-                        r2_files = [f for f in f_list if re.match('.*_R2_.*.fastq.gz', f)]
-                        r1_files.sort()
-                        r2_files.sort()
-                        # r1_files = list(map(lambda s: directory+'/'+s, r1_files))
-                        # r2_files = list(map(lambda s: directory+'/'+s, r2_files))
+                assay = 'tenX_v3'
+                if 'Assay' in df_local.columns:
+                    if df_local['Assay'].unique().size > 1:
+                        print("Detected multiple assay names for sample " + sample_id + "!", file = sys.stderr)
+                    assay = df_local['Assay'].iat[0]
 
-                        r1_list.extend(r1_files)
-                        r2_list.extend(r2_files)
-
-                else:  # R1 and R2 fastqs specified in sample sheet.
-                    r1_list = list(map(lambda s: s.strip(), row['R1'].split(',')))
-                    r2_list = list(map(lambda s: s.strip(), row['R2'].split(',')))
-
-                fo2.write(row['Sample'] + '\t' + ','.join(r1_list) + '\n')
-                fo3.write(row['Sample'] + '\t' + ','.join(r2_list) + '\n')
+                fo1.write(sample_id + '\n')
+                fo2.write(sample_id + '\t' + ','.join(dirs) + '\n')
+                fo3.write(sample_id + '\t' + reference + '\n')
+                fo4.write(sample_id + '\t' + assay + '\n')
         CODE
     }
 
     output {
         Array[String] sample_ids = read_lines('sample_ids.txt')
-        Map[String, String] id2r1 = read_map('sample_r1.tsv')
-        Map[String, String] id2r2 = read_map('sample_r2.tsv')
+        Map[String, String] sample2dir = read_map('sample2dir.txt')
+        Map[String, String] sample2genome = read_map('sample2genome.txt')
+        Map[String, String] sample2assay = read_map('sample2assay.txt')
     }
 
     runtime {
