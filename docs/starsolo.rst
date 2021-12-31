@@ -17,10 +17,10 @@ Prepare input data and import workflow
 
 	For Non-Broad users, you'll need to build your own docker for *bcl2fastq* step. Instructions are `here <bcl2fastq.html>`_.
 
-2. Import ``star_solo``
-+++++++++++++++++++++++
+2. Import ``starsolo_workflow``
+++++++++++++++++++++++++++++++++++
 
-	Import *star_solo* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose workflow **github.com/klarman-cell-observatory/cumulus/STAR-Solo** to import.
+	Import *starsolo_workflow* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose workflow **github.com/klarman-cell-observatory/cumulus/STARSolo** to import.
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *star_solo* workflow in the drop-down menu.
 
@@ -29,7 +29,7 @@ Prepare input data and import workflow
 
 	**3.1 Sample sheet format:**
 
-	The sample sheet for *star_solo* workflow should be in TSV format, i.e. columns are separated by tabs (NOT commas). Please note that the columns in the TSV can be in any order, but that the column names must match the recognized headings.
+	Please note that the columns in the CSV can be in any order, but that the column names must match the recognized headings.
 
 	The sample sheet describes how to identify flowcells and generate sample/channel-specific count matrices.
 
@@ -42,38 +42,38 @@ Prepare input data and import workflow
 		* - Column
 		  - Description
 		* - **Sample**
-		  - Contains sample names. Each sample or 10X channel should have a unique sample name.
-		* - **Flowcells**
-		  - Indicates the Google bucket URLs of folder(s) holding FASTQ files of this sample.
+		  - Contains the sample name. Each sample or 10X channel should have a unique sample name.
+		* - **Reference**
+		  - | Provides the reference genome used by STARSolo for each sample.
+		    | The elements in this column can be either Cloud bucket URIs to reference tarballs or keywords such as *GRCh38-2020-A*.
+			| A full list of available keywords is included in `genome reference`_ section below.
+		* - **Location**
+		  - Indicates the Cloud bucket URI of the folder holding FASTQ files of each sample.
+		* - Assay
+		  - | Indicates the assay type of each sample.
+		    | Available options: ``tenX_v3`` for 10X v3, ``tenX_v2`` for 10X v2, ``DropSeq``, ``SeqWell``, ``SlideSeq``.
+			| If not specified, use the default ``tenX_v3``.
 
-	For 10X data, the sample sheet supports sequencing the same 10X channel across multiple flowcells. If a sample is sequenced across multiple flowcells, simply list all of its flowcells in a comma-seperated way. In the following example, we have 2 samples sequenced in two flowcells.
+	For 10X data, the sample sheet supports sequencing the same 10X channel across multiple flowcells. If a sample is sequenced across multiple flowcells, you should specify one line for each of the flowcells with the same sample name. In the following example, we have 2 samples sequenced in two flowcells.
 
 	Example::
 
 		Sample	Flowcells
-		sample_1	gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/sample_1_fastqs,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/sample_1_fastqs
+		sample_1	gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/sample_1_fastqs
+		sample_1	gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/sample_1_fastqs
 		sample_2	gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/sample_2_fastqs
 
-	Alternatively, if you want to specify Read 1 and 2 FASTQ files yourself, you should prepare the sample sheet of the following format::
-
-		Sample	R1	R2
-		sample_1	gs://your-bucket/sample_1_L001_R1.fastq.gz,gs://your-bucket/sample_1_L002_R1.fastq.gz	gs://your-bucket/sample_1_L001_R2.fastq.gz,gs://your-bucket/sample_1_L002_R2.fastq.gz
-		sample_2	gs://your-bucket/sample_2_L001_R1.fastq.gz	gs://your-bucket/sample_2_L001_R2.fastq.gz
-
-	where FASTQ files in *R1* and *R2* should be in one-to-one correspondence if the sample has multiple *R1* FASTQ files.
 
 	**3.2 Upload your sample sheet to the workspace bucket:**
 
-	Use gsutil_ (you already have it if you've installed Google cloud SDK) in your unix terminal to upload your sample sheet to workspace bucket.
-
 	Example::
 
-			gsutil cp /foo/bar/projects/sample_sheet.tsv gs://fc-e0000000-0000-0000-0000-000000000000/
+			gsutil cp /foo/bar/projects/sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
 4. Launch analysis
 +++++++++++++++++++
 
-	In your workspace, open ``star_solo`` in ``WORKFLOWS`` tab. Select the desired snapshot version (e.g. latest). Select ``Process single workflow from files`` as below
+	In your workspace, open ``starsolo_workflow`` in ``WORKFLOWS`` tab. Select the desired snapshot version (e.g. latest). Select ``Process single workflow from files`` as below
 
 		.. image:: images/single_workflow.png
 
@@ -96,28 +96,37 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	  - Description
 	  - Example
 	  - Default
-	* - **input_tsv_file**
-	  - Input TSV sample sheet describing metadata of each sample.
+	* - **input_csv_file**
+	  - Input CSV sample sheet describing metadata of each sample.
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.tsv"
 	  -
-	* - **genome**
-	  - Genome reference. It can be either of the following two formats:
-
-		- String. Pre-built `genome reference`_.
-
-		- Google bucket URL of a custom reference, must be a ``.tar.gz`` file.
-	  - | "GRCh38",
-	    | or "gs://user-bucket/starsolo.tar.gz"
-	  -
-	* - **chemistry**
-	  - | Chemistry name. Available options: "tenX_v3" (for 10X V3 chemistry), "tenX_v2" (for 10X V2 chemistry), "DropSeq", "SeqWell", "SlideSeq" and "custom".
-	    | For "DropSeq", "SeqWell" and "SlideSeq", CBstart=1, CBlen=12, UMIstart=13, UMIlen=8.
-	  - "tenX_v3"
-	  -
 	* - **output_directory**
-	  - GS URL of output directory.
+	  - Cloud bucket URI of output directory.
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/count_result"
 	  -
+	* - r1_fastq_pattern
+	  - | Filename suffix pattern in wildcards for Read 1. This is used for looking for Read 1 fastq files.
+	    | If fastq files are generated by CellRanger count, use ``_S*_L*_R1_001.fastq.gz``.
+		| If fastq files are Sequence Read Archive (SRA) data, use ``_1.fastq.gz``.
+		| If fastq files are not zipped, substitute ``.fastq`` for ``.fastq.gz`` in the corresponding pattern above.
+	  - "_S*_L*_R1_001.fastq.gz"
+	  - "_S*_L*_R1_001.fastq.gz"
+	* - r2_fastq_pattern
+	  - | Filename suffix pattern in wildcards for Read 2. This is used for looking for Read 2 fastq files.
+	    | If fastq files are generated by CellRanger count, use ``_S*_L*_R2_001.fastq.gz``.
+		| If fastq files are Sequence Read Archive (SRA) data, use ``_2.fastq.gz``.
+		| If fastq files are not zipped, substitute ``.fastq`` for ``.fastq.gz`` in the corresponding pattern above.
+	  - "_S*_L*_R2_001.fastq.gz"
+	  - "_S*_L*_R2_001.fastq.gz"
+	* - outSAMtype
+	  - Type of SAM/BAM output.
+	  - | "BAM" to output BAM without sorting
+	    | "SAM" to output SAM without sorting
+		| "None" for no SAM/BAM output
+		| "BAM SortedByCoordinate" or "SAM SortedByCoordinate" to sort by coordinate for BAM and SAM output, respectively.
+	  - | "BAM SortedByCoordinate" for *tenX_v3*, *tenX_v2*, *SeqWell* and *DropSeq* assays.
+	    | "SAM" for the others.
+	* -
 	* - CBstart
 	  - Cell barcode start position (1-based coordinate). Only matters if *chemistry* is "custom".
 	  - 1
@@ -135,13 +144,45 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
 	  - 12
 	  -
 	* - CBwhitelist
-	  - Cell barcode white list. Only matters if *chemistry* is "custom".
+	  - Cell barcode white list. Only works if *chemistry* is "custom".
 	  - gs://my_bucket/my_white_list.txt
 	  -
+	* - BarcodeReadLength
+	  - Identifies which read mate contains the barcode (CB+UMI) sequence:
+
+	  	- 1: equals to sum of *CBlen* and *UMIlen*.
+	  	- 0: not defined, do not check.
+	  - 1
+	  - 1
+	* - BarcodeMate
+	  - Identifies which read mate contains the barcode (CB+UMI) sequence:
+
+	  	- 0: barcode sequence is on separate read, which should always be the last file in the input Read1 file list
+	  	- 1: barcode sequence is a part of mate 1
+	  	- 2: barcode sequence is a part of mate 2
+	  - 0
+	  - 0
+	* - CBposition
+	  - | position of Cell Barcode(s) on the barcode read.
+	    | Presently only works when *solo_type* is ``CB_UMI_Complex``, and barcodes are assumed to be on Read2.
+		| Format for each barcode: "startAnchor_startPosition_endAnchor_endPosition"
+		| start(end)Anchor defines the Anchor Base for the CB: 0: read start; 1: read end; 2: adapter start; 3: adapter end
+		| start(end)Position is the 0-based position with of the CB start(end) with respect to the Anchor Base
+		| String for different barcodes are separated by space.
+	  - "0\_0\_2\_-1,3\_1\_3\_8"
+	  -
+	* - UMIposition
+	  - position of the UMI on the barcode read, same as soloCBposition
+	  - "3\_9\_3\_14"
+	  -
+	* - adapterSequence
+	  - adapter sequence to anchor barcodes.
+	  -
+	  -
 	* - star_version
-	  - STAR version to use. Currently only support ``2.7.6a``.
-	  - "2.7.6a"
-	  - "2.7.6a"
+	  - STAR version to use. Currently support: ``2.7.9a``, ``2.7.6a``.
+	  - "2.7.9a"
+	  - "2.7.9a"
 	* - docker_registry
 	  - Docker registry to use:
 
@@ -234,6 +275,67 @@ We've built the following snRNA-seq references for users' convenience:
 		* - **mm10-2020-A-premrna**
 		  - Mouse, introns included, built from mm10 cellranger reference 2020-A, GENCODE vM23/Ensembl 98 gene annotation, treating annotated transcripts as exons
 
+---------------------------
+
+Build STARSolo References
+^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+We provide a wrapper of STAR to build sc/snRNA-seq references. Please follow the instructions below.
+
+1. Import ``starsolo_create_reference``
+
+Import *starsolo_create_reference* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/klarman-cell-observatory/STARSolo_create_reference** to import.
+
+Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *starsolo_create_reference* workflow in the drop-down menu.
+
+2. Upload required data to Cloud bucket
+
+Required data include the genome FASTA file and gene annotation GTF file of the target genome reference.
+
+3. Workflow input
+
+Required inputs are highlighted **in bold**.
+
+.. list-table::
+	:widths: 5 20 10 5
+	:header-rows: 1
+
+	* - Name
+	  - Description
+	  - Example
+	  - Default
+	* - **input_fasta**
+	  - Input genome reference in FASTA format.
+	  - "gs://fc-e0000000-0000-0000-0000-000000000000/mm-10/genome.fa"
+	  -
+	* - **input_gtf**
+	  - Input gene annotation file in GTF format.
+	  - "gs://fc-e0000000-0000-0000-0000-000000000000/mm-10/genes.gtf"
+	  -
+	* - **genome**
+	  - Genome reference name. This is used for specifying the name of the genome index generated.
+	  - "mm-10"
+	  -
+	* - **output_directory**
+	  - Cloud bucket URI of the output directory.
+	  - "gs://fc-e0000000-0000-0000-0000-000000000000/starsolo-reference"
+	  -
+	* - docker_registry
+	  - Docker registry to use:
+
+	  	- "quay.io/cumulus" for images on Red Hat registry;
+
+		- "cumulusprod" for backup images on Docker Hub.
+	  - "quay.io/cumulus"
+	  - "quay.io/cumulus"
+	* - star_version
+	* - num_cpu
+	* - disk_space
+	* - memory
+	* - zones
+	* - backend
+	* - preemptible
+	* - awsMaxRetries
 
 .. _Import workflows to Terra: ./cumulus_import.html
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
