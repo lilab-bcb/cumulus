@@ -6,10 +6,10 @@ workflow starsolo_per_sample {
         String sample_id
         # A comma-separated list of input FASTQs directories (local paths or URIs)
         String input_fastqs_directories
-        String assay
+        String assay = ""
         String genome
-        String r1_fastq_pattern
-        String r2_fastq_pattern
+        String r1_fastq_pattern = "_S*_L*_R1_001.fastq.gz"
+        String r2_fastq_pattern = "_S*_L*_R2_001.fastq.gz"
         String output_directory
         File acronym_file
         String? outSAMtype
@@ -49,7 +49,7 @@ workflow starsolo_per_sample {
     Map[String, String] acronym2uri = read_map(acronym_file)
     File genome_file = if sub(genome, "^.+\\.(tgz|gz)$", "PATH") == "PATH" then genome else acronym2uri[genome]
 
-    String whitelist_uri = if assay != 'custom' then acronym2uri[assay] else 'null'
+    String whitelist_uri = if assay != '' then acronym2uri[assay] else 'null'
 
     call run_starsolo {
         input:
