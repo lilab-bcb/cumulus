@@ -1,0 +1,11 @@
+GRCh38-2020-A	gs://regev-lab/resources/starsolo/GRCh38-2020-A-starsolo.tar.gz
+mm10-2020-A	gs://regev-lab/resources/starsolo/mm10-2020-A-starsolo.tar.gz
+GRCh38	gs://regev-lab/resources/starsolo/GRCh38-starsolo.tar.gz
+mm10	gs://regev-lab/resources/starsolo/mm10-starsolo.tar.gz
+GRCh38-2020-A-premrna	gs://regev-lab/resources/starsolo/GRCh38-2020-A-premrna-starsolo.tar.gz
+mm10-2020-A-premrna	gs://regev-lab/resources/starsolo/mm10-2020-A-premrna-starsolo.tar.gz
+tenX_v3	gs://regev-lab/resources/count_tools/3M-february-2018.txt
+tenX_v2	gs://regev-lab/resources/count_tools/737K-august-2016.txt
+DropSeq	null
+SeqWell	null
+SlideSeq	null
