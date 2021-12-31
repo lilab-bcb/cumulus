@@ -8,7 +8,7 @@ This ``chromap`` workflow aligns and preprocesses FASTQ data using Chromap.
 Workflow inputs
 ^^^^^^^^^^^^^^^^^^
 
-Below are inputs for *chromap* workflow. Notice that required inputs are in bold. Options described with [chromap option -...] refer directly to Chromap options and are mentioned in `Chromap's manual`_. 
+Below are inputs for *chromap* workflow. Notice that required inputs are in bold. Options described with [chromap option -...] refer directly to Chromap options and are mentioned in `Chromap's manual`_.
 
 .. list-table::
 	:widths: 5 20 10 5
@@ -45,28 +45,28 @@ Below are inputs for *chromap* workflow. Notice that required inputs are in bold
 	  - "s3://xxxx/index.tsv" or "gs://xxxx/index.tsv"
 	  -
 	* - preset
-          - | [chromap option -\\-preset]
+          - | [chromap option \-\-preset]
 	    | This option applies multiple options at the same time.
-	    | It should be applied before other options because options applied later will overwrite the values set by -\\-preset. Available STR are:
+	    | It should be applied before other options because options applied later will overwrite the values set by \-\-preset. Available STR are:
             | chip
-            | Mapping ChIP-seq reads (-l 2000 -\\-remove-pcr-duplicates -\\-low-mem -\\-BED).
+            | Mapping ChIP-seq reads (-l 2000 \-\-remove-pcr-duplicates \-\-low-mem \-\-BED).
             | atac
-            | Mapping ATAC-seq/scATAC-seq reads (-l 2000 -\\-remove-pcr-duplicates -\\-low-mem -\\-trim-adapters -\\-Tn5-shift -\\-remove-pcr-duplicates-at-cell-level -\\-BED).
+            | Mapping ATAC-seq/scATAC-seq reads (-l 2000 \-\-remove-pcr-duplicates \-\-low-mem \-\-trim-adapters \-\-Tn5-shift \-\-remove-pcr-duplicates-at-cell-level \-\-BED).
             | hic
-            | Mapping Hi-C reads (-e 4 -q 1 -\\-low-mem -\\-split-alignment -\\-pairs).
+            | Mapping Hi-C reads (-e 4 -q 1 \-\-low-mem \-\-split-alignment \-\-pairs).
 	  - | "atac"
             | or "hic"
             | or "chip"
           - "atac"
 	* - barcode_whitelist
-	  - | [chromap option -\\-barcode-whitelist] 
+	  - | [chromap option \-\-barcode-whitelist]
             | Cell barcode whitelist file. This is supposed to be a txt file where each line is a whitelisted barcode.
-	  - 
+	  -
 	  -
 	* - barcode_translate
-	  - | [chromap option -\\-barcode-translate] 
-            | Barcode translation file. 
-	  - 
+	  - | [chromap option \-\-barcode-translate]
+            | Barcode translation file.
+	  -
 	  -
 	* - read1
 	  - read 1 Fastq file identifier.
@@ -81,7 +81,7 @@ Below are inputs for *chromap* workflow. Notice that required inputs are in bold
 	  - "I1"
 	  - "I1"
         * - read_format
-          - [chromap option -\\-read-format] Format for read files and barcode files
+          - [chromap option \-\-read-format] Format for read files and barcode files
           - "r1:0:-1,bc:0:-1"
           - "r1:0:-1,bc:0:-1"
         * - chromap_version
@@ -89,9 +89,9 @@ Below are inputs for *chromap* workflow. Notice that required inputs are in bold
 	  - "0.1.4"
           - "0.1.4"
 	* - split_alignment
-	  - [chromap option -\\-split-alignment] Allow split alignments. This option should be set only when mapping Hi-C reads.
-	  - False 
-          - 
+	  - [chromap option \-\-split-alignment] Allow split alignments. This option should be set only when mapping Hi-C reads.
+	  - False
+          -
 	* - max_edit_dist_e
 	  - [chromap option -e] Max edit distance allowed to map a read.
 	  - 8
@@ -113,76 +113,76 @@ Below are inputs for *chromap* workflow. Notice that required inputs are in bold
 	  - 30
           - 30
 	* - min_read_length
-	  - [chromap option -\\-min-read-length] Skip mapping the reads of length less than Min read length.
+	  - [chromap option \-\-min-read-length] Skip mapping the reads of length less than Min read length.
 	  - 30
           - 30
 	* - trim_adaptors
-	  - | [chromap option -\\-trim-adapters]
-            | Try to trim adapters on 3’. This only works for paired-end reads. 
-            | When the fragment length indicated by the read pair is less than the length of the reads, 
+	  - | [chromap option \-\-trim-adapters]
+            | Try to trim adapters on 3’. This only works for paired-end reads.
+            | When the fragment length indicated by the read pair is less than the length of the reads,
             | the two mates are overlapped with each other. Then the regions outside the overlap are regarded as adapters and trimmed.
 	  - True
-          - 
+          -
 	* - remove_pcr_duplicates
-	  - | [chromap option -\\-remove-pcr-duplicates] 
+	  - | [chromap option \-\-remove-pcr-duplicates]
             | Remove PCR duplicates.
 	  - True
-          - 
+          -
 	* - remove_pcr_duplicates_at_bulk_level
-	  - | [chromap option -\\-remove-pcr-duplicates-at-bulk-level] 
+	  - | [chromap option \-\-remove-pcr-duplicates-at-bulk-level]
             | Remove PCR duplicates at bulk level for single cell data.
 	  - False
-          - 
+          -
 	* - remove_pcr_duplicates_at_cell_level
-	  - | [chromap option -\\-remove-pcr-duplicates-at-cell-level] 
+	  - | [chromap option \-\-remove-pcr-duplicates-at-cell-level]
             | Remove PCR duplicates at cell level for single cell data.
 	  - False
-          - 
+          -
 	* - tn5_shift
-          - | [chromap option -\\-Tn5-shift]
-	    | Perform Tn5 shift. When this option is turned on, 
-            | the forward mapping start positions are increased by 4bp and the reverse 
+          - | [chromap option \-\-Tn5-shift]
+	    | Perform Tn5 shift. When this option is turned on,
+            | the forward mapping start positions are increased by 4bp and the reverse
             | mapping end positions are decreased by 5bp. Note that this works only when --SAM is NOT set.
 	  - True
           -
 	* - low_mem
-          - | [chromap option -\\-low-mem]
-	    | Use low memory mode. When this option is set, 
-            | multiple temporary intermediate mapping files might be 
-            | generated on disk and they are merged at the end of processing to reduce memory usage. 
-            | When this is NOT set, all the mapping results are kept in the memory before 
+          - | [chromap option \-\-low-mem]
+	    | Use low memory mode. When this option is set,
+            | multiple temporary intermediate mapping files might be
+            | generated on disk and they are merged at the end of processing to reduce memory usage.
+            | When this is NOT set, all the mapping results are kept in the memory before
             | they are saved on disk, which works more efficiently for datasets that are not too large.
 	  - True
           -
 	* - bc_error_threshold
-          - | [chromap option -\\-bc-error-threshold]
+          - | [chromap option \-\-bc-error-threshold]
 	    | Max Hamming distance allowed to correct a barcode. Max allowed 2.
 	  - 1
           - 1
 	* - bc_probability_threshold
-          - | [chromap option -\\-bc-probability-threshold]
+          - | [chromap option \-\-bc-probability-threshold]
 	    | Min probability to correct a barcode.
 	  - 0.9
           - 0.9
 	* - output_mappings_not_in_whitelist
-          - | [chromap option -\\-output-mappings-not-in-whitelist]
+          - | [chromap option \-\-output-mappings-not-in-whitelist]
 	    | Output mappings with barcode not in the whitelist.
-	  - 
+	  -
           -
 	* - output_format
 	  - | Output format. The following formats are available:
             | bed, tagalign, sam, pairs
 	  - "bed"
-          - 
+          -
 	* - chr_order
-          - | [chromap option -\\-chr-order]
+          - | [chromap option \-\-chr-order]
 	    | File with customized chromsome order.
-	  - 
+	  -
           -
 	* - pairs_natural_chr_order
-	  - | [chromap option -\\-pairs-natural-chr-order]
+	  - | [chromap option \-\-pairs-natural-chr-order]
             | File with natural chromosome order for pairs flipping.
-	  - 
+	  -
           -
 	* - docker_registry
 	  - Docker registry to use:

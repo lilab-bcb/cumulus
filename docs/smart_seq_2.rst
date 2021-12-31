@@ -245,7 +245,7 @@ We also provide a way of generating user-customized Genome references for SMART-
 
 #. Import smartseq2_create_reference workflow to your workspace.
 
-    Import by following instructions in `Import workflows to Terra`_. You should choose **github.com/kalarman-cell-observatory/cumulus/Smart-Seq2_create_reference** to import.
+    Import by following instructions in `Import workflows to Terra`_. You should choose **github.com/klarman-cell-observatory/cumulus/Smart-Seq2_create_reference** to import.
 
     Moreover, in the workflow page, click ``Export to Workflow...`` button, and select the workspace to which you want to export ``smartseq2_create_reference`` in the drop-down menu.
 
