@@ -190,7 +190,7 @@ task generate_count_config {
                 print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &', file = sys.stderr)
                 sys.exit(1)
 
-        with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2, open('sample2genome.txt', 'w') as fo3, open('sample2assay.txt', 'w'):
+        with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2, open('sample2genome.txt', 'w') as fo3, open('sample2assay.txt', 'w') as fo4:
             for sample_id in df['Sample'].unique():
                 df_local = df.loc[df['Sample'] == sample_id]
 
