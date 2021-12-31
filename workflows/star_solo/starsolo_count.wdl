@@ -1,6 +1,6 @@
 version 1.0
 
-workflow starsolo_per_sample {
+workflow starsolo_count {
     input {
         # Sample ID
         String sample_id

@@ -1,8 +1,8 @@
 version 1.0
 
-import "starsolo_per_sample.wdl" as sps
+import "starsolo_count.wdl" as ssc
 
-workflow starsolo {
+workflow starsolo_workflow {
     input {
         # Input CSV sample sheet describing metadata of each sample
         File input_csv_file
@@ -10,9 +10,11 @@ workflow starsolo {
         String output_directory
         String r1_fastq_pattern = "_S*_L*_R1_001.fastq.gz"
         String r2_fastq_pattern = "_S*_L*_R2_001.fastq.gz"
-        # Cell barcode start position (1-based coordinate)
+        # Type of SAM/BAM output
         String? outSAMtype
+        # Type of single-cell RNA-seq
         String? soloType
+        # Cell barcode start position (1-based coordinate)
         Int? soloCBstart
         # Cell barcode length
         Int? soloCBlen
@@ -83,11 +85,6 @@ workflow starsolo {
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
-    #Map[String, String] ref_index2url = read_map(ref_index_file)
-    #String genome_url = if sub(genome, "^(gs|s3)://.*", "URL")=="URL" then genome else ref_index2url[genome] + '/starsolo.tar.gz'
-
-    #Map[String, String] wl_index2url = read_map(whitelist_index_file)
-
     call generate_count_config {
         input:
             input_csv_file = input_csv_file,
@@ -101,7 +98,7 @@ workflow starsolo {
 
     if (length(generate_count_config.sample_ids) > 0) {
         scatter (sample_id in generate_count_config.sample_ids) {
-            call sps.starsolo_per_sample as starsolo_per_sample {
+            call ssc.starsolo_count as starsolo_count {
                 input:
                     sample_id = sample_id,
                     input_fastqs_directories = generate_count_config.sample2dir[sample_id],
