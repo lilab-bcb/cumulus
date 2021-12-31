@@ -47,7 +47,7 @@ workflow starsolo_per_sample {
     }
 
     Map[String, String] acronym2uri = read_map(acronym_file)
-    File genome_file = if sub(genome, "^.+\\.(tgz|gz)$", "PATH") == "PATH" then genome else acronym2uri[genome] + '/starsolo.tar.gz'
+    File genome_file = if sub(genome, "^.+\\.(tgz|gz)$", "PATH") == "PATH" then genome else acronym2uri[genome]
 
     String whitelist_uri = if assay != 'custom' then acronym2uri[assay] else 'null'
 

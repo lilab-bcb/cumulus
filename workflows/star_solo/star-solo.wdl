@@ -65,7 +65,7 @@ workflow starsolo {
         # Docker registry, default to quay.io/cumulus
         String docker_registry = "quay.io/cumulus"
         # Reference Index TSV
-        File acronym_file = "gs://regev-lab/resources/count_tools/index.tsv"
+        File acronym_file = "gs://regev-lab/resources/starsolo/index.tsv"
         # Disk space in GB needed per sample
         Int disk_space = 500
         # Google cloud zones to consider for execution
