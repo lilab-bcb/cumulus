@@ -11,7 +11,7 @@ workflow starsolo_create_reference {
         String star_version = "2.7.9a"
         Int num_cpu = 32
         Int disk_space = 100
-        String memory = "20G"
+        String memory = "80G"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String backend = "gcp"
         Int preemptible = 2
