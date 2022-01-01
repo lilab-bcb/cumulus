@@ -180,6 +180,11 @@ task generate_count_config {
             print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &')
             sys.exit(1)
 
+        if 'Assay' not in df.columns:
+            df['Assay'] = 'tenX_v3'
+        else:
+            df.loc[df['Assay'].isna(), 'Assay'] = 'tenX_v3'
+
         for idx, row in df.iterrows():
             row['Location'] = re.sub('/+$', '', row['Location'])
             if re.search('[^a-zA-Z0-9_-]', row['Sample']) is not None:
@@ -198,11 +203,9 @@ task generate_count_config {
                     sys.exit(1)
                 reference = df_local['Reference'].iat[0]
 
-                assay = 'tenX_v3'
-                if 'Assay' in df_local.columns:
-                    if df_local['Assay'].unique().size > 1:
-                        print("Detected multiple assay names for sample " + sample_id + "!", file = sys.stderr)
-                    assay = df_local['Assay'].iat[0]
+                if df_local['Assay'].unique().size > 1:
+                    print("Detected multiple assay names for sample " + sample_id + "!", file = sys.stderr)
+                assay = df_local['Assay'].iat[0]
 
                 fo1.write(sample_id + '\n')
                 fo2.write(sample_id + '\t' + ','.join(dirs) + '\n')
