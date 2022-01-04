@@ -70,7 +70,10 @@ def parse_reference_vcf(reference_vcf: str, snp2geno: dict, sample_names: List[s
             continue
         if line.startswith('#'):
             fields = line.strip()[1:].split('\t')
-            assert check_colnames(fields)
+            if 'FORMAT' in fields:
+                assert check_colnames(fields)
+            else:
+                return None, None, False
             ref_names = fields[9:]
             mmat = np.zeros((len(ref_names), nsample), dtype = int)
         else:
@@ -90,7 +93,7 @@ def parse_reference_vcf(reference_vcf: str, snp2geno: dict, sample_names: List[s
 
     print("\n{0} variants are parsed and {1} SNPs are matched.".format(cnt, nbingo))
 
-    return ref_names, mmat
+    return ref_names, mmat, True
 
 
 def replace_ref_names(ref_str: str, ref_names: List[str], has_ref_genotypes: bool) -> List[str]:
@@ -210,8 +213,11 @@ if __name__ == '__main__':
 
     if args.cluster_genotypes is not None:  # freemuxlet
         sample_names, snp2geno = parse_denovo_vcf(args.cluster_genotypes)
+        has_format = False
         if args.ref_genotypes is not None:
-            ref_names, mmat = parse_reference_vcf(args.ref_genotypes, snp2geno, sample_names)
+            ref_names, mmat, has_format = parse_reference_vcf(args.ref_genotypes, snp2geno, sample_names)
+
+        if has_format:
             ref_names = replace_ref_names(args.ref_names, ref_names, has_ref_genotypes = True)
             matching = find_max_matching(ref_names, sample_names, mmat)
         else:

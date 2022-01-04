@@ -162,7 +162,11 @@ task popscle_task {
 
         print(' '.join(call_args))
         check_call(call_args)
+        CODE
 
+        strato sync --backend ~{backend} -m result "~{output_directory}/~{sample_id}"
+
+        python <<CODE
         cluster_result = 'result/~{sample_id}.best' if '~{algorithm}' == 'demuxlet' else 'result/~{sample_id}.clust1.samples.gz'
         call_args = ['python', '/software/generate_zarr.py', cluster_result, '~{input_rna}', 'result/~{sample_id}_demux.zarr.zip', '--ref-genotypes', '~{ref_genotypes}']
         if '~{algorithm}' == 'freemuxlet':
@@ -174,7 +178,7 @@ task popscle_task {
         check_call(call_args)
         CODE
 
-        strato sync --backend ${backend} -m result "~{output_directory}/~{sample_id}"
+        strato sync --backend ~{backend} -m result "~{output_directory}/~{sample_id}"
     }
 
     output {
