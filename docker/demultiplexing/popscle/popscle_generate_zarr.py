@@ -147,6 +147,9 @@ def find_max_matching(ref_names: List[str], sample_names: List[str], mmat: np.ar
     return result
 
 def translate_donor_name(inp_str: str, matching: dict) -> str:
+    if inp_str == '':
+        return inp_str
+
     res_str = []
     for donor_id in inp_str.split(','):
         res_str.append(matching[f"CLUST{donor_id}"][5:])
