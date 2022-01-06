@@ -62,10 +62,10 @@ The sample sheet supports sequencing the same sample across multiple flowcells. 
 
 Example::
 
-    Sample    Flowcells
-    sample_1    gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/sample_1_fastqs
-    sample_1    gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/sample_1_fastqs
-    sample_2    gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/sample_2_fastqs
+    Sample,Flowcells
+    sample_1,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/sample_1_fastqs
+    sample_1,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/sample_1_fastqs
+    sample_2,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/sample_2_fastqs
 
 
 **3.2 Upload your sample sheet to the workspace bucket:**
