@@ -22,10 +22,10 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/scripts/gzip_utils.hpp /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/scripts/barcode_utils.hpp /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/scripts/shareseq_reorg_barcodes.cpp /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/scripts/Makefile /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseq_reorg/scripts/gzip_utils.hpp /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseq_reorg/scripts/barcode_utils.hpp /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseq_reorg/scripts/shareseq_reorg_barcodes.cpp /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseq_reorg/scripts/Makefile /software
 RUN cd /software && make clean && make all && cd ..
 
 RUN mkdir /indices

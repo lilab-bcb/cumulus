@@ -24,8 +24,8 @@ workflow shareseq_reorg {
 
         # Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
         String zones = "us-central1-b"
-        # Number of cpus per bcl2fastq job
-        Int num_cpu = 32
+        # Number of cpus per reorg job
+        Int num_cpu = 1
         # Memory string, e.g. 120G
         String memory = "120G"
         # Disk space in GB
@@ -43,6 +43,9 @@ workflow shareseq_reorg {
             sample_id = sample_id,
             type = type,
             input_fastqs_directories = sub(input_fastqs_directories, "/+$", ""),
+            r1_fastq_pattern = r1_fastq_pattern,
+            r2_fastq_pattern = r2_fastq_pattern,
+            index_fastq_pattern = index_fastq_pattern,
             output_directory = sub(output_directory, "/+$", ""),
             shareseq_reorg_version = shareseq_reorg_version,
             docker_registry = docker_registry,
@@ -56,7 +59,7 @@ workflow shareseq_reorg {
     }
 
     output {
-        String output_directory = run_shareseq_reorg.output_directory
+        String output_reorg_directory = run_shareseq_reorg.output_reorg_directory
         File monitoringLog = run_shareseq_reorg.monitoringLog
     }
 }
