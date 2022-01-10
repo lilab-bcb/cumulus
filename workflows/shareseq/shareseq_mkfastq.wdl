@@ -4,7 +4,7 @@ workflow shareseq_mkfastq {
     input {
         # Input BCL directory, gs url
         String input_bcl_directory
-        # 4 column CSV file (Lane, Sample, Index)
+        # 3 column CSV file (Lane, Sample, Index)
         File input_csv_file
         # Shareseq output directory, gs url
         String output_directory
