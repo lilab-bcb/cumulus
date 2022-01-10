@@ -22,11 +22,13 @@ vector<string> barcode_names, barcode_seqs;
 
 vector<string> flanking_seqs;
 
+string sample_name, sample_type, output_directory;
+
 struct InputFile{
 	static string r1_pattern, r2_pattern, i1_pattern;
 
-	string directory, input_r1, input_r2, input_i1;
-	InputFile(string dir, string r1, string r2, string i1) : directory(dir), input_r1(r1), input_r2(r2), input_i1(i1) {}
+	string directory, input_r1, input_r2, input_i1, out_prefix; // out_prefix, adding directory number to distinguish FASTQ files from different directories
+	InputFile(string dir, string r1, string r2, string i1, int dir_num) : directory(dir), input_r1(r1), input_r2(r2), input_i1(i1), out_prefix(sample_name + "_d" + to_string(dir_num)) {}
 	
 	string get_input_name(string choice) {
 		if (choice == "r1") return directory + input_r1;
@@ -35,9 +37,9 @@ struct InputFile{
 	}
 
 	string get_output_name(string choice, const string& output_directory) {
-		if (choice == "r1") return output_directory + input_r1;
-		if (choice == "r2") return output_directory + input_r2.substr(0, input_r2.length() - r2_pattern.length()) + "R2_001.fastq.gz";
-		return output_directory + input_i1.substr(0, input_i1.length() - i1_pattern.length()) + "I1_001.fastq.gz";
+		if (choice == "r1") return output_directory + out_prefix + input_r1.substr(sample_name.length(), input_r1.length() - sample_name.length() - r1_pattern.length()) + "R1.fastq.gz";
+		if (choice == "r2") return output_directory + out_prefix + input_r2.substr(sample_name.length(), input_r2.length() - sample_name.length() - r2_pattern.length()) + "R2.fastq.gz";
+		return output_directory + out_prefix + input_i1.substr(sample_name.length(), input_i1.length() - sample_name.length() - i1_pattern.length()) + "I1.fastq.gz";
 	}		
 };
 
@@ -50,8 +52,6 @@ vector<InputFile> inputs;
 Read read1, read2, index1;
 iGZipFile gzip_in_r1, gzip_in_r2, gzip_in_i1;
 oGZipFile gzip_out_r1, gzip_out_r2, gzip_out_i1;
-
-string sample_name, sample_type, output_directory;
 
 time_t start_time, finish_time;
 
@@ -82,6 +82,7 @@ void parse_input_directory(char* input_dirs, const string& sample_name) {
 	vector<string> mate1s, mate2s, index1s;
 
 	string dir_name;
+	int dir_num = 0;
 
 	char *input_dir = strtok(input_dirs, ",");
 	
@@ -90,6 +91,7 @@ void parse_input_directory(char* input_dirs, const string& sample_name) {
 		assert((dir = opendir(input_dir)) != NULL);
 		
 		dir_name = string(input_dir) + "/";
+		++dir_num;
 
 		mate1s.clear();
 		mate2s.clear();
@@ -129,7 +131,7 @@ void parse_input_directory(char* input_dirs, const string& sample_name) {
 		sort(index1s.begin(), index1s.end());
 
 		for (int i = 0; i < s; ++i) {
-			inputs.emplace_back(dir_name, mate1s[i], mate2s[i], index1s[i]);
+			inputs.emplace_back(dir_name, mate1s[i], mate2s[i], index1s[i], dir_num);
 		}
 
 		input_dir = strtok(NULL, ",");
@@ -183,14 +185,17 @@ inline bool check_polyT(const string& sequence, int polyT_start, int polyT_len, 
 }
 
 int main(int argc, char* argv[]) {
-	if (argc != 7) {
-		printf("Usage: shareseq_reorg_barcodes barcode_index.csv flanking_sequence.csv sample_name sample_type fastq_folders output_directory\n");
+	if (argc < 7) {
+		printf("Usage: shareseq_reorg_barcodes barcode_index.csv flanking_sequence.csv sample_name sample_type fastq_folders output_directory [--r1-pattern pattern] [--r2-pattern pattern] [--i1-pattern pattern]\n");
 		printf("Arguments:\n\tbarcode_index.csv\tSHARE-Seq barcode white list, used by round1 to round3.\n");
 		printf("\tflanking_sequence.csv\tFlanking sequences in front of round1 to round3 barcodes\n");
 		printf("\tsample_name\tSample name. Only FASTQ files with sample_name as prefix are considered.\n");
 		printf("\tsample_type\tSample type, choosing from 'gex' and 'atac'.\n");
 		printf("\tfastq_folders\tfolder contain all FASTQ files ending with 001.fastq.gz\n");
 		printf("\toutput_directory\tOutput all reorganized FASTQs to this folder. Please do not include slash at the end of directory name.\n");
+		printf("\t[--r1-pattern pattern]\tOptional, specify the end of file name for read 1. Default to R1_001.fastq.gz.\n");
+		printf("\t[--r2-pattern pattern]\tOptional, specify the end of file name for read 2. Default to R3_001.fastq.gz.\n");
+		printf("\t[--i1-pattern pattern]\tOptional, specify the end of file name for index 1. Default to R2_001.fastq.gz.\n");
 		exit(-1);
 	}
 
@@ -205,15 +210,19 @@ int main(int argc, char* argv[]) {
 	check_polyT_len = 6; // Follow shareseq paper
 	check_polyT_max_mismatch = 1; // Follow shareseq paper
 
-	assert(sample_type == "gex" || sample_type == "atac");
+	for (int i = 7; i < argc; ++i) {
+		if (!strcmp(argv[i], "--r1-pattern")) { InputFile::r1_pattern = string(argv[i + 1]); ++i; }
+		if (!strcmp(argv[i], "--r2-pattern")) { InputFile::r2_pattern = string(argv[i + 1]); ++i; }
+		if (!strcmp(argv[i], "--i1-pattern")) { InputFile::i1_pattern = string(argv[i + 1]); ++i; }
+	}
 
+	assert(sample_type == "gex" || sample_type == "atac");
 
 	parse_sample_sheet(argv[1], n_barcode, barcode_len, barcode_index, barcode_names, barcode_seqs, max_mismatch);
 
 	parse_flanking_csv(argv[2]);
 
 	parse_input_directory(argv[5], sample_name);
-
 
 	int cnt = 0;
 	int n_valid = 0;

@@ -142,10 +142,12 @@ workflow chromap_mapping {
             awsMaxRetries = awsMaxRetries,
             backend = backend                                    
     }
-        output {
-            String output_aln_directory = chromap.output_aln_directory
-            File monitoringLog = chromap.monitoringLog
-        }
+
+
+    output {
+        String output_aln_directory = chromap.output_aln_directory
+        File monitoringLog = chromap.monitoringLog
+    }
 
 }
 
