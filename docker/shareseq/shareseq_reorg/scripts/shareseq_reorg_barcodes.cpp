@@ -191,7 +191,7 @@ int main(int argc, char* argv[]) {
 		printf("\tflanking_sequence.csv\tFlanking sequences in front of round1 to round3 barcodes\n");
 		printf("\tsample_name\tSample name. Only FASTQ files with sample_name as prefix are considered.\n");
 		printf("\tsample_type\tSample type, choosing from 'gex' and 'atac'.\n");
-		printf("\tfastq_folders\tfolder contain all FASTQ files ending with 001.fastq.gz\n");
+		printf("\tfastq_folders\tfolder contain all FASTQ files.\n");
 		printf("\toutput_directory\tOutput all reorganized FASTQs to this folder. Please do not include slash at the end of directory name.\n");
 		printf("\t[--r1-pattern pattern]\tOptional, specify the end of file name for read 1. Default to R1_001.fastq.gz.\n");
 		printf("\t[--r2-pattern pattern]\tOptional, specify the end of file name for read 2. Default to R3_001.fastq.gz.\n");
