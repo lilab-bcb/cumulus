@@ -4,7 +4,7 @@ workflow shareseq_mkfastq {
     input {
         # Input BCL directory, gs url
         String input_bcl_directory
-        # 4 column CSV file (Lane, Sample, Index, Type)
+        # 3 column CSV file (Lane, Sample, Index)
         File input_csv_file
         # Shareseq output directory, gs url
         String output_directory
@@ -16,8 +16,8 @@ workflow shareseq_mkfastq {
         # Override the read lengths as specified in RunInfo.xml
         String? use_bases_mask
 
-        # shareseqdemux version
-        String shareseqdemux_version = "0.1.0"
+        # shareseq_mkfastq version
+        String shareseq_mkfastq_version = "0.1.0"
         # Which docker registry to use
         String docker_registry
 
@@ -44,7 +44,8 @@ workflow shareseq_mkfastq {
             output_directory = sub(output_directory, "/+$", ""),
             delete_input_bcl_directory = delete_input_bcl_directory,
             barcode_mismatches = barcode_mismatches,
-            shareseqdemux_version = shareseqdemux_version,
+            use_bases_mask = use_bases_mask,
+            shareseq_mkfastq_version = shareseq_mkfastq_version,
             docker_registry = docker_registry,
             zones = zones,
             num_cpu = num_cpu,
@@ -69,7 +70,7 @@ task run_shareseq_mkfastq {
         Boolean delete_input_bcl_directory
         Int? barcode_mismatches
         String? use_bases_mask
-        String shareseqdemux_version
+        String shareseq_mkfastq_version
         String docker_registry
         String zones
         Int num_cpu
@@ -91,29 +92,11 @@ task run_shareseq_mkfastq {
         bcl2fastq -o _out -R ~{run_id} --sample-sheet _bcl_sample_sheet.csv ~{"--barcode-mismatches " + barcode_mismatches} --use-bases-mask ~{default="Y*,Y*,I*,Y*" use_bases_mask}
         strato sync --backend ~{backend} -m _out ~{output_directory}/~{run_id}_fastqs
 
-        mkdir -p _out_reorg
-
-        python <<CODE
-        import pandas as pd
-        from subprocess import check_call
-
-        df = pd.read_csv('~{input_csv_file}', header=0)
-        for i, row in df.iterrows():
-            call_args = ['shareseq_reorg_barcodes', '/indices/shareseq_barcode_index.csv', '/indices/shareseq_flanking_sequence.csv', row['Sample'], row['Type'], '_out', '_out_reorg']
-            print(' '.join(call_args))
-            check_call(call_args)
-        CODE
-
-        strato sync --backend ~{backend} -m _out_reorg ~{output_directory}/~{run_id}_fastqs_reorg
-
         python <<CODE
         from subprocess import check_call, CalledProcessError
         if '~{delete_input_bcl_directory}' is 'true':
             try:
                 call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_fastqs/']
-                print(' '.join(call_args))
-                check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-                call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_fastqs_reorg/']
                 print(' '.join(call_args))
                 check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
                 try:
@@ -124,18 +107,17 @@ task run_shareseq_mkfastq {
                 except CalledProcessError:
                     print("Failed to delete BCL directory.")
             except CalledProcessError:
-                print("Either demultiplexing or reorganizing did not complete. Stop to delete BCL directory.")                
+                print("Demultiplexing did not complete. Stop to delete BCL directory.")                
         CODE
     }
 
     output {
         String output_fastqs_directory = "~{output_directory}/~{run_id}_fastqs"
-        String output_fastqs_reorg_directory = "~{output_directory}/~{run_id}_fastqs_reorg"
         File monitoringLog = "monitoring.log"
     }
 
     runtime {
-        docker: "~{docker_registry}/shareseqdemux:~{shareseqdemux_version}"
+        docker: "~{docker_registry}/shareseq_mkfastq:~{shareseq_mkfastq_version}"
         zones: zones
         memory: memory
         bootDiskSizeGb: 12
