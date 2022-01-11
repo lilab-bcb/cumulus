@@ -8,8 +8,8 @@ workflow starsolo_count {
         String input_fastqs_directories
         String assay = ""
         String genome
-        String r1_fastq_pattern = "_S*_L*_R1_001.fastq.gz"
-        String r2_fastq_pattern = "_S*_L*_R2_001.fastq.gz"
+        String read1_fastq_pattern = "_S*_L*_R1_001.fastq.gz"
+        String read2_fastq_pattern = "_S*_L*_R2_001.fastq.gz"
         String output_directory
         File acronym_file
         String? outSAMtype
@@ -55,8 +55,8 @@ workflow starsolo_count {
         input:
             sample_id = sample_id,
             input_fastqs_directories = input_fastqs_directories,
-            r1_fastq_pattern = r1_fastq_pattern,
-            r2_fastq_pattern = r2_fastq_pattern,
+            read1_fastq_pattern = read1_fastq_pattern,
+            read2_fastq_pattern = read2_fastq_pattern,
             assay = assay,
             genome = genome_file,
             output_directory = output_directory,
@@ -104,8 +104,8 @@ task run_starsolo {
     input {
         String sample_id
         String input_fastqs_directories
-        String r1_fastq_pattern
-        String r2_fastq_pattern
+        String read1_fastq_pattern
+        String read2_fastq_pattern
         String assay
         File genome
         String output_directory
@@ -178,31 +178,31 @@ task run_starsolo {
                 print(' '.join(call_args))
                 check_call(call_args)
 
-                set_up_input_fastq_files(r1_list, target, '~{r1_fastq_pattern}')
-                set_up_input_fastq_files(r2_list, target, '~{r2_fastq_pattern}')
+                set_up_input_fastq_files(r1_list, target, '~{read1_fastq_pattern}')
+                set_up_input_fastq_files(r2_list, target, '~{read2_fastq_pattern}')
 
             except CalledProcessError:
                 if not os.path.exists(target):
                     os.mkdir(target)
-                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{r1_fastq_pattern}' , target + '/']
+                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{read1_fastq_pattern}' , target + '/']
                 print(' '.join(call_args))
                 check_call(call_args)
-                set_up_input_fastq_files(r1_list, target, '~{r1_fastq_pattern}')
+                set_up_input_fastq_files(r1_list, target, '~{read1_fastq_pattern}')
 
-                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{r2_fastq_pattern}' , target + '/']
+                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{read2_fastq_pattern}' , target + '/']
                 print(' '.join(call_args))
                 check_call(call_args)
-                set_up_input_fastq_files(r2_list, target, '~{r2_fastq_pattern}')
+                set_up_input_fastq_files(r2_list, target, '~{read2_fastq_pattern}')
 
         assert len(r1_list) == len(r2_list)
-        file_ext = '.fastq.gz' if os.path.splitext("~{r1_fastq_pattern}")[-1] == '.gz' else '.fastq'
+        file_ext = '.fastq.gz' if os.path.splitext("~{read1_fastq_pattern}")[-1] == '.gz' else '.fastq'
 
         def remove_extra_space(s):
             return re.sub(' +', ' ', s.strip())
 
         call_args = ['STAR', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}']
 
-        if '~{assay}' in ['tenX_v2', 'tenX_v3']:
+        if '~{assay}' in ['tenX_v2', 'tenX_v3', 'ShareSeq']:
             call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBmatchWLtype', '1MM_multi_Nbase_pseudocounts', '--soloUMIfiltering', 'MultiGeneUMI_CR', \
                               '--soloUMIdedup', '1MM_CR', '--clipAdapterType', 'CellRanger4', '--outFilterScoreMin', '30', \
                               '--outSAMtype', 'BAM', 'SortedByCoordinate', '--outSAMattributes', 'CR', 'UR', 'CY', 'UY', 'CB', 'UB'])
@@ -210,6 +210,8 @@ task run_starsolo {
                 call_args.extend(['--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '12'])
             elif '~{assay}' == 'tenX_v2':
                 call_args.extend(['--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '10'])
+            elif '~{assay}' == 'ShareSeq':
+                call_args.extend(['--soloCBstart', '1', '--soloCBlen', '24', '--soloUMIstart', '25', '--soloUMIlen', '10'])
         elif '~{assay}' in ['SeqWell', 'DropSeq']:
             call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8', \
                               '--outSAMtype', 'BAM', 'SortedByCoordinate', '--outSAMattributes', 'CR', 'UR', 'CY', 'UY', 'CB', 'UB'])
