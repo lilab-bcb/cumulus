@@ -127,7 +127,7 @@ task run_shareseq_reorg {
 
 
         call_args = ['shareseq_reorg_barcodes', '/indices/shareseq_barcode_index.csv', '/indices/shareseq_flanking_sequence.csv',
-                     '~{sample_id}', '~{type}', target_dirs, _out_reorg,
+                     '~{sample_id}', '~{type}', target_dirs, '_out_reorg',
                      '--r1-pattern', '~{r1_fastq_pattern}', '--r2-pattern', '~{r2_fastq_pattern}',
                      '--r3-pattern', '~{index_fastq_pattern}']
         print(' '.join(call_args))
