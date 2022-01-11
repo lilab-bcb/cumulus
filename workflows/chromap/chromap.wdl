@@ -262,7 +262,7 @@ task chromap {
             assert len(r1_list) == len(r2_list)
 
         read1_fq = ",".join(r1_list)
-        read1_fq = ",".join(r2_list)             
+        read2_fq = ",".join(r2_list)             
 
         call_args = ['chromap', '--preset', '~{preset}', '-r', 'genome_dir/ref.fa', 
                      '-x', 'genome_dir/ref.index', '-1', read1_fq, 
