@@ -8,8 +8,8 @@ workflow starsolo_workflow {
         File input_csv_file
         # URL of output directory
         String output_directory
-        String r1_fastq_pattern = "_S*_L*_R1_001.fastq.gz"
-        String r2_fastq_pattern = "_S*_L*_R2_001.fastq.gz"
+        String read1_fastq_pattern = "_S*_L*_R1_001.fastq.gz"
+        String read2_fastq_pattern = "_S*_L*_R2_001.fastq.gz"
         # Type of SAM/BAM output
         String? outSAMtype
         # Type of single-cell RNA-seq
@@ -105,8 +105,8 @@ workflow starsolo_workflow {
                     genome = generate_count_config.sample2genome[sample_id],
                     assay = generate_count_config.sample2assay[sample_id],
                     acronym_file = acronym_file,
-                    r1_fastq_pattern = r1_fastq_pattern,
-                    r2_fastq_pattern = r2_fastq_pattern,
+                    read1_fastq_pattern = read1_fastq_pattern,
+                    read2_fastq_pattern = read2_fastq_pattern,
                     outSAMtype = outSAMtype,
                     soloType = soloType,
                     soloCBstart = soloCBstart,
