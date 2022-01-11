@@ -204,6 +204,7 @@ task chromap {
         python <<CODE
         import re
         import os
+        from fnmatch import fnmatch
         from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
         import sys
 
