@@ -9,6 +9,7 @@
 #include <algorithm>
 
 #include "dirent.h"
+#include "fnmatch.h"
 
 #include "gzip_utils.hpp"
 #include "barcode_utils.hpp"
@@ -28,7 +29,7 @@ struct InputFile{
 	static string r1_pattern, r2_pattern, i1_pattern;
 
 	string directory, input_r1, input_r2, input_i1, out_prefix; // out_prefix, adding directory number to distinguish FASTQ files from different directories
-	InputFile(string dir, string r1, string r2, string i1, int dir_num) : directory(dir), input_r1(r1), input_r2(r2), input_i1(i1), out_prefix(sample_name + "_d" + to_string(dir_num)) {}
+	InputFile(string dir, string r1, string r2, string i1, int file_num) : directory(dir), input_r1(r1), input_r2(r2), input_i1(i1), out_prefix(sample_name + "_f" + to_string(file_num)) {}
 	
 	string get_input_name(string choice) {
 		if (choice == "r1") return directory + input_r1;
@@ -37,15 +38,15 @@ struct InputFile{
 	}
 
 	string get_output_name(string choice, const string& output_directory) {
-		if (choice == "r1") return output_directory + out_prefix + input_r1.substr(sample_name.length(), input_r1.length() - sample_name.length() - r1_pattern.length()) + "R1.fastq.gz";
-		if (choice == "r2") return output_directory + out_prefix + input_r2.substr(sample_name.length(), input_r2.length() - sample_name.length() - r2_pattern.length()) + "R2.fastq.gz";
-		return output_directory + out_prefix + input_i1.substr(sample_name.length(), input_i1.length() - sample_name.length() - i1_pattern.length()) + "I1.fastq.gz";
+		if (choice == "r1") return output_directory + out_prefix + "_R1.fastq.gz";
+		if (choice == "r2") return output_directory + out_prefix + "_R2.fastq.gz";
+		return output_directory + out_prefix + "_I1.fastq.gz";
 	}		
 };
 
-string InputFile::r1_pattern = string("R1_001.fastq.gz");
-string InputFile::r2_pattern = string("R3_001.fastq.gz");
-string InputFile::i1_pattern = string("R2_001.fastq.gz");
+string InputFile::r1_pattern = string("_S*_L*_R1_001.fastq.gz");
+string InputFile::r2_pattern = string("_S*_L*_R3_001.fastq.gz");
+string InputFile::i1_pattern = string("_S*_L*_R2_001.fastq.gz");
 
 vector<InputFile> inputs; 
 
@@ -82,16 +83,16 @@ void parse_input_directory(char* input_dirs, const string& sample_name) {
 	vector<string> mate1s, mate2s, index1s;
 
 	string dir_name;
-	int dir_num = 0;
+	int file_num = 0;
 
 	char *input_dir = strtok(input_dirs, ",");
+
 	
 	inputs.clear();
 	while (input_dir != NULL) {
 		assert((dir = opendir(input_dir)) != NULL);
 		
 		dir_name = string(input_dir) + "/";
-		++dir_num;
 
 		mate1s.clear();
 		mate2s.clear();
@@ -99,27 +100,9 @@ void parse_input_directory(char* input_dirs, const string& sample_name) {
 
 		while ((ent = readdir(dir)) != NULL) {
 			if (ent->d_type == DT_REG) {
-				string file_name = string(ent->d_name);
-				size_t pos;
-
-				if (file_name.find(sample_name) == 0) {
-					pos = file_name.find(InputFile::r1_pattern);
-					if (pos != string::npos && pos + InputFile::r1_pattern.length() == file_name.length()) {
-						mate1s.push_back(file_name);
-					}
-					else {
-						pos = file_name.find(InputFile::r2_pattern);
-						if (pos != string::npos && pos + InputFile::r2_pattern.length() == file_name.length()) {
-							mate2s.push_back(file_name);
-						}
-						else {
-							pos = file_name.find(InputFile::i1_pattern);
-							if (pos != string::npos && pos + InputFile::i1_pattern.length() == file_name.length()) {
-								index1s.push_back(file_name);
-							}							
-						}						
-					}
-				}
+				if (!fnmatch(InputFile::r1_pattern.c_str(), ent->d_name, 0)) mate1s.emplace_back(ent->d_name);
+				else if (!fnmatch(InputFile::r2_pattern.c_str(), ent->d_name, 0)) mate2s.emplace_back(ent->d_name);
+				else if (!fnmatch(InputFile::i1_pattern.c_str(), ent->d_name, 0)) index1s.emplace_back(ent->d_name);
 			}
 		}
 
@@ -131,7 +114,8 @@ void parse_input_directory(char* input_dirs, const string& sample_name) {
 		sort(index1s.begin(), index1s.end());
 
 		for (int i = 0; i < s; ++i) {
-			inputs.emplace_back(dir_name, mate1s[i], mate2s[i], index1s[i], dir_num);
+			++file_num;
+			inputs.emplace_back(dir_name, mate1s[i], mate2s[i], index1s[i], file_num);
 		}
 
 		input_dir = strtok(NULL, ",");
@@ -193,9 +177,9 @@ int main(int argc, char* argv[]) {
 		printf("\tsample_type\tSample type, choosing from 'gex' and 'atac'.\n");
 		printf("\tfastq_folders\tfolder contain all FASTQ files.\n");
 		printf("\toutput_directory\tOutput all reorganized FASTQs to this folder. Please do not include slash at the end of directory name.\n");
-		printf("\t[--r1-pattern pattern]\tOptional, specify the end of file name for read 1. Default to R1_001.fastq.gz.\n");
-		printf("\t[--r2-pattern pattern]\tOptional, specify the end of file name for read 2. Default to R3_001.fastq.gz.\n");
-		printf("\t[--i1-pattern pattern]\tOptional, specify the end of file name for index 1. Default to R2_001.fastq.gz.\n");
+		printf("\t[--r1-pattern pattern]\tOptional, specify regex expression for file name after sample_name in read 1. sample_id + pattern should match FASTQ file names for read 1. Default to _S*_L*_R1_001.fastq.gz.\n");
+		printf("\t[--r2-pattern pattern]\tOptional, specify regex expression for file name after sample_name in read 2. sample_id + pattern should match FASTQ file names for read 2. Default to _S*_L*_R3_001.fastq.gz.\n");
+		printf("\t[--i1-pattern pattern]\tOptional, specify regex expression for file name after sample_name in index 1. sample_id + pattern should match FASTQ file names for index 1. Default to _S*_L*_R2_001.fastq.gz.\n");
 		exit(-1);
 	}
 
@@ -216,6 +200,10 @@ int main(int argc, char* argv[]) {
 		if (!strcmp(argv[i], "--i1-pattern")) { InputFile::i1_pattern = string(argv[i + 1]); ++i; }
 	}
 
+	InputFile::r1_pattern = sample_name + InputFile::r1_pattern;
+	InputFile::r2_pattern = sample_name + InputFile::r2_pattern;
+	InputFile::i1_pattern = sample_name + InputFile::i1_pattern;
+
 	assert(sample_type == "gex" || sample_type == "atac");
 
 	parse_sample_sheet(argv[1], n_barcode, barcode_len, barcode_index, barcode_names, barcode_seqs, max_mismatch);
@@ -223,6 +211,7 @@ int main(int argc, char* argv[]) {
 	parse_flanking_csv(argv[2]);
 
 	parse_input_directory(argv[5], sample_name);
+
 
 	int cnt = 0;
 	int n_valid = 0;
