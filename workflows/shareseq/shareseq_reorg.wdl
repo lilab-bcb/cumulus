@@ -25,7 +25,7 @@ workflow shareseq_reorg {
         # Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
         String zones = "us-central1-b"
         # Number of cpus per reorg job
-        Int num_cpu = 1
+        Int num_cpu = 4
         # Memory string, e.g. 120G
         String memory = "120G"
         # Disk space in GB
@@ -91,16 +91,54 @@ task run_shareseq_reorg {
         
         mkdir -p _out_reorg
 
-        shareseq_reorg_barcodes /indices/shareseq_barcode_index.csv /indices/shareseq_flanking_sequence.csv \
-                                ~{sample_id} ~{type} ~{input_fastqs_directories} _out_reorg \
-                                ~{'--r1-pattern '+ r1_fastq_pattern} ~{'--r2-pattern '+ r2_fastq_pattern} \
-                                ~{'--r3-pattern '+ index_fastq_pattern}
+        python <<CODE
+        import os, re
+        from fnmatch import fnmatch
+        from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
 
-        strato sync --backend ~{backend} -m _out_reorg ~{output_directory}/~{sample_id}_fastqs_reorg
+        target_dirs = []
+        for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
+            directory = re.sub('/+$', '', directory) # remove trailing slashes
+            target = "~{sample_id}_" + str(i)
+            try:
+                call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}']
+                print(' '.join(call_args))
+                check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
+                call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]
+                print(' '.join(call_args))
+                check_call(call_args)
+                target_dirs.append(target)
+
+            except CalledProcessError:
+                if not os.path.exists(target):
+                    os.mkdir(target)
+                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{r1_fastq_pattern}' , target + '/']
+                print(' '.join(call_args))
+                check_call(call_args)
+
+                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{r2_fastq_pattern}' , target + '/']
+                print(' '.join(call_args))
+                check_call(call_args)
+
+                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{index_fastq_pattern}' , target + '/']
+                print(' '.join(call_args))
+                check_call(call_args)
+                target_dirs.append(target)               
+
+
+        call_args = ['shareseq_reorg_barcodes', '/indices/shareseq_barcode_index.csv', '/indices/shareseq_flanking_sequence.csv',
+                     ~{sample_id}, ~{type}, target_dirs, _out_reorg,
+                     '--r1-pattern', r1_fastq_pattern, '--r2-pattern', r2_fastq_pattern,
+                     '--r3-pattern', index_fastq_pattern]
+        print(' '.join(call_args))
+        check_call(call_args)
+        CODE
+        
+        strato sync --backend ~{backend} -m _out_reorg ~{output_directory}/fastqs_reorg/~{sample_id}
     }
 
     output {
-        String output_reorg_directory = "~{output_directory}/~{sample_id}_fastqs_reorg"
+        String output_reorg_directory = "~{output_directory}/fastqs_reorg/~{sample_id}"
         File monitoringLog = "monitoring.log"
     }
 
