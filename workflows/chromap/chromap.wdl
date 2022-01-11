@@ -255,15 +255,14 @@ task chromap {
                     check_call(call_args)
                     set_up_input_fastq_files(index_list, target, '~{index_fastq_pattern}')               
 
-        assert len(r1_list) == len(r2_list)
-
         if '~{preset}' == 'atac':
-            if index_fq != '':
-                assert len(r1_list) == len(r2_list) ==  len(index_list)
+            assert len(r1_list) == len(r2_list) ==  len(index_list)
+            index_fq = ",".join(index_list)  
+        else:
+            assert len(r1_list) == len(r2_list)
 
         read1_fq = ",".join(r1_list)
-        read1_fq = ",".join(r2_list)
-        index_fq = ",".join(index_list)       
+        read1_fq = ",".join(r2_list)             
 
         call_args = ['chromap', '--preset', '~{preset}', '-r', 'genome_dir/ref.fa', 
                      '-x', 'genome_dir/ref.index', '-1', read1_fq, 
