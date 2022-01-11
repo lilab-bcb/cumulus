@@ -16,12 +16,12 @@ workflow chromap_mapping {
         # Index TSV file 
         File acronym_file
         
-        # Read1
-        String read1
-        # Read2
-        String read2
-        # Barcode 
-        String? barcode
+        # R1 Fastq pattern
+        String read1_fastq_pattern
+        # R2 Fastq pattern
+        String read2_fastq_pattern
+        # Index Fastq pattern
+        String index_fastq_pattern
         # Barcode whitelist
         File? barcode_whitelist
         # Read format
@@ -103,9 +103,9 @@ workflow chromap_mapping {
     call chromap {
         input:
             chromap_version = chromap_version,
-            read1 = read1,
-            read2 = read2,
-            barcode = barcode,
+            read1_fastq_pattern = read1_fastq_pattern,
+            read2_fastq_pattern = read2_fastq_pattern,
+            index_fastq_pattern = index_fastq_pattern,
             sample_id = sample_id,
             output_directory = output_directory_stripped,
             input_fastqs_directories = input_fastqs_directories,
@@ -154,9 +154,9 @@ workflow chromap_mapping {
 task chromap {
     input {
             String chromap_version
-            String read1
-            String read2
-            String? barcode
+            String read1_fastq_pattern
+            String read2_fastq_pattern
+            String? index_fastq_pattern
             String sample_id
             String output_directory
             String input_fastqs_directories
@@ -206,30 +206,63 @@ task chromap {
         import os
         from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
         import sys
-        
-        fastqs = []
+
+        def set_up_input_fastq_files(l, folder, pattern):
+            file_list = [f for f in os.listdir(folder) if fnmatch(f, "*" + pattern)]
+            file_list.sort()
+            for f in file_list:
+                l.append(folder + '/' + f)
+
+        r1_list = list()
+        r2_list = list()
+        if '~{preset}' == 'atac':
+            index_list = list()
+                
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
             directory = re.sub('/+$', '', directory) # remove trailing slashes
-            target = '~{sample_id}_' + str(i)
+            target = "~{sample_id}_" + str(i)
             try:
-                call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
+                call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}']
                 print(' '.join(call_args))
                 check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-                call_args = ['strato', 'cp', '--backend','~{backend}','-r', '-m', directory + '/~{sample_id}', target]
+                call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]
                 print(' '.join(call_args))
                 check_call(call_args)
+
+                set_up_input_fastq_files(r1_list, target, '~{read1_fastq_pattern}')
+                set_up_input_fastq_files(r2_list, target, '~{read2_fastq_pattern}')
+
+                if '~{preset}' == 'atac':                    
+                    set_up_input_fastq_files(index_list, target, '~{index_fastq_pattern}')
+
             except CalledProcessError:
                 if not os.path.exists(target):
                     os.mkdir(target)
-                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz', target]
+                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{read1_fastq_pattern}' , target + '/']
                 print(' '.join(call_args))
                 check_call(call_args)
-            fl = [os.path.abspath(os.path.join(target,i)) for i in os.listdir(target)]     
-            fastqs.extend(fl)
-        
-        read1_fq = ",".join(sorted(list(filter(lambda k: '_~{read1}_' in k, fastqs))))
-        read2_fq = ",".join(sorted(list(filter(lambda k: '_~{read2}_' in k, fastqs))))
-        index_fq = ",".join(sorted(list(filter(lambda k: '_~{barcode}_' in k, fastqs))))
+                set_up_input_fastq_files(r1_list, target, '~{read1_fastq_pattern}')
+
+                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{read2_fastq_pattern}' , target + '/']
+                print(' '.join(call_args))
+                check_call(call_args)
+                set_up_input_fastq_files(r2_list, target, '~{read2_fastq_pattern}')
+
+                if '~{preset}' == 'atac':                        
+                    call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{index_fastq_pattern}' , target + '/']
+                    print(' '.join(call_args))
+                    check_call(call_args)
+                    set_up_input_fastq_files(index_list, target, '~{index_fastq_pattern}')               
+
+        assert len(r1_list) == len(r2_list)
+
+        if '~{preset}' == 'atac':
+            if index_fq != '':
+                assert len(r1_list) == len(r2_list) ==  len(index_list)
+
+        read1_fq = ",".join(r1_list)
+        read1_fq = ",".join(r2_list)
+        index_fq = ",".join(index_list)       
 
         call_args = ['chromap', '--preset', '~{preset}', '-r', 'genome_dir/ref.fa', 
                      '-x', 'genome_dir/ref.index', '-1', read1_fq, 
