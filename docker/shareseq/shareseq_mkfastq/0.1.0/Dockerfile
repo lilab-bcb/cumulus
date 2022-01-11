@@ -22,27 +22,20 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/scripts/shareseq2bcl /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/scripts/gzip_utils.hpp /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/scripts/barcode_utils.hpp /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/scripts/shareseq_reorg_barcodes.cpp /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/scripts/Makefile /software
-RUN cd /software && make clean && make all && cd ..
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseq_mkfastq/scripts/shareseq2bcl /software
 
 ADD bcl2fastq2-v2-20-0-linux-x86-64.zip /software/
 RUN unzip -d /software/ /software/bcl2fastq2-v2-20-0-linux-x86-64.zip && alien -i /software/bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm && rm -f /software/bcl2fastq2-v2*
 
 RUN mkdir /indices
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/indices/shareseq_sample_index.csv /indices/
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/indices/shareseq_barcode_index.csv /indices/
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseqdemux/indices/shareseq_flanking_sequence.csv /indices/
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseq_mkfastq/indices/shareseq_sample_index.csv /indices/
 
 RUN apt-get -qq -y remove alien curl gnupg python3-pip unzip && \
     apt-get -qq -y autoremove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
 
-RUN chmod a+rx /software/monitor_script.sh /software/shareseq2bcl /software/shareseq_reorg_barcodes
+RUN chmod a+rx /software/monitor_script.sh /software/shareseq2bcl
 
 ENV PATH=/software:$PATH
 ENV TMPDIR=/tmp
