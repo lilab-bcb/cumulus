@@ -19,7 +19,7 @@ workflow cellranger_count {
         String genome
         # Index TSV file
         File acronym_file
-        
+
         # Target panel CSV for targeted gene expression analysis
         File? target_panel
 
@@ -178,7 +178,7 @@ task run_cellranger_count {
                     directory = re.sub('/+$', '', directory) # remove trailing slashes
                     target = samples[i] + "_" + str(i)
                     try:
-                        call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/' + samples[i]]
+                        call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/' + samples[i] + '/']
                         print(' '.join(call_args))
                         check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
                         call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/' + samples[i], target]
@@ -219,7 +219,7 @@ task run_cellranger_count {
                         os.mkdir(target)
                     call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
                     print(' '.join(call_args))
-                    check_call(call_args)                           
+                    check_call(call_args)
                 fastqs_dirs.append(target)
 
         call_args = ['cellranger', 'count', '--id=results', '--transcriptome=genome_dir', '--chemistry=~{chemistry}', '--jobmode=local']

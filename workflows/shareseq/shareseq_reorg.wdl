@@ -88,7 +88,7 @@ task run_shareseq_reorg {
         set -e
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
-        
+
         mkdir -p _out_reorg
 
         python <<CODE
@@ -101,7 +101,7 @@ task run_shareseq_reorg {
             directory = re.sub('/+$', '', directory) # remove trailing slashes
             target = "~{sample_id}_" + str(i)
             try:
-                call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}']
+                call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
                 print(' '.join(call_args))
                 check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
                 call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]
@@ -123,7 +123,7 @@ task run_shareseq_reorg {
                 call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{index_fastq_pattern}' , target + '/']
                 print(' '.join(call_args))
                 check_call(call_args)
-                target_dirs.append(target)               
+                target_dirs.append(target)
 
         target_dirs = ','.join(target_dirs)
         call_args = ['shareseq_reorg_barcodes', '/indices/shareseq_barcode_index.csv', '/indices/shareseq_flanking_sequence.csv',

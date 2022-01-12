@@ -171,7 +171,7 @@ task run_starsolo {
             directory = re.sub('/+$', '', directory) # remove trailing slashes
             target = "~{sample_id}_" + str(i)
             try:
-                call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}']
+                call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
                 print(' '.join(call_args))
                 check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
                 call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]

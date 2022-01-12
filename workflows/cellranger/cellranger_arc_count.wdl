@@ -138,7 +138,7 @@ task run_cellranger_arc_count {
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
                 target = samples[i] + '_' + str(i)
                 try:
-                    call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/' + samples[i]]
+                    call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/' + samples[i] + '/']
                     print(' '.join(call_args))
                     check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
                     call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/' + samples[i], target]
@@ -149,7 +149,7 @@ task run_cellranger_arc_count {
                         os.mkdir(target)
                     call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/' + samples[i] + '_S*_L*_*_001.fastq.gz' , target]
                     print(' '.join(call_args))
-                    check_call(call_args)    
+                    check_call(call_args)
                 fout.write(os.path.abspath(target) + ',' + samples[i] + ',' + ('Gene Expression' if data_types[i] == 'rna' else 'Chromatin Accessibility') + '\n')
 
         call_args = ['cellranger-arc', 'count', '--id=results', '--libraries=libraries.csv', '--reference=genome_dir', '--jobmode=local']

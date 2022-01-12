@@ -189,7 +189,7 @@ task run_cellranger_multi {
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
                 target = samples[i] + "_" + str(i)
                 try:
-                    call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/' + samples[i]]
+                    call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/' + samples[i] + '/']
                     print(' '.join(call_args))
                     check_call(call_args, stderr=STDOUT, stdout=DEVNULL)
                     call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/' + samples[i], target]
