@@ -27,9 +27,9 @@ workflow shareseq_reorg {
         # Number of cpus per reorg job
         Int num_cpu = 4
         # Memory string, e.g. 120G
-        String memory = "120G"
+        String memory = "8G"
         # Disk space in GB
-        Int disk_space = 1500
+        Int disk_space = 500
         # Number of preemptible tries
         Int preemptible = 2
         # Max number of retries for AWS instance
@@ -129,7 +129,7 @@ task run_shareseq_reorg {
         call_args = ['shareseq_reorg_barcodes', '/indices/shareseq_barcode_index.csv', '/indices/shareseq_flanking_sequence.csv',
                      '~{sample_id}', '~{type}', target_dirs, '_out_reorg',
                      '--r1-pattern', '~{r1_fastq_pattern}', '--r2-pattern', '~{r2_fastq_pattern}',
-                     '--r3-pattern', '~{index_fastq_pattern}']
+                     '--i1-pattern', '~{index_fastq_pattern}']
         print(' '.join(call_args))
         check_call(call_args)
         CODE
