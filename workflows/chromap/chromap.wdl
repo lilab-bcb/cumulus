@@ -20,8 +20,8 @@ workflow chromap_mapping {
         String read1_fastq_pattern
         # R2 Fastq pattern
         String read2_fastq_pattern
-        # Index Fastq pattern
-        String index_fastq_pattern
+        # Barcode Fastq pattern
+        String barcode_fastq_pattern
         # Barcode whitelist
         File? barcode_whitelist
         # Read format
@@ -105,7 +105,7 @@ workflow chromap_mapping {
             chromap_version = chromap_version,
             read1_fastq_pattern = read1_fastq_pattern,
             read2_fastq_pattern = read2_fastq_pattern,
-            index_fastq_pattern = index_fastq_pattern,
+            barcode_fastq_pattern = barcode_fastq_pattern,
             sample_id = sample_id,
             output_directory = output_directory_stripped,
             input_fastqs_directories = input_fastqs_directories,
@@ -156,7 +156,7 @@ task chromap {
             String chromap_version
             String read1_fastq_pattern
             String read2_fastq_pattern
-            String? index_fastq_pattern
+            String barcode_fastq_pattern
             String sample_id
             String output_directory
             String input_fastqs_directories
@@ -223,7 +223,7 @@ task chromap {
             directory = re.sub('/+$', '', directory) # remove trailing slashes
             target = "~{sample_id}_" + str(i)
             try:
-                call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}']
+                call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
                 print(' '.join(call_args))
                 check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
                 call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]
@@ -234,7 +234,7 @@ task chromap {
                 set_up_input_fastq_files(r2_list, target, '~{read2_fastq_pattern}')
 
                 if '~{preset}' == 'atac':                    
-                    set_up_input_fastq_files(index_list, target, '~{index_fastq_pattern}')
+                    set_up_input_fastq_files(index_list, target, '~{barcode_fastq_pattern}')
 
             except CalledProcessError:
                 if not os.path.exists(target):
@@ -250,10 +250,10 @@ task chromap {
                 set_up_input_fastq_files(r2_list, target, '~{read2_fastq_pattern}')
 
                 if '~{preset}' == 'atac':                        
-                    call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{index_fastq_pattern}' , target + '/']
+                    call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{barcode_fastq_pattern}' , target + '/']
                     print(' '.join(call_args))
                     check_call(call_args)
-                    set_up_input_fastq_files(index_list, target, '~{index_fastq_pattern}')               
+                    set_up_input_fastq_files(index_list, target, '~{barcode_fastq_pattern}')               
 
         if '~{preset}' == 'atac':
             assert len(r1_list) == len(r2_list) ==  len(index_list)
