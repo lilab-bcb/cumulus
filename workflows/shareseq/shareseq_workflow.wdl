@@ -171,34 +171,10 @@ workflow shareseq_workflow {
                         read1_fastq_pattern = '_f*_R1.fastq.gz',
                         read2_fastq_pattern = '_f*_R2.fastq.gz',
                         assay = 'ShareSeq',
+                        barcode_read = 'read2',
                         genome = generate_count_config.sample2datatype[sample_id],
                         acronym_file = acronym2gsurl['starsolo'],
                         output_directory = output_directory_stripped,
-                        ''''
-                        outSAMtype = outSAMtype,
-                        soloType = soloType,
-                        soloCBwhitelist = soloCBwhitelist,
-                        soloCBstart = soloCBstart,
-                        soloCBlen = soloCBlen,
-                        soloUMIstart = soloUMIstart,
-                        soloUMIlen = soloUMIlen,
-                        soloBarcodeReadLength = soloBarcodeReadLength,
-                        soloBarcodeMate = soloBarcodeMate,
-                        soloCBposition = soloCBposition,
-                        soloUMIposition = soloUMIposition,
-                        soloAdapterSequence = soloAdapterSequence,
-                        soloAdapterMismatchesNmax = soloAdapterMismatchesNmax,
-                        soloCBmatchWLtype = soloCBmatchWLtype,
-                        soloInputSAMattrBarcodeSeq = soloInputSAMattrBarcodeSeq,
-                        soloInputSAMattrBarcodeQual = soloInputSAMattrBarcodeQual,
-                        soloStrand = soloStrand,
-                        soloFeatures = soloFeatures,
-                        soloMultiMappers = soloMultiMappers,
-                        soloUMIdedup = soloUMIdedup,
-                        soloUMIfiltering = soloUMIfiltering,
-                        soloCellFilter = soloCellFilter,
-                        soloOutFormatFeaturesGeneField3 = soloOutFormatFeaturesGeneField3,
-                        ''''
                         docker_registry = docker_registry,
                         star_version = star_version,
                         zones = zones,
@@ -245,32 +221,6 @@ workflow shareseq_workflow {
                         output_directory = output_directory_stripped,
                         input_fastqs_directories = shareseq_reorg.output_reorg_directory,
                         genome = generate_count_config.sample2datatype[sample_id],
-                        ''''
-                        output_mappings_not_in_whitelist = output_mappings_not_in_whitelist,
-                        output_format = output_format,
-                        read_format = read_format,
-                        #feel the need to expose these at least
-                        barcode_whitelist = barcode_whitelist,
-                        barcode_translate = barcode_translate,
-                        ############### 
-                        split_alignment = split_alignment, 
-                        max_edit_dist_e = max_edit_dist_e,
-                        min_num_minimizer_s = min_num_minimizer_s,
-                        ignore_minimizer_times_f = ignore_minimizer_times_f,
-                        max_insert_size_l = max_insert_size_l,
-                        min_mapq_q = min_mapq_q,
-                        min_read_length = min_read_length,
-                        trim_adaptors = trim_adaptors,
-                        remove_pcr_duplicates = remove_pcr_duplicates,
-                        remove_pcr_duplicates_at_bulk_level = remove_pcr_duplicates_at_bulk_level,
-                        remove_pcr_duplicates_at_cell_level = remove_pcr_duplicates_at_cell_level,
-                        tn5_shift = tn5_shift,
-                        low_mem = low_mem,
-                        bc_error_threshold = bc_error_threshold,
-                        bc_probability_threshold = bc_probability_threshold,
-                        chr_order = chr_order,
-                        pairs_natural_chr_order = pairs_natural_chr_order,
-                        ''''
                         disk_space = disk_space,
                         docker_registry = docker_registry_stripped,
                         zones = zones,
@@ -307,19 +257,17 @@ task generate_mkfastq_input {
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
 
-        if 'Type' not in df.columns:
-            df['Type'] = 'gex'
-        else:
-            df.loc[df['Type'].isna(), 'Type'] = 'gex'
-
         for c in df.columns:
             df[c] = df[c].str.strip()
 
+        mkfastq_cols = ["Lane","Sample","Index","Flowcell"]
+        for c in mkfastq_cols: 
+            if c not in df.columns:
+                print("To run SHARE-seq mkfastq, following column is required: " + c + ". Please correct sample sheet.", file = sys.stderr)
+                sys.exit(1)
+
         for idx, row in df.iterrows():
             row['Flowcell'] = re.sub('/+$', '', row['Flowcell'])
-            if row['DataType'] not in ['gex', 'atac']:
-                print("Unknown DataType " + row['DataType'] + " is detected!", file = sys.stderr)
-                sys.exit(1)
             if re.search('[^a-zA-Z0-9_-]', row['Sample']) is not None:
                 print('Sample must contain only alphanumeric characters, hyphens, and underscores.', file = sys.stderr)
                 print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &', file = sys.stderr)
@@ -375,13 +323,14 @@ task generate_count_config {
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
 
-        if 'Type' not in df.columns:
-            df['Type'] = 'gex'
-        else:
-            df.loc[df['Type'].isna(), 'Type'] = 'gex'
-
         for c in df.columns:
             df[c] = df[c].str.strip()
+
+        count_cols = ["Sample","Flowcell","Type","Reference"]
+        for c in count_cols: 
+            if c not in df.columns:
+                print("To run SHARE-seq count (ATAC/GEX), following column is required: " + c + ". Please correct sample sheet.", file = sys.stderr)
+                sys.exit(1)
 
         for idx, row in df.iterrows():
             row['Flowcell'] = re.sub('/+$', '', row['Flowcell'])
@@ -406,11 +355,9 @@ task generate_count_config {
         r2f = parse_fastq_dirs('~{sep="," fastq_dirs}')
 
         with open('sample_gex_ids.txt', 'w') as fo1, open('sample_atac_ids.txt', 'w') as fo2,            
-             open('sample2dir.txt', 'w') as foo1, open('sample2datatype.txt', 'w') as foo2, open('sample2genome.txt', 'w') as foo3, \
-             open('count_matrix.csv', 'w') as foo6:
+             open('sample2dir.txt', 'w') as foo1, open('sample2datatype.txt', 'w') as foo2, open('sample2genome.txt', 'w') as foo3:
 
             n_ref = 0 # this mapping can be empty
-            foo6.write('Sample,Location,Bam,Barcodes,Reference\n') # count_matrix.csv
             datatype2fo = dict([('gex', fo1), ('atac', fo2)])
 
             for sample_id in df['Sample'].unique():
@@ -442,13 +389,6 @@ task generate_count_config {
                     foo3.write(sample_id + '\t' + reference + '\n')
                     n_ref += 1
 
-                if datatype == 'gex':
-                    prefix = '~{output_dir}/' + sample_id
-                    count_matrix = prefix + '/' + sample_id + '_Solo.out/Gene/filtered/matrix.mtx'
-                    bam = prefix + '/' + sample_id + '_Aligned.sortedByCoord.out.bam'
-                    barcodes = prefix + '/' + sample_id + '_Solo.out/Gene/filtered/matrix.mtx'
-                    foo6.write(sample_id + ',' + count_matrix + ',' + bam + ',' + barcodes + ',' + reference + '\n')
-
             if n_ref == 0:
                 foo3.write('null\tnull\n')
         CODE
@@ -460,7 +400,6 @@ task generate_count_config {
         Map[String, String] sample2dir = read_map('sample2dir.txt')
         Map[String, String] sample2datatype = read_map('sample2datatype.txt')
         Map[String, String] sample2genome = read_map('sample2genome.txt')
-        File count_matrix = "count_matrix.csv"
     }
 
     runtime {
