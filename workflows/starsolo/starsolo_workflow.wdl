@@ -10,6 +10,8 @@ workflow starsolo_workflow {
         String output_directory
         String read1_fastq_pattern = "_S*_L*_R1_001.fastq.gz"
         String read2_fastq_pattern = "_S*_L*_R2_001.fastq.gz"
+        # Which read contains cell barcodes and UMIs. Either "read1" or "read2"
+        String barcode_read = "read1"
         # Type of SAM/BAM output
         String? outSAMtype
         # Type of single-cell RNA-seq
@@ -107,6 +109,7 @@ workflow starsolo_workflow {
                     acronym_file = acronym_file,
                     read1_fastq_pattern = read1_fastq_pattern,
                     read2_fastq_pattern = read2_fastq_pattern,
+                    barcode_read = barcode_read,
                     outSAMtype = outSAMtype,
                     soloType = soloType,
                     soloCBstart = soloCBstart,
