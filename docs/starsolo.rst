@@ -127,7 +127,7 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
       - "_S*_L*_R2_001.fastq.gz"
       - "_S*_L*_R2_001.fastq.gz"
     * - barcode_read
-      - | Specify which read contains cell barcodes and UMIs: either ``read1`` or ``read2``. This only applies to samples with *Assay* ``None`` in the *input_csv_file*.
+      - | Specify which read contains cell barcodes and UMIs: either ``read1`` or ``read2``. This only applies to samples with *Assay* ``None`` in **input_csv_file**.
         | Otherwise, samples with *Assay* type ``ShareSeq`` automatically specify ``read2`` for cell barcodes and UMIs, while ``read1`` for cDNAs;
         | samples of all the other know *Assay* types automatically specify ``read1`` for cell barcodes and UMIs, while ``read2`` for cDNAs.
       - "read1"
