@@ -409,9 +409,8 @@ task generate_count_config {
              open('sample2dir.txt', 'w') as foo1, open('sample2datatype.txt', 'w') as foo2, open('sample2genome.txt', 'w') as foo3, \
              open('count_matrix.csv', 'w') as foo6:
 
-            n_ref = 0 # this mappings can be empty
-            #TODO
-            foo6.write('Sample,Location,Reference\n') # count_matrix.csv
+            n_ref = 0 # this mapping can be empty
+            foo6.write('Sample,Location,Bam,Barcodes,Reference\n') # count_matrix.csv
             datatype2fo = dict([('gex', fo1), ('atac', fo2)])
 
             for sample_id in df['Sample'].unique():
@@ -443,14 +442,12 @@ task generate_count_config {
                     foo3.write(sample_id + '\t' + reference + '\n')
                     n_ref += 1
 
-                # TODO
-                if datatype == 'atac':
+                if datatype == 'gex':
                     prefix = '~{output_dir}/' + sample_id
-                    bam = prefix + '/possorted_genome_bam.bam'
-                    bai = prefix + '/possorted_genome_bam.bam.bai'
-                    count_matrix = prefix + '/filtered_feature_bc_matrix.h5' # assume cellranger version >= 3.0.0
-                    barcodes = prefix + '/filtered_feature_bc_matrix/barcodes.tsv.gz'
-                    foo6.write(sample_id + ',' + count_matrix + ',' + bam + ',' + bai + ',' + barcodes + ',' + reference + ',' + chemistry + '\n')
+                    count_matrix = prefix + '/' + sample_id + '_Solo.out/Gene/filtered/matrix.mtx'
+                    bam = prefix + '/' + sample_id + '_Aligned.sortedByCoord.out.bam'
+                    barcodes = prefix + '/' + sample_id + '_Solo.out/Gene/filtered/matrix.mtx'
+                    foo6.write(sample_id + ',' + count_matrix + ',' + bam + ',' + barcodes + ',' + reference + '\n')
 
             if n_ref == 0:
                 foo3.write('null\tnull\n')
