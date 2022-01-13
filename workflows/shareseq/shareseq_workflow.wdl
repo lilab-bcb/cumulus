@@ -25,7 +25,8 @@ workflow shareseq_workflow {
         # Override the read lengths as specified in RunInfo.xml
         String? use_bases_mask
 
-        # for fastq patterns
+        # for fastq patterns - shareseq reorg
+
         # read1 fastq pattern
         String read1_fastq_pattern = "_S*_L*_R1_001.fastq.gz"
         # read2 fastq pattern
@@ -46,22 +47,36 @@ workflow shareseq_workflow {
         # Memory string
         String memory = "120G"
 
+        # SHARE-Seq index TSV
+        String acronym_file = "gs://gred-cumulus-output/ref-data/shareseq/index.tsv"
+
         # 0.2
         String config_version = "0.2"
         # 0.1.0
         String shareseq_mkfastq_version = "0.1.0"
         # 0.1.0
         String shareseq_reorg_version = "0.1.0"
+        # 2.7.9a
+        String star_version = "2.7.9a"
+        # 0.1.4
+        String chromap_version = "0.1.4"
 
         # num cpu sharseq_reorg
         Int sharseq_reorg_num_cpu = 4
         # memory sharseq_reorg
         String shareseq_reorg_memory = "8G"
 
+        # num cpu starsolo
+        Int starsolo_num_cpu = 32
+        # memory starsolo
+        String starsolo_memory = "120G"
+
         # Optional disk space for mkfastq.
         Int mkfastq_disk_space = 1500
         # Optional disk space for shareseq_reorg.
         Int shareseq_reorg_disk_space = 500
+        # Optional disk space for starsolo.
+        Int starsolo_disk_space = 500
 
         # Number of preemptible tries
         Int preemptible = 2
@@ -76,7 +91,6 @@ workflow shareseq_workflow {
     String mkfastq_docker_registry_stripped = sub(mkfastq_docker_registry, "/+$", "")
 
     Map[String, String] acronym2gsurl = read_map(acronym_file)
-    String null_file = acronym2gsurl["null_file"]
 
     if (run_mkfastq) {
         call generate_mkfastq_input {
@@ -126,8 +140,7 @@ workflow shareseq_workflow {
                 zones = zones,
                 preemptible = preemptible,
                 awsMaxRetries = awsMaxRetries,
-                backend = backend,
-                null_file = null_file
+                backend = backend
         }
 
         if (length(generate_count_config.sample_gex_ids) > 0) {
@@ -155,14 +168,16 @@ workflow shareseq_workflow {
                     input:
                         sample_id = sample_id,
                         input_fastqs_directories = shareseq_reorg.output_reorg_directory,
-                        read1_fastq_pattern = "_f*_R1.fastq.gz",
-                        read2_fastq_pattern = "_f*_R2.fastq.gz",
-                        assay = "ShareSeq",
-                        genome = genome_file,
-                        output_directory = output_directory,
+                        read1_fastq_pattern = '_f*_R1.fastq.gz',
+                        read2_fastq_pattern = '_f*_R2.fastq.gz',
+                        assay = 'ShareSeq',
+                        genome = generate_count_config.sample2datatype[sample_id],
+                        acronym_file = acronym2gsurl['starsolo'],
+                        output_directory = output_directory_stripped,
+                        ''''
                         outSAMtype = outSAMtype,
                         soloType = soloType,
-                        soloCBwhitelist = if whitelist_uri != 'null' then whitelist_uri else soloCBwhitelist,
+                        soloCBwhitelist = soloCBwhitelist,
                         soloCBstart = soloCBstart,
                         soloCBlen = soloCBlen,
                         soloUMIstart = soloUMIstart,
@@ -171,7 +186,7 @@ workflow shareseq_workflow {
                         soloBarcodeMate = soloBarcodeMate,
                         soloCBposition = soloCBposition,
                         soloUMIposition = soloUMIposition,
-                        soloAdapterSequence =soloAdapterSequence,
+                        soloAdapterSequence = soloAdapterSequence,
                         soloAdapterMismatchesNmax = soloAdapterMismatchesNmax,
                         soloCBmatchWLtype = soloCBmatchWLtype,
                         soloInputSAMattrBarcodeSeq = soloInputSAMattrBarcodeSeq,
@@ -183,12 +198,84 @@ workflow shareseq_workflow {
                         soloUMIfiltering = soloUMIfiltering,
                         soloCellFilter = soloCellFilter,
                         soloOutFormatFeaturesGeneField3 = soloOutFormatFeaturesGeneField3,
+                        ''''
                         docker_registry = docker_registry,
-                        version = star_version,
+                        star_version = star_version,
                         zones = zones,
-                        memory = memory,
-                        num_cpu = num_cpu,
+                        memory = starsolo_memory,
+                        num_cpu = starsolo_num_cpu,
+                        disk_space = starsolo_disk_space,
+                        preemptible = preemptible,
+                        awsMaxRetries = awsMaxRetries,
+                        backend = backend
+                }
+            }
+        }
+
+        if (length(generate_count_config.sample_atac_ids) > 0) {
+            scatter (sample_id in generate_count_config.sample_atac_ids) {
+                call shr.shareseq_reorg as shareseq_reorg {
+                    input:
+                        sample_id = sample_id,
+                        type = generate_count_config.sample2datatype[sample_id],
+                        input_fastqs_directories = generate_count_config.sample2dir[sample_id],
+                        r1_fastq_pattern = read1_fastq_pattern,
+                        r2_fastq_pattern = read2_fastq_pattern,
+                        index_fastq_pattern = index_fastq_pattern,
+                        output_directory = output_directory_stripped,
+                        shareseq_reorg_version = shareseq_reorg_version,
+                        docker_registry = docker_registry,
+                        zones = zones,
+                        num_cpu = sharseq_reorg_num_cpu,
+                        memory = shareseq_reorg_memory,
+                        disk_space = shareseq_reorg_disk_space,
+                        preemptible = preemptible,
+                        awsMaxRetries = awsMaxRetries,
+                        backend = backend   
+                }    
+                call cm.chromap as chromap {
+                    input:
+                        chromap_version = chromap_version,
+                        read1_fastq_pattern = '_f*_R1.fastq.gz',
+                        read2_fastq_pattern = '_f*_R2.fastq.gz',
+                        barcode_fastq_pattern = '_f*_I1.fastq.gz',
+                        preset = 'atac',
+                        acronym_file = acronym2gsurl['chromap'],
+                        sample_id = sample_id,
+                        output_directory = output_directory_stripped,
+                        input_fastqs_directories = shareseq_reorg.output_reorg_directory,
+                        genome = generate_count_config.sample2datatype[sample_id],
+                        ''''
+                        output_mappings_not_in_whitelist = output_mappings_not_in_whitelist,
+                        output_format = output_format,
+                        read_format = read_format,
+                        #feel the need to expose these at least
+                        barcode_whitelist = barcode_whitelist,
+                        barcode_translate = barcode_translate,
+                        ############### 
+                        split_alignment = split_alignment, 
+                        max_edit_dist_e = max_edit_dist_e,
+                        min_num_minimizer_s = min_num_minimizer_s,
+                        ignore_minimizer_times_f = ignore_minimizer_times_f,
+                        max_insert_size_l = max_insert_size_l,
+                        min_mapq_q = min_mapq_q,
+                        min_read_length = min_read_length,
+                        trim_adaptors = trim_adaptors,
+                        remove_pcr_duplicates = remove_pcr_duplicates,
+                        remove_pcr_duplicates_at_bulk_level = remove_pcr_duplicates_at_bulk_level,
+                        remove_pcr_duplicates_at_cell_level = remove_pcr_duplicates_at_cell_level,
+                        tn5_shift = tn5_shift,
+                        low_mem = low_mem,
+                        bc_error_threshold = bc_error_threshold,
+                        bc_probability_threshold = bc_probability_threshold,
+                        chr_order = chr_order,
+                        pairs_natural_chr_order = pairs_natural_chr_order,
+                        ''''
                         disk_space = disk_space,
+                        docker_registry = docker_registry_stripped,
+                        zones = zones,
+                        num_cpu = num_cpu,
+                        memory = memory,
                         preemptible = preemptible,
                         awsMaxRetries = awsMaxRetries,
                         backend = backend
@@ -273,7 +360,6 @@ task generate_count_config {
         Int preemptible
         Int awsMaxRetries
         String backend
-        String null_file
     }
 
     command {
