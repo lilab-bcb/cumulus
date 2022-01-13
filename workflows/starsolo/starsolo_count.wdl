@@ -10,6 +10,7 @@ workflow starsolo_count {
         String genome
         String read1_fastq_pattern = "_S*_L*_R1_001.fastq.gz"
         String read2_fastq_pattern = "_S*_L*_R2_001.fastq.gz"
+        String barcode_read
         String output_directory
         File acronym_file
         String? outSAMtype
@@ -57,6 +58,7 @@ workflow starsolo_count {
             input_fastqs_directories = input_fastqs_directories,
             read1_fastq_pattern = read1_fastq_pattern,
             read2_fastq_pattern = read2_fastq_pattern,
+            barcode_read = barcode_read,
             assay = assay,
             genome = genome_file,
             output_directory = output_directory,
@@ -106,6 +108,7 @@ task run_starsolo {
         String input_fastqs_directories
         String read1_fastq_pattern
         String read2_fastq_pattern
+        String barcode_read
         String assay
         File genome
         String output_directory
@@ -202,26 +205,36 @@ task run_starsolo {
 
         call_args = ['STAR', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}']
 
+        barcode_read = '~{barcode_read}'
+
         if '~{assay}' in ['tenX_v2', 'tenX_v3', 'ShareSeq']:
             call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBmatchWLtype', '1MM_multi_Nbase_pseudocounts', '--soloUMIfiltering', 'MultiGeneUMI_CR', \
                               '--soloUMIdedup', '1MM_CR', '--clipAdapterType', 'CellRanger4', '--outFilterScoreMin', '30', \
                               '--outSAMtype', 'BAM', 'SortedByCoordinate', '--outSAMattributes', 'CR', 'UR', 'CY', 'UY', 'CB', 'UB'])
             if '~{assay}' == 'tenX_v3':
                 call_args.extend(['--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '12'])
+                barcode_read = 'read1'
             elif '~{assay}' == 'tenX_v2':
                 call_args.extend(['--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '10'])
+                barcode_read = 'read1'
             elif '~{assay}' == 'ShareSeq':
                 call_args.extend(['--soloCBstart', '1', '--soloCBlen', '24', '--soloUMIstart', '25', '--soloUMIlen', '10'])
+                barcode_read = 'read2'
         elif '~{assay}' in ['SeqWell', 'DropSeq']:
             call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8', \
                               '--outSAMtype', 'BAM', 'SortedByCoordinate', '--outSAMattributes', 'CR', 'UR', 'CY', 'UY', 'CB', 'UB'])
+            barcode_read = 'read1'
         else:
             call_args.extend(['--outSAMtype', 'BAM', 'Unsorted'])
 
         if file_ext == '.fastq.gz':
             call_args.extend(['--readFilesCommand', 'zcat'])
 
-        call_args.extend(['--readFilesIn', ','.join(r2_list), ','.join(r1_list)])
+        if barcode_read == 'read1':
+            call_args.extend(['--readFilesIn', ','.join(r2_list), ','.join(r1_list)])
+        else:
+            call_args.extend(['--readFilesIn', ','.join(r1_list), ','.join(r2_list)])
+
         call_args.extend(['--outFileNamePrefix', 'result/~{sample_id}_'])
 
         if '~{outSAMtype}' != '':
