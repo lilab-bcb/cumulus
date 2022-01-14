@@ -101,7 +101,7 @@ workflow shareseq_workflow {
                 zones = zones,
                 preemptible = preemptible,
                 awsMaxRetries = awsMaxRetries,
-                backend = backend
+                backend = backend   
         }
 
         if (length(generate_mkfastq_input.bcl_csv) > 0) {
@@ -341,6 +341,9 @@ task generate_count_config {
                 print('Sample must contain only alphanumeric characters, hyphens, and underscores.', file = sys.stderr)
                 print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &', file = sys.stderr)
                 sys.exit(1)
+            if pd.isnull(row['Reference']):
+                print('Reference cannot be empty. No reference provided for sample ' + row['Sample'] + ".")
+                sys.exit(1)
 
         def parse_fastq_dirs(dirs_str):
             r2f = dict()
@@ -357,7 +360,6 @@ task generate_count_config {
         with open('sample_gex_ids.txt', 'w') as fo1, open('sample_atac_ids.txt', 'w') as fo2,            
              open('sample2dir.txt', 'w') as foo1, open('sample2datatype.txt', 'w') as foo2, open('sample2genome.txt', 'w') as foo3:
 
-            n_ref = 0 # this mapping can be empty
             datatype2fo = dict([('gex', fo1), ('atac', fo2)])
 
             for sample_id in df['Sample'].unique():
@@ -373,7 +375,6 @@ task generate_count_config {
                 else:
                     dirs = df_local['Flowcell'].values # if start from count step
 
-                reference = 'null'
                 if datatype in ['gex', 'atac']:
                     if df_local['Reference'].unique().size > 1:
                         print("Detected multiple references for sample " + sample_id + "!", file = sys.stderr)
@@ -384,13 +385,8 @@ task generate_count_config {
 
                 foo1.write(sample_id + '\t' + ','.join(dirs) + '\n')
                 foo2.write(sample_id + '\t' + datatype + '\n')
-
-                if reference != 'null':
-                    foo3.write(sample_id + '\t' + reference + '\n')
-                    n_ref += 1
-
-            if n_ref == 0:
-                foo3.write('null\tnull\n')
+                foo3.write(sample_id + '\t' + reference + '\n')
+                
         CODE
     }
 
