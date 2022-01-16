@@ -168,6 +168,15 @@ task run_starsolo {
             for f in file_list:
                 l.append(folder + '/' + f)
 
+        def generate_args_list(args_dict):
+            res_list = list()
+            for k, v in args_dict.items():
+                if isinstance(v, list):
+                    res_list.extend([k] + v)
+                else:
+                    res_list.extend([k, v])
+            return res_list
+
         r1_list = list()
         r2_list = list()
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
@@ -203,44 +212,63 @@ task run_starsolo {
         def remove_extra_space(s):
             return re.sub(' +', ' ', s.strip())
 
-        call_args = ['STAR', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}']
+        call_args = ['STAR', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}', '--outFileNamePrefix', 'result/~{sample_id}_']
 
         barcode_read = '~{barcode_read}'
+        args_dict = dict()
 
         if '~{assay}' in ['tenX_v2', 'tenX_v3', 'ShareSeq']:
-            call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBmatchWLtype', '1MM_multi_Nbase_pseudocounts', '--soloUMIfiltering', 'MultiGeneUMI_CR', \
-                              '--soloUMIdedup', '1MM_CR', '--clipAdapterType', 'CellRanger4', '--outFilterScoreMin', '30', \
-                              '--outSAMtype', 'BAM', 'SortedByCoordinate', '--outSAMattributes', 'CR', 'UR', 'CY', 'UY', 'CB', 'UB'])
+            args_dict['--soloType'] = 'CB_UMI_Simple'
+            args_dict['--soloCBmatchWLtype'] = '1MM_multi_Nbase_pseudocounts'
+            args_dict['--soloUMIfiltering'] = 'MultiGeneUMI_CR'
+            args_dict['--soloUMIdedup'] = '1MM_CR'
+            args_dict['--clipAdapterType'] = 'CellRanger4'
+            args_dict['--outFilterScoreMin'] = '30'
+            args_dict['--outSAMtype'] = ['BAM', 'SortedByCoordinate']
+            args_dict['--outSAMattributes'] = ['CR', 'UR', 'CY', 'UY', 'CB', 'UB']
+
             if '~{assay}' == 'tenX_v3':
-                call_args.extend(['--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '12'])
+                args_dict['--soloCBstart'] = '1'
+                args_dict['--soloCBlen'] = '16'
+                args_dict['--soloUMIstart'] = '17'
+                args_dict['--soloUMIlen'] = '12'
                 barcode_read = 'read1'
             elif '~{assay}' == 'tenX_v2':
-                call_args.extend(['--soloCBstart', '1', '--soloCBlen', '16', '--soloUMIstart', '17', '--soloUMIlen', '10'])
+                args_dict['--soloCBstart'] = '1'
+                args_dict['--soloCBlen'] = '16'
+                args_dict['--soloUMIstart'] = '17'
+                args_dict['--soloUMIlen'] = '10'
                 barcode_read = 'read1'
             elif '~{assay}' == 'ShareSeq':
-                call_args.extend(['--soloCBstart', '1', '--soloCBlen', '24', '--soloUMIstart', '25', '--soloUMIlen', '10'])
+                args_dict['--soloCBstart'] = '1'
+                args_dict['--soloCBlen'] = '24'
+                args_dict['--soloUMIstart'] = '25'
+                args_dict['--soloUMIlen'] = '10'
                 barcode_read = 'read2'
         elif '~{assay}' in ['SeqWell', 'DropSeq']:
-            call_args.extend(['--soloType', 'CB_UMI_Simple', '--soloCBstart', '1', '--soloCBlen', '12', '--soloUMIstart', '13', '--soloUMIlen', '8', \
-                              '--outSAMtype', 'BAM', 'SortedByCoordinate', '--outSAMattributes', 'CR', 'UR', 'CY', 'UY', 'CB', 'UB'])
+            args_dict['--soloType'] = 'CB_UMI_Simple'
+            args_dict['--soloCBstart'] = '1'
+            args_dict['--soloCBlen'] = '12'
+            args_dict['--soloUMIstart'] = '13'
+            args_dict['--soloUMIlen'] = '8'
+            args_dict['--outSAMtype'] = ['BAM', 'SortedByCoordinate']
+            args_dict['--outSAMattributes'] = ['CR', 'UR', 'CY', 'UY', 'CB', 'UB']
             barcode_read = 'read1'
         else:
-            call_args.extend(['--outSAMtype', 'BAM', 'Unsorted'])
+            args_dict['--outSAMattributes'] = ['BAM', 'Unsorted']
 
         if file_ext == '.fastq.gz':
-            call_args.extend(['--readFilesCommand', 'zcat'])
+            args_dict['--readFilesCommand'] = 'zcat'
 
         if barcode_read == 'read1':
-            call_args.extend(['--readFilesIn', ','.join(r2_list), ','.join(r1_list)])
+            args_dict['--readFilesIn'] = [','.join(r2_list), ','.join(r1_list)]
         else:
-            call_args.extend(['--readFilesIn', ','.join(r1_list), ','.join(r2_list)])
-
-        call_args.extend(['--outFileNamePrefix', 'result/~{sample_id}_'])
+            args_dict['--readFilesIn'] = [','.join(r1_list), ','.join(r2_list)]
 
         if '~{outSAMtype}' != '':
-            call_args.extend(['--outSAMtype'] + remove_extra_space('~{outSAMtype}').split(' '))
+            args_dict['--outSAMtype'] = remove_extra_space('~{outSAMtype}').split(' ')
         if '~{soloType}' != '':
-            call_args.extend(['--soloType', '~{soloType}'])
+            args_dict['--soloType'] = '~{soloType}'
 
         if '~{soloCBwhitelist}' != '':
             fn_tup = os.path.splitext("~{soloCBwhitelist}")
@@ -250,54 +278,56 @@ task run_starsolo {
                 whitelist_file = fn_tup[0]
             else:
                 whitelist_file = '~{soloCBwhitelist}'
-            call_args.extend(['--soloCBwhitelist', whitelist_file])
+            args_dict['--soloCBwhitelist'] = whitelist_file
         else:
-            call_args.extend(['--soloCBwhitelist', 'None'])
+            args_dict['--soloCBwhitelist'] = 'None'
 
         if '~{soloCBstart}' != '':
-            call_args.extend(['--soloCBstart', '~{soloCBstart}'])
+            args_dict['--soloCBstart'] = '~{soloCBstart}'
         if '~{soloCBlen}' != '':
-            call_args.extend(['--soloCBlen', '~{soloCBlen}'])
+            args_dict['--soloCBlen'] = '~{soloCBlen}'
         if '~{soloUMIstart}' != '':
-            call_args.extend(['--soloUMIstart', '~{soloUMIstart}'])
+            args_dict['--soloUMIstart'] = '~{soloUMIstart}'
         if '~{soloUMIlen}' != '':
-            call_args.extend(['--soloUMIlen', '~{soloUMIlen}'])
+            args_dict['--soloUMIlen'] = '~{soloUMIlen}'
         if '~{soloBarcodeReadLength}' != '':
-            call_args.extend(['--soloBarcodeReadLength', '~{soloBarcodeReadLength}'])
+            args_dict['--soloBarcodeReadLength'] = '~{soloBarcodeReadLength}'
         if '~{soloBarcodeMate}' != '':
-            call_args.extend(['--soloBarcodeMate', '~{soloBarcodeMate}'])
+            args_dict['--soloBarcodeMate'] = '~{soloBarcodeMate}'
         if '~{soloType}' == 'CB_UMI_Complex':
             if '~{soloCBposition}' != '':
-                call_args.extend(['--soloCBposition'] + remove_extra_space('~{soloCBposition}').split(' '))
+                args_dict['--soloCBposition'] = remove_extra_space('~{soloCBposition}').split(' ')
             if '~{soloUMIposition}' != '':
-                call_args.extend(['--soloUMIposition'] + remove_extra_space('~{soloUMIposition}').split(' '))
+                args_dict['--soloUMIposition'] = remove_extra_space('~{soloUMIposition}').split(' ')
         if '~{soloAdapterSequence}' != '':
-            call_args.extend(['--soloAdapterSequence', '~{soloAdapterSequence}'])
+            args_dict['--soloAdapterSequence'] = '~{soloAdapterSequence}'
         if '~{soloAdapterMismatchesNmax}' != '':
-            call_args.extend(['--soloAdapterMismatchesNmax', '~{soloAdapterMismatchesNmax}'])
+            args_dict['--soloAdapterMismatchesNmax'] = '~{soloAdapterMismatchesNmax}'
         if '~{soloCBmatchWLtype}' != '':
-            call_args.extend(['--soloCBmatchWLtype', '~{soloCBmatchWLtype}'])
+            args_dict['--soloCBmatchWLtype'] = '~{soloCBmatchWLtype}'
         if '~{soloInputSAMattrBarcodeSeq}' != '':
-            call_args.extend(['--soloInputSAMattrBarcodeSeq'] + remove_extra_space('~{soloInputSAMattrBarcodeSeq}').split(' '))
+            args_dict['--soloInputSAMattrBarcodeSeq'] = remove_extra_space('~{soloInputSAMattrBarcodeSeq}').split(' ')
         if '~{soloInputSAMattrBarcodeQual}' != '':
-            call_args.extend(['--soloInputSAMattrBarcodeQual'] + remove_extra_space('~{soloInputSAMattrBarcodeQual}').split(' '))
+            args_dict['--soloInputSAMattrBarcodeQual'] = remove_extra_space('~{soloInputSAMattrBarcodeQual}').split(' ')
         if '~{soloStrand}' != '':
-            call_args.extend(['--soloStrand', '~{soloStrand}'])
+            args_dict['--soloStrand'] = '~{soloStrand}'
         if '~{soloFeatures}' != '':
             feature_list = remove_extra_space('~{soloFeatures}').split(' ')
             if ('Velocyto' in feature_list) and ('Gene' not in feature_list):
                 feature_list.append('Gene')
-            call_args.extend(['--soloFeatures'] + feature_list)
+            args_dict['--soloFeatures'] = feature_list
         if '~{soloMultiMappers}' != '':
-            call_args.extend(['--soloMultiMappers'] + remove_extra_space('~{soloMultiMappers}').split(' '))
+            args_dict['--soloMultiMappers'] = remove_extra_space('~{soloMultiMappers}').split(' ')
         if '~{soloUMIdedup}' != '':
-            call_args.extend(['--soloUMIdedup'] + remove_extra_space('~{soloUMIdedup}').split(' '))
+            args_dict['--soloUMIdedup'] = remove_extra_space('~{soloUMIdedup}').split(' ')
         if '~{soloUMIfiltering}' != '':
-            call_args.extend(['--soloUMIfiltering'] + remove_extra_space('~{soloUMIfiltering}').split(' '))
+            args_dict['--soloUMIfiltering'] = remove_extra_space('~{soloUMIfiltering}').split(' ')
         if '~{soloCellFilter}' != '':
-            call_args.extend(['--soloCellFilter'] + remove_extra_space('~{soloCellFilter}').split(' '))
+            args_dict['--soloCellFilter'] = remove_extra_space('~{soloCellFilter}').split(' ')
         if '~{soloOutFormatFeaturesGeneField3}' != '':
-            call_args.extend(['--soloOutFormatFeaturesGeneField3'] + remove_extra_space('~{soloOutFormatFeaturesGeneField3}').split(' '))
+            args_dict['--soloOutFormatFeaturesGeneField3'] = remove_extra_space('~{soloOutFormatFeaturesGeneField3}').split(' ')
+
+        call_args += generate_args_list(args_dict)
 
         print(' '.join(call_args))
         check_call(call_args)
