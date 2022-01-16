@@ -9,6 +9,9 @@ workflow shareseq_mkfastq {
         # Shareseq output directory, gs url
         String output_directory
 
+        # Dual-index Paired-end flowcell workflow type, choosing from 'auto', 'forward' and 'reverse'. 'auto' means automatically determine the workflow type.
+        String dual_index_type = "auto"
+
         # Whether to delete input bcl directory. If false, you should delete this folder yourself so as to not incur storage charges.
         Boolean delete_input_bcl_directory = false
         # Number of allowed mismatches per index
@@ -42,6 +45,7 @@ workflow shareseq_mkfastq {
             input_bcl_directory = sub(input_bcl_directory, "/+$", ""),
             input_csv_file = input_csv_file,
             output_directory = sub(output_directory, "/+$", ""),
+            dual_index_type = dual_index_type,
             delete_input_bcl_directory = delete_input_bcl_directory,
             barcode_mismatches = barcode_mismatches,
             use_bases_mask = use_bases_mask,
@@ -67,6 +71,7 @@ task run_shareseq_mkfastq {
         String input_bcl_directory
         File input_csv_file
         String output_directory
+        String dual_index_type
         Boolean delete_input_bcl_directory
         Int? barcode_mismatches
         String? use_bases_mask
@@ -87,9 +92,45 @@ task run_shareseq_mkfastq {
         set -e
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
+
         strato sync --backend ~{backend} -m ~{input_bcl_directory} ~{run_id}
-        shareseq2bcl ~{input_csv_file} ~{run_id} _bcl_sample_sheet.csv
+
+        shareseq2bcl ~{input_csv_file} ~{run_id} ~{dual_index_type} _bcl_sample_sheet.csv
+
         bcl2fastq -o _out -R ~{run_id} --sample-sheet _bcl_sample_sheet.csv ~{"--barcode-mismatches " + barcode_mismatches} --use-bases-mask ~{default="Y*,Y*,I*,Y*" use_bases_mask}
+
+        # if auto, compare file sizes and choose the one with larger total size
+        remove_prefix () {
+            for fastq in $@
+            do
+                fastqnew=`cut -c 6-11 --complement <<< $fastq`
+                mv $fastq $fastqnew
+            done
+        }
+
+        readarray -d '' fwd_arr < <(find _out -maxdepth 1 -type f -name '__fwd_*.fastq.gz' -print0)
+        readarray -d '' rvs_arr < <(find _out -maxdepth 1 -type f -name '__rvs_*.fastq.gz' -print0)
+
+        if [ ${#fwd_arr[@]} -gt 0  ] && [ ${#rvs_arr[@]} -eq 0 ]
+        then
+            remove_prefix ${fwd_arr[@]}
+        elif [ ${#fwd_arr[@]} -eq 0  ] && [ ${#rvs_arr[@]} -gt 0 ]
+        then
+            remove_prefix ${rvs_arr[@]}
+        elif [ ${#fwd_arr[@]} -gt 0 ] && [ ${#rvs_arr[@]} -gt 0  ]
+        then
+            fwd_size=`du -c ${fwd_arr[@]} | tail -n 1 | cut -f 1`
+            rvs_size=`du -c ${rvs_arr[@]} | tail -n 1 | cut -f 1`
+            if [ $fwd_size -gt $rvs_size ]
+            then
+                remove_prefix ${fwd_arr[@]}
+                rm -f ${rvs_arr[@]}
+            else
+                remove_prefix ${rvs_arr[@]}
+                rm -f ${fwd_arr[@]}        
+            fi
+        fi
+
         strato sync --backend ~{backend} -m _out ~{output_directory}/~{run_id}_fastqs
 
         python <<CODE
