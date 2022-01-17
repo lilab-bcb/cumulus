@@ -553,6 +553,7 @@ task generate_bcl_csv {
         from collections import defaultdict
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
+        df.columns = df.columns.str.strip()
 
         if 'DataType' not in df.columns:
             df['DataType'] = 'rna'
@@ -640,6 +641,7 @@ task generate_count_config {
         from collections import defaultdict
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
+        df.columns = df.columns.str.strip()
 
         if 'DataType' not in df.columns:
             df['DataType'] = 'rna'

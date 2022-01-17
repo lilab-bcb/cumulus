@@ -233,6 +233,7 @@ task generate_demux_config {
         import pandas as pd
 
         df = pd.read_csv('~{input_sample_sheet}', header = 0, dtype = str, index_col = False)
+        df.columns = df.columns.str.strip()
         for c in df.columns:
             df[c] = df[c].str.strip()
         regex_pat = re.compile('[^a-zA-Z0-9_-]')
