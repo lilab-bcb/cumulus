@@ -73,7 +73,7 @@ with open(argv[4], 'w') as fout:
         if dual_index_type == 'forward':
             for lane in lanes:
                 fout.write(f"{lane},{sample_id},{index2}\n")
-        elif dual_index_type = 'reverse':
+        elif dual_index_type == 'reverse':
             for lane in lanes:
                 fout.write(f"{lane},{sample_id},{reverse_complement(index2)}\n")
         else:
