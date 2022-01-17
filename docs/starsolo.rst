@@ -6,7 +6,7 @@ This ``starsolo_workflow`` workflow generates gene-count matrices from FASTQ dat
 Prepare input data and import workflow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Run ``cellranger_workflow`` to generate FASTQ data
+1. Run ``starsolo_workflow`` to generate FASTQ data
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 You can skip this step if your data are already in FASTQ format.
@@ -353,6 +353,8 @@ We've built the following scRNA-seq references for users' convenience:
       - Human GRCh38, comparable to cellranger reference 2020-A (GENCODE v32/Ensembl 98)
     * - **mm10-2020-A**
       - Mouse mm10, comparable to cellranger reference 2020-A (GENCODE vM23/Ensembl 98)
+    * - **GRCh38-and-mm10-2020-A**
+      - Human GRCh38 (GENCODE v32/Ensembl 98) and mouse mm10 (GENCODE vM23/Ensembl 98)
     * - **GRCh38**
       - Human GRCh38, comparable to cellranger reference 3.0.0, Ensembl v93 gene annotation
     * - **mm10**
