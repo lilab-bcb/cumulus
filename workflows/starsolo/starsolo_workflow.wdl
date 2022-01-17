@@ -174,6 +174,7 @@ task generate_count_config {
         from subprocess import check_call
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
+        df.columns = df.columns.str.strip()
         for c in df.columns:
             df[c] = df[c].str.strip()
 

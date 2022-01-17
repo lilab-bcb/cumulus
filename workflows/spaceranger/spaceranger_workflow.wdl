@@ -189,6 +189,7 @@ task generate_bcl_csv {
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
 
+        df.columns = df.columns.str.strip()
         for c in df.columns:
             df[c] = df[c].str.strip()
 
@@ -247,6 +248,7 @@ task generate_count_config {
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
 
+        df.columns = df.columns.str.strip()
         for c in df.columns:
             df[c] = df[c].str.strip()
 
