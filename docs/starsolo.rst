@@ -6,7 +6,7 @@ This ``starsolo_workflow`` workflow generates gene-count matrices from FASTQ dat
 Prepare input data and import workflow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Run ``starsolo_workflow`` to generate FASTQ data
+1. Run ``cellranger_workflow`` to generate FASTQ data
 ++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 
 You can skip this step if your data are already in FASTQ format.
