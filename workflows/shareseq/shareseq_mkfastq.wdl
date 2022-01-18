@@ -99,6 +99,8 @@ task run_shareseq_mkfastq {
 
         bcl2fastq -o _out -R ~{run_id} --sample-sheet _bcl_sample_sheet.csv ~{"--barcode-mismatches " + barcode_mismatches} --use-bases-mask ~{default="Y*,Y*,I*,Y*" use_bases_mask}
 
+        strato sync --backend ~{backend} -m _out ~{output_directory}/~{run_id}_fastqs_orig
+
         remove_prefix.sh _out
 
         strato sync --backend ~{backend} -m _out ~{output_directory}/~{run_id}_fastqs

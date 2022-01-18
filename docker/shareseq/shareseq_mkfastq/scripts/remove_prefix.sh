@@ -5,6 +5,9 @@ remove_prefix () {
 for fastq in $@
 do
     fastqnew=`cut -c 1-6 --complement <<< $fastq`
+    echo "prints"
+    echo $fastq
+    echo $fastqnew
     mv $fastq $fastqnew
 done
 }
@@ -18,6 +21,9 @@ done
 
 readarray fwd_arr < <(find $1 -maxdepth 1 -type f -name '__fwd_*.fastq.gz' -print0)
 readarray rvs_arr < <(find $1 -maxdepth 1 -type f -name '__rvs_*.fastq.gz' -print0)
+
+echo "${fwd_arr[*]}"
+echo "${rvs_arr[*]}"
 
 if [ ${#fwd_arr[@]} -gt 0  ] && [ ${#rvs_arr[@]} -eq 0 ]
 then
