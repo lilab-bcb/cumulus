@@ -7,6 +7,9 @@ do
     fastq_dir=$(dirname "$fastq")
     fastqfilenew=`cut -c 1-6 --complement <<< $(basename "$fastq")`
     fastqnew=${fastq_dir}/${fastqfilenew}
+    echo "move will take place between following files"
+    echo $fastq 
+    echo $fastqnew
     mv $fastq $fastqnew
 done
 }
