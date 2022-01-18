@@ -18,8 +18,8 @@ do
 done
 }
 
-readarray fwd_arr < <(find $1 -maxdepth 1 -type f -name '__fwd_*.fastq.gz' -print0)
-readarray rvs_arr < <(find $1 -maxdepth 1 -type f -name '__rvs_*.fastq.gz' -print0)
+readarray -d '' fwd_arr < <(find $1 -maxdepth 1 -type f -name '__fwd_*.fastq.gz' -print0)
+readarray -d '' rvs_arr < <(find $1 -maxdepth 1 -type f -name '__rvs_*.fastq.gz' -print0)
 
 if [ ${#fwd_arr[@]} -gt 0  ] && [ ${#rvs_arr[@]} -eq 0 ]
 then
