@@ -4,8 +4,15 @@
 remove_prefix () {
 for fastq in $@
 do
-    fastqnew=`cut -c 6-11 --complement <<< $fastq`
+    fastqnew=`cut -c 1-6 --complement <<< $fastq`
     mv $fastq $fastqnew
+done
+}
+
+remove_files () {
+for file in $@
+do
+    rm -f "$file"
 done
 }
 
@@ -25,9 +32,9 @@ then
     if [ $fwd_size -gt $rvs_size ]
     then
         remove_prefix ${fwd_arr[@]}
-        rm -f ${rvs_arr[@]}
+        remove_files ${rvs_arr[@]}
     else
         remove_prefix ${rvs_arr[@]}
-        rm -f ${fwd_arr[@]}        
+        remove_files ${fwd_arr[@]}  
     fi
 fi
