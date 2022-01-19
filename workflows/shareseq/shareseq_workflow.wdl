@@ -368,7 +368,7 @@ task generate_count_config {
         r2f = parse_fastq_dirs('~{sep="," fastq_dirs}')
 
         with open('sample_gex_ids.txt', 'w') as fo1, open('sample_atac_ids.txt', 'w') as fo2,            
-             open('sample2dir.txt', 'w') as foo1, open('sample2genome.txt', 'w') as foo3:
+             open('sample2dir.txt', 'w') as foo1, open('sample2genome.txt', 'w') as foo2:
 
             for sample_id in df['Sample'].unique():
                 df_local = df.loc[df['Sample'] == sample_id]
@@ -390,7 +390,7 @@ task generate_count_config {
                     reference = df_local['Reference'].iat[0]
 
                 foo1.write(sample_id + '\t' + ','.join(dirs) + '\n')
-                foo3.write(sample_id + '\t' + reference + '\n')
+                foo2.write(sample_id + '\t' + reference + '\n')
                 
         CODE
     }
