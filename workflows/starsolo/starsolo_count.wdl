@@ -246,8 +246,6 @@ task run_starsolo {
                     args_dict['--soloBarcodeMate'] = '1'
                     args_dict['--clip5pNbases'] = ['39', '0']
                     args_dict['--soloStrand'] = 'Reverse'
-                    args_dict['--soloCellFilter'] = 'EmptyDrops_CR'                       ## not sure if required
-                    args_dict['--soloFeatures'] = ['Gene', 'GeneFull', 'SJ', 'Velocyto']  ## not sure if required
                     barcode_read = 'read2'
             elif '~{assay}' == 'ShareSeq':
                 args_dict['--soloCBstart'] = '1'
