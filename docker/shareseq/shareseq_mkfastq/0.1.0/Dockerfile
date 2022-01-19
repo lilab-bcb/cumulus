@@ -23,6 +23,7 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseq_mkfastq/scripts/shareseq2bcl /software
+ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseq_mkfastq/scripts/remove_prefix.sh /software
 
 ADD bcl2fastq2-v2-20-0-linux-x86-64.zip /software/
 RUN unzip -d /software/ /software/bcl2fastq2-v2-20-0-linux-x86-64.zip && alien -i /software/bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm && rm -f /software/bcl2fastq2-v2*
@@ -35,7 +36,7 @@ RUN apt-get -qq -y remove alien curl gnupg python3-pip unzip && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
 
-RUN chmod a+rx /software/monitor_script.sh /software/shareseq2bcl
+RUN chmod a+rx /software/monitor_script.sh /software/shareseq2bcl /software/remove_prefix.sh
 
 ENV PATH=/software:$PATH
 ENV TMPDIR=/tmp
