@@ -217,12 +217,11 @@ task run_starsolo {
         barcode_read = '~{barcode_read}'
         args_dict = dict()
 
-        if '~{assay}' in ['tenX_v2', 'tenX_v3', 'ShareSeq']:
+        if '~{assay}' in ['tenX_v2', 'tenX_v3', 'ShareSeq', 'tenX_fiveprime']:
             args_dict['--soloType'] = 'CB_UMI_Simple'
             args_dict['--soloCBmatchWLtype'] = '1MM_multi_Nbase_pseudocounts'
             args_dict['--soloUMIfiltering'] = 'MultiGeneUMI_CR'
             args_dict['--soloUMIdedup'] = '1MM_CR'
-            args_dict['--clipAdapterType'] = 'CellRanger4'
             args_dict['--outFilterScoreMin'] = '30'
             args_dict['--outSAMtype'] = ['BAM', 'SortedByCoordinate']
             args_dict['--outSAMattributes'] = ['CR', 'UR', 'CY', 'UY', 'CB', 'UB']
@@ -232,13 +231,24 @@ task run_starsolo {
                 args_dict['--soloCBlen'] = '16'
                 args_dict['--soloUMIstart'] = '17'
                 args_dict['--soloUMIlen'] = '12'
+                args_dict['--clipAdapterType'] = 'CellRanger4'
                 barcode_read = 'read1'
-            elif '~{assay}' == 'tenX_v2':
+            elif '~{assay}' in ['tenX_v2', 'tenX_fiveprime']:
                 args_dict['--soloCBstart'] = '1'
                 args_dict['--soloCBlen'] = '16'
                 args_dict['--soloUMIstart'] = '17'
                 args_dict['--soloUMIlen'] = '10'
-                barcode_read = 'read1'
+
+                if '~{assay}' == 'tenX_v2':
+                    args_dict['--clipAdapterType'] = 'CellRanger4'
+                    barcode_read = 'read1'
+                else:
+                    args_dict['--soloBarcodeMate'] = '1'
+                    args_dict['--clip5pNbases'] = ['39', '0']
+                    args_dict['--soloStrand'] = 'Reverse'
+                    args_dict['--soloCellFilter'] = 'EmptyDrops_CR'                       ## not sure if required
+                    args_dict['--soloFeatures'] = ['Gene', 'GeneFull', 'SJ', 'Velocyto']  ## not sure if required
+                    barcode_read = 'read2'
             elif '~{assay}' == 'ShareSeq':
                 args_dict['--soloCBstart'] = '1'
                 args_dict['--soloCBlen'] = '24'

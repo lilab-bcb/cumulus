@@ -6,6 +6,7 @@ GRCh38-2020-A-premrna	gs://regev-lab/resources/starsolo/GRCh38-2020-A-premrna-st
 mm10-2020-A-premrna	gs://regev-lab/resources/starsolo/mm10-2020-A-premrna-starsolo.tar.gz
 tenX_v3	gs://regev-lab/resources/count_tools/3M-february-2018.txt
 tenX_v2	gs://regev-lab/resources/count_tools/737K-august-2016.txt
+tenX_fiveprime	gs://regev-lab/resources/count_tools/737K-august-2016.txt
 DropSeq	null
 SeqWell	null
 SlideSeq	null
