@@ -7,7 +7,7 @@ import "../chromap/chromap.wdl" as cm
 
 workflow shareseq_workflow {
     input {
-        # 3 - 6 columns (Sample, Lane, Index, [Reference, Flowcell, Type]). gs URL
+        # 4 - 6 columns (Sample, Lane, Index, Flowcell, [optional for mkfastq: Reference, Type]). gs URL
         File input_csv_file
         # Output directory, gs URL
         String output_directory
@@ -18,6 +18,8 @@ workflow shareseq_workflow {
 
         # for mkfastq
 
+        # Dual-index Paired-end flowcell workflow type, choosing from 'auto', 'forward' and 'reverse'. 'auto' means automatically determine the workflow type.
+        String dual_index_type = "auto"
         # Whether to delete input_bcl_directory, default: false
         Boolean delete_input_bcl_directory = false
         # Number of allowed mismatches per index
@@ -42,10 +44,7 @@ workflow shareseq_workflow {
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         # Backend
         String backend = "gcp"
-        # Number of cpus per shareseq job
-        Int num_cpu = 32
-        # Memory string
-        String memory = "120G"
+
 
         # SHARE-Seq index TSV
         String acronym_file = "gs://gred-cumulus-output/ref-data/shareseq/index.tsv"
@@ -61,6 +60,11 @@ workflow shareseq_workflow {
         # 0.1.4
         String chromap_version = "0.1.4"
 
+        # Number of cpus shareseq_mkfastq 
+        Int shareseq_mkfastq_num_cpu = 32
+        # Memory string
+        String shareseq_mkfastq_memory = "120G"
+
         # num cpu sharseq_reorg
         Int sharseq_reorg_num_cpu = 4
         # memory sharseq_reorg
@@ -70,6 +74,11 @@ workflow shareseq_workflow {
         Int starsolo_num_cpu = 32
         # memory starsolo
         String starsolo_memory = "120G"
+
+        # num cpu chromap
+        Int chromap_num_cpu = 8
+        # memory chromap
+        String chromap_memory = "64G"
 
         # Optional disk space for mkfastq.
         Int mkfastq_disk_space = 1500
@@ -113,13 +122,14 @@ workflow shareseq_workflow {
                         input_csv_file = bcl_csv,
                         output_directory = output_directory_stripped,
                         delete_input_bcl_directory = delete_input_bcl_directory,
+                        dual_index_type = dual_index_type,
                         barcode_mismatches = barcode_mismatches,
                         use_bases_mask = use_bases_mask,
                         shareseq_mkfastq_version = shareseq_mkfastq_version,
                         docker_registry = mkfastq_docker_registry_stripped,
                         zones = zones,
-                        num_cpu = num_cpu,
-                        memory = memory,
+                        num_cpu = shareseq_mkfastq_num_cpu,
+                        memory = shareseq_mkfastq_memory,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible,
                         awsMaxRetries = awsMaxRetries,
@@ -148,7 +158,7 @@ workflow shareseq_workflow {
                 call shr.shareseq_reorg as shareseq_reorg {
                     input:
                         sample_id = sample_id,
-                        type = generate_count_config.sample2datatype[sample_id],
+                        type = 'gex',
                         input_fastqs_directories = generate_count_config.sample2dir[sample_id],
                         r1_fastq_pattern = read1_fastq_pattern,
                         r2_fastq_pattern = read2_fastq_pattern,
@@ -172,7 +182,7 @@ workflow shareseq_workflow {
                         read2_fastq_pattern = '_f*_R2.fastq.gz',
                         assay = 'ShareSeq',
                         barcode_read = 'read2',
-                        genome = generate_count_config.sample2datatype[sample_id],
+                        genome = generate_count_config.sample2genome[sample_id],
                         acronym_file = acronym2gsurl['starsolo'],
                         output_directory = output_directory_stripped,
                         docker_registry = docker_registry,
@@ -193,7 +203,7 @@ workflow shareseq_workflow {
                 call shr.shareseq_reorg as shareseq_reorg {
                     input:
                         sample_id = sample_id,
-                        type = generate_count_config.sample2datatype[sample_id],
+                        type = 'atac',
                         input_fastqs_directories = generate_count_config.sample2dir[sample_id],
                         r1_fastq_pattern = read1_fastq_pattern,
                         r2_fastq_pattern = read2_fastq_pattern,
@@ -220,12 +230,12 @@ workflow shareseq_workflow {
                         sample_id = sample_id,
                         output_directory = output_directory_stripped,
                         input_fastqs_directories = shareseq_reorg.output_reorg_directory,
-                        genome = generate_count_config.sample2datatype[sample_id],
+                        genome = generate_count_config.sample2genome[sample_id],
                         disk_space = disk_space,
                         docker_registry = docker_registry_stripped,
                         zones = zones,
-                        num_cpu = num_cpu,
-                        memory = memory,
+                        num_cpu = chromap_num_cpu,
+                        memory = chromap_memory,
                         preemptible = preemptible,
                         awsMaxRetries = awsMaxRetries,
                         backend = backend
@@ -358,9 +368,7 @@ task generate_count_config {
         r2f = parse_fastq_dirs('~{sep="," fastq_dirs}')
 
         with open('sample_gex_ids.txt', 'w') as fo1, open('sample_atac_ids.txt', 'w') as fo2,            
-             open('sample2dir.txt', 'w') as foo1, open('sample2datatype.txt', 'w') as foo2, open('sample2genome.txt', 'w') as foo3:
-
-            datatype2fo = dict([('gex', fo1), ('atac', fo2)])
+             open('sample2dir.txt', 'w') as foo1, open('sample2genome.txt', 'w') as foo3:
 
             for sample_id in df['Sample'].unique():
                 df_local = df.loc[df['Sample'] == sample_id]
@@ -381,10 +389,7 @@ task generate_count_config {
                         sys.exit(1)
                     reference = df_local['Reference'].iat[0]
 
-                datatype2fo[datatype].write(sample_id + '\n')
-
                 foo1.write(sample_id + '\t' + ','.join(dirs) + '\n')
-                foo2.write(sample_id + '\t' + datatype + '\n')
                 foo3.write(sample_id + '\t' + reference + '\n')
                 
         CODE
@@ -394,7 +399,6 @@ task generate_count_config {
         Array[String] sample_gex_ids = read_lines('sample_gex_ids.txt')
         Array[String] sample_atac_ids = read_lines('sample_atac_ids.txt')
         Map[String, String] sample2dir = read_map('sample2dir.txt')
-        Map[String, String] sample2datatype = read_map('sample2datatype.txt')
         Map[String, String] sample2genome = read_map('sample2genome.txt')
     }
 
