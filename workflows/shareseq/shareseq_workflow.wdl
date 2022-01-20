@@ -367,7 +367,7 @@ task generate_count_config {
 
         r2f = parse_fastq_dirs('~{sep="," fastq_dirs}')
 
-        with open('sample_gex_ids.txt', 'w') as fo1, open('sample_atac_ids.txt', 'w') as fo2,            
+        with open('sample_gex_ids.txt', 'w') as fo1, open('sample_atac_ids.txt', 'w') as fo2, \   
              open('sample2dir.txt', 'w') as foo1, open('sample2genome.txt', 'w') as foo2:
 
             for sample_id in df['Sample'].unique():
