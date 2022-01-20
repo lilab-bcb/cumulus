@@ -361,7 +361,7 @@ task generate_count_config {
                 return r2f
             dirs = dirs_str.split(',')
             for dir in dirs:
-                run_id = dir.split('/')[-2].rpartition('_')[0]
+                run_id = dir.split('/')[-1].rpartition('_')[0]
                 print("%%%%%%%%%%%%")
                 print(run_id)
                 print("%%%%%%%%%%%%")
