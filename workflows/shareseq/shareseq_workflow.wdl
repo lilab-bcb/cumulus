@@ -157,7 +157,7 @@ workflow shareseq_workflow {
 
         if (length(generate_count_config.sample_gex_ids) > 0) {
             scatter (sample_id in generate_count_config.sample_gex_ids) {
-                call shr.shareseq_reorg as shareseq_reorg {
+                call shr.shareseq_reorg as shareseq_reorg_gex {
                     input:
                         sample_id = sample_id,
                         type = 'gex',
@@ -174,12 +174,12 @@ workflow shareseq_workflow {
                         disk_space = shareseq_reorg_disk_space,
                         preemptible = preemptible,
                         awsMaxRetries = awsMaxRetries,
-                        backend = backend   
+                        backend = backend
                 }    
                 call sc.starsolo_count as starsolo_count {
                     input:
                         sample_id = sample_id,
-                        input_fastqs_directories = shareseq_reorg.output_reorg_directory,
+                        input_fastqs_directories = shareseq_reorg_gex.output_reorg_directory,
                         read1_fastq_pattern = '_f*_R1.fastq.gz',
                         read2_fastq_pattern = '_f*_R2.fastq.gz',
                         assay = 'ShareSeq',
@@ -202,7 +202,7 @@ workflow shareseq_workflow {
 
         if (length(generate_count_config.sample_atac_ids) > 0) {
             scatter (sample_id in generate_count_config.sample_atac_ids) {
-                call shr.shareseq_reorg as shareseq_reorg {
+                call shr.shareseq_reorg as shareseq_reorg_atac {
                     input:
                         sample_id = sample_id,
                         type = 'atac',
@@ -231,7 +231,7 @@ workflow shareseq_workflow {
                         acronym_file = acronym2gsurl['chromap'],
                         sample_id = sample_id,
                         output_directory = output_directory_stripped,
-                        input_fastqs_directories = shareseq_reorg.output_reorg_directory,
+                        input_fastqs_directories = shareseq_reorg_atac.output_reorg_directory,
                         genome = generate_count_config.sample2genome[sample_id],
                         disk_space = chromap_disk_space,
                         docker_registry = docker_registry_stripped,
