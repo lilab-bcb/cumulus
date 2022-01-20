@@ -86,6 +86,8 @@ workflow shareseq_workflow {
         Int shareseq_reorg_disk_space = 500
         # Optional disk space for starsolo.
         Int starsolo_disk_space = 500
+        # Optional disk space for chromap.
+        Int chromap_disk_space = 200
 
         # Number of preemptible tries
         Int preemptible = 2
