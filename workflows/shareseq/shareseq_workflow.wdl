@@ -47,7 +47,7 @@ workflow shareseq_workflow {
 
 
         # SHARE-Seq index TSV
-        String acronym_file = "gs://gred-cumulus-output/ref-data/shareseq/index.tsv"
+        File acronym_file = "gs://gred-cumulus-output/ref-data/shareseq/index.tsv"
 
         # 0.2
         String config_version = "0.2"
