@@ -233,7 +233,7 @@ workflow shareseq_workflow {
                         output_directory = output_directory_stripped,
                         input_fastqs_directories = shareseq_reorg.output_reorg_directory,
                         genome = generate_count_config.sample2genome[sample_id],
-                        disk_space = disk_space,
+                        disk_space = chromap_disk_space,
                         docker_registry = docker_registry_stripped,
                         zones = zones,
                         num_cpu = chromap_num_cpu,
