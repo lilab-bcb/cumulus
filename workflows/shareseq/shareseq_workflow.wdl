@@ -362,9 +362,7 @@ task generate_count_config {
             dirs = dirs_str.split(',')
             for dir in dirs:
                 run_id = dir.split('/')[-1].rpartition('_')[0]
-                print("%%%%%%%%%%%%")
                 print(run_id)
-                print("%%%%%%%%%%%%")
                 r2f[run_id] = dir
             return(r2f)
 
@@ -373,6 +371,7 @@ task generate_count_config {
         with open('sample_gex_ids.txt', 'w') as fo1, open('sample_atac_ids.txt', 'w') as fo2, \
              open('sample2dir.txt', 'w') as foo1, open('sample2genome.txt', 'w') as foo2:
 
+            datatype2fo = dict([('gex', fo1), ('atac', fo2)])
             for sample_id in df['Sample'].unique():
                 df_local = df.loc[df['Sample'] == sample_id]
                 if df_local['Type'].unique().size > 1:
@@ -391,7 +390,8 @@ task generate_count_config {
                         print("Detected multiple references for sample " + sample_id + "!", file = sys.stderr)
                         sys.exit(1)
                     reference = df_local['Reference'].iat[0]
-
+                    
+                datatype2fo[datatype].write(sample_id + '\n')
                 foo1.write(sample_id + '\t' + ','.join(dirs) + '\n')
                 foo2.write(sample_id + '\t' + reference + '\n')
                 
