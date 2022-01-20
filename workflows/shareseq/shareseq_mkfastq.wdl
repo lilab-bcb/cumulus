@@ -99,37 +99,7 @@ task run_shareseq_mkfastq {
 
         bcl2fastq -o _out -R ~{run_id} --sample-sheet _bcl_sample_sheet.csv ~{"--barcode-mismatches " + barcode_mismatches} --use-bases-mask ~{default="Y*,Y*,I*,Y*" use_bases_mask}
 
-        # if auto, compare file sizes and choose the one with larger total size
-        remove_prefix () {
-            for fastq in $@
-            do
-                fastqnew=`cut -c 6-11 --complement <<< $fastq`
-                mv $fastq $fastqnew
-            done
-        }
-
-        readarray -d '' fwd_arr < <(find _out -maxdepth 1 -type f -name '__fwd_*.fastq.gz' -print0)
-        readarray -d '' rvs_arr < <(find _out -maxdepth 1 -type f -name '__rvs_*.fastq.gz' -print0)
-
-        if [ ${#fwd_arr[@]} -gt 0  ] && [ ${#rvs_arr[@]} -eq 0 ]
-        then
-            remove_prefix ${fwd_arr[@]}
-        elif [ ${#fwd_arr[@]} -eq 0  ] && [ ${#rvs_arr[@]} -gt 0 ]
-        then
-            remove_prefix ${rvs_arr[@]}
-        elif [ ${#fwd_arr[@]} -gt 0 ] && [ ${#rvs_arr[@]} -gt 0  ]
-        then
-            fwd_size=`du -c ${fwd_arr[@]} | tail -n 1 | cut -f 1`
-            rvs_size=`du -c ${rvs_arr[@]} | tail -n 1 | cut -f 1`
-            if [ $fwd_size -gt $rvs_size ]
-            then
-                remove_prefix ${fwd_arr[@]}
-                rm -f ${rvs_arr[@]}
-            else
-                remove_prefix ${rvs_arr[@]}
-                rm -f ${fwd_arr[@]}        
-            fi
-        fi
+        remove_prefix.sh _out
 
         strato sync --backend ~{backend} -m _out ~{output_directory}/~{run_id}_fastqs
 

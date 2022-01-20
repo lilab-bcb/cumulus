@@ -128,6 +128,7 @@ task generate_create_reference_config {
 
         if '~{input_sample_sheet}' is not '':
             df = pd.read_csv('~{input_sample_sheet}', header = 0, dtype = str, index_col = False, keep_default_na = False)
+            df.columns = df.columns.str.strip()
             for c in df.columns:
                 df[c] = df[c].str.strip()
             if 'Attributes' not in df.columns:
