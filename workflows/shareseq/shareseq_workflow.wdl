@@ -145,7 +145,6 @@ workflow shareseq_workflow {
         call generate_count_config {
             input:
                 input_csv_file = input_csv_file,
-                output_dir = output_directory_stripped,
                 fastq_dirs = shareseq_mkfastq.output_fastqs_directory,
                 config_version = config_version,
                 docker_registry = docker_registry_stripped,
@@ -312,7 +311,6 @@ task generate_mkfastq_input {
 task generate_count_config {
     input {
         File input_csv_file
-        String output_dir
         Array[String]? fastq_dirs
         String config_version
         String docker_registry
