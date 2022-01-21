@@ -212,7 +212,7 @@ task run_starsolo {
         def remove_extra_space(s):
             return re.sub(' +', ' ', s.strip())
 
-        call_args = ['STAR', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}', '--outFileNamePrefix', 'result/~{sample_id}_']
+        call_args = ['STAR', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}', '--outFileNamePrefix', 'result/']
 
         barcode_read = '~{barcode_read}'
         args_dict = dict()
@@ -245,6 +245,7 @@ task run_starsolo {
                 else:
                     args_dict['--soloBarcodeMate'] = '1'
                     args_dict['--clip5pNbases'] = ['39', '0']
+                    args_dict['--clipAdapterType'] = 'CellRanger4'
                     args_dict['--soloStrand'] = 'Reverse'
                     barcode_read = 'read2'
             elif '~{assay}' == 'ShareSeq':
