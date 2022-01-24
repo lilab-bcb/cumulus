@@ -16,6 +16,7 @@
    cumulus_import
    cellranger/index
    spaceranger
+   shareseq/index
    chromap
    starsolo
    demultiplexing
