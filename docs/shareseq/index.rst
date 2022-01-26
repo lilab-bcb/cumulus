@@ -13,4 +13,4 @@ General step-by-step instructions
 SHARE-seq inputs and outputs 
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. include:: gex_rnaseq.rst
+.. include:: gex_atac.rst
