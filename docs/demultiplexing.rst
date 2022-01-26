@@ -132,7 +132,7 @@ global inputs
 	  - "us-east1-d us-west1-a us-west1-b"
 	  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 	* - docker_registry
-	  - Docker registry to use. Notice that docker image for Bustools is seperate.
+	  - Docker registry to use.
 
 	  	- "quay.io/cumulus" for images on Red Hat registry;
 
