@@ -243,9 +243,17 @@ task run_starsolo {
                     args_dict['--clipAdapterType'] = 'CellRanger4'
                     barcode_read = 'read1'
                 else:
-                    args_dict['--soloBarcodeMate'] = '2'
+                    args_dict['--soloBarcodeMate'] = '1'
                     args_dict['--clip5pNbases'] = ['39', '0']
-                    barcode_read = 'read1'
+                    barcode_read = 'read2'
+                    import gzip
+                    with gzip.open(r1_list[0], 'rb') as fin:
+                        cnt = 0
+                        while cnt < 2:
+                            r1_read_str = fin.readline().strip()
+                            cnt += 1
+                    if len(r1_read_str) > 39:
+                        args_dict['--soloStrand'] = 'Reverse'
             elif '~{assay}' == 'ShareSeq':
                 args_dict['--soloCBstart'] = '1'
                 args_dict['--soloCBlen'] = '24'
