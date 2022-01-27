@@ -243,10 +243,9 @@ task run_starsolo {
                     args_dict['--clipAdapterType'] = 'CellRanger4'
                     barcode_read = 'read1'
                 else:
-                    args_dict['--soloBarcodeMate'] = '1'
+                    args_dict['--soloBarcodeMate'] = '2'
                     args_dict['--clip5pNbases'] = ['39', '0']
-                    args_dict['--soloStrand'] = 'Reverse'
-                    barcode_read = 'read2'
+                    barcode_read = 'read1'
             elif '~{assay}' == 'ShareSeq':
                 args_dict['--soloCBstart'] = '1'
                 args_dict['--soloCBlen'] = '24'
