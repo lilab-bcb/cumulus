@@ -253,12 +253,12 @@ See the table below for important SHARE-seq outputs.
 	  - Array[String]
 	  - 
             | A list of google bucket urls containing reorganized gene expression FASTQ files, one url per sample.
-            | There are 3 FASTQs generated per sample I1 (index), R1 (read1) and R2 (read2)
+            | There are 3 FASTQs generated per sample: I1 (index), R1 (read1) and R2 (read2)
 	* - reorg_atac_fastqs
 	  - Array[String]
 	  - 
             | A list of google bucket urls containing reorganized ATAC-seq FASTQ files, one url per sample.
-            | There are 3 FASTQs generated per sample I1 (index), R1 (read1) and R2 (read2)
+            | There are 3 FASTQs generated per sample: I1 (index), R1 (read1) and R2 (read2)
         * - gex_outputs
 	  - Array[String]
           -
