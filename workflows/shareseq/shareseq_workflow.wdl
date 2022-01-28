@@ -220,7 +220,7 @@ workflow shareseq_workflow {
                         awsMaxRetries = awsMaxRetries,
                         backend = backend   
                 }    
-                call cm.chromap as chromap {
+                call cm.chromap_mapping as chromap {
                     input:
                         chromap_version = chromap_version,
                         read1_fastq_pattern = '_f*_R1.fastq.gz',
@@ -242,8 +242,15 @@ workflow shareseq_workflow {
                         backend = backend
                 }
             }
-        }
-    }    
+        }      
+    }
+    output {
+        Array[String]? demuxed_fastqs = shareseq_mkfastq.output_fastqs_directory
+        Array[String]? reorg_gex_fastqs = shareseq_reorg_gex.output_reorg_directory
+        Array[String]? reorg_atac_fastqs = shareseq_reorg_atac.output_reorg_directory 
+        Array[String]? gex_outputs = starsolo_count.output_folder
+        Array[String]? atac_outputs = chromap.output_aln_directory        
+    }      
 }
 
 task generate_mkfastq_input {
@@ -362,7 +369,6 @@ task generate_count_config {
             dirs = dirs_str.split(',')
             for dir in dirs:
                 run_id = dir.split('/')[-1].rpartition('_')[0]
-                print(run_id)
                 r2f[run_id] = dir
             return(r2f)
 

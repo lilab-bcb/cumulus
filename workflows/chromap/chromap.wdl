@@ -1,6 +1,6 @@
 version 1.0
 
-workflow chromap {
+workflow chromap_mapping {
     input {
         # Chromap version
         String chromap_version = "0.1.4"
