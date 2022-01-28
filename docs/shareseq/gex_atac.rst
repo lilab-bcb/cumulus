@@ -239,12 +239,44 @@ See the table below for important SHARE-seq outputs.
 	* - Name
 	  - Type
 	  - Description
-	* - output_fastqs_directory
+	* - demuxed_fastqs
 	  - Array[String]
-	  - A list of google bucket urls containing FASTQ files, one url per flowcell.
-	* - output_aln_directory
+	  - 
+            | A list of google bucket urls containing FASTQ files, one url per flowcell.
+            | In SHARE-Seq: 
+
+                           - R1 => cDNA 
+                           - R2 => barcode
+                           - R3 => cDNA
+
+	* - reorg_gex_fastqs
 	  - Array[String]
-	  - A list of google bucket urls containing Chromap results, one url per sample.
-        * - output_folder
-          - Array[String]
-          - A list of google bucket urls containing STARsolo results, one url per sample.
+	  - 
+            | A list of google bucket urls containing reorganized gene expression FASTQ files, one url per sample.
+            | There are 3 FASTQs generated per sample I1 (index), R1 (read1) and R2 (read2)
+	* - reorg_atac_fastqs
+	  - Array[String]
+	  - 
+            | A list of google bucket urls containing reorganized ATAC-seq FASTQ files, one url per sample.
+            | There are 3 FASTQs generated per sample I1 (index), R1 (read1) and R2 (read2)
+        * - gex_outputs
+	  - Array[String]
+          -
+            | Contains STARsolo (gene expression) output.
+            | More detailed explaination on output files can be found in `STAR manual`_.  
+        * - atac_outputs
+	  - Array[String]
+	  - 
+            | Contains Chromap (ATAC-seq) output in BED format. 
+            | Columns in BED file are:
+                                 
+                                  - chrom
+                                  - chrom_start 
+                                  - chrom_end
+                                  - barcode
+                                  - duplicate_count
+
+	    | More detailed explaination on output files can be found in `Chromap README`_.
+
+.. _STAR manual: https://github.com/alexdobin/STAR/blob/master/doc/STARmanual.pdf
+.. _Chromap README: https://github.com/haowenz/chromap/blob/master/README.md
