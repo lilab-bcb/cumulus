@@ -98,7 +98,7 @@ workflow starsolo_count {
 
     output {
         File monitoringLog = run_starsolo.monitoringLog
-        String output_folder = run_starsolo.output_folder
+        String output_count_directory = run_starsolo.output_count_directory
     }
 }
 
@@ -212,17 +212,16 @@ task run_starsolo {
         def remove_extra_space(s):
             return re.sub(' +', ' ', s.strip())
 
-        call_args = ['STAR', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}', '--outFileNamePrefix', 'result/~{sample_id}_']
+        call_args = ['STAR', '--genomeDir', 'genome_ref', '--runThreadN', '~{num_cpu}', '--outFileNamePrefix', 'result/']
 
         barcode_read = '~{barcode_read}'
         args_dict = dict()
 
-        if '~{assay}' in ['tenX_v2', 'tenX_v3', 'ShareSeq']:
+        if '~{assay}' in ['tenX_v2', 'tenX_v3', 'ShareSeq', 'tenX_fiveprime']:
             args_dict['--soloType'] = 'CB_UMI_Simple'
             args_dict['--soloCBmatchWLtype'] = '1MM_multi_Nbase_pseudocounts'
             args_dict['--soloUMIfiltering'] = 'MultiGeneUMI_CR'
             args_dict['--soloUMIdedup'] = '1MM_CR'
-            args_dict['--clipAdapterType'] = 'CellRanger4'
             args_dict['--outFilterScoreMin'] = '30'
             args_dict['--outSAMtype'] = ['BAM', 'SortedByCoordinate']
             args_dict['--outSAMattributes'] = ['CR', 'UR', 'CY', 'UY', 'CB', 'UB']
@@ -232,13 +231,29 @@ task run_starsolo {
                 args_dict['--soloCBlen'] = '16'
                 args_dict['--soloUMIstart'] = '17'
                 args_dict['--soloUMIlen'] = '12'
+                args_dict['--clipAdapterType'] = 'CellRanger4'
                 barcode_read = 'read1'
-            elif '~{assay}' == 'tenX_v2':
+            elif '~{assay}' in ['tenX_v2', 'tenX_fiveprime']:
                 args_dict['--soloCBstart'] = '1'
                 args_dict['--soloCBlen'] = '16'
                 args_dict['--soloUMIstart'] = '17'
                 args_dict['--soloUMIlen'] = '10'
-                barcode_read = 'read1'
+
+                if '~{assay}' == 'tenX_v2':
+                    args_dict['--clipAdapterType'] = 'CellRanger4'
+                    barcode_read = 'read1'
+                else:
+                    args_dict['--soloBarcodeMate'] = '1'
+                    args_dict['--clip5pNbases'] = ['39', '0']
+                    barcode_read = 'read2'
+                    import gzip
+                    with gzip.open(r1_list[0], 'rb') as fin:
+                        cnt = 0
+                        while cnt < 2:
+                            r1_read_str = fin.readline().strip()
+                            cnt += 1
+                    if len(r1_read_str) > 39:
+                        args_dict['--soloStrand'] = 'Reverse'
             elif '~{assay}' == 'ShareSeq':
                 args_dict['--soloCBstart'] = '1'
                 args_dict['--soloCBlen'] = '24'
@@ -338,7 +353,7 @@ task run_starsolo {
 
     output {
         File monitoringLog = 'monitoring.log'
-        String output_folder = '~{output_directory}/~{sample_id}'
+        String output_count_directory = '~{output_directory}/~{sample_id}'
     }
 
     runtime {
