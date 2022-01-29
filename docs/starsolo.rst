@@ -51,25 +51,28 @@ A brief description of the sample sheet format is listed below **(required colum
       - Indicates the Cloud bucket URI of the folder holding FASTQ files of each sample.
     * - Assay
       - | Indicates the assay type of each sample.
-        | Available options: ``tenX_v3`` for 10X v3, ``tenX_v2`` for 10X v2, ``DropSeq``, ``SeqWell``, ``SlideSeq``, ``ShareSeq`` and ``None``.
+        | Available options: ``tenX_v3`` for 10X v3, ``tenX_v2`` for 10X v2, ``tenX_fiveprime`` for 10X 5' protocol, ``DropSeq``, ``SeqWell``, ``SlideSeq``, ``ShareSeq`` and ``None``.
         | If not specified, use the default ``tenX_v3``.
-        | If ``tenX_v3``, the following STARsolo options would be applied (could be overwritten by user-specified options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 12 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR``
+        | If **tenX_v3**, the following STARsolo options would be applied (could be overwritten by user-specified options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 12 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR``
         | ``--soloUMIdedup 1MM_CR --clipAdapterType CellRanger4 --outFilterScoreMin 30 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB``
-        | If ``tenX_v2``, the following STARsolo options would be applied (could be overwritten by user-specified options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 10 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR``
+        | If **tenX_v2**, the following STARsolo options would be applied (could be overwritten by user-specified options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 10 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR``
         | ``--soloUMIdedup 1MM_CR --clipAdapterType CellRanger4 --outFilterScoreMin 30 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB``
-        | If ``ShareSeq``, the following STARsolo options would be applied (could be overwritten by user-specific options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 24 --soloUMIstart 25 --soloUMIlen 10 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR``
+        | If **tenX_fiveprime**, the following STARsolo options would be applied (could be overwritten by user-specified options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 10 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR``
+        | ``--soloBarcodeMate 1 --clip5pNbases 39 0 --soloUMIdedup 1MM_CR --outFilterScoreMin 30 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB``
+        | Moreover, for **tenX_fiveprime** assays, if Read 1 has more than 39 nt, ``--soloStrand Reverse`` option will be used.
+        | If **ShareSeq**, the following STARsolo options would be applied (could be overwritten by user-specific options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 24 --soloUMIstart 25 --soloUMIlen 10 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR``
         | ``--soloUMIdedup 1MM_CR --clipAdapterType CellRanger4 --outFilterScoreMin 30 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB``
-        | If ``SeqWell`` or ``DropSeq``, the following STARsolo options would be applied (could be overwritten by user-specified options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 12 --soloUMIstart 13 --soloUMIlen 8 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB``
-        | If ``None``, not preset options would be applied.
+        | If **SeqWell** or **DropSeq**, the following STARsolo options would be applied (could be overwritten by user-specified options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 12 --soloUMIstart 13 --soloUMIlen 8 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB``
+        | If **None**, no preset option would be applied.
 
 The sample sheet supports sequencing the same sample across multiple flowcells. In case of multiple flowcells, you should specify one line for each flowcell using the same sample name. In the following example, we have 2 samples and ``sample_1`` is sequenced in two flowcells.
 
 Example::
 
-    Sample,Location
-    sample_1,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/sample_1_fastqs
-    sample_1,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/sample_1_fastqs
-    sample_2,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/sample_2_fastqs
+    Sample,Reference,Location,Assay
+    sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/sample_1_fastqs,tenX_v3
+    sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/sample_1_fastqs,tenX_v3
+    sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/sample_2_fastqs,tenX_v2
 
 
 **3.2 Upload your sample sheet to the workspace bucket:**
