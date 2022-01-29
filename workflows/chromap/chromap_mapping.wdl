@@ -100,7 +100,7 @@ workflow chromap_mapping {
     Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
     File genome_file = (if is_url then genome else acronym2gsurl[genome])
 
-    call chromap {
+    call run_chromap {
         input:
             chromap_version = chromap_version,
             read1_fastq_pattern = read1_fastq_pattern,
@@ -145,13 +145,13 @@ workflow chromap_mapping {
 
 
     output {
-        String output_aln_directory = chromap.output_aln_directory
-        File monitoringLog = chromap.monitoringLog
+        String output_aln_directory = run_chromap.output_aln_directory
+        File monitoringLog = run_chromap.monitoringLog
     }
 
 }
 
-task chromap {
+task run_chromap {
     input {
             String chromap_version
             String read1_fastq_pattern
