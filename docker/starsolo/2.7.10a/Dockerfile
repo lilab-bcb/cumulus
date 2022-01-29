@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim
+FROM debian:buster-slim
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get -qq update && \
@@ -6,6 +6,7 @@ RUN apt-get -qq update && \
         wget \
         build-essential \
         curl \
+        zlib1g-dev \
         unzip \
         gnupg \
         python3 \
@@ -29,7 +30,10 @@ RUN wget https://github.com/alexdobin/STAR/archive/refs/tags/2.7.10a.tar.gz && \
     tar -xzvf 2.7.10a.tar.gz && \
     rm 2.7.10a.tar.gz && \
     mkdir /software && \
-    mv STAR-2.7.10a/ /software/STAR
+    mv STAR-2.7.10a/ /software/STAR && \
+    cd /software/STAR/source && \
+    make STAR && \
+    ln -s /software/STAR/source/STAR /software/STAR/bin/STAR
 
 RUN apt-get -qq -y remove curl gnupg wget curl && \
     apt-get -qq -y autoremove && \
@@ -40,4 +44,4 @@ RUN apt-get -qq -y remove curl gnupg wget curl && \
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
 RUN chmod a+rx /software/monitor_script.sh
 
-ENV PATH=/software:/software/STAR/bin/Linux_x86_64:$PATH
+ENV PATH=/software:/software/STAR/bin:$PATH
