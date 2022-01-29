@@ -245,15 +245,15 @@ See the table below for important SHARE-seq outputs.
             | A list of google bucket urls containing FASTQ files, one url per flowcell.
             | In SHARE-Seq: 
 
-                           - R1 => cDNA 
+                           - R1 => read1 
                            - R2 => barcode
-                           - R3 => cDNA
+                           - R3 => read2
 
 	* - reorg_gex_fastqs
 	  - Array[String]
 	  - 
             | A list of google bucket urls containing reorganized gene expression FASTQ files, one url per sample.
-            | There are 3 FASTQs generated per sample: I1 (index), R1 (read1) and R2 (read2).
+            | There are 2 FASTQs generated per sample: R1 (read1) and R2 (read2).
 	* - reorg_atac_fastqs
 	  - Array[String]
 	  - 
