@@ -173,7 +173,7 @@ inline bool check_polyT(const string& sequence, int polyT_start, int polyT_len, 
 int main(int argc, char* argv[]) {
 	if (argc < 7) {
 		printf("Usage: shareseq_reorg_barcodes barcode_index.csv flanking_sequence.csv sample_name sample_type fastq_folders output_directory [--r1-pattern pattern] [--r2-pattern pattern] [--i1-pattern pattern]\n");
-		printf("Note that this program will change the content in fastq_folders!\n");
+		printf("Note that this program requires PIGZ installed and will change the content in fastq_folders!\n");
 		printf("Arguments:\n\tbarcode_index.csv\tSHARE-Seq barcode white list, used by round1 to round3.\n");
 		printf("\tflanking_sequence.csv\tFlanking sequences in front of round1 to round3 barcodes\n");
 		printf("\tsample_name\tSample name. Only FASTQ files with sample_name as prefix are considered.\n");
