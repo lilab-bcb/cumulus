@@ -3,7 +3,7 @@ version 1.0
 import "shareseq_mkfastq.wdl" as shm
 import "shareseq_reorg.wdl" as shr
 import "../starsolo/starsolo_count.wdl" as sc
-import "../chromap/chromap.wdl" as cm
+import "../chromap/chromap_mapping.wdl" as cm
 
 workflow shareseq_workflow {
     input {
