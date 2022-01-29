@@ -16,12 +16,12 @@ workflow chromap_mapping {
         # Index TSV file 
         File acronym_file
         
-        # R1 Fastq pattern
-        String read1_fastq_pattern
-        # R2 Fastq pattern
-        String read2_fastq_pattern
-        # Barcode Fastq pattern
-        String barcode_fastq_pattern
+        # R1 Fastq pattern, default as 10x atac/multiome format
+        String read1_fastq_pattern = "_S*_L*_R1_001.fastq.gz"
+        # R2 Fastq pattern, default as 10x atac/multiome format
+        String read2_fastq_pattern = "_S*_L*_R3_001.fastq.gz"
+        # Barcode Fastq pattern, default as 10x atac/multiome format
+        String barcode_fastq_pattern = "_S*_L*_R2_001.fastq.gz"
         # Barcode whitelist
         File? barcode_whitelist
         # Read format
