@@ -254,6 +254,7 @@ See the table below for important SHARE-seq outputs.
 	  - 
             | A list of google bucket urls containing reorganized gene expression FASTQ files, one url per sample.
             | There are 2 FASTQs generated per sample: R1 (read1) and R2 (read2).
+            | Cell barcode and UMI are part of R2.
 	* - reorg_atac_fastqs
 	  - Array[String]
 	  - 
