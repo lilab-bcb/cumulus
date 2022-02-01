@@ -326,7 +326,7 @@ task run_chromap {
         if '~{remove_pcr_duplicates_at_cell_level}':
             call_args.append('--remove-pcr-duplicates-at-cell-level')
         if '~{read_format}' != '':
-            call_args.append('--read-format', '~{read_format}')
+            call_args.extend(['--read-format', '~{read_format}'])
         if '~{tn5_shift}':
             call_args.append('--Tn5-shift')
         if '~{low_mem}':
