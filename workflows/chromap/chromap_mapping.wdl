@@ -268,17 +268,29 @@ task run_chromap {
                      '-x', 'genome_dir/ref.index', '-1', read1_fq, 
                      '-2', read2_fq]
 
-        if '~{preset}' not in ['atac','hic','chip']:
+        if '~{preset}' not in ['atac', 'hic', 'chip']:
             print('Choose from following preset options only: atac, chip or hic.')
             sys.exit(1)
+
+
+        def check_gz_file(input_file):
+            ### If file is gzipped, ungzip it
+            root, ext = os.path.splitext(input_file)
+            if  ext == '.gz':
+                gunzip_command = ['gunzip', '-f', input_file]
+                print(' '.join(gunzip_command))
+                check_call(gunzip_command)
+                return root
+            return input_file
+
 
         if '~{preset}' == 'atac':
             if index_fq != '':
                 call_args.extend(['-b', index_fq])
             if '~{barcode_translate}' != '':
-                call_args.extend(['--barcode-translate', '~{barcode_translate}'])
+                call_args.extend(['--barcode-translate', check_gz_file('~{barcode_translate}')])
             if '~{barcode_whitelist}' != '':
-                call_args.extend(['--barcode-whitelist', '~{barcode_whitelist}'])
+                call_args.extend(['--barcode-whitelist', check_gz_file('~{barcode_whitelist}')])
             out_file_suffix = '.bed'
         if '~{preset}' == 'chip':
             out_file_suffix = '.bed'
