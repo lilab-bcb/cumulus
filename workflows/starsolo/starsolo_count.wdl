@@ -64,7 +64,7 @@ workflow starsolo_count {
             output_directory = output_directory,
             outSAMtype = outSAMtype,
             soloType = soloType,
-            soloCBwhitelist = if soloCBwhitelist != '' then soloCBwhitelist else (if whitelist_uri != 'null' then whitelist_uri else ''),
+            soloCBwhitelist = if defined(soloCBwhitelist) then soloCBwhitelist else (if whitelist_uri != 'null' then whitelist_uri else ''),
             soloCBstart = soloCBstart,
             soloCBlen = soloCBlen,
             soloUMIstart = soloUMIstart,
