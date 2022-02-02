@@ -3,7 +3,7 @@ version 1.0
 workflow chromap_mapping {
     input {
         # Chromap version
-        String chromap_version = "0.1.4"
+        String chromap_version = "0.1.5"
         # Sample ID
         String sample_id
         # A comma-separated list of input FASTQs directories (urls)

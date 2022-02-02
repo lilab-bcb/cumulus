@@ -57,8 +57,8 @@ workflow shareseq_workflow {
         String shareseq_reorg_version = "0.1.0"
         # 2.7.9a
         String star_version = "2.7.9a"
-        # 0.1.4
-        String chromap_version = "0.1.4"
+        # 0.1.4, 0.1.5
+        String chromap_version = "0.1.5"
 
         # Number of cpus shareseq_mkfastq 
         Int shareseq_mkfastq_num_cpu = 32
