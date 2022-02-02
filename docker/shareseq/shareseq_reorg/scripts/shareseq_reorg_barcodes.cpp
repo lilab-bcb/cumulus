@@ -16,6 +16,9 @@
 
 using namespace std;
 
+const int block_size = 1000000;
+
+
 int n_barcode, barcode_len, max_mismatch;
 HashType barcode_index;
 HashIterType barcode_iter;
@@ -23,7 +26,7 @@ vector<string> barcode_names, barcode_seqs;
 
 vector<string> flanking_seqs;
 
-string sample_name, sample_type, output_directory, command;
+string sample_name, sample_type, output_directory;
 
 struct InputFile{
 	static string r1_pattern, r2_pattern, i1_pattern;
@@ -38,11 +41,10 @@ struct InputFile{
 	}
 
 	string get_output_name(string choice, const string& output_directory) {
-		// r1, r2atac, r2gex, i1
+		// r1, r2, i1
 		if (choice == "r1") return output_directory + out_prefix + "_R1.fastq.gz";
-		if (choice == "r2atac") return output_directory + out_prefix + "_R2.fastq.gz";
-		if (choice == "r2gex") return output_directory + out_prefix + "_R2.fastq";
-		return output_directory + out_prefix + "_I1.fastq";
+		if (choice == "r2") return output_directory + out_prefix + "_R2.fastq.gz";
+		return output_directory + out_prefix + "_I1.fastq.gz";
 	}		
 };
 
@@ -53,8 +55,9 @@ string InputFile::i1_pattern = string("_S*_L*_R2_001.fastq.gz");
 vector<InputFile> inputs; 
 
 Read read1, read2, index1;
-iGZipFile gzip_in_r1, gzip_in_r2, gzip_in_i1;
-oGZipFile gzip_out_r1, gzip_out_r2, gzip_out_i1;
+iGZipFile in_r1, in_r2, in_i1;
+vector<Read> r1_buffer, r2_buffer, i1_buffer;
+string out_r1, out_r2, out_i1;
 
 time_t begin_time, start_time, finish_time;
 
@@ -170,10 +173,23 @@ inline bool check_polyT(const string& sequence, int polyT_start, int polyT_len, 
 	return n_mismatch <= polyT_max_mismatch;
 }
 
+inline void check_buffer(vector<Read>& buffer, string& out_file, bool push = false) {
+	if (buffer.size() < block_size && !push) return;
+
+	string command = "pigz -c - >> " + out_file;
+	FILE* fo = popen(command.c_str(), "w");
+	assert(fo != NULL);
+	for (size_t i = 0; i < buffer.size(); ++i)
+		fprintf(fo, "%s", buffer[i].toString().c_str());
+	assert(pclose(fo) == 0);
+	buffer.clear();
+}
+
+
 int main(int argc, char* argv[]) {
 	if (argc < 7) {
 		printf("Usage: shareseq_reorg_barcodes barcode_index.csv flanking_sequence.csv sample_name sample_type fastq_folders output_directory [--r1-pattern pattern] [--r2-pattern pattern] [--i1-pattern pattern]\n");
-		printf("Note that this program requires PIGZ installed and will change the content in fastq_folders!\n");
+		printf("Note that this program requires PIGZ installed.\n");
 		printf("Arguments:\n\tbarcode_index.csv\tSHARE-Seq barcode white list, used by round1 to round3.\n");
 		printf("\tflanking_sequence.csv\tFlanking sequences in front of round1 to round3 barcodes\n");
 		printf("\tsample_name\tSample name. Only FASTQ files with sample_name as prefix are considered.\n");
@@ -216,27 +232,28 @@ int main(int argc, char* argv[]) {
 	parse_input_directory(argv[5], sample_name);
 
 
-	int cnt = 0;
-	int n_valid = 0;
+	int cnt_overall = 0;
+	int n_valid_overall = 0;
+	int cnt, n_valid;
 	string barcode, qual;
 	bool proceed_valid;
 
 	start_time = time(NULL);
 	for (auto&& input_fastq : inputs) {
-		gzip_in_i1.open(input_fastq.get_input_name("i1"));
-		if (sample_type == "atac") {
-			gzip_out_i1.open(input_fastq.get_output_name("i1", output_directory));
-		} else {
-			gzip_in_r2.open(input_fastq.get_input_name("r2"));
-			gzip_out_r2.open(input_fastq.get_output_name("r2gex", output_directory));			
-		}
+		in_r1.open(input_fastq.get_input_name("r1"));
+		in_r2.open(input_fastq.get_input_name("r2"));
+		in_i1.open(input_fastq.get_input_name("i1"));
 
-		while (gzip_in_i1.next(index1) == 4) {
+		r1_buffer.clear(); out_r1 = input_fastq.get_output_name("r1", output_directory); assert(system(("rm -f " + out_r1).c_str()) == 0);
+		r2_buffer.clear(); out_r2 = input_fastq.get_output_name("r2", output_directory); assert(system(("rm -f " + out_r2).c_str()) == 0);
+		if (sample_type == "atac") { i1_buffer.clear(); out_i1 = input_fastq.get_output_name("i1", output_directory); assert(system(("rm -f " + out_i1).c_str()) == 0); }
+
+		cnt = n_valid = 0;
+		while (in_r1.next(read1) == 4 && in_r2.next(read2) == 4 && in_i1.next(index1) == 4) {
 			++cnt;
 
 			proceed_valid = true;
 			if (sample_type == "gex") {
-				assert(gzip_in_r2.next(read2) == 4);
 				proceed_valid = check_polyT(read2.seq, umi_len, check_polyT_len, check_polyT_max_mismatch);
 			}
 
@@ -245,51 +262,38 @@ int main(int argc, char* argv[]) {
 				index1.qual = qual;
 				++n_valid;
 
-				if (sample_type == "atac") {
-					gzip_out_i1.write(index1);
-				} else {
+				if (sample_type == "gex") {
 					read2.seq = index1.seq + read2.seq.substr(0, umi_len);
-					read2.qual = index1.qual + read2.qual.substr(0, umi_len);
-					gzip_out_r2.write(read2);					
+					read2.qual = index1.qual + read2.qual.substr(0, umi_len);					
 				}
+
+				r1_buffer.push_back(read1); check_buffer(r1_buffer, out_r1);
+				r2_buffer.push_back(read2); check_buffer(r2_buffer, out_r2);
+				if (sample_type == "atac") { i1_buffer.push_back(index1); check_buffer(i1_buffer, out_i1); }
 			}
 
-			if (cnt % 1000000 == 0) {
-				finish_time = time(NULL);
-				printf("Processed %d reads, %d reads passed filtration, time_spent=%.2fs.\n", cnt, n_valid, difftime(finish_time, start_time));
-				start_time = finish_time;
-			}
+			if (cnt % 1000000 == 0)
+				printf("Processed %d reads, %d reads passed filtration.\n", cnt, n_valid);
 		}
 
-		gzip_in_i1.close();
-		if (sample_type == "atac") gzip_out_i1.close();
-		else {
-			gzip_in_r2.close();
-			gzip_out_r2.close();
-		}
+		in_r1.close();
+		in_r2.close();
+		in_i1.close();
 
-		command = "mv -f " + input_fastq.get_input_name("r1") + " " + input_fastq.get_output_name("r1", output_directory);
-		printf("MV command: %s\n", command.c_str());
-		assert(system(command.c_str()) == 0);
+		check_buffer(r1_buffer, out_r1, true);
+		check_buffer(r2_buffer, out_r2, true);
+		if (sample_type == "atac") check_buffer(i1_buffer, out_i1, true);
 
-		if (sample_type == "atac") {
-			command = "mv -f " + input_fastq.get_input_name("r2") + " " + input_fastq.get_output_name("r2atac", output_directory);
-			printf("MV command: %s\n", command.c_str());
-			assert(system(command.c_str()) == 0);
+		finish_time = time(NULL);
+		printf("%s is processed, %d out of %d reads passed filtration, time_spent=%.2fs.\n", input_fastq.out_prefix.c_str(), n_valid, cnt, difftime(finish_time, start_time));
+		start_time = finish_time;
 
-			command = "pigz -f " + input_fastq.get_output_name("i1", output_directory);
-			printf("PIGZ command: %s\n", command.c_str());
-			assert(system(command.c_str()) == 0);
-		}
-		else {
-			command = "pigz -f " + input_fastq.get_output_name("r2gex", output_directory);
-			printf("PIGZ command: %s\n", command.c_str());
-			assert(system(command.c_str()) == 0);
-		}
+		cnt_overall += cnt;
+		n_valid_overall += n_valid;
 	}
 
 	finish_time = time(NULL);
-	printf("Reorg for %s (%s) is finished. Kept %d reads out of %d reads. Time spent = %.2fs\n", sample_name.c_str(), sample_type.c_str(), n_valid, cnt, difftime(finish_time, begin_time));
+	printf("Reorg for %s (%s) is finished. Kept %d reads out of %d reads. Time spent = %.2fs\n", sample_name.c_str(), sample_type.c_str(), n_valid_overall, cnt_overall, difftime(finish_time, begin_time));
 
 	return 0;
 }
