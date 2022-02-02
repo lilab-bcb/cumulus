@@ -68,26 +68,26 @@ Below are inputs for *chromap* workflow. Notice that required inputs are in bold
             | Barcode translation file.
 	  -
 	  -
-	* - read1
+	* - read1_fastq_pattern
 	  - read 1 Fastq file identifier.
-	  - "R1"
-	  - "R1"
-	* - read2
+	  - "_S*_L*_R1_001.fastq.gz"
+	  - "_S*_L*_R1_001.fastq.gz"
+	* - read2_fastq_pattern
 	  - read 2 Fastq file identifier.
-	  - "R2"
-	  - "R2"
-	* - barcode
+	  - "_S*_L*_R3_001.fastq.gz"
+	  - "_S*_L*_R3_001.fastq.gz"
+	* - barcode_fastq_pattern
 	  - barcode index Fastq file identifier.
-	  - "I1"
-	  - "I1"
+	  - "_S*_L*_R2_001.fastq.gz"
+	  - "_S*_L*_R2_001.fastq.gz"
         * - read_format
           - [chromap option \-\-read-format] Format for read files and barcode files
           - "r1:0:-1,bc:0:-1"
           - "r1:0:-1,bc:0:-1"
         * - chromap_version
-	  - Chromap version to use. Currently only support ``0.1.4``.
-	  - "0.1.4"
-          - "0.1.4"
+	  - Chromap version to use. Available options: 0.1.4, 0.1.5.
+	  - "0.1.5"
+          - "0.1.5"
 	* - split_alignment
 	  - [chromap option \-\-split-alignment] Allow split alignments. This option should be set only when mapping Hi-C reads.
 	  - False
