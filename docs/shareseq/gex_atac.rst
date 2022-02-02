@@ -168,8 +168,8 @@ For SHARE-seq data, ``shareseq_workflow`` takes Illumina outputs as input and ru
 		  - "2.7.9a"
 		* - chromap_version
 		  - Chromap version 
-		  - "0.1.4"
-		  - "0.1.4"
+		  - "0.1.5"
+		  - "0.1.5"
 		* - shareseq_mkfastq_num_cpu
 		  - Number of CPUs for shareseq_mkfastq
 		  - 32
