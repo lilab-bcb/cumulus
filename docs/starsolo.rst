@@ -82,7 +82,7 @@ Example::
 
     gsutil cp /foo/bar/projects/sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
-1. Launch analysis
+4. Launch analysis
 +++++++++++++++++++
 
 In your workspace, open ``starsolo_workflow`` in ``WORKFLOWS`` tab. Select the desired snapshot version (e.g. latest). Select ``Process single workflow from files`` as below
