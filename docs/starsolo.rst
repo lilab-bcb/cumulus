@@ -51,10 +51,11 @@ A brief description of the sample sheet format is listed below **(required colum
       - Indicates the Cloud bucket URI of the folder holding FASTQ files of each sample.
     * - Assay
       - | Indicates the assay type of each sample.
-        | Available options: ``tenX_v3`` for 10X v3, ``tenX_v2`` for 10X v2, ``tenX_fiveprime`` for 10X 5' protocol, ``DropSeq``, ``SeqWell``, ``SlideSeq``, ``ShareSeq`` and ``None``.
+        | Available options: ``tenX_v3`` for 10X v3, ``tenX_multiome`` for 10X multiome, ``tenX_v2`` for 10X v2, ``tenX_fiveprime`` for 10X 5' protocol, ``DropSeq``, ``SeqWell``, ``SlideSeq``, ``ShareSeq`` and ``None``.
         | If not specified, use the default ``tenX_v3``.
         | If **tenX_v3**, the following STARsolo options would be applied (could be overwritten by user-specified options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 12 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR``
         | ``--soloUMIdedup 1MM_CR --clipAdapterType CellRanger4 --outFilterScoreMin 30 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB``
+        | If **tenX_multiome**, use the same STARsolo options as for *tenX_v3* assay, but with the 10X ARC Multiome Gene Expression whitelist.
         | If **tenX_v2**, the following STARsolo options would be applied (could be overwritten by user-specified options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 10 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR``
         | ``--soloUMIdedup 1MM_CR --clipAdapterType CellRanger4 --outFilterScoreMin 30 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB``
         | If **tenX_fiveprime**, the following STARsolo options would be applied (could be overwritten by user-specified options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 10 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR``
@@ -140,7 +141,8 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
       - "CB_UMI_Simple"
       -    None
     * - soloCBwhitelist
-      - [STARsolo option] Cell barcode white list in either plain text or gzipped format.
+      - | [STARsolo option] Cell barcode white list in either plain text or gzipped format.
+        | **Notice:** If specified, it will overwrite the white lists for **ALL** the samples in your sample sheet.
       - gs://my_bucket/my_white_list.txt
       - None
     * - soloFeatures

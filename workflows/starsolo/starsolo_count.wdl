@@ -64,7 +64,7 @@ workflow starsolo_count {
             output_directory = output_directory,
             outSAMtype = outSAMtype,
             soloType = soloType,
-            soloCBwhitelist = if whitelist_uri != 'null' then whitelist_uri else soloCBwhitelist,
+            soloCBwhitelist = if defined(soloCBwhitelist) then soloCBwhitelist else (if whitelist_uri != 'null' then whitelist_uri else ''),
             soloCBstart = soloCBstart,
             soloCBlen = soloCBlen,
             soloUMIstart = soloUMIstart,
@@ -217,7 +217,7 @@ task run_starsolo {
         barcode_read = '~{barcode_read}'
         args_dict = dict()
 
-        if '~{assay}' in ['tenX_v2', 'tenX_v3', 'ShareSeq', 'tenX_fiveprime']:
+        if '~{assay}' in ['tenX_v2', 'tenX_v3', 'ShareSeq', 'tenX_fiveprime', 'tenX_multiome']:
             args_dict['--soloType'] = 'CB_UMI_Simple'
             args_dict['--soloCBmatchWLtype'] = '1MM_multi_Nbase_pseudocounts'
             args_dict['--soloUMIfiltering'] = 'MultiGeneUMI_CR'
@@ -226,7 +226,7 @@ task run_starsolo {
             args_dict['--outSAMtype'] = ['BAM', 'SortedByCoordinate']
             args_dict['--outSAMattributes'] = ['CR', 'UR', 'CY', 'UY', 'CB', 'UB']
 
-            if '~{assay}' == 'tenX_v3':
+            if '~{assay}' in ['tenX_v3', 'tenX_multiome']:
                 args_dict['--soloCBstart'] = '1'
                 args_dict['--soloCBlen'] = '16'
                 args_dict['--soloUMIstart'] = '17'
