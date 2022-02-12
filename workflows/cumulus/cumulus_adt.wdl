@@ -162,6 +162,12 @@ task run_generate_count_matrix_ADTs {
         then
             filter_chimeric_reads ~{data_type} ~{feature_barcodes} "~{sample_id}.stat.csv.gz" ~{min_read_ratio} ~{sample_id}
         fi
+
+        if [ -f "~{sample_id}".crispr.stat.csv.gz ]
+        then
+            filter_chimeric_reads ~{data_type} ~{feature_barcodes} "~{sample_id}.crispr.stat.csv.gz" ~{min_read_ratio} ~{sample_id}
+        fi
+
         strato cp --backend ~{backend} -m "~{sample_id}".*csv* "~{output_directory}/~{sample_id}/"
 
         if [ -f "~{sample_id}".umi_count.pdf ]
