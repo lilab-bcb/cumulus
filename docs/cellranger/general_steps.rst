@@ -93,7 +93,7 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 			| **vdj** refers to V(D)J data (*cellranger vdj*),
 			| **citeseq** refers to CITE-Seq tag data,
 			| **hashing** refers to cell-hashing or nucleus-hashing tag data,
-			| **adt**, which refers to either *citeseq* and/or *hashing*. If hashing and citeseq reads are pooled under a same sample index, users can consider use **adt**,
+			| **adt**, which refers to the case where *hashing* and *citeseq* reads are in a sample library.
 			| **cmo** refers to cell multiplexing oligos used in 10x Genomics' CellPlex assay,
 			| **crispr** refers to Perturb-seq guide tag data,
 			| **atac** refers to scATAC-Seq data (*cellranger-atac count*),
@@ -154,27 +154,50 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 6. Run ``cellranger count`` only
 ++++++++++++++++++++++++++++++++++++
 
-Sometimes, users might want to perform demultiplexing locally and only run the count part on the cloud. This section describes how to only run the count part via ``cellranger_workflow``.
+	Sometimes, users might want to perform demultiplexing locally and only run the count part on the cloud. This section describes how to only run the count part via ``cellranger_workflow``.
 
-#. Copy your FASTQ files to the workspace using gsutil_ in your unix terminal.
+	#. Copy your FASTQ files to the workspace using gsutil_ in your unix terminal.
 
-	You should upload folders of FASTQ files. The uploaded folder (for one flowcell) should contain one subfolder for each sample belong to the this flowcell. **In addition, the subfolder name and the sample name in your sample sheet MUST be the same.** Each subfolder contains FASTQ files for that sample. Please note that if your FASTQ file are downloaded from the Sequence Read Archive (SRA) from NCBI, you must rename your FASTQs to follow the bcl2fastq `file naming conventions`_.
+		You should upload folders of FASTQ files. The uploaded folder (for one flowcell) should contain one subfolder for each sample belong to the this flowcell. **In addition, the subfolder name and the sample name in your sample sheet MUST be the same.** Each subfolder contains FASTQ files for that sample. Please note that if your FASTQ file are downloaded from the Sequence Read Archive (SRA) from NCBI, you must rename your FASTQs to follow the bcl2fastq `file naming conventions`_.
 
-	Example::
+		Example::
 
-		gsutil -m cp -r /foo/bar/fastq_path/K18WBC6Z4 gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq
+			gsutil -m cp -r /foo/bar/fastq_path/K18WBC6Z4 gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq
 
-#. Create a sample sheet following the similar structure as `above <./index.html#prepare-a-sample-sheet>`_, except the following differences:
+	#. Create a sample sheet following the similar structure as `above <./index.html#prepare-a-sample-sheet>`_, except the following differences:
 
-	- **Flowcell** column should list Google bucket URLs of the FASTQ folders for flowcells.
-	- **Lane** and **Index** columns are NOT required in this case.
+		- **Flowcell** column should list Google bucket URLs of the FASTQ folders for flowcells.
+		- **Lane** and **Index** columns are NOT required in this case.
 
-	Example::
+		Example::
 
-		Sample,Reference,Flowcell
-		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq
+			Sample,Reference,Flowcell
+			sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq
 
-#. Set optional input ``run_mkfastq`` to ``false``.
+	#. Set optional input ``run_mkfastq`` to ``false``.
+
+
+7. Workflow outputs
++++++++++++++++++++
+
+	See the table below for workflow level outputs.
+
+	.. list-table::
+		:widths: 5 5 10
+		:header-rows: 1
+
+		* - Name
+		  - Type
+		  - Description
+		* - fastq_outputs
+		  - Array[Array[String]?]
+		  - The top-level array contains results (as arrays) for different data modalities. The inner-level array contains cloud locations of FASTQ files, one url per flowcell.
+		* - count_outputs
+		  - Array[Array[String]?]
+		  - The top-level array contains results (as arrays) for different data modalities. The inner-level array contains cloud locations of count matrices, one url per sample.
+		* - count_matrix
+		  - String
+		  - Cloud url for a template count_matrix.csv to run Cumulus. It only contains sc/snRNA-Seq samples.
 
 
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil

@@ -87,7 +87,7 @@ Sample sheet
 		* - **cmo**
 		  - CellPlex
 		* - **adt**
-		  - Used for a mix of hashing and Cite-seq
+		  - Hashing and CITE-seq are in the same library
 		* - **crispr**
 		  - | Perturb-seq/CROP-seq
 		    | If neither *crispr_barcode_pos* nor *scaffold_sequence* (see Workflow input) is set, **crispr** refers to 10x CRISPR assays. If in addition *Chemistry* is set to be **SC3Pv3** or its aliases, Cumulus automatically complement the middle two bases to convert 10x feature barcoding cell barcodes back to 10x RNA cell barcodes.
@@ -272,15 +272,12 @@ See the table below for important outputs.
 	* - Name
 	  - Type
 	  - Description
-	* - output_fastqs_directory
+	* - cellranger_mkfastq.output_fastqs_directory
 	  - Array[String]
-	  - A list of google bucket urls containing FASTQ files, one url per flowcell.
-	* - output_count_directory
+	  - Subworkflow output. A list of cloud urls containing FASTQ files, one url per flowcell.
+	* - cumulus_adt.output_count_directory
 	  - Array[String]
-	  - A list of google bucket urls containing feature-barcode count matrices, one url per sample.
-	* - count_matrix
-	  - String
-	  - gs url for a template count_matrix.csv to run cumulus.
+	  - Subworkflow output. A list of cloud urls containing feature-barcode count matrices, one url per sample.
 
 In addition, For each antibody tag or crispr tag sample, a folder with the sample ID is generated under ``output_directory``. In the folder, two files --- ``sample_id.csv`` and ``sample_id.stat.csv.gz`` --- are generated.
 
@@ -292,7 +289,7 @@ If the feature barcode file has a third column, there will be two files for each
 
 If data type is ``crispr``, three additional files, ``sample_id.umi_count.pdf``, ``sample_id.filt.csv`` and ``sample_id.filt.stat.csv.gz``, are generated.
 
-``sample_id.umi_count.pdf`` plots number of UMIs against UMI with certain number of reads and colors UMIs with high likelihood of being chimeric in blue and other UMIs in red. This plot is generated purely based on number of reads each UMI has.
+``sample_id.umi_count.pdf`` plots number of UMIs against UMI with certain number of reads and colors UMIs with high likelihood of being chimeric in blue and other UMIs in red. This plot is generated purely based on number of reads each UMI has. For better visualization, we do not show UMIs with > 50 read counts (rare in data).
 
 ``sample_id.filt.csv`` is the filtered feature count matrix. It has the same format as ``sample_id.csv``.
 
