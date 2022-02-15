@@ -88,7 +88,7 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		  - Describes the 10x chemistry used for the sample. This column is optional.
 		* - DataType
 		  -
-			| Describes the data type of the sample --- *rna*, *vdj*, *cieseq*, *hashing*, *cmo*, *crispr*, *atac*.
+			| Describes the data type of the sample --- *rna*, *vdj*, *citeseq*, *hashing*, *cmo*, *crispr*, *atac*.
 			| **rna** refers to gene expression data (*cellranger count*),
 			| **vdj** refers to V(D)J data (*cellranger vdj*),
 			| **citeseq** refers to CITE-Seq tag data,
