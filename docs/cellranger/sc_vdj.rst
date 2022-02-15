@@ -187,21 +187,18 @@ See the table below for important scIR-seq outputs.
 	* - Name
 	  - Type
 	  - Description
-	* - output_fastqs_directory
+	* - cellranger_mkfastq.output_fastqs_directory
 	  - Array[String]
-	  - A list of google bucket urls containing FASTQ files, one url per flowcell.
-	* - output_vdj_directory
+	  - Subworkflow output. A list of cloud urls containing FASTQ files, one url per flowcell.
+	* - cellranger_vdj.output_vdj_directory
 	  - Array[String]
-	  - A list of google bucket urls containing vdj results, one url per sample.
-	* - metrics_summaries
-	  - File
-	  - A excel spreadsheet containing QCs for each sample.
-	* - output_web_summary
+	  - Subworkflow output. A list of cloud urls containing vdj results, one url per sample.
+	* - cellranger_vdj.output_web_summary
 	  - Array[File]
-	  - A list of htmls visualizing QCs for each sample (cellranger count output).
-	* - count_matrix
-	  - String
-	  - gs url for a template count_matrix.csv to run cumulus.
+	  - Subworkflow output. A list of htmls visualizing QCs for each sample (cellranger vdj output).
+	* - collect_summaries_vdj.metrics_summaries
+	  - File
+	  - Task output. A excel spreadsheet containing QCs for each sample.
 
 
 .. _10x single cell V(D)J sample index set names: https://support.10xgenomics.com/single-cell-vdj/sequencing/doc/specifications-sample-index-sets-for-single-cell-vdj

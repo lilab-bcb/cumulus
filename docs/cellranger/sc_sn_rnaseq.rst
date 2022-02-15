@@ -252,21 +252,21 @@ See the table below for important sc/snRNA-seq outputs.
 	* - Name
 	  - Type
 	  - Description
-	* - output_fastqs_directory
+	* - cellranger_mkfastq.output_fastqs_directory
 	  - Array[String]
-	  - A list of google bucket urls containing FASTQ files, one url per flowcell.
-	* - output_count_directory
+	  - Subworkflow output. A list of cloud urls containing FASTQ files, one url per flowcell.
+	* - cellranger_count.output_count_directory
 	  - Array[String]
-	  - A list of google bucket urls containing count matrices, one url per sample.
-	* - metrics_summaries
-	  - File
-	  - A excel spreadsheet containing QCs for each sample.
-	* - output_web_summary
+	  - Subworkflow output. A list of cloud urls containing gene count matrices, one url per sample.
+	* - cellranger_count.output_web_summary
 	  - Array[File]
-	  - A list of htmls visualizing QCs for each sample (cellranger count output).
+	  - Subworkflow output. A list of htmls visualizing QCs for each sample (cellranger count output).
+	* - collect_summaries.metrics_summaries
+	  - File
+	  - Task output. A excel spreadsheet containing QCs for each sample.
 	* - count_matrix
 	  - String
-	  - gs url for a template count_matrix.csv to run Cumulus.
+	  - Workflow output. Cloud url for a template count_matrix.csv to run Cumulus.
 
 
 .. _Carly Ziegler: http://shaleklab.com/author/carly/
