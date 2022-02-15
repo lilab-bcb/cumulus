@@ -526,7 +526,9 @@ workflow cellranger_workflow {
     }
 
     output {
-        String? count_matrix = generate_count_config.count_matrix
+        Array[Array[String]?] fastq_outputs = [cellranger_mkfastq.output_fastqs_flowcell_directory, cellranger_atac_mkfastq.output_fastqs_flowcell_directory, cellranger_arc_mkfastq.output_fastqs_flowcell_directory]
+        Array[Array[String]?] count_outputs = [cellranger_count.output_count_directory, cellranger_vdj.output_vdj_directory, cumulus_adt.output_count_directory, cellranger_atac_count.output_count_directory, cellranger_arc_count.output_count_directory, cellranger_multi.output_multi_directory, cellranger_count_fbc.output_count_directory]
+        File? count_matrix = generate_count_config.count_matrix
     }
 }
 
