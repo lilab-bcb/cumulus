@@ -65,6 +65,8 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 
 	Please note that the columns in the CSV can be in any order, but that the column names must match the recognized headings.
 
+	For **FFPE** data, **ProbeSet** column is mandatory.
+
 	The sample sheet describes how to demultiplex flowcells and generate channel-specific count matrices. Note that *Sample*, *Lane*, and *Index* columns are defined exactly the same as in 10x's simple CSV layout file.
 
 	A brief description of the sample sheet format is listed below **(required column headers are shown in bold)**.
