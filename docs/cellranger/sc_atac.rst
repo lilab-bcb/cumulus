@@ -197,16 +197,16 @@ See the table below for important scATAC-seq outputs.
 	  - Type
 	  - Description
 	* - cellranger_atac_mkfastq.output_fastqs_directory
-	  - Array[String]
+	  - Array[String]?
 	  - Subworkflow output. A list of cloud urls containing FASTQ files, one url per flowcell.
 	* - cellranger_atac_count.output_count_directory
-	  - Array[String]
+	  - Array[String]?
 	  - Subworkflow output. A list of cloud urls containing cellranger-atac count outputs, one url per sample.
 	* - cellranger_atac_count.output_web_summary
-	  - Array[File]
+	  - Array[File]?
 	  - Subworkflow output. A list of htmls visualizing QCs for each sample (cellranger-atac count output).
 	* - collect_summaries_atac.metrics_summaries
-	  - File
+	  - File?
 	  - Task output. A excel spreadsheet containing QCs for each sample.
 
 Aggregate scATAC-Seq Samples

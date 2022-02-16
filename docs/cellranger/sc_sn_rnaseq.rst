@@ -253,16 +253,16 @@ See the table below for important sc/snRNA-seq outputs.
 	  - Type
 	  - Description
 	* - cellranger_mkfastq.output_fastqs_directory
-	  - Array[String]
+	  - Array[String]?
 	  - Subworkflow output. A list of cloud urls containing FASTQ files, one url per flowcell.
 	* - cellranger_count.output_count_directory
-	  - Array[String]
+	  - Array[String]?
 	  - Subworkflow output. A list of cloud urls containing gene count matrices, one url per sample.
 	* - cellranger_count.output_web_summary
-	  - Array[File]
+	  - Array[File]?
 	  - Subworkflow output. A list of htmls visualizing QCs for each sample (cellranger count output).
 	* - collect_summaries.metrics_summaries
-	  - File
+	  - File?
 	  - Task output. A excel spreadsheet containing QCs for each sample.
 	* - count_matrix
 	  - String

@@ -5,7 +5,7 @@ import "spaceranger_count.wdl" as src
 
 workflow spaceranger_workflow {
     input {
-        # 5 - 14 columns (Sample, Reference, Flowcell, Lane, Index, [Image, DarkImage, ColorizedImage, Slide, Area, SlideFile, ReorientImages, LoupeAlignment, TargetPanel])
+        # 5 - 14 columns (Sample, Reference, Flowcell, Lane, Index, [ProbeSet, Image, DarkImage, ColorizedImage, Slide, Area, SlideFile, ReorientImages, LoupeAlignment, TargetPanel])
         File input_csv_file
         # Output directory, gs URL
         String output_directory
@@ -163,6 +163,12 @@ workflow spaceranger_workflow {
                 awsMaxRetries = awsMaxRetries,
                 backend = backend
         }
+    }
+
+    output {
+        Array[String]? fastq_outputs = spaceranger_mkfastq.output_fastqs_flowcell_directory
+        Array[String]? count_outputs = spaceranger_count.output_count_directory
+        File? metrics_summaries = collect_summaries.metrics_summaries
     }
 }
 

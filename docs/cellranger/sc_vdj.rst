@@ -188,16 +188,16 @@ See the table below for important scIR-seq outputs.
 	  - Type
 	  - Description
 	* - cellranger_mkfastq.output_fastqs_directory
-	  - Array[String]
+	  - Array[String]?
 	  - Subworkflow output. A list of cloud urls containing FASTQ files, one url per flowcell.
 	* - cellranger_vdj.output_vdj_directory
-	  - Array[String]
+	  - Array[String]?
 	  - Subworkflow output. A list of cloud urls containing vdj results, one url per sample.
 	* - cellranger_vdj.output_web_summary
-	  - Array[File]
+	  - Array[File]?
 	  - Subworkflow output. A list of htmls visualizing QCs for each sample (cellranger vdj output).
 	* - collect_summaries_vdj.metrics_summaries
-	  - File
+	  - File?
 	  - Task output. A excel spreadsheet containing QCs for each sample.
 
 
