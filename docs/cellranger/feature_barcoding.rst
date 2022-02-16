@@ -273,10 +273,10 @@ See the table below for important outputs.
 	  - Type
 	  - Description
 	* - cellranger_mkfastq.output_fastqs_directory
-	  - Array[String]
+	  - Array[String]?
 	  - Subworkflow output. A list of cloud urls containing FASTQ files, one url per flowcell.
 	* - cumulus_adt.output_count_directory
-	  - Array[String]
+	  - Array[String]?
 	  - Subworkflow output. A list of cloud urls containing feature-barcode count matrices, one url per sample.
 
 In addition, For each antibody tag or crispr tag sample, a folder with the sample ID is generated under ``output_directory``. In the folder, two files --- ``sample_id.csv`` and ``sample_id.stat.csv.gz`` --- are generated.

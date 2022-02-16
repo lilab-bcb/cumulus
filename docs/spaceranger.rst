@@ -94,6 +94,8 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		    | Can be either single lane (e.g. 8) or a range (e.g. 7-8) or all (e.g. \*).
 		* - **Index**
 		  - Sample index (e.g. SI-GA-A12).
+		* - ProbeSet
+		  - Probe set for FFPE samples. **Choosing** from ``human_probe_v1`` (10x human probe set) and ``mouse_probe_v1`` (10x mouse probe set). Alternatively, a CSV file describing the probe set can be directly used. Setting ProbeSet to ```` for a sample implies the sample is not FFPE.
 		* - Image
 		  - Google bucket url for a brightfield tissue H&E image in .jpg or .tiff format. This column is mutually exclusive with DarkImage and ColorizedImage columns.
 		* - DarkImage
@@ -196,43 +198,6 @@ Sample sheet
 		  - Human GRCh38 (GENCODE v32/Ensembl 98)
 		* - **mm10-2020-A**
 		  - Mouse mm10 (GENCODE vM23/Ensembl 98)
-		* - **GRCh38_and_mm10-2020-A**
-		  - Human GRCh38 (GENCODE v32/Ensembl 98) and mouse mm10 (GENCODE vM23/Ensembl 98)
-		* - **GRCh38_v3.0.0**
-		  - Human GRCh38, spaceranger reference 3.0.0, Ensembl v93 gene annotation
-		* - **hg19_v3.0.0**
-		  - Human hg19, cellranger reference 3.0.0, Ensembl v87 gene annotation
-		* - **mm10_v3.0.0**
-		  - Mouse mm10, cellranger reference 3.0.0, Ensembl v93 gene annotation
-		* - **GRCh38_and_mm10_v3.1.0**
-		  - Human (GRCh38) and mouse (mm10), cellranger references 3.1.0, Ensembl v93 gene annotations for both human and mouse
-		* - **hg19_and_mm10_v3.0.0**
-		  - Human (hg19) and mouse (mm10), cellranger reference 3.0.0, Ensembl v93 gene annotations for both human and mouse
-		* - **GRCh38_v1.2.0** or **GRCh38**
-		  - Human GRCh38, cellranger reference 1.2.0, Ensembl v84 gene annotation
-		* - **hg19_v1.2.0** or **hg19**
-		  - Human hg19, cellranger reference 1.2.0, Ensembl v82 gene annotation
-		* - **mm10_v1.2.0** or **mm10**
-		  - Mouse mm10, cellranger reference 1.2.0, Ensembl v84 gene annotation
-		* - **GRCh38_and_mm10_v1.2.0** or **GRCh38_and_mm10**
-		  - Human and mouse, built from GRCh38 and mm10 cellranger references, Ensembl v84 gene annotations are used
-
-	Pre-built snRNA-seq references are summarized below.
-
-	.. list-table::
-		:widths: 5 20
-		:header-rows: 1
-
-		* - Keyword
-		  - Description
-		* - **GRCh38_premrna_v3.0.0**
-		  - Human, introns included, built from GRCh38 cellranger reference 3.0.0, Ensembl v93 gene annotation, treating annotated transcripts as exons
-		* - **GRCh38_premrna_v1.2.0** or **GRCh38_premrna**
-		  - Human, introns included, built from GRCh38 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcripts as exons
-		* - **mm10_premrna_v1.2.0** or **mm10_premrna**
-		  - Mouse, introns included, built from mm10 cellranger reference 1.2.0, Ensembl v84 gene annotation, treating annotated transcripts as exons
-		* - **GRCh38_premrna_and_mm10_premrna_v1.2.0** or **GRCh38_premrna_and_mm10_premrna**
-		  - Human and mouse, introns included, built from GRCh38_premrna_v1.2.0 and mm10_premrna_v1.2.0
 
 Workflow input
 ++++++++++++++
@@ -248,7 +213,7 @@ For spatial data, ``spaceranger_workflow`` takes Illumina outputs and related im
 		  - Example
 		  - Default
 		* - **input_csv_file**
-		  - Sample Sheet (contains Sample, Reference, Flowcell, Lane, Index as required and Image, DarkImage, ColorizedImage, Slide, Area, SlideFile, ReorientImages, LoupeAlignment, TargetPanel as optional)
+		  - Sample Sheet (contains Sample, Reference, Flowcell, Lane, Index as required and ProbeSet, Image, DarkImage, ColorizedImage, Slide, Area, SlideFile, ReorientImages, LoupeAlignment, TargetPanel as optional)
 		  - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.csv"
 		  -
 		* - **output_directory**
@@ -350,17 +315,17 @@ See the table below for important sc/snRNA-seq outputs.
 	* - Name
 	  - Type
 	  - Description
-	* - output_fastqs_directory
-	  - Array[String]
-	  - A list of google bucket urls containing FASTQ files, one url per flowcell.
-	* - output_count_directory
-	  - Array[String]
-	  - A list of google bucket urls containing count matrices, one url per sample.
+	* - fastq_outputs
+	  - Array[String]?
+	  - A list of cloud urls containing FASTQ files, one url per flowcell.
+	* - count_outputs
+	  - Array[String]?
+	  - A list of cloud urls containing spaceranger count outputs, one url per sample.
 	* - metrics_summaries
-	  - File
+	  - File?
 	  - A excel spreadsheet containing QCs for each sample.
-	* - output_web_summary
-	  - Array[File]
+	* - spaceranger_count.output_web_summary
+	  - Array[File]?
 	  - A list of htmls visualizing QCs for each sample (spaceranger count output).
 
 ---------------------------------
