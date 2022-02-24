@@ -98,6 +98,7 @@ workflow starsolo_count {
 
     output {
         File monitoringLog = run_starsolo.monitoringLog
+        File starsoloLog = run_starsolo.starsoloLog
         String output_count_directory = run_starsolo.output_count_directory
     }
 }
@@ -353,6 +354,7 @@ task run_starsolo {
 
     output {
         File monitoringLog = 'monitoring.log'
+        File starsoloLog = 'result/Log.out'
         String output_count_directory = '~{output_directory}/~{sample_id}'
     }
 
