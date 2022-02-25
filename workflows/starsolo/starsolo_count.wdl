@@ -50,7 +50,7 @@ workflow starsolo_count {
     Map[String, String] acronym2uri = read_map(acronym_file)
     File genome_file = if sub(genome, "^.+\\.(tgz|gz)$", "PATH") == "PATH" then genome else acronym2uri[genome]
 
-    String whitelist_uri = if assay != '' then acronym2uri[assay] else 'null'
+    String whitelist_uri = if assay != '' then acronym2uri[assay] else acronym2uri['null']
 
     call run_starsolo {
         input:
@@ -64,7 +64,7 @@ workflow starsolo_count {
             output_directory = output_directory,
             outSAMtype = outSAMtype,
             soloType = soloType,
-            soloCBwhitelist = if defined(soloCBwhitelist) then soloCBwhitelist else (if whitelist_uri != 'null' then whitelist_uri else ''),
+            soloCBwhitelist = if defined(soloCBwhitelist) then soloCBwhitelist else whitelist_uri,
             soloCBstart = soloCBstart,
             soloCBlen = soloCBlen,
             soloUMIstart = soloUMIstart,
