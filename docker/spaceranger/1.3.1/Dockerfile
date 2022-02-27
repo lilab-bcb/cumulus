@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
@@ -16,13 +16,13 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.4.21.zip" -o "a
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
 RUN python -m pip install --upgrade pip --no-cache-dir && \
-    python -m pip install pandas==1.3.5 --no-cache-dir && \
+    python -m pip install pandas==1.4.1 --no-cache-dir && \
     python -m pip install packaging==21.3 --no-cache-dir && \
     python -m pip install stratocumulus==0.1.5 --no-cache-dir
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
-ADD cellranger-6.1.1.tar.gz /software
+ADD spaceranger-1.3.1.tar.gz /software
 
 #ADD bcl2fastq2-v2-20-0-linux-x86-64.zip /software/
 #RUN unzip -d /software/ /software/bcl2fastq2-v2-20-0-linux-x86-64.zip && alien -i /software/bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm && rm -f /software/bcl2fastq2-v2*
@@ -32,5 +32,5 @@ RUN apt-get -qq -y autoremove && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
 
 RUN chmod a+rx /software/monitor_script.sh
-ENV PATH=/software:/software/cellranger-6.1.1:$PATH
+ENV PATH=/software:/software/spaceranger-1.3.1:$PATH
 ENV TMPDIR=/tmp
