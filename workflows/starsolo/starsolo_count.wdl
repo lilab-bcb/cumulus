@@ -15,7 +15,7 @@ workflow starsolo_count {
         File acronym_file
         String? outSAMtype
         String? soloType
-        String soloCBwhitelist
+        File? soloCBwhitelist
         Int? soloCBstart
         Int? soloCBlen
         Int? soloUMIstart
@@ -50,7 +50,7 @@ workflow starsolo_count {
     Map[String, String] acronym2uri = read_map(acronym_file)
     File genome_file = if sub(genome, "^.+\\.(tgz|gz)$", "PATH") == "PATH" then genome else acronym2uri[genome]
 
-    String whitelist_uri = if assay != '' then acronym2uri[assay] else 'null'
+    String whitelist_uri = if assay != '' then acronym2uri[assay] else acronym2uri["Nil"]
 
     call run_starsolo {
         input:
@@ -64,7 +64,7 @@ workflow starsolo_count {
             output_directory = output_directory,
             outSAMtype = outSAMtype,
             soloType = soloType,
-            soloCBwhitelist_uri = if soloCBwhitelist != "" then soloCBwhitelist else whitelist_uri,
+            soloCBwhitelist = if defined(soloCBwhitelist) then select_first([soloCBwhitelist]) else whitelist_uri,
             soloCBstart = soloCBstart,
             soloCBlen = soloCBlen,
             soloUMIstart = soloUMIstart,
@@ -115,7 +115,7 @@ task run_starsolo {
         String output_directory
         String? outSAMtype
         String? soloType
-        String soloCBwhitelist_uri
+        File soloCBwhitelist
         Int? soloCBstart
         Int? soloCBlen
         Int? soloUMIstart
@@ -147,8 +147,6 @@ task run_starsolo {
         String backend
     }
 
-    String soloCBwhitelist = if soloCBwhitelist_uri != "null" then basename(soloCBwhitelist_uri) else ""
-
     command {
         set -e
         export TMPDIR=/tmp
@@ -157,11 +155,6 @@ task run_starsolo {
         mkdir genome_ref
         tar -zxf "~{genome}" -C genome_ref --strip-components 1
         rm "~{genome}"
-
-        if [ "~{soloCBwhitelist}" != "" ]
-        then
-            strato cp --backend ~{backend} ~{soloCBwhitelist_uri} ~{soloCBwhitelist}
-        fi
 
         mkdir result
 
@@ -288,7 +281,7 @@ task run_starsolo {
         if '~{soloType}' != '':
             args_dict['--soloType'] = '~{soloType}'
 
-        if '~{soloCBwhitelist}' != '':
+        if '~{soloCBwhitelist}' != '' and os.path.basename('~{soloCBwhitelist}') != 'null':
             fn_tup = os.path.splitext("~{soloCBwhitelist}")
             if fn_tup[1] == '.gz':
                 with open(fn_tup[0], 'w') as fp:

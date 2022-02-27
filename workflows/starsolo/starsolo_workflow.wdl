@@ -25,7 +25,7 @@ workflow starsolo_workflow {
         # UMI length
         Int? soloUMIlen
         # Cell barcode white list
-        String soloCBwhitelist = ""
+        File? soloCBwhitelist
         # Length of the barcode read
         Int? soloBarcodeReadLength
         # Identifies which read mate contains the barcode (CB+UMI) sequence
