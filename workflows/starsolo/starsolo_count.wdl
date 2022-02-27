@@ -225,7 +225,7 @@ task run_starsolo {
         barcode_read = '~{barcode_read}'
         args_dict = dict()
 
-        if '~{assay}' in ['tenX_v2', 'tenX_v3', 'ShareSeq', 'tenX_fiveprime', 'tenX_multiome']:
+        if '~{assay}' in ['tenX_v2', 'tenX_v3', 'ShareSeq', 'tenX_5p', 'tenX_5p_pe', 'tenX_multiome']:
             args_dict['--soloType'] = 'CB_UMI_Simple'
             args_dict['--soloCBmatchWLtype'] = '1MM_multi_Nbase_pseudocounts'
             args_dict['--soloUMIfiltering'] = 'MultiGeneUMI_CR'
@@ -241,7 +241,7 @@ task run_starsolo {
                 args_dict['--soloUMIlen'] = '12'
                 args_dict['--clipAdapterType'] = 'CellRanger4'
                 barcode_read = 'read1'
-            elif '~{assay}' in ['tenX_v2', 'tenX_fiveprime']:
+            elif '~{assay}' in ['tenX_v2', 'tenX_5p', 'tenX_5p_pe']:
                 args_dict['--soloCBstart'] = '1'
                 args_dict['--soloCBlen'] = '16'
                 args_dict['--soloUMIstart'] = '17'
@@ -250,18 +250,13 @@ task run_starsolo {
                 if '~{assay}' == 'tenX_v2':
                     args_dict['--clipAdapterType'] = 'CellRanger4'
                     barcode_read = 'read1'
+                elif '~{assay}' == 'tenX_5p':
+                    barcode_read = 'read1'
                 else:
                     args_dict['--soloBarcodeMate'] = '1'
                     args_dict['--clip5pNbases'] = ['39', '0']
                     barcode_read = 'read2'
-                    import gzip
-                    with gzip.open(r1_list[0], 'rb') as fin:
-                        cnt = 0
-                        while cnt < 2:
-                            r1_read_str = fin.readline().strip()
-                            cnt += 1
-                    if len(r1_read_str) > 39:
-                        args_dict['--soloStrand'] = 'Reverse'
+                    args_dict['--soloStrand'] = 'Reverse'
             elif '~{assay}' == 'ShareSeq':
                 args_dict['--soloCBstart'] = '1'
                 args_dict['--soloCBlen'] = '24'
