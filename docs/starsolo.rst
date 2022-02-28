@@ -55,8 +55,8 @@ A brief description of the sample sheet format is listed below **(required colum
         - ``tenX_v3`` for 10x 3' v3
         - ``tenX_multiome`` for 10x multiome
         - ``tenX_v2`` for 10x 3' v2
-        - ``tenX_5p`` for 10x 5' (only use R2 for alignment, equivalent to 10x chemistry *SC5P-R2*)
-        - ``tenX_5p_pe`` for 10x 5' (use both R1 and R2 for alignment, equivalent to 10x chemistry *SC5P-PE*)
+        - ``tenX_5p`` for 10x 5' (only use R2 for alignment; equivalent to 10x chemistry *SC5P-R2*)
+        - ``tenX_5p_pe`` for 10x 5' (use both R1 and R2 for alignment, and R1 has length longer than 39 nt; equivalent to 10x chemistry *SC5P-PE*)
         - ``DropSeq``
         - ``SeqWell``
         - ``SlideSeq``
@@ -368,7 +368,10 @@ See the table below for *star_solo* workflow outputs.
       - Description
     * - output_folder
       - String
-      - Google Bucket URL of output directory. Within it, each folder is for one sample in the input sample sheet.
+      - Google Bucket URI of output directory. Within it, each folder is for one sample in the input sample sheet.
+    * - starsoloLogs
+      - Array[File]
+      - Google Bucket URIs of STAR logs for each sample, respectively. This is the ``Log.out`` if running STAR locally, which is important for debugging.
 
 ----------------------------
 
