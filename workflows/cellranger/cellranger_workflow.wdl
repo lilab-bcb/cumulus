@@ -150,6 +150,8 @@ workflow cellranger_workflow {
         Int preemptible = 2
         # Max number of retries for AWS instance
         Int awsMaxRetries = 5
+        # Arn of AWS queue to use
+        String awsQueueArn = ""
     }
 
     # Output directory, with trailing slashes stripped
@@ -293,6 +295,7 @@ workflow cellranger_workflow {
                         disk_space = count_disk_space,
                         preemptible = preemptible,
                         awsMaxRetries = awsMaxRetries,
+                        awsQueueArn = awsQueueArn,
                         backend = backend
                 }
             }
