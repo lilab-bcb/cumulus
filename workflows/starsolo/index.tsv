@@ -3,7 +3,8 @@ mm10-2020-A	gs://regev-lab/resources/starsolo/mm10-2020-A-starsolo.tar.gz
 GRCh38-and-mm10-2020-A	gs://regev-lab/resources/starsolo/GRCh38-and-mm10-2020-A-starsolo.tar.gz
 tenX_v3	gs://regev-lab/resources/starsolo/3M-february-2018.txt
 tenX_v2	gs://regev-lab/resources/starsolo/737K-august-2016.txt
-tenX_fiveprime	gs://regev-lab/resources/starsolo/737K-august-2016.txt
+tenX_5p	gs://regev-lab/resources/starsolo/737K-august-2016.txt
+tenX_5p_pe	gs://regev-lab/resources/starsolo/737K-august-2016.txt
 tenX_multiome	gs://regev-lab/resources/starsolo/737K-arc-v1.txt.gz
 DropSeq	gs://regev-lab/resources/starsolo/null
 SeqWell	gs://regev-lab/resources/starsolo/null
