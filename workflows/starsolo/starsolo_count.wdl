@@ -245,11 +245,11 @@ task run_starsolo {
                     barcode_read = 'read1'
                 elif '~{assay}' == 'tenX_5p':
                     barcode_read = 'read1'
+                    args_dict['--soloStrand'] = 'Reverse'
                 else:
                     args_dict['--soloBarcodeMate'] = '1'
                     args_dict['--clip5pNbases'] = ['39', '0']
                     barcode_read = 'read2'
-                    args_dict['--soloStrand'] = 'Reverse'
             elif '~{assay}' == 'ShareSeq':
                 args_dict['--soloCBstart'] = '1'
                 args_dict['--soloCBlen'] = '24'
