@@ -50,21 +50,50 @@ A brief description of the sample sheet format is listed below **(required colum
     * - **Location**
       - Indicates the Cloud bucket URI of the folder holding FASTQ files of each sample.
     * - Assay
-      - | Indicates the assay type of each sample.
-        | Available options: ``tenX_v3`` for 10X v3, ``tenX_multiome`` for 10X multiome, ``tenX_v2`` for 10X v2, ``tenX_fiveprime`` for 10X 5' protocol, ``DropSeq``, ``SeqWell``, ``SlideSeq``, ``ShareSeq`` and ``None``.
-        | If not specified, use the default ``tenX_v3``.
-        | If **tenX_v3**, the following STARsolo options would be applied (could be overwritten by user-specified options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 12 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR``
-        | ``--soloUMIdedup 1MM_CR --clipAdapterType CellRanger4 --outFilterScoreMin 30 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB``
-        | If **tenX_multiome**, use the same STARsolo options as for *tenX_v3* assay, but with the 10X ARC Multiome Gene Expression whitelist.
-        | If **tenX_v2**, the following STARsolo options would be applied (could be overwritten by user-specified options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 10 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR``
-        | ``--soloUMIdedup 1MM_CR --clipAdapterType CellRanger4 --outFilterScoreMin 30 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB``
-        | If **tenX_fiveprime**, the following STARsolo options would be applied (could be overwritten by user-specified options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 10 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR``
-        | ``--soloBarcodeMate 1 --clip5pNbases 39 0 --soloUMIdedup 1MM_CR --outFilterScoreMin 30 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB``
-        | Moreover, for **tenX_fiveprime** assays, if Read 1 has more than 39 nt, ``--soloStrand Reverse`` option will be used.
-        | If **ShareSeq**, the following STARsolo options would be applied (could be overwritten by user-specific options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 24 --soloUMIstart 25 --soloUMIlen 10 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR``
-        | ``--soloUMIdedup 1MM_CR --clipAdapterType CellRanger4 --outFilterScoreMin 30 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB``
-        | If **SeqWell** or **DropSeq**, the following STARsolo options would be applied (could be overwritten by user-specified options): ``--soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 12 --soloUMIstart 13 --soloUMIlen 8 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB``
-        | If **None**, no preset option would be applied.
+      - Indicates the assay type of each sample. Available options:
+
+        - ``tenX_v3`` for 10x 3' v3
+        - ``tenX_multiome`` for 10x multiome
+        - ``tenX_v2`` for 10x 3' v2
+        - ``tenX_5p`` for 10x 5' (only use R2 for alignment; equivalent to 10x chemistry *SC5P-R2*)
+        - ``tenX_5p_pe`` for 10x 5' (use both R1 and R2 for alignment, and R1 has length longer than 39 nt; equivalent to 10x chemistry *SC5P-PE*)
+        - ``DropSeq``
+        - ``SeqWell``
+        - ``SlideSeq``
+        - ``ShareSeq``
+        - ``None``
+        If not specified, use the default ``tenX_v3``.
+
+**3.2 Assay-specific preset STARsolo options**
+
+If **tenX_v3**, The following STARsolo options would be applied (could be overwritten by user-specified options)::
+
+  --soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 12 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR --soloUMIdedup 1MM_CR --clipAdapterType CellRanger4 --outFilterScoreMin 30 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB
+
+If **tenX_multiome**, use the same STARsolo options as for *tenX_v3* assay, but with the 10X ARC Multiome Gene Expression whitelist.
+
+If **tenX_v2**, the following STARsolo options would be applied (could be overwritten by user-specified options)::
+
+  --soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 10 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR --soloUMIdedup 1MM_CR --clipAdapterType CellRanger4 --outFilterScoreMin 30 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB
+
+If **tenX_5p**, the following STARsolo options would be applied (could be overwritten by user-specified options)::
+
+  --soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 10 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR --soloStrand Reverse --soloUMIdedup 1MM_CR --outFilterScoreMin 30 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB
+
+If **tenX_5p_pe**, the following STARsolo options would be applied (could be overwritten by user-specified options)::
+
+  --soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 16 --soloUMIstart 17 --soloUMIlen 10 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR --soloBarcodeMate 1 --clip5pNbases 39 0 --soloUMIdedup 1MM_CR --outFilterScoreMin 30 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB
+
+If **ShareSeq**, the following STARsolo options would be applied (could be overwritten by user-specific options)::
+
+  --soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 24 --soloUMIstart 25 --soloUMIlen 10 --soloCBmatchWLtype 1MM_multi_Nbase_pseudocounts --soloUMIfiltering MultiGeneUMI_CR --soloUMIdedup 1MM_CR --clipAdapterType CellRanger4 --outFilterScoreMin 30 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB
+
+If **SeqWell** or **DropSeq**, the following STARsolo options would be applied (could be overwritten by user-specified options)::
+
+  --soloType CB_UMI_Simple --soloCBstart 1 --soloCBlen 12 --soloUMIstart 13 --soloUMIlen 8 --outSAMtype BAM SortedByCoordinate --outSAMattributes CR UR CY UY CB UB
+
+If **None**, no preset option would be applied.
+
 
 The sample sheet supports sequencing the same sample across multiple flowcells. In case of multiple flowcells, you should specify one line for each flowcell using the same sample name. In the following example, we have 2 samples and ``sample_1`` is sequenced in two flowcells.
 
@@ -82,7 +111,7 @@ Example::
 
     gsutil cp /foo/bar/projects/sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
-4. Launch analysis
+1. Launch analysis
 +++++++++++++++++++
 
 In your workspace, open ``starsolo_workflow`` in ``WORKFLOWS`` tab. Select the desired snapshot version (e.g. latest). Select ``Process single workflow from files`` as below
@@ -181,12 +210,12 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
       - 10
       - 10
     * - soloBarcodeReadLength
-      - [STARsolo option] Length of the barcode read
-
-        - 1: equals to sum of *soloCBlen* and *soloUMIlen*.
-        - 0: not defined, do not check.
-      - 1
-      - 1
+      - | [STARsolo option] Length of the barcode read
+        | - 1: equals to sum of *soloCBlen* and *soloUMIlen*.
+        | - 0: not defined, do not check.
+        | **Notice:** ``0`` is set to be default, which is different from STAR. This is in case users have barcode read sequenced of length 28 nt (standard for 10x 3'), but assay is 5' (CB+UMI length is 26 nt).
+      - 0
+      - 0
     * - soloBarcodeMate
       - [STARsolo option] Identifies which read mate contains the barcode (CB+UMI) sequence:
 
@@ -268,7 +297,7 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
         - *None*: do not output filtered cells
         - *TopCells*: only report top cells by UMI count, followed by the exact number of cells
         - *CellRanger2.2*: simple filtering of CellRanger 2.2. Can be followed by numbers: number of expected cells, robust maximum percentile for UMI count, maximum to minimum ratio for UMI count. The harcoded values are from CellRanger: nExpectedCells=3000; maxPercentile=0.99; maxMinRatio=10
-        - *EmptyDrops CR*: EmptyDrops filtering in CellRanger flavor. Please cite the original EmptyDrops paper: A.T.L Lun et al, Genome Biology, 20, 63 (2019): https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1662-y. Can be followed by 10 numeric parameters: nExpectedCells maxPercentile maxMinRatio indMin indMax umiMin umiMinFracMedian candMaxN FDR simN. The harcoded values are from CellRanger: 3000 0.99 10 45000 90000 500 0.01 20000 0.01 10000
+        - *EmptyDrops_CR*: EmptyDrops filtering in CellRanger flavor. Please cite the original EmptyDrops paper: A.T.L Lun et al, Genome Biology, 20, 63 (2019): https://genomebiology.biomedcentral.com/articles/10.1186/s13059-019-1662-y. Can be followed by 10 numeric parameters: nExpectedCells maxPercentile maxMinRatio indMin indMax umiMin umiMinFracMedian candMaxN FDR simN. The harcoded values are from CellRanger: 3000 0.99 10 45000 90000 500 0.01 20000 0.01 10000
       - "CellRanger2.2 3000 0.99 10"
       - "CellRanger2.2 3000 0.99 10"
     * - soloOutFormatFeaturesGeneField3
@@ -339,7 +368,10 @@ See the table below for *star_solo* workflow outputs.
       - Description
     * - output_folder
       - String
-      - Google Bucket URL of output directory. Within it, each folder is for one sample in the input sample sheet.
+      - Google Bucket URI of output directory. Within it, each folder is for one sample in the input sample sheet.
+    * - starsoloLogs
+      - Array[File]
+      - Google Bucket URIs of STAR logs for each sample, respectively. This is the ``Log.out`` if running STAR locally, which is important for debugging.
 
 ----------------------------
 

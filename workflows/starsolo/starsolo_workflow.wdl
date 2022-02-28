@@ -27,7 +27,7 @@ workflow starsolo_workflow {
         # Cell barcode white list
         File? soloCBwhitelist
         # Length of the barcode read
-        Int? soloBarcodeReadLength
+        Int soloBarcodeReadLength = 0
         # Identifies which read mate contains the barcode (CB+UMI) sequence
         Int? soloBarcodeMate
         # position of Cell Barcode(s) on the barcode read. Presently only works with --soloType CB_UMI_Complex, and barcodes are assumed to be on Read2.
