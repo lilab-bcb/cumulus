@@ -242,7 +242,7 @@ task run_filter_gtf {
     runtime {
         docker: "~{docker_registry}/cellranger:~{cellranger_version}"
         zones: zones
-        memory: "~{memory}G"
+        memory: memory
         disks: "local-disk ~{disk_space} HDD"
         cpu: 1
         preemptible: preemptible
