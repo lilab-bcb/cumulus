@@ -299,7 +299,14 @@ task run_cellranger_mkref {
         for genome, fasta, gtf in zip(genome_list, fasta_list, gtf_list):
             call_args.extend(['--genome=' + genome, '--fasta=' + fasta, '--genes=' + gtf])
 
-        call_args.extend(['--nthreads=~{num_cpu}', '--memgb=~{memory}'])
+        mem_digit = ""
+        for c in "~{memory}":
+            if c.isdigit():
+                mem_digit += c
+            else:
+                break
+
+        call_args.extend(['--nthreads=~{num_cpu}', '--memgb=' + mem_digit])
         if '~{ref_version}' is not '':
             call_args.append('--ref-version=~{ref_version}')
 
