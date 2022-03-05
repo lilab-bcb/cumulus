@@ -264,7 +264,7 @@ task run_cellranger_mkref {
         Int disk_space
         String zones
         Int num_cpu
-        Int memory
+        String memory
         Int preemptible
         Int awsMaxRetries
         String backend
