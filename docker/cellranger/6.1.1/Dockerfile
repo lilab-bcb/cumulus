@@ -24,9 +24,6 @@ RUN mkdir /software
 ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
 ADD cellranger-6.1.1.tar.gz /software
 
-#ADD bcl2fastq2-v2-20-0-linux-x86-64.zip /software/
-#RUN unzip -d /software/ /software/bcl2fastq2-v2-20-0-linux-x86-64.zip && alien -i /software/bcl2fastq2-v2.20.0.422-Linux-x86_64.rpm && rm -f /software/bcl2fastq2-v2*
-
 RUN apt-get -qq -y autoremove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
