@@ -9,6 +9,11 @@ workflows:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
         affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
   - name: SpaceRanger
     subclass: WDL
     publish: true
@@ -17,6 +22,11 @@ workflows:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
         affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
   - name: STARsolo
     subclass: WDL
     publish: true
@@ -25,6 +35,11 @@ workflows:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
         affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
   - name: Demultiplexing
     subclass: WDL
     publish: true
@@ -33,6 +48,11 @@ workflows:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
         affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
   - name: Cumulus
     subclass: WDL
     publish: true
@@ -41,6 +61,11 @@ workflows:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
         affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
   - name: Smart-Seq2
     subclass: WDL
     primaryDescriptorPath: /workflows/smartseq2/smartseq2.wdl
@@ -48,6 +73,11 @@ workflows:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
         affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
   - name: Chromap
     subclass: WDL
     primaryDescriptorPath: /workflows/chromap/chromap_mapping.wdl
@@ -55,6 +85,11 @@ workflows:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
         affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
   - name: Cellranger_atac_aggr
     subclass: WDL
     primaryDescriptorPath: /workflows/cellranger/cellranger_atac_aggr.wdl
@@ -62,6 +97,11 @@ workflows:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
         affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
   - name: Cellranger_create_reference
     sublicass: WDL
     publish: true
@@ -70,6 +110,11 @@ workflows:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
         affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
   - name: Cellranger_atac_create_reference
     subclass: WDL
     publish: true
@@ -78,6 +123,11 @@ workflows:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
         affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
   - name: Cellranger_vdj_create_reference
     subclass: WDL
     publish: true
@@ -86,6 +136,11 @@ workflows:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
         affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
   - name: STARsolo_create_reference
     subclass: WDL
     publish: true
@@ -94,6 +149,11 @@ workflows:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
         affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
   - name: Smart-Seq2_create_reference
     subclass: WDL
     publish: true
@@ -102,3 +162,8 @@ workflows:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
         affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
