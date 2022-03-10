@@ -3,7 +3,7 @@ Import workflows to Terra
 
 Cumulus workflows are hosted on Dockstore_ under the organization of Broad Institute of MIT and Harvard.
 
-1. `Cumulus collection of workflows`_ lists all workflows in Cumulus. For purpose of illustration, we will describe process of importing Demultiplexing workflow in Terra. Click on View button beside "github.com/klarman-cell-observatory/cumulus/Demultiplexing".
+1. `Cumulus collection of workflows`_ lists all workflows in Cumulus. For purpose of illustration, we will describe process of importing Demultiplexing workflow in Terra. Click on View button beside "github.com/lilab-bcb/cumulus/Demultiplexing".
 
 .. image:: images/demult_workflow.png
    :scale: 60 %
@@ -22,4 +22,4 @@ Cumulus workflows are hosted on Dockstore_ under the organization of Broad Insti
    :align: center
 
 .. _Dockstore: https://dockstore.org/
-.. _Cumulus collection of workflows: https://dockstore.org/organizations/BroadInstitute/collections/Cumulus 
+.. _Cumulus collection of workflows: https://dockstore.org/organizations/BroadInstitute/collections/Cumulus

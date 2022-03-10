@@ -11,7 +11,7 @@ This section mainly considers jobs starting from BCL files. If your job starts w
 1. Import ``spaceranger_workflow``
 ++++++++++++++++++++++++++++++++++
 
-	Import *spaceranger_workflow* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose workflow **github.com/klarman-cell-observatory/cumulus/SpaceRanger** to import.
+	Import *spaceranger_workflow* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose workflow **github.com/lilab-bcb/cumulus/SpaceRanger** to import.
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *spaceranger_workflow* workflow in the drop-down menu.
 

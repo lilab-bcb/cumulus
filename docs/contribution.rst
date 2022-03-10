@@ -7,9 +7,9 @@ We welcome contributions to our repositories that make up the Cumulus ecosystem:
 - demuxEM_
 - cumulus_
 - cumulus_feature_barcoding_
-- scPlot_
-- altocumulus_
 - cirrocumulus_
+- altocumulus_
+- stratocumulus_
 
 
 
@@ -23,8 +23,8 @@ In addition to the Cumulus team, we would like to sincerely thank the following 
 .. _pegasus: https://github.com/klarman-cell-observatory/pegasus
 .. _pegasusio: https://github.com/klarman-cell-observatory/pegasusio
 .. _demuxEM: https://github.com/klarman-cell-observatory/demuxEM
-.. _cumulus: https://github.com/klarman-cell-observatory/cumulus
+.. _cumulus: https://github.com/lilab-bcb/cumulus
 .. _cumulus_feature_barcoding: https://github.com/klarman-cell-observatory/cumulus_feature_barcoding
-.. _scPlot: https://github.com/klarman-cell-observatory/scPlot
-.. _altocumulus: https://github.com/klarman-cell-observatory/altocumulus
+.. _altocumulus: https://github.com/lilab-bcb/altocumulus
 .. _cirrocumulus: https://github.com/klarman-cell-observatory/cirrocumulus
+.. _stratocumulus: https://github.com/lilab-bcb/stratocumulus

@@ -20,7 +20,7 @@ For Non-Broad users, you'll need to build your own docker for *bcl2fastq* step. 
 2. Import ``starsolo_workflow``
 ++++++++++++++++++++++++++++++++++
 
-Import *starsolo_workflow* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose workflow **github.com/klarman-cell-observatory/cumulus/STARsolo** to import.
+Import *starsolo_workflow* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose workflow **github.com/lilab-bcb/cumulus/STARsolo** to import.
 
 Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *starsolo_workflow* in the drop-down menu.
 
@@ -403,7 +403,7 @@ We provide a wrapper of STAR to build sc/snRNA-seq references. Please follow the
 1. Import ``starsolo_create_reference``
 +++++++++++++++++++++++++++++++++++++++++
 
-Import *starsolo_create_reference* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/klarman-cell-observatory/STARsolo_create_reference** to import.
+Import *starsolo_create_reference* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/lilab-bcb/STARsolo_create_reference** to import.
 
 Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *starsolo_create_reference* workflow in the drop-down menu.
 

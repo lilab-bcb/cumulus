@@ -162,7 +162,7 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 1. Import ``cellranger_atac_create_reference``
 ==============================================
 
-	Import *cellranger_atac_create_reference* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/klarman-cell-observatory/cumulus/Cellranger_atac_create_reference** to import.
+	Import *cellranger_atac_create_reference* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/lilab-bcb/cumulus/Cellranger_atac_create_reference** to import.
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cellranger_atac_create_reference* workflow in the drop-down menu.
 
@@ -277,7 +277,7 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 1. Import ``cellranger_vdj_create_reference``
 ==============================================
 
-	Import *cellranger_vdj_create_reference* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/klarman-cell-observatory/cumulus/Cellranger_vdj_create_reference** to import.
+	Import *cellranger_vdj_create_reference* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/lilab-bcb/cumulus/Cellranger_vdj_create_reference** to import.
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cellranger_vdj_create_reference* workflow in the drop-down menu.
 

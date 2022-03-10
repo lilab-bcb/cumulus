@@ -40,7 +40,7 @@ In this example we create a docker image for running ``cellranger mkfastq`` vers
 #. Enable the Google Container Registry
 #. Clone the cumulus repository::
 
-    git clone https://github.com/klarman-cell-observatory/cumulus.git
+    git clone https://github.com/lilab-bcb/cumulus.git
 
 #. Add the lines to cumulus/docker/cellranger/3.0.2/Dockerfile to include bcl2fastq (see Docker_).
 #. Ensure you have `Docker installed`_

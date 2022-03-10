@@ -447,12 +447,12 @@ You can check the job's status in the *Job History* tab of your Terra workspace 
 .. _Altocumulus: https://github.com/lilab-bcb/altocumulus
 .. _Cell Ranger sample sheet instruction: ../cellranger/index.html#prepare-a-sample-sheet
 .. _Cell Ranger workflow inputs: ../cellranger/index.html#workflow-input
-.. _cellranger_workflow: https://dockstore.org/workflows/github.com/klarman-cell-observatory/cumulus/Cellranger
-.. _demultiplexing: https://dockstore.org/workflows/github.com/klarman-cell-observatory/cumulus/Demultiplexing
+.. _cellranger_workflow: https://dockstore.org/workflows/github.com/lilab-bcb/cumulus/Cellranger
+.. _demultiplexing: https://dockstore.org/workflows/github.com/lilab-bcb/cumulus/Demultiplexing
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
 .. _Cumulus single-cell genome reference list: ../cellranger/index.html#sample-sheet
 .. _cumulus inputs: ../cumulus.html#global-inputs
-.. _cumulus: https://dockstore.org/workflows/github.com/klarman-cell-observatory/cumulus/Cumulus
+.. _cumulus: https://dockstore.org/workflows/github.com/lilab-bcb/cumulus/Cumulus
 .. _import workflows: ../cumulus_import.html
 .. _Run Analysis with Terra Web UI: ./example_hashing_citeseq.html#run-analysis-with-terra-web-ui
 .. _Pegasus: https://pegasus.readthedocs.io
