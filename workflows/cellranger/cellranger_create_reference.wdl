@@ -22,8 +22,8 @@ workflow cellranger_create_reference {
 
         # Which docker registry to use
         String docker_registry = "quay.io/cumulus"
-        # 6.1.1, 6.0.2, 6.0.1
-        String cellranger_version = "6.1.1"
+        # 6.1.2, 6.1.1
+        String cellranger_version = "6.1.2"
 
         # Disk space in GB
         Int disk_space = 100

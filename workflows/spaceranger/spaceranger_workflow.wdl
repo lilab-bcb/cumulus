@@ -32,8 +32,8 @@ workflow spaceranger_workflow {
         # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false. This is also a spaceranger argument.
         Boolean secondary = false
 
-        # Space Ranger version: 1.3.0
-        String spaceranger_version = "1.3.0"
+        # Space Ranger version: 1.3.1, 1.3.0
+        String spaceranger_version = "1.3.1"
         # Config version: 0.2
         String config_version = "0.2"
 
