@@ -5,6 +5,8 @@ workflows:
     subclass: WDL
     publish: true
     primaryDescriptorPath: /workflows/cellranger/cellranger_workflow.wdl
+    testParameterFiles:
+      - /test/dummy.json
     authors:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
@@ -18,6 +20,8 @@ workflows:
     subclass: WDL
     publish: true
     primaryDescriptorPath: /workflows/spaceranger/spaceranger_workflow.wdl
+    testParameterFiles:
+      - /test/dummy.json
     authors:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
@@ -31,6 +35,8 @@ workflows:
     subclass: WDL
     publish: true
     primaryDescriptorPath: /workflows/starsolo/starsolo_workflow.wdl
+    testParameterFiles:
+      - /test/dummy.json
     authors:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
@@ -44,6 +50,8 @@ workflows:
     subclass: WDL
     publish: true
     primaryDescriptorPath: /workflows/demultiplexing/demultiplexing.wdl
+    testParameterFiles:
+      - /test/dummy.json
     authors:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
@@ -57,6 +65,8 @@ workflows:
     subclass: WDL
     publish: true
     primaryDescriptorPath: /workflows/cumulus/cumulus.wdl
+    testParameterFiles:
+      - /test/dummy.json
     authors:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
@@ -69,6 +79,8 @@ workflows:
   - name: Smart-Seq2
     subclass: WDL
     primaryDescriptorPath: /workflows/smartseq2/smartseq2.wdl
+    testParameterFiles:
+      - /test/dummy.json
     authors:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
@@ -81,6 +93,8 @@ workflows:
   - name: Chromap
     subclass: WDL
     primaryDescriptorPath: /workflows/chromap/chromap_mapping.wdl
+    testParameterFiles:
+      - /test/dummy.json
     authors:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
@@ -93,6 +107,8 @@ workflows:
   - name: Cellranger_atac_aggr
     subclass: WDL
     primaryDescriptorPath: /workflows/cellranger/cellranger_atac_aggr.wdl
+    testParameterFiles:
+      - /test/dummy.json
     authors:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
@@ -106,6 +122,8 @@ workflows:
     sublicass: WDL
     publish: true
     primaryDescriptorPath: /workflows/cellranger/cellranger_create_reference.wdl
+    testParameterFiles:
+      - /test/dummy.json
     authors:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
@@ -119,6 +137,8 @@ workflows:
     subclass: WDL
     publish: true
     primaryDescriptorPath: /workflows/cellranger/cellranger_atac_create_reference.wdl
+    testParameterFiles:
+      - /test/dummy.json
     authors:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
@@ -132,6 +152,8 @@ workflows:
     subclass: WDL
     publish: true
     primaryDescriptorPath: /workflows/cellranger/cellranger_vdj_create_reference.wdl
+    testParameterFiles:
+      - /test/dummy.json
     authors:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
@@ -145,6 +167,8 @@ workflows:
     subclass: WDL
     publish: true
     primaryDescriptorPath: /workflows/starsolo/starsolo_create_reference.wdl
+    testParameterFiles:
+      - /test/dummy.json
     authors:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
@@ -158,6 +182,8 @@ workflows:
     subclass: WDL
     publish: true
     primaryDescriptorPath: /workflows/smartseq2/smartseq2_create_reference.wdl
+    testParameterFiles:
+      - /test/dummy.json
     authors:
       - name: Cumulus Team
         email: cumulus-support@googlegroups.com
