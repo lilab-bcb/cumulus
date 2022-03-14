@@ -13,6 +13,7 @@ Release Highlights in Current Stable
 
    first_time
    workflow_overview/index
+   cumulus_import
    release_notes
 
 .. toctree::
@@ -20,7 +21,6 @@ Release Highlights in Current Stable
    :maxdepth: 1
    :hidden:
 
-   cumulus_import
    cellranger/index
    spaceranger
    starsolo
