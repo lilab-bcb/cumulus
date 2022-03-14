@@ -1,12 +1,19 @@
+.. role:: small
+
 .. include:: header.rst
-.. include:: release_notes.rst
+
+Release Highlights in Current Stable
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. include:: release_notes/version_2_0.rst
 
 .. toctree::
    :maxdepth: 1
    :hidden:
 
    first_time
-   versions
+   workflow_overview/index
+   release_notes
 
 .. toctree::
    :caption: Droplet-based single-cell assays
