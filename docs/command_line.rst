@@ -1,7 +1,7 @@
 Run Terra pipelines via command line
 ----------------------------------------------
 
-You can run Terra pipelines via the command line by installing the **altocumulus** package.
+You can run Terra pipelines via the command line by installing the Altocumulus_ package (version ``2.0.0`` or later is required).
 
 Install ``altocumulus`` for Broad users
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -50,7 +50,7 @@ When the installation is done, type ``alto -h`` in terminal to see if you can se
 Set up Google Cloud Account
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Install `Google Cloud SDK <https://cloud.google.com/cloud-sdk>`_ on your local machine.
+Install `gcloud CLI`_ on your local machine.
 
 Then type the following command in your terminal
 
@@ -192,9 +192,9 @@ Required options are in bold.
         | \\-\\-bucket <[s3|gs]://<bucket-name>/<bucket-folder>>
       - | Cloud bucket folder for uploading local input data. Start with 's3://' if an AWS S3 bucket is used, 'gs://' for a Google bucket. Must be specified when '-o' option is used.
     * - | \\-\\-no-ssl-verify
-      - | Disable SSL verification for web requests. Not recommended for general usage, but can be useful for intra-networks which don't support SSL verification. 
+      - | Disable SSL verification for web requests. Not recommended for general usage, but can be useful for intra-networks which don't support SSL verification.
 
-Example import of any Cumulus workflow 
+Example import of any Cumulus workflow
 ++++++++++++++++++++++++++++++++++++++++++
 
 This example shows how to use ``alto cromwell run`` to run demultiplexing workflow on any backend.
@@ -222,4 +222,7 @@ This example shows how to use ``alto cromwell run`` to run demultiplexing workfl
     alto cromwell run -s 10.10.10.10 -p 3000 -m broadinstitute:cumulus:Demultiplexing:master \
                       -i cumulus_inputs.json
 
+
 .. _conda: https://docs.conda.io/en/latest/miniconda.html
+.. _Altocumulus: https://pypi.org/project/altocumulus/
+.. _gcloud CLI: https://cloud.google.com/sdk/docs/install

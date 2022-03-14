@@ -10,7 +10,7 @@ In this example, you'll learn how to perform Cellplex analysis on Cloud using `C
 
 You need to install the corresponding Cloud SDK tool on your local machine if not:
 
-* `Google Cloud SDK <https://cloud.google.com/sdk/docs/install>`_ for Google Cloud.
+* `gcloud CLI <https://cloud.google.com/sdk/docs/install>`_ for Google Cloud.
 * `AWS CLI v2 <https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html>`_ for Amazon AWS Cloud.
 
 And then install `Altocumulus <https://github.com/lilab-bcb/altocumulus>`_ in your Python environment. This is the tool for data transfer between local machine and Cloud VM instance.

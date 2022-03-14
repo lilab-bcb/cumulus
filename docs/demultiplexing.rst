@@ -72,7 +72,7 @@ Prepare input data and import workflow
 
 	**3.2 Upload your sample sheet to the workspace bucket:**
 
-	Use gsutil_ (you already have it if you've installed Google Cloud SDK) in your unix terminal to upload your sample sheet to workspace bucket.
+	Use gsutil_ (you already have it if you've installed gcloud CLI) in your unix terminal to upload your sample sheet to workspace bucket.
 
 	Example::
 

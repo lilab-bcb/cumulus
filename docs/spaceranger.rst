@@ -11,7 +11,7 @@ This section mainly considers jobs starting from BCL files. If your job starts w
 1. Import ``spaceranger_workflow``
 ++++++++++++++++++++++++++++++++++
 
-	Import *spaceranger_workflow* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose workflow **github.com/lilab-bcb/cumulus/SpaceRanger** to import.
+	Import *spaceranger_workflow* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose workflow **github.com/lilab-bcb/cumulus/Spaceranger** to import.
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *spaceranger_workflow* workflow in the drop-down menu.
 
@@ -156,9 +156,12 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 
 Sometimes, users might want to perform demultiplexing locally and only run the count part on the cloud. This section describes how to only run the count part via ``spaceranger_workflow``.
 
-#. Copy your FASTQ files to the workspace using gsutil_ in your unix terminal.
+#. Copy your FASTQ files to the workspace using gsutil_ in your unix terminal. There are two cases:
 
-	You should upload folders of FASTQ files. The uploaded folder (for one flowcell) should contain one subfolder for each sample belong to the this flowcell. **In addition, the subfolder name and the sample name in your sample sheet MUST be the same.** Each subfolder contains FASTQ files for that sample. Please note that if your FASTQ file are downloaded from the Sequence Read Archive (SRA) from NCBI, you must rename your FASTQs to follow the bcl2fastq `file naming conventions`_.
+	- **Case 1**: All the FASTQ files are in one top-level folder. Then you can simply upload this folder to Cloud, and in your sample sheet, make sure **Sample** names are consistent with the filename prefix of their corresponding FASTQ files.
+	- **Case 2**: In the top-level folder, each sample has a dedicated subfolder containing its FASTQ files. In this case, you need to upload the whole top-level folder, and in your sample sheet, make sure **Sample** names and their corresponding subfolder names are identical.
+
+	Notice that if your FASTQ files are downloaded from the Sequence Read Archive (SRA) from NCBI, you must rename your FASTQs to follow the bcl2fastq `file naming conventions`_.
 
 	Example::
 
