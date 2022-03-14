@@ -16,7 +16,7 @@ workflows:
         - /.*/
       branches:
         - master
-  - name: SpaceRanger
+  - name: Spaceranger
     subclass: WDL
     publish: true
     primaryDescriptorPath: /workflows/spaceranger/spaceranger_workflow.wdl
@@ -79,20 +79,6 @@ workflows:
   - name: Smart-Seq2
     subclass: WDL
     primaryDescriptorPath: /workflows/smartseq2/smartseq2.wdl
-    testParameterFiles:
-      - /test/dummy.json
-    authors:
-      - name: Cumulus Team
-        email: cumulus-support@googlegroups.com
-        affiliation: Genentech
-    filters:
-      tags:
-        - /.*/
-      branches:
-        - master
-  - name: Chromap
-    subclass: WDL
-    primaryDescriptorPath: /workflows/chromap/chromap_mapping.wdl
     testParameterFiles:
       - /test/dummy.json
     authors:
