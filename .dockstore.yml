@@ -16,7 +16,7 @@ workflows:
         - /.*/
       branches:
         - master
-  - name: SpaceRanger
+  - name: Spaceranger
     subclass: WDL
     publish: true
     primaryDescriptorPath: /workflows/spaceranger/spaceranger_workflow.wdl
@@ -90,20 +90,6 @@ workflows:
         - /.*/
       branches:
         - master
-  - name: Chromap
-    subclass: WDL
-    primaryDescriptorPath: /workflows/chromap/chromap_mapping.wdl
-    testParameterFiles:
-      - /test/dummy.json
-    authors:
-      - name: Cumulus Team
-        email: cumulus-support@googlegroups.com
-        affiliation: Genentech
-    filters:
-      tags:
-        - /.*/
-      branches:
-        - master
   - name: Cellranger_atac_aggr
     subclass: WDL
     primaryDescriptorPath: /workflows/cellranger/cellranger_atac_aggr.wdl
@@ -119,7 +105,7 @@ workflows:
       branches:
         - master
   - name: Cellranger_create_reference
-    sublicass: WDL
+    subclass: WDL
     publish: true
     primaryDescriptorPath: /workflows/cellranger/cellranger_create_reference.wdl
     testParameterFiles:
