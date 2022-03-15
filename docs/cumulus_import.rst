@@ -19,6 +19,9 @@ Notice that all Cumulus workflows have ``github.com/lilab-bcb/cumulus/`` prefix,
 
 To change to a non-default version, simply clicking the version name in "Git Reference" column. After that, click "Terra" button on the right panel.
 
+.. note::
+   The **master** version refers to the development branch of Cumulus workflows, which is always under rapid change. For stable usage, please always refer to a `released version`_.
+
 3. You'll be asked to log in to Terra if not. Then you can see the following page:
 
 .. image:: images/step3.png
@@ -45,3 +48,4 @@ you can even switch the workflow's version in "Version" drop-down menu, and clic
 .. _Dockstore: https://dockstore.org/
 .. _Cumulus workflow collection: https://dockstore.org/organizations/lilab/collections/Cumulus
 .. _Terra: https://app.terra.bio/
+.. _released version: ./release_notes.html

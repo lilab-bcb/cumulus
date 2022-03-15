@@ -37,7 +37,7 @@
 
     * Add support for 10x Space Ranger version ``1.3.0`` and ``1.3.1``, and use ``1.3.1`` by default. See `Space Ranger v1.3 release notes`_ for the release notes.
     * For input data consisting of fastq files, it's able to handle folder structure of both flat (all fastq files in one folder) and nested (one subfolder per library) forms.
-    * Add output section for the workflow. See `here <./spaceranger.html#workflow-output>` for details.
+    * Add output section for the workflow. See `here <./spaceranger.html#workflow-output>`_ for details.
     * Retire old genome references:
 
         * Keep ``GRCh38-2020-A`` and ``mm10-2020-A``.

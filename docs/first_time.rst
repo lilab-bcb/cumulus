@@ -1,5 +1,5 @@
-First Time Running
-------------------
+First Time Running on Terra
+------------------------------
 
 Authenticate with Google
 ^^^^^^^^^^^^^^^^^^^^^^^^

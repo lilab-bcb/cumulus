@@ -1,4 +1,4 @@
-Release Notes
+Release notes
 ----------------------------
 
 .. role:: small
