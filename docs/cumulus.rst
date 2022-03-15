@@ -1205,5 +1205,5 @@ Follow `Pegasus plotting tutorial`_ for visualizing your data in Python.
 .. _create a data table: https://support.terra.bio/hc/en-us/articles/360025758392
 .. _GMT: https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29
 .. _[Kobak et al. 2019]: https://www.nature.com/articles/s41467-019-13056-x
-.. _Pegasus plotting tutorial: https://pegasus.readthedocs.io/en/stable/_static/tutorials/plotting_tutorial.html
+.. _Pegasus plotting tutorial: https://pegasus-tutorials.readthedocs.io/en/latest/_static/tutorials/plotting_tutorial.html
 .. _reference list: ./cellranger/index.html#sample-sheet

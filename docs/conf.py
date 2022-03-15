@@ -20,13 +20,13 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Cumulus'
-copyright = '2020 The Broad Institute, Inc. and The General Hospital Corporation. All rights reserved.'
+copyright = '2020 - 2022 Genentech, Inc. and the Broad Institute, Inc. All rights reserved.'
 author = 'Yiming Yang, Joshua Gould and Bo Li'
 
 # The short X.Y version
-version = ''
+version = '2.0'
 # The full version, including alpha/beta/rc tags
-release = ''
+release = '2.0.0'
 
 
 # -- General configuration ---------------------------------------------------
