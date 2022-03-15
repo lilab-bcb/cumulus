@@ -17,6 +17,8 @@ Sample sheet
 		  - Human GRCh38, cellranger-arc/atac reference 2.0.0
 		* - **mm10-2020-A_arc_v2.0.0**
 		  - Mouse mm10, cellranger-arc/atac reference 2.0.0
+		* - **GRCh38_and_mm10-2020-A_atac_v2.0.0**
+		  - Human GRCh38 and mouse mm10, cellranger-atac reference 2.0.0
 		* - **GRCh38_atac_v1.2.0**
 		  - Human GRCh38, cellranger-atac reference 1.2.0
 		* - **mm10_atac_v1.2.0**
