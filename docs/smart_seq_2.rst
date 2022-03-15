@@ -12,18 +12,6 @@ Follow the steps below to extract gene-count matrices from SMART-Seq2 data on Te
 
     .. image:: images/google_bucket_link.png
 
-    Note: Broad users need to be on an UGER node (not a login node) in order to use the ``-m`` flag
-
-    Request an UGER node::
-
-        reuse UGER
-        qrsh -q interactive -l h_vmem=4g -pe smp 8 -binding linear:8 -P regevlab
-
-    The above command requests an interactive node with 4G memory per thread and 8 threads. Feel free to change the memory, thread, and project parameters.
-
-    Once you're connected to an UGER node, you can make gsutil_ available by running::
-
-        reuse Google-Cloud-SDK
 
     Use ``gsutil cp [OPTION]... src_url dst_url`` to copy data to your workspace bucket.
     For example, the following command copies the directory at /foo/bar/nextseq/Data/VK18WBC6Z4 to a Google bucket::

@@ -3,25 +3,8 @@ Run Terra pipelines via command line
 
 You can run Terra pipelines via the command line by installing the Altocumulus_ package (version ``2.0.0`` or later is required).
 
-Install ``altocumulus`` for Broad users
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Request an UGER node::
-
-    reuse UGER
-    qrsh -q interactive -l h_vmem=4g -pe smp 8 -binding linear:8 -P regevlab
-
-The above command requests an interactive shell using the regevlab project with 4G memory per thread, 8 threads. Feel free to change the memory, thread, and project parameters.
-
-Add conda to your path::
-
-    reuse Anaconda3
-
-Activate the alto virtual environment::
-
-    source activate /seq/regev_genome_portal/conda_env/cumulus
-
-Install ``altocumulus`` for non-Broad users
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Install Altocumulus
+^^^^^^^^^^^^^^^^^^^^^
 
 #. Make sure you have ``conda`` installed. If you haven't installed conda_, use the following commands to install it on Linux::
 
@@ -39,7 +22,7 @@ Or use the following commdands for MacOS installation::
 
     where ``/Users/foo/miniconda3`` should be replaced by your own folder holding Miniconda3.
 
-#. Create a conda environment named "alto" and install ``altocumulus``::
+#. Create a conda environment named "alto" and install Altocumulus::
 
     conda create -n alto -y pip
     source activate alto
