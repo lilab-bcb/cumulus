@@ -21,7 +21,7 @@
 
 **Workflow-specific:**
 
-* Add *STARsolo_create_reference* workflow to build genome references for STARsolo counting. See its `documentation <./starsolo.html#prepare-a-sample-sheet>`_ for details.
+* Add *STARsolo_create_reference* workflow to build genome references for STARsolo counting. See its `documentation <./starsolo.html#build-starsolo-references>`_ for details.
 
 * On *Cellranger* workflow:
 
