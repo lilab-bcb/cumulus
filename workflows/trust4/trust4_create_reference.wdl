@@ -8,11 +8,11 @@ workflow trust4_create_reference {
         String trust4_version = "master"
 
         # Disk space in GB
-        Int disk_space = 100
+        Int disk_space = 50
         # Google cloud zones
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         # Memory string
-        String memory = "80G"
+        String memory = "8G"
 
         # Number of preemptible tries
         Int preemptible = 2
@@ -29,7 +29,9 @@ workflow trust4_create_reference {
         File gene_name_list
         # Species name
         String species
-        
+        # Reference name
+        String ref_name
+
         # Output directory, URL
         String output_directory
     }
@@ -50,13 +52,13 @@ workflow trust4_create_reference {
             reference_fasta = reference_fasta,
             annotation_gtf = annotation_gtf,
             gene_name_list = gene_name_list,
-            species = species,           
+            species = species,
+            ref_name = ref_name,           
             output_dir = output_directory_stripped
     }
 
     output {
-        File bcrtcr = run_trust4_create_reference.bcrtcr
-        File imgt = run_trust4_create_reference.imgt
+        File output_reference = run_trust4_create_reference.output_reference
     }
 
 }
@@ -75,6 +77,7 @@ task run_trust4_create_reference {
         File annotation_gtf
         File gene_name_list
         String species
+        String ref_name
         String output_dir
     }
 
@@ -83,17 +86,18 @@ task run_trust4_create_reference {
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
         
-        mkdir -p ~{species}
+        mkdir -p ~{ref_name}
 
-        perl BuildDatabaseFa.pl ~{reference_fasta} ~{annotation_gtf} ~{gene_name_list} > ~{species}/bcrtcr.fa
-        perl BuildImgtAnnot.pl ~{species} > ~{species}/IMGT+C.fa
+        perl BuildDatabaseFa.pl ~{reference_fasta} ~{annotation_gtf} ~{gene_name_list} > ~{ref_name}/bcrtcr.fa
+        perl BuildImgtAnnot.pl ~{species} > ~{ref_name}/IMGT+C.fa
+
+        tar -czf ~{ref_name}.tar.gz ~{ref_name}
         
-        strato sync --backend ~{backend} -m ~{species} ~{output_dir}/
+        strato sync --backend ~{backend} -m ~{ref_name}.tar.gz ~{output_dir}/
     }
 
     output {
-        File bcrtcr = "~{species}/bcrtcr.fa"
-        File imgt = "~{species}/IMGT+C.fa"
+        File output_reference = "~{ref_name}.tar.gz"
         File monitoringLog = "monitoring.log"
     }
 
