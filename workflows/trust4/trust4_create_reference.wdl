@@ -93,7 +93,7 @@ task run_trust4_create_reference {
 
         tar -czf ~{ref_name}.tar.gz ~{ref_name}
         
-        strato sync --backend ~{backend} -m ~{ref_name}.tar.gz ~{output_dir}/
+        strato cp --backend ~{backend} -m ~{ref_name}.tar.gz ~{output_dir}/
     }
 
     output {
