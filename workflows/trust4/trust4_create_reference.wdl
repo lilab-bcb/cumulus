@@ -96,7 +96,7 @@ task run_trust4_create_reference {
             call_args = ['gunzip', compressed_file]
             print(' '.join(call_args))
             check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-            return(os.path.basename(compressed_file))
+            return(os.path.splitext(os.path.basename(compressed_file))[0])
 
         ref_fa = '~{reference_fasta}'
         annotation_gtf = '~{annotation_gtf}'
