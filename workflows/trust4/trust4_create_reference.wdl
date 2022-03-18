@@ -112,7 +112,7 @@ task run_trust4_create_reference {
 
         with open('~{ref_name}/IMGT+C.fa', "w") as outfile2:
             call_args = ['perl', '/BuildImgtAnnot.pl', '~{species}']
-            print(' '.join(call_args, stdout='~{ref_name}/IMGT+C.fa'))
+            print(' '.join(call_args))
             run(call_args, stdout = outfile2, check = True)
 
         CODE
