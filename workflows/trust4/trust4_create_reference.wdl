@@ -89,13 +89,13 @@ task run_trust4_create_reference {
         mkdir -p ~{ref_name}
 
         python <<CODE
-        from subprocess import check_call, DEVNULL, STDOUT
+        from subprocess import run
         import os
 
         def uncompress_file(compressed_file):
             call_args = ['gunzip', compressed_file]
             print(' '.join(call_args))
-            check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
+            check_call(call_args)
             return(os.path.splitext(os.path.basename(compressed_file))[0])
 
         ref_fa = '~{reference_fasta}'
@@ -105,13 +105,15 @@ task run_trust4_create_reference {
         if annotation_gtf.endswith('.gz'):
             annotation_gtf = uncompress_file(annotation_gtf)     
 
-        call_args = ['perl', '/BuildDatabaseFa.pl', ref_fa, annotation_gtf, '~{gene_name_list}', '>', '~{ref_name}/bcrtcr.fa']
-        print(' '.join(call_args))
-        check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
+        with open('~{ref_name}/bcrtcr.fa', "w") as outfile1: 
+            call_args = ['perl', '/BuildDatabaseFa.pl', ref_fa, annotation_gtf, '~{gene_name_list}']
+            print(' '.join(call_args))
+            run(call_args, stdout = outfile1, check = True)
 
-        call_args = ['perl', '/BuildImgtAnnot.pl', '~{species}', '>', '~{ref_name}/IMGT+C.fa']
-        print(' '.join(call_args))
-        check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
+        with open('~{ref_name}/IMGT+C.fa', "w") as outfile2:
+            call_args = ['perl', '/BuildImgtAnnot.pl', '~{species}']
+            print(' '.join(call_args, stdout='~{ref_name}/IMGT+C.fa'))
+            run(call_args, stdout = outfile2, check = True)
 
         CODE
 
