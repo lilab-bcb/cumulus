@@ -88,13 +88,7 @@ task run_trust4_create_reference {
         
         mkdir -p ~{ref_name}
 
-        ls /software/TRUST4
-        echo "next"
-        ls /software
-        echo "next"
-        ls /
-
-        perl BuildDatabaseFa.pl
+        perl /BuildDatabaseFa.pl
 
     }
 
