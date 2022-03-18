@@ -88,9 +88,6 @@ task run_trust4_create_reference {
         
         mkdir -p ~{ref_name}
 
-        perl BuildDatabaseFa.pl ~{reference_fasta} ~{annotation_gtf} ~{gene_name_list} > ~{ref_name}/bcrtcr.fa
-        perl BuildImgtAnnot.pl ~{species} > ~{ref_name}/IMGT+C.fa
-
         python <<CODE
         from subprocess import check_call, DEVNULL, STDOUT
         import os
