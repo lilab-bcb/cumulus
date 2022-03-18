@@ -22,13 +22,13 @@ workflow trust4_create_reference {
         String backend = "gcp"
 
         # Reference FASTA file
-        File reference_fasta
+        #File reference_fasta
         # Annotation GTF file
-        File annotation_gtf
+        #File annotation_gtf
         # gene name list of interest
-        File gene_name_list
+        #File gene_name_list
         # Species name
-        String species
+        #String species
         # Reference name
         String ref_name
 
@@ -49,10 +49,10 @@ workflow trust4_create_reference {
             preemptible = preemptible,
             awsMaxRetries = awsMaxRetries,
             backend = backend,
-            reference_fasta = reference_fasta,
-            annotation_gtf = annotation_gtf,
-            gene_name_list = gene_name_list,
-            species = species,
+            #reference_fasta = reference_fasta,
+            #annotation_gtf = annotation_gtf,
+            #gene_name_list = gene_name_list,
+            #species = species,
             ref_name = ref_name,           
             output_dir = output_directory_stripped
     }
@@ -73,10 +73,10 @@ task run_trust4_create_reference {
         Int preemptible
         Int awsMaxRetries
         String backend
-        File reference_fasta
-        File annotation_gtf
-        File gene_name_list
-        String species
+        #File reference_fasta
+        #File annotation_gtf
+        #File gene_name_list
+        #String species
         String ref_name
         String output_dir
     }
@@ -92,12 +92,6 @@ task run_trust4_create_reference {
 
         perl BuildDatabaseFa.pl
 
-        #perl BuildDatabaseFa.pl ~{reference_fasta} ~{annotation_gtf} ~{gene_name_list} > ~{ref_name}/bcrtcr.fa
-        #perl BuildImgtAnnot.pl ~{species} > ~{ref_name}/IMGT+C.fa
-
-        #tar -czf ~{ref_name}.tar.gz ~{ref_name}
-        
-        #strato cp --backend ~{backend} -m ~{ref_name}.tar.gz ~{output_dir}/
     }
 
     output {
