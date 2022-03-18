@@ -89,7 +89,7 @@ task run_trust4_create_reference {
         mkdir -p ~{ref_name}
 
         python <<CODE
-        from subprocess import run
+        from subprocess import run, check_call
         import os
 
         def uncompress_file(compressed_file):
