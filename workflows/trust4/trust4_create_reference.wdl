@@ -88,7 +88,7 @@ task run_trust4_create_reference {
         
         mkdir -p ~{ref_name}
 
-        ls 
+        ls /software/TRUST4
 
         perl BuildDatabaseFa.pl
 
