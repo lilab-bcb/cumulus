@@ -88,12 +88,16 @@ task run_trust4_create_reference {
         
         mkdir -p ~{ref_name}
 
-        perl BuildDatabaseFa.pl ~{reference_fasta} ~{annotation_gtf} ~{gene_name_list} > ~{ref_name}/bcrtcr.fa
-        perl BuildImgtAnnot.pl ~{species} > ~{ref_name}/IMGT+C.fa
+        ls 
 
-        tar -czf ~{ref_name}.tar.gz ~{ref_name}
+        perl BuildDatabaseFa.pl
+
+        #perl BuildDatabaseFa.pl ~{reference_fasta} ~{annotation_gtf} ~{gene_name_list} > ~{ref_name}/bcrtcr.fa
+        #perl BuildImgtAnnot.pl ~{species} > ~{ref_name}/IMGT+C.fa
+
+        #tar -czf ~{ref_name}.tar.gz ~{ref_name}
         
-        strato cp --backend ~{backend} -m ~{ref_name}.tar.gz ~{output_dir}/
+        #strato cp --backend ~{backend} -m ~{ref_name}.tar.gz ~{output_dir}/
     }
 
     output {
