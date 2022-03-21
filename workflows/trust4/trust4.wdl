@@ -24,7 +24,7 @@ workflow trust4 {
         Int disk_space = 200
 
         # R2 Fastq pattern SE data
-        String se_fastq_pattern = "_S\*_L*_R2_001.fastq.gz"
+        String se_fastq_pattern = "_S*_L*_R2_001.fastq.gz"
         # R1 Fastq pattern PE data
         String? pe_read1_fastq_pattern
         # R2 Fastq pattern PE data
@@ -41,11 +41,12 @@ workflow trust4 {
         # path to the barcode whitelist
         File? barcode_whitelist
         # UMI Fastq pattern
-        String umi_fastq_pattern = "_S\*_L*_R1_001.fastq.gz"
+        String umi_fastq_pattern = "_S*_L*_R1_001.fastq.gz"
         # start, end(-1 for length-1), strand in a UMI is the true UMI 
         String umi_range = "16,-1,+"
         # If input_bam; provide bam field for UMI
         String? umi_bam_field
+
         # path to bam file
         File? input_bam
         # bam field for UMI
@@ -60,7 +61,7 @@ workflow trust4 {
         # directly use the files from provided -1 -2/-u to assemble
         Boolean? noExtraction
         # the data is from TCR-seq or BCR-seq
-        String? repseq
+        Boolean? repseq
         # output read assignment results to the prefix_assign.out file 
         Boolean? outputReadAssignment
 
@@ -154,7 +155,7 @@ task run_trust4 {
             Boolean? skipMateExtension
             Int? mateIdSuffixLen
             Boolean? noExtraction
-            String? repseq
+            Boolean? repseq
             Boolean? outputReadAssignment
             String docker_registry
             String zones
@@ -209,15 +210,6 @@ task run_trust4 {
 
                 fastq_dirs.append(target)
 
-        if '~{input_bam}':
-            target = '~{sample_id}_' + str(i)
-            if not os.path.exists(target):
-                os.mkdir(target)
-            call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', ~{input_bam} , target + '/']
-            print(' '.join(call_args))
-            check_call(call_args)
-
-
         call_args = ['run-trust4', '-f', 'genome_dir/bcrtcr.fa' ,
                      '--ref', 'genome_dir/IMGT+C.fa', '-t', '~{num_cpu}',
                      '--od', 'trust4_~{sample_id}', '-o', '~{sample_id}']
@@ -231,14 +223,16 @@ task run_trust4 {
         if '~{noExtraction}':
             call_args.append('--noExtraction')
         if '~{repseq}':
-            call_args.extend(['--repseq', '~{repseq}'])
+            call_args.append('--repseq')
         if '~{outputReadAssignment}':
             call_args.append('--outputReadAssignment')
 
         if '~{barcode_range}':
-            call_args.extend(['--barcode_range', ' '.join(~{barcode_range}'.split(','))])
+            barcode_range_list = ~{barcode_range}'.split(',')
+            call_args.extend(['--barcodeRange'].extend(barcode_range_list))
         if '~{umi_range}':
-            call_args.extend(['--umi_range', ' '.join(~{umi_range}'.split(','))])
+            umi_range_list = ~{umi_range}'.split(',')
+            call_args.extend(['--umiRange'].extend(umi_range_list))
 
         if '~{input_bam}':
             if '~{bam_barcode_field}':
@@ -252,8 +246,8 @@ task run_trust4 {
         if '~{input_fastqs_directories}':
             if '~{pe_read1_fastq_pattern}' and '~{pe_read2_fastq_pattern}':
                 for pe_fastq_dir in fastq_dirs:
-                    call_args.extend(['-1', Path(pe_fastq_dir, ~{pe_read1_fastq_pattern}),
-                                      '-2', Path(pe_fastq_dir, ~{pe_read1_fastq_pattern})])
+                    call_args.extend(['-1', Path(pe_fastq_dir, '~{pe_read1_fastq_pattern}'),
+                                      '-2', Path(pe_fastq_dir, '~{pe_read2_fastq_pattern}')])
                 if '~{read2_range}':
                     call_args.extend(['--read2Range', ' '.join('~{read2_range}'.split(','))])                      
             else:
@@ -263,17 +257,19 @@ task run_trust4 {
             if '~{read1_range}':
                 call_args.extend(['--read1Range', ' '.join('~{read1_range}'.split(','))])
 
-            for barcode_fastq_dir in fastq_dirs:
-                call_args.extend(['--barcode', Path(barcode_fastq_dir, ~{barcode_fastq_pattern})])
+            if ~{barcode_fastq_pattern} is not None:
+                for barcode_fastq_dir in fastq_dirs:
+                    call_args.extend(['--barcode', Path(barcode_fastq_dir, '~{barcode_fastq_pattern}')])
 
-            for umi_fastq_dir in fastq_dirs: 
-                call_args.extend(['--UMI', Path(umi_fastq_dir, ~{umi_fastq_pattern})])
+            if ~{umi_fastq_pattern} is not None:
+                for umi_fastq_dir in fastq_dirs: 
+                    call_args.extend(['--UMI', Path(umi_fastq_dir, '~{umi_fastq_pattern}')])
 
 
         print(' '.join(call_args))
         check_call(call_args)
 
-        call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', trust4_~{sample_id}, '~{output_directory}/~{sample_id}/']
+        call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', 'trust4_~{sample_id}', '~{output_directory}/~{sample_id}/']
         print(' '.join(call_args))
         check_call(call_args)
 
