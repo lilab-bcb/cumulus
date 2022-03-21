@@ -37,13 +37,13 @@ workflow trust4 {
         # Barcode Fastq pattern
         String barcode_fastq_pattern = "_S*_L*_R1_001.fastq.gz"
         # start, end(-1 for length-1), strand in a barcode is the true barcode
-        String? barcode_range = "0,15,+"
+        String barcode_range = "0,15,+"
         # path to the barcode whitelist
         File? barcode_whitelist
         # UMI Fastq pattern
         String umi_fastq_pattern = "_S\*_L*_R1_001.fastq.gz"
         # start, end(-1 for length-1), strand in a UMI is the true UMI 
-        String? umi_range = "16,-1,+"
+        String umi_range = "16,-1,+"
         # If input_bam; provide bam field for UMI
         String? umi_bam_field
         # path to bam file
@@ -53,7 +53,6 @@ workflow trust4 {
         # the flag in BAM for the unmapped read-pair is nonconcordant
         String? bam_abnormal_unmap_flag
 
-        #TODO: confirm with Bo if these can be set to optional
         # do not extend assemblies with mate information, useful for SMART-seq
         Boolean? skipMateExtension
         # the suffix length in read id for mate
@@ -64,6 +63,7 @@ workflow trust4 {
         String? repseq
         # output read assignment results to the prefix_assign.out file 
         Boolean? outputReadAssignment
+
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
         # Google cloud zones, default to "us-central1-b"
@@ -121,7 +121,7 @@ workflow trust4 {
 
 
     output {
-        String output_aln_directory = run_trust4.output_aln_directory
+        String output_vdj_directory = run_trust4.output_vdj_directory
         File monitoringLog = run_trust4.monitoringLog
     }
 
@@ -143,10 +143,10 @@ task run_trust4 {
             String? read1_range
             String? read2_range
             String barcode_fastq_pattern
-            String? barcode_range
+            String barcode_range
             File? barcode_whitelist
             String umi_fastq_pattern
-            String? umi_range
+            String umi_range
             String? umi_bam_field
             File? input_bam
             String? bam_barcode_field
@@ -189,10 +189,7 @@ task run_trust4 {
                 se_fastq_pattern = '~{se_fastq_pattern}'
 
         if '~{input_fastqs_directories}':
-            se_fastq_dirs=[]
-            pe_fastq_dirs=[]
-            barcode_fastq_dirs=[]
-            umi_fastq_dirs=[]
+            fastq_dirs = []
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
                 target = "~{sample_id}_" + str(i)
@@ -206,36 +203,12 @@ task run_trust4 {
                 except CalledProcessError:
                     if not os.path.exists(target):
                         os.mkdir(target)
-                    if '~{pe_read1_fastq_pattern}' and '~{pe_read2_fastq_pattern}':
-                        call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{pe_read1_fastq_pattern}' , target + '/']
-                        print(' '.join(call_args))
-                        check_call(call_args)
-                        call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{pe_read2_fastq_pattern}' , target + '/']
-                        print(' '.join(call_args))
-                        check_call(call_args)                        
-                    else:
-                        call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + se_fastq_pattern , target + '/']
-                        print(' '.join(call_args))
-                        check_call(call_args)
+                    call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}*' , target + '/']
+                    print(' '.join(call_args))
+                    check_call(call_args)
 
-                #TODO: ask Bo if this required in case of PE? 
-                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{barcode_fastq_pattern}' , target + '/']
-                print(' '.join(call_args))
-                check_call(call_args)
-                #TODO: ask Bo if this required in case of PE or SE?                       
-                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{umi_fastq_pattern}' , target + '/']
-                print(' '.join(call_args))
-                check_call(call_args)
+                fastq_dirs.append(target)
 
-                if '~{pe_read1_fastq_pattern}' and '~{pe_read2_fastq_pattern}':
-                    pe_fastq_dirs.append(target)
-                else:
-                    se_fastq_dirs.append(target)
-
-                barcode_fastq_dirs.append(target)
-                umi_fastq_dirs.append(target)
-
-        # TODO multiple bam files? Change name and type of parameter and add for loop
         if '~{input_bam}':
             target = '~{sample_id}_' + str(i)
             if not os.path.exists(target):
@@ -269,33 +242,31 @@ task run_trust4 {
 
         if '~{input_bam}':
             if '~{bam_barcode_field}':
-                call_args.extend(['--barcode', '~{bam_barcode_field}'])
-            #TODO: check with Bo - should this run only when bam file is input?   
+                call_args.extend(['--barcode', '~{bam_barcode_field}'])  
             if '~{bam_abnormal_unmap_flag}':
                 call_args.extend(['--abnormalUnmapFlag', '~{bam_abnormal_unmap_flag}'])
             if '~{umi_bam_field}':
-                call_args.extend(['--UMI', '~{umi_bam_field}'])
-            #TODO: This may change if multiple ones are expected    
+                call_args.extend(['--UMI', '~{umi_bam_field}'])   
             call_args.extend(['-b', '~{input_bam}']
 
         if '~{input_fastqs_directories}':
             if '~{pe_read1_fastq_pattern}' and '~{pe_read2_fastq_pattern}':
-                for pe_fastq_dir in pe_fastq_dirs:
-                    call_args.extend(['-1', Path(pe_fastq_dir,~{pe_read1_fastq_pattern}),
-                                      '-2', Path(pe_fastq_dir/~{pe_read1_fastq_pattern})])
+                for pe_fastq_dir in fastq_dirs:
+                    call_args.extend(['-1', Path(pe_fastq_dir, ~{pe_read1_fastq_pattern}),
+                                      '-2', Path(pe_fastq_dir, ~{pe_read1_fastq_pattern})])
                 if '~{read2_range}':
                     call_args.extend(['--read2Range', ' '.join('~{read2_range}'.split(','))])                      
             else:
-                for se_fastq_dir in se_fastq_dirs:
+                for se_fastq_dir in fastq_dirs:
                     call_args.extend(['-u', Path(se_fastq_dir, se_fastq_pattern)])
             
             if '~{read1_range}':
                 call_args.extend(['--read1Range', ' '.join('~{read1_range}'.split(','))])
 
-            for barcode_fastq_dir in barcode_fastq_dirs:
+            for barcode_fastq_dir in fastq_dirs:
                 call_args.extend(['--barcode', Path(barcode_fastq_dir, ~{barcode_fastq_pattern})])
 
-            for umi_fastq_dir in umi_fastq_dirs: 
+            for umi_fastq_dir in fastq_dirs: 
                 call_args.extend(['--UMI', Path(umi_fastq_dir, ~{umi_fastq_pattern})])
 
 
@@ -310,7 +281,7 @@ task run_trust4 {
     }
 
     output {
-        String output_aln_directory = "~{output_directory}/~{sample_id}"
+        String output_vdj_directory = "~{output_directory}/~{sample_id}"
         File monitoringLog = "monitoring.log"
     }
 
