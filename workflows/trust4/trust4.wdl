@@ -241,7 +241,7 @@ task run_trust4 {
                 call_args.extend(['--abnormalUnmapFlag', '~{bam_abnormal_unmap_flag}'])
             if '~{umi_bam_field}':
                 call_args.extend(['--UMI', '~{umi_bam_field}'])   
-            call_args.extend(['-b', '~{input_bam}']
+            call_args.extend(['-b', '~{input_bam}'])
 
         if '~{input_fastqs_directories}':
             if '~{pe_read1_fastq_pattern}' and '~{pe_read2_fastq_pattern}':
