@@ -211,30 +211,7 @@ task run_trust4 {
                 fastq_dirs.append(target)
 
         call_args = ['run-trust4', '-f', 'genome_dir/bcrtcr.fa' ,
-                     '--ref', 'genome_dir/IMGT+C.fa', '-t', '~{num_cpu}',
-                     '--od', 'trust4_~{sample_id}', '-o', '~{sample_id}']
-        
-        if '~{barcode_whitelist}':
-            call_args.extend(['--barcodeWhitelist', '~{barcode_whitelist}'])
-        if '~{skipMateExtension}':
-            call_args.append('--skipMateExtension')
-        if '~{mateIdSuffixLen}':
-            call_args.extend(['--mateIdSuffixLen', '~{mateIdSuffixLen}'])
-        if '~{noExtraction}':
-            call_args.append('--noExtraction')
-        if '~{repseq}':
-            call_args.append('--repseq')
-        if '~{outputReadAssignment}':
-            call_args.append('--outputReadAssignment')
-
-        if '~{barcode_range}':
-            barcode_range_list = '~{barcode_range}'.split(',')
-            call_args.extend(['--barcodeRange'])
-            call_args.extend(barcode_range_list)
-        if '~{umi_range}':
-            umi_range_list = '~{umi_range}'.split(',')
-            call_args.extend(['--umiRange'])
-            call_args.extend(umi_range_list)
+                     '--ref', 'genome_dir/IMGT+C.fa']
 
         if '~{input_bam}':
             if '~{bam_barcode_field}':
@@ -266,6 +243,33 @@ task run_trust4 {
             if '~{umi_fastq_pattern}' != None:
                 for umi_fastq_dir in fastq_dirs: 
                     call_args.extend(['--UMI', Path(umi_fastq_dir, '~{umi_fastq_pattern}')])
+
+        call_args.extend(['-t', '~{num_cpu}', '--od', 
+                          'trust4_~{sample_id}', '-o', '~{sample_id}'])
+
+        if '~{barcode_whitelist}':
+            call_args.extend(['--barcodeWhitelist', '~{barcode_whitelist}'])
+        if '~{skipMateExtension}':
+            call_args.append('--skipMateExtension')
+        if '~{mateIdSuffixLen}':
+            call_args.extend(['--mateIdSuffixLen', '~{mateIdSuffixLen}'])
+        if '~{noExtraction}':
+            call_args.append('--noExtraction')
+        if '~{repseq}':
+            call_args.append('--repseq')
+        if '~{outputReadAssignment}':
+            call_args.append('--outputReadAssignment')
+
+        if '~{barcode_range}':
+            barcode_range_list = '~{barcode_range}'.split(',')
+            call_args.extend(['--barcodeRange'])
+            call_args.extend(barcode_range_list)
+        if '~{umi_range}':
+            umi_range_list = '~{umi_range}'.split(',')
+            call_args.extend(['--umiRange'])
+            call_args.extend(umi_range_list)
+
+ 
 
 
         print(' '.join(call_args))
