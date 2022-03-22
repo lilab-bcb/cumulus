@@ -134,7 +134,7 @@ task run_trust4 {
             String sample_id
             String? input_fastqs_directories
             String output_directory
-            String genome_file 
+            File genome_file 
             Int num_cpu
             String memory
             Int disk_space
