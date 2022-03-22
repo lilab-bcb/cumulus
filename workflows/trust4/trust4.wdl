@@ -270,6 +270,16 @@ task run_trust4 {
         print(' '.join(call_args))
         check_call(call_args)
 
+        ld = os.listdir(".")
+        print("*******************")
+        print(ld)
+        print("*******************")
+
+        ld = os.listdir('trust4_~{sample_id}')
+        print("-------------------")
+        print(ld)
+        print("-------------------")
+
         call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', 'trust4_~{sample_id}', '~{output_directory}/~{sample_id}/']
         print(' '.join(call_args))
         check_call(call_args)
