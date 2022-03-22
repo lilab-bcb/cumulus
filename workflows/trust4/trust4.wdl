@@ -229,10 +229,12 @@ task run_trust4 {
 
         if '~{barcode_range}':
             barcode_range_list = '~{barcode_range}'.split(',')
-            call_args.extend(['--barcodeRange'].extend(barcode_range_list))
+            call_args.extend(['--barcodeRange'])
+            call_args.extend(barcode_range_list)
         if '~{umi_range}':
             umi_range_list = '~{umi_range}'.split(',')
-            call_args.extend(['--umiRange'].extend(umi_range_list))
+            call_args.extend(['--umiRange'])
+            call_args.extend(umi_range_list)
 
         if '~{input_bam}':
             if '~{bam_barcode_field}':
@@ -257,11 +259,11 @@ task run_trust4 {
             if '~{read1_range}':
                 call_args.extend(['--read1Range', ' '.join('~{read1_range}'.split(','))])
 
-            if ~{barcode_fastq_pattern} is not None:
+            if '~{barcode_fastq_pattern}' != None:
                 for barcode_fastq_dir in fastq_dirs:
                     call_args.extend(['--barcode', Path(barcode_fastq_dir, '~{barcode_fastq_pattern}')])
 
-            if ~{umi_fastq_pattern} is not None:
+            if '~{umi_fastq_pattern}' != None:
                 for umi_fastq_dir in fastq_dirs: 
                     call_args.extend(['--UMI', Path(umi_fastq_dir, '~{umi_fastq_pattern}')])
 
