@@ -280,7 +280,7 @@ task run_trust4 {
         print(ld)
         print("-------------------")
 
-        call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', 'trust4_~{sample_id}', '~{output_directory}/~{sample_id}/']
+        call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', 'trust4_vdj_nextgem_hs_pbmc3_b_26x91', '~{output_directory}/~{sample_id}/']
         print(' '.join(call_args))
         check_call(call_args)
 
