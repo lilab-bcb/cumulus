@@ -228,10 +228,10 @@ task run_trust4 {
             call_args.append('--outputReadAssignment')
 
         if '~{barcode_range}':
-            barcode_range_list = ~{barcode_range}'.split(',')
+            barcode_range_list = '~{barcode_range}'.split(',')
             call_args.extend(['--barcodeRange'].extend(barcode_range_list))
         if '~{umi_range}':
-            umi_range_list = ~{umi_range}'.split(',')
+            umi_range_list = '~{umi_range}'.split(',')
             call_args.extend(['--umiRange'].extend(umi_range_list))
 
         if '~{input_bam}':
