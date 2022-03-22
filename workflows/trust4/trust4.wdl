@@ -204,48 +204,15 @@ task run_trust4 {
                 except CalledProcessError:
                     if not os.path.exists(target):
                         os.mkdir(target)
-                    call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}*' , target + '/']
+                    call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}*', target + '/']
                     print(' '.join(call_args))
                     check_call(call_args)
 
                 fastq_dirs.append(target)
 
         call_args = ['run-trust4', '-f', 'genome_dir/bcrtcr.fa' ,
-                     '--ref', 'genome_dir/IMGT+C.fa']
-
-        if '~{input_bam}':
-            if '~{bam_barcode_field}':
-                call_args.extend(['--barcode', '~{bam_barcode_field}'])  
-            if '~{bam_abnormal_unmap_flag}':
-                call_args.extend(['--abnormalUnmapFlag', '~{bam_abnormal_unmap_flag}'])
-            if '~{umi_bam_field}':
-                call_args.extend(['--UMI', '~{umi_bam_field}'])   
-            call_args.extend(['-b', '~{input_bam}'])
-
-        if '~{input_fastqs_directories}':
-            if '~{pe_read1_fastq_pattern}' and '~{pe_read2_fastq_pattern}':
-                for pe_fastq_dir in fastq_dirs:
-                    call_args.extend(['-1', Path(pe_fastq_dir, '~{pe_read1_fastq_pattern}'),
-                                      '-2', Path(pe_fastq_dir, '~{pe_read2_fastq_pattern}')])
-                if '~{read2_range}':
-                    call_args.extend(['--read2Range', ' '.join('~{read2_range}'.split(','))])                      
-            else:
-                for se_fastq_dir in fastq_dirs:
-                    call_args.extend(['-u', Path(se_fastq_dir, se_fastq_pattern)])
-            
-            if '~{read1_range}':
-                call_args.extend(['--read1Range', ' '.join('~{read1_range}'.split(','))])
-
-            if '~{barcode_fastq_pattern}' != None:
-                for barcode_fastq_dir in fastq_dirs:
-                    call_args.extend(['--barcode', Path(barcode_fastq_dir, '~{barcode_fastq_pattern}')])
-
-            if '~{umi_fastq_pattern}' != None:
-                for umi_fastq_dir in fastq_dirs: 
-                    call_args.extend(['--UMI', Path(umi_fastq_dir, '~{umi_fastq_pattern}')])
-
-        call_args.extend(['-t', '~{num_cpu}', '--od', 
-                          'trust4_~{sample_id}', '-o', '~{sample_id}'])
+                     '--ref', 'genome_dir/IMGT+C.fa','-t', '~{num_cpu}', '--od', 
+                     'trust4_~{sample_id}', '-o', '~{sample_id}']
 
         if '~{barcode_whitelist}':
             call_args.extend(['--barcodeWhitelist', '~{barcode_whitelist}'])
@@ -269,8 +236,36 @@ task run_trust4 {
             call_args.extend(['--umiRange'])
             call_args.extend(umi_range_list)
 
- 
+        if '~{input_bam}':
+            if '~{bam_barcode_field}':
+                call_args.extend(['--barcode', '~{bam_barcode_field}'])  
+            if '~{bam_abnormal_unmap_flag}':
+                call_args.extend(['--abnormalUnmapFlag', '~{bam_abnormal_unmap_flag}'])
+            if '~{umi_bam_field}':
+                call_args.extend(['--UMI', '~{umi_bam_field}'])   
+            call_args.extend(['-b', '~{input_bam}'])
 
+        if '~{input_fastqs_directories}':
+            if '~{pe_read1_fastq_pattern}' and '~{pe_read2_fastq_pattern}':
+                for pe_fastq_dir in fastq_dirs:
+                    call_args.extend(['-1', Path(pe_fastq_dir, '~{sample_id}~{pe_read1_fastq_pattern}'),
+                                      '-2', Path(pe_fastq_dir, '~{sample_id}~{pe_read2_fastq_pattern}')])
+                if '~{read2_range}':
+                    call_args.extend(['--read2Range', ' '.join('~{read2_range}'.split(','))])                      
+            else:
+                for se_fastq_dir in fastq_dirs:
+                    call_args.extend(['-u', Path(se_fastq_dir, '~{sample_id}' + se_fastq_pattern)])
+            
+            if '~{read1_range}':
+                call_args.extend(['--read1Range', ' '.join('~{read1_range}'.split(','))])
+
+            if '~{barcode_fastq_pattern}' != None:
+                for barcode_fastq_dir in fastq_dirs:
+                    call_args.extend(['--barcode', Path(barcode_fastq_dir, '~{sample_id}~{barcode_fastq_pattern}')])
+
+            if '~{umi_fastq_pattern}' != None:
+                for umi_fastq_dir in fastq_dirs: 
+                    call_args.extend(['--UMI', Path(umi_fastq_dir, '~{sample_id}~{umi_fastq_pattern}')])
 
         print(' '.join(call_args))
         check_call(call_args)
