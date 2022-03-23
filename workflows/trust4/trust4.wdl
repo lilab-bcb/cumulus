@@ -202,18 +202,18 @@ task run_trust4 {
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
                 target = "~{sample_id}_" + str(i)
                 try:
-                    call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
-                    print(' '.join(call_args))
-                    check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-                    call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]
-                    print(' '.join(call_args))
-                    check_call(call_args)     
+                    strato_call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
+                    print(' '.join(strato_call_args))
+                    check_call(strato_call_args, stdout=DEVNULL, stderr=STDOUT)
+                    strato_call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]
+                    print(' '.join(strato_call_args))
+                    check_call(strato_call_args)     
                 except CalledProcessError:
                     if not os.path.exists(target):
                         os.mkdir(target)
-                    call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}*', target + '/']
-                    print(' '.join(call_args))
-                    check_call(call_args)
+                    strato_call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}*', target + '/']
+                    print(' '.join(strato_call_args))
+                    check_call(strato_call_args)
 
                 fastq_dirs.append(target)
 
