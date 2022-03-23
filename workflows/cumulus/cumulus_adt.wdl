@@ -49,6 +49,8 @@ workflow cumulus_adt {
         Int awsMaxRetries = 5
         # Backend
         String backend = "gcp"
+        # Arn string of AWS queue
+        String awsQueueArn = ""
     }
 
     Map[String, String] acronym2gsurl = read_map(acronym_file)
@@ -75,7 +77,8 @@ workflow cumulus_adt {
             disk_space = disk_space,
             preemptible = preemptible,
             awsMaxRetries = awsMaxRetries,
-            backend = backend
+            backend = backend,
+            awsQueueArn = awsQueueArn
     }
 
     output {
@@ -105,6 +108,7 @@ task run_generate_count_matrix_ADTs {
         Int preemptible
         Int awsMaxRetries
         String backend
+        String awsQueueArn
     }
 
     command {
@@ -190,5 +194,6 @@ task run_generate_count_matrix_ADTs {
         cpu: 1
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }
