@@ -49,7 +49,7 @@ workflow trust4 {
 
         # path to bam file
         File? input_bam
-        # bam field for UMI
+        # bam field for barcode
         String? bam_barcode_field
         # the flag in BAM for the unmapped read-pair is nonconcordant
         String? bam_abnormal_unmap_flag
