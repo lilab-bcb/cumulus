@@ -62,11 +62,11 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
       - "_S*_L*_R2_001.fastq.gz"
       - 
     * - read1_range
-      - Start, end(-1 for length-1) in -1/-u files for genomic sequence.
+      - [trust4 option \-\-read1Range] Start, end(-1 for length-1) in -1/-u files for genomic sequence.
       - "0,-1"
       - "0,-1"
     * - read2_range
-      - | Start, end(-1 for length-1) in -2 files for genomic sequence.
+      - | [trust4 option \-\-read2Range] Start, end(-1 for length-1) in -2 files for genomic sequence.
 	| Only use in case of paired-end data.
       - "0,-1"
       - "0,-1"
@@ -75,11 +75,11 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
       - "_S*_L*_R1_001.fastq.gz"
       - "_S*_L*_R1_001.fastq.gz"
     * - barcode_range
-      - Start, end(-1 for lenght-1), strand in a barcode is the true barcode.
+      - [trust4 option \-\-barcodeRange] Start, end(-1 for lenght-1), strand in a barcode is the true barcode.
       - "0,15,+"
       - "0,15,+"
     * - barcode_whitelist
-      - | Path to the barcode whitelist.
+      - | [trust4 option \-\-barcodeWhitelist] Path to the barcode whitelist.
 	| Cell barcode whitelist file. This is supposed to be a txt file where each line is a whitelisted barcode.
       - 
       -
@@ -88,11 +88,11 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
       - "_S*_L*_R1_001.fastq.gz"
       - "_S*_L*_R1_001.fastq.gz"
     * - umi_range
-      - Start, end(-1 for length-1), strand in a UMI is the true UMI. 
+      - [trust4 option \-\-umiRange] Start, end(-1 for length-1), strand in a UMI is the true UMI. 
       - "16,-1,+"
       - "16,-1,+"
     * - umi_bam_field
-      - If BAM file is provided as input; provide bam field for UMI.
+      - [trust4 option --UMI] If BAM file is provided as input; provide bam field for UMI.
       - 
       - 
     * - **input_bam**
@@ -101,33 +101,33 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
       - 
       - 
     * - bam_barcode_field
-      - | [trust4 option --barcode] BAM field for barcode.
+      - | [trust4 option \-\-barcode] BAM field for barcode.
 	| Only use when BAM file is used as input.
       - 
       - 
     * - bam_abnormal_unmap_flag
-      - | [trust4 option --abnormalUnmapFlag] The flag in BAM for the unmapped read-pair is nonconcordant.
+      - | [trust4 option \-\-abnormalUnmapFlag] The flag in BAM for the unmapped read-pair is nonconcordant.
 	| Only use when BAM file is used as input.
       - 
       - 
     * - skipMateExtension
-      - [trust4 option --skipMateExtension] Do not extend assemblies with mate information, useful for SMART-seq.
+      - [trust4 option \-\-skipMateExtension] Do not extend assemblies with mate information, useful for SMART-seq.
       -
       - 
     * - mateIdSuffixLen
-      - [trust4 option --mateIdSuffixLen] The suffix length in read id for mate.
+      - [trust4 option \-\-mateIdSuffixLen] The suffix length in read id for mate.
       - 
       -
     * - noExtraction
-      - [trust4 option --noExtraction] Directly use the files from provided -1 -2/-u to assemble.
+      - [trust4 option \-\-noExtraction] Directly use the files from provided -1 -2/-u to assemble.
       - 
       -
     * - repseq
-      - [trust4 option --repseq] The data is from TCR-seq or BCR-seq.
+      - [trust4 option \-\-repseq] The data is from TCR-seq or BCR-seq.
       - 
       -
     * - outputReadAssignment
-      - [trust4 option --outputReadAssignment] Output read assignment results to the prefix_assign.out file. 
+      - [trust4 option \-\-outputReadAssignment] Output read assignment results to the prefix_assign.out file. 
       - 
       -
     * - docker_registry
