@@ -251,13 +251,17 @@ task run_trust4 {
                     call_args.extend(['-1', Path(pe_fastq_dir, '~{sample_id}~{pe_read1_fastq_pattern}'),
                                       '-2', Path(pe_fastq_dir, '~{sample_id}~{pe_read2_fastq_pattern}')])
                 if '~{read2_range}':
-                    call_args.extend(['--read2Range', ' '.join('~{read2_range}'.split(','))])                      
+                    read2_range_list = '~{read2_range}'.split(',')
+                    call_args.extend(['--read2Range'])
+                    call_args.extend(read2_range_list)              
             else:
                 for se_fastq_dir in fastq_dirs:
                     call_args.extend(['-u', Path(se_fastq_dir, '~{sample_id}' + se_fastq_pattern)])
             
             if '~{read1_range}':
-                call_args.extend(['--read1Range', ' '.join('~{read1_range}'.split(','))])
+                read1_range_list = '~{read1_range}'.split(',')
+                call_args.extend(['--read1Range'])
+                call_args.extend(read1_range_list)
 
             if '~{barcode_fastq_pattern}' != None:
                 for barcode_fastq_dir in fastq_dirs:
