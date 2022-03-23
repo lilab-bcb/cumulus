@@ -148,7 +148,6 @@ task run_trust4 {
             File? barcode_whitelist
             String umi_fastq_pattern
             String umi_range
-            String? umi_bam_field
             File? input_bam
             String? bam_barcode_field
             String? bam_umi_field
@@ -191,7 +190,7 @@ task run_trust4 {
             if '~{bam_barcode_field}' != '':
                 call_args.extend(['--barcode', '~{bam_barcode_field}'])  
             if '~{bam_umi_field}' != '':
-                call_args.extend(['--UMI', '~{umi_bam_field}'])
+                call_args.extend(['--UMI', '~{bam_umi_field}'])
             if '~{bam_abnormal_unmap_flag}' != '':
                 call_args.extend(['--abnormalUnmapFlag', '~{bam_abnormal_unmap_flag}'])
             call_args.extend(['-b', '~{input_bam}'])
@@ -223,17 +222,13 @@ task run_trust4 {
                     call_args.extend(['-1', Path(pe_fastq_dir, '~{sample_id}~{pe_read1_fastq_pattern}'),
                                       '-2', Path(pe_fastq_dir, '~{sample_id}~{pe_read2_fastq_pattern}')])
                 if '~{read2_range}' != '':
-                    read2_range_list = '~{read2_range}'.split(',')
-                    call_args.extend(['--read2Range'])
-                    call_args.extend(read2_range_list)              
+                    call_args.extend(['--read2Range'] + '~{read2_range}'.split(','))
             else:
                 for se_fastq_dir in fastq_dirs:
                     call_args.extend(['-u', Path(se_fastq_dir, '~{sample_id}~{se_fastq_pattern}')])
             
             if '~{read1_range}' != '':
-                read1_range_list = '~{read1_range}'.split(',')
-                call_args.extend(['--read1Range'])
-                call_args.extend(read1_range_list)
+                call_args.extend(['--read1Range'] + '~{read1_range}'.split(','))
 
             if '~{barcode_fastq_pattern}' != '':
                 for barcode_fastq_dir in fastq_dirs:
