@@ -38,19 +38,19 @@ workflow trust4 {
         String barcode_fastq_pattern = "_S*_L*_R1_001.fastq.gz"
         # start, end(-1 for length-1), strand in a barcode is the true barcode
         String barcode_range = "0,15,+"
-        # path to the barcode whitelist
+        # Barcode whitelist, can be gzipped
         File? barcode_whitelist
         # UMI Fastq pattern
         String umi_fastq_pattern = "_S*_L*_R1_001.fastq.gz"
         # start, end(-1 for length-1), strand in a UMI is the true UMI 
         String umi_range = "16,-1,+"
-        # If input_bam; provide bam field for UMI
-        String? umi_bam_field
 
         # path to bam file
         File? input_bam
         # bam field for barcode
         String? bam_barcode_field
+        # bam field for for UMI
+        String? bam_umi_field
         # the flag in BAM for the unmapped read-pair is nonconcordant
         String? bam_abnormal_unmap_flag
 
@@ -104,9 +104,9 @@ workflow trust4 {
             barcode_whitelist = barcode_whitelist,
             umi_fastq_pattern = umi_fastq_pattern,
             umi_range = umi_range,
-            umi_bam_field = umi_bam_field,
             input_bam = input_bam,            
             bam_barcode_field = bam_barcode_field,
+            bam_umi_field = bam_umi_field,
             bam_abnormal_unmap_flag = bam_abnormal_unmap_flag,
             skipMateExtension = skipMateExtension,
             mateIdSuffixLen = mateIdSuffixLen,
@@ -151,6 +151,7 @@ task run_trust4 {
             String? umi_bam_field
             File? input_bam
             String? bam_barcode_field
+            String? bam_umi_field
             String? bam_abnormal_unmap_flag
             Boolean? skipMateExtension
             Int? mateIdSuffixLen
@@ -174,22 +175,29 @@ task run_trust4 {
         python <<CODE
         import re
         import os
-        from fnmatch import fnmatch
-        from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
         import sys
+        from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
 
         Path = os.path.join
 
-        if '~{input_fastqs_directories}' and '~{input_bam}':
+        if ('~{input_fastqs_directories}' != '' and '~{input_bam}' != '') or ('~{input_fastqs_directories}' == '' and '~{input_bam}' == ''):
             sys.exit("Please provide either Fastq OR BAM as input (not both)")
 
-        if '~{input_fastqs_directories}':
-            if '~{pe_read1_fastq_pattern}' and '~{pe_read2_fastq_pattern}':
-                se_fastq_pattern = ''
-            else:         
-                se_fastq_pattern = '~{se_fastq_pattern}'
+        call_args = ['run-trust4', '-f', 'genome_dir/bcrtcr.fa' ,
+                     '--ref', 'genome_dir/IMGT+C.fa','-t', '~{num_cpu}', '--od', 
+                     'trust4_~{sample_id}', '-o', '~{sample_id}']
 
-        if '~{input_fastqs_directories}':
+        if '~{input_bam}' != '':
+            if '~{bam_barcode_field}' != '':
+                call_args.extend(['--barcode', '~{bam_barcode_field}'])  
+            if '~{bam_umi_field}' != '':
+                call_args.extend(['--UMI', '~{umi_bam_field}'])
+            if '~{bam_abnormal_unmap_flag}' != '':
+                call_args.extend(['--abnormalUnmapFlag', '~{bam_abnormal_unmap_flag}'])
+            call_args.extend(['-b', '~{input_bam}'])
+        else:
+            assert '~{input_fastqs_directories}' != '' 
+
             fastq_dirs = []
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
@@ -210,75 +218,63 @@ task run_trust4 {
 
                 fastq_dirs.append(target)
 
-        call_args = ['run-trust4', '-f', 'genome_dir/bcrtcr.fa' ,
-                     '--ref', 'genome_dir/IMGT+C.fa','-t', '~{num_cpu}', '--od', 
-                     'trust4_~{sample_id}', '-o', '~{sample_id}']
-
-        if '~{barcode_whitelist}':
-            call_args.extend(['--barcodeWhitelist', '~{barcode_whitelist}'])
-        if '~{skipMateExtension}':
-            call_args.append('--skipMateExtension')
-        if '~{mateIdSuffixLen}':
-            call_args.extend(['--mateIdSuffixLen', '~{mateIdSuffixLen}'])
-        if '~{noExtraction}':
-            call_args.append('--noExtraction')
-        if '~{repseq}':
-            call_args.append('--repseq')
-        if '~{outputReadAssignment}':
-            call_args.append('--outputReadAssignment')
-
-        if '~{barcode_range}':
-            barcode_range_list = '~{barcode_range}'.split(',')
-            call_args.extend(['--barcodeRange'])
-            call_args.extend(barcode_range_list)
-        if '~{umi_range}':
-            umi_range_list = '~{umi_range}'.split(',')
-            call_args.extend(['--umiRange'])
-            call_args.extend(umi_range_list)
-
-        if '~{input_bam}':
-            if '~{bam_barcode_field}':
-                call_args.extend(['--barcode', '~{bam_barcode_field}'])  
-            if '~{bam_abnormal_unmap_flag}':
-                call_args.extend(['--abnormalUnmapFlag', '~{bam_abnormal_unmap_flag}'])
-            if '~{umi_bam_field}':
-                call_args.extend(['--UMI', '~{umi_bam_field}'])   
-            call_args.extend(['-b', '~{input_bam}'])
-
-        if '~{input_fastqs_directories}':
-            if '~{pe_read1_fastq_pattern}' and '~{pe_read2_fastq_pattern}':
+            if '~{pe_read1_fastq_pattern}' != '' and '~{pe_read2_fastq_pattern}' != '':
                 for pe_fastq_dir in fastq_dirs:
                     call_args.extend(['-1', Path(pe_fastq_dir, '~{sample_id}~{pe_read1_fastq_pattern}'),
                                       '-2', Path(pe_fastq_dir, '~{sample_id}~{pe_read2_fastq_pattern}')])
-                if '~{read2_range}':
+                if '~{read2_range}' != '':
                     read2_range_list = '~{read2_range}'.split(',')
                     call_args.extend(['--read2Range'])
                     call_args.extend(read2_range_list)              
             else:
                 for se_fastq_dir in fastq_dirs:
-                    call_args.extend(['-u', Path(se_fastq_dir, '~{sample_id}' + se_fastq_pattern)])
+                    call_args.extend(['-u', Path(se_fastq_dir, '~{sample_id}~{se_fastq_pattern}')])
             
-            if '~{read1_range}':
+            if '~{read1_range}' != '':
                 read1_range_list = '~{read1_range}'.split(',')
                 call_args.extend(['--read1Range'])
                 call_args.extend(read1_range_list)
 
-            if '~{barcode_fastq_pattern}' != None:
+            if '~{barcode_fastq_pattern}' != '':
                 for barcode_fastq_dir in fastq_dirs:
                     call_args.extend(['--barcode', Path(barcode_fastq_dir, '~{sample_id}~{barcode_fastq_pattern}')])
 
-            if '~{umi_fastq_pattern}' != None:
+            if '~{umi_fastq_pattern}' != '':
                 for umi_fastq_dir in fastq_dirs: 
                     call_args.extend(['--UMI', Path(umi_fastq_dir, '~{sample_id}~{umi_fastq_pattern}')])
 
+        def uncompress_file(compressed_file):
+            call_args = ['gunzip', compressed_file]
+            print(' '.join(call_args))
+            check_call(call_args)
+            return(os.path.splitext(compressed_file)[0])
+
+        if '~{barcode_whitelist}' != '':
+            whitelist = '~{barcode_whitelist}'
+            if whitelist.endswith('.gz'):
+                whiltelist = uncompress_file(whitelist)
+            call_args.extend(['--barcodeWhitelist', whitelist])
+        if '~{skipMateExtension}' != '':
+            call_args.append('--skipMateExtension')
+        if '~{mateIdSuffixLen}' != '':
+            call_args.extend(['--mateIdSuffixLen', '~{mateIdSuffixLen}'])
+        if '~{noExtraction}' != '':
+            call_args.append('--noExtraction')
+        if '~{repseq}' != '':
+            call_args.append('--repseq')
+        if '~{outputReadAssignment}' != '':
+            call_args.append('--outputReadAssignment')
+
+        if '~{barcode_range}' != '':
+            call_args.extend(['--barcodeRange'] + '~{barcode_range}'.split(','))
+        if '~{umi_range}' != '':
+            call_args.extend(['--umiRange'] + '~{umi_range}'.split(','))
+
         print(' '.join(call_args))
         check_call(call_args)
-
-        call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', 'trust4_~{sample_id}', '~{output_directory}/~{sample_id}/']
-        print(' '.join(call_args))
-        check_call(call_args)
-
         CODE
+
+        strato sync --backend '~{backend}' -m 'trust4_~{sample_id}' '~{output_directory}/~{sample_id}/'
     }
 
     output {
