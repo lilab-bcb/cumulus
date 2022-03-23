@@ -63,45 +63,42 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
 	  - "_S*_L*_R3_001.fastq.gz"
 	* - read1_range
       - start, end(-1 for length-1) in -1/-u files for genomic sequence
-	  - 0,-1
-	  - 0,-1
+	  - "0,-1"
+	  - "0,-1"
 	* - read2_range
       - | start, end(-1 for length-1) in -2 files for genomic sequence
 	    | Only use in case of paired-end data
-	  - 0,-1
-	  - 0,-1	  
+	  - "0,-1"
+	  - "0,-1"
 	* - barcode_fastq_pattern
-	  - barcode index Fastq file identifier.
-	  - "_S*_L*_R2_001.fastq.gz"
-	  - "_S*_L*_R2_001.fastq.gz"
-        * - read_format
-          - [chromap option \-\-read-format] Format for read files and barcode files
-          - "r1:0:-1,bc:0:-1"
-          - "r1:0:-1,bc:0:-1"
-        * - chromap_version
-	  - Chromap version to use. Available options: 0.1.4, 0.1.5.
-	  - "0.1.5"
-          - "0.1.5"
-	* - split_alignment
-	  - [chromap option \-\-split-alignment] Allow split alignments. This option should be set only when mapping Hi-C reads.
-	  - False
-          -
-	* - max_edit_dist_e
-	  - [chromap option -e] Max edit distance allowed to map a read.
-	  - 8
-          - 8
-	* - min_num_minimizer_s
-	  - [chromap option -s] Min number of minimizers required to map a read.
-	  - 2
-          - 2
-	* - ignore_minimizer_times_f
-	  - [chromap option -f] Skip minimizers occuring > INT1 [500] times. INT2 [1000] is the threshold for a second round of seeding.
-	  - "500,1000"
-          - "500,1000"
-	* - max_insert_size_l
-	  - [chromap option -l] Max insert size, only for paired-end read mapping.
-	  - 1000
-          - 1000
+	  - Barcode Fastq pattern.
+	  - "_S*_L*_R1_001.fastq.gz"
+	  - "_S*_L*_R1_001.fastq.gz"
+    * - barcode_range
+      - start, end(-1 for lenght-1), strand in a barcode is the true barcode
+      - "0,15,+"
+      - "0,15,+"
+	* - barcode_whitelist
+	  - | path to the barcode whitelist
+	    | Cell barcode whitelist file. This is supposed to be a txt file where each line is a whitelisted barcode.
+	  - 
+      -
+	* - umi_fastq_pattern
+	  - UMI Fastq pattern
+	  - "_S*_L*_R1_001.fastq.gz"
+      - "_S*_L*_R1_001.fastq.gz"
+	* - umi_range
+	  - start, end(-1 for length-1), strand in a UMI is the true UMI 
+	  - "16,-1,+"
+      - "16,-1,+"
+	* - umi_bam_field
+	  - If BAM file is provided as input; provide bam field for UMI
+	  - 
+      - 
+	* - input_bam
+	  - Path to bam file
+	  - 
+      - 
 	* - min_mapq_q
 	  - [chromap option -q] Min MAPQ in range [0, 60] for mappings to be output.
 	  - 30
