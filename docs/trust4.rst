@@ -11,8 +11,8 @@ Workflow inputs
 Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold. Options described with [trust4 option -...] refer directly to TRUST4 options and are mentioned in `TRUST4's manual`_.
 
 .. list-table::
-	:widths: 5 20 10 5
-	:header-rows: 1
+    :widths: 5 20 10 5
+    :header-rows: 1
 
     * - Name
       - Description
@@ -28,7 +28,7 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
       -
     * - **input_fastqs_directories**
       - | A comma-separated list of input FASTQs directories (urls).
-	| Provide input fastqs or BAM but not both
+	| **Either provide input_fastqs_directories or input_bam but not both.**
       - "/path/fastq_dir1,/path/fastq_dir2"
       -
     * - **output_directory**
@@ -62,12 +62,12 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
       - "_S*_L*_R2_001.fastq.gz"
       - 
     * - read1_range
-      - start, end(-1 for length-1) in -1/-u files for genomic sequence
+      - Start, end(-1 for length-1) in -1/-u files for genomic sequence.
       - "0,-1"
       - "0,-1"
     * - read2_range
-      - | start, end(-1 for length-1) in -2 files for genomic sequence
-	| Only use in case of paired-end data
+      - | Start, end(-1 for length-1) in -2 files for genomic sequence.
+	| Only use in case of paired-end data.
       - "0,-1"
       - "0,-1"
     * - barcode_fastq_pattern
@@ -75,11 +75,11 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
       - "_S*_L*_R1_001.fastq.gz"
       - "_S*_L*_R1_001.fastq.gz"
     * - barcode_range
-      - start, end(-1 for lenght-1), strand in a barcode is the true barcode
+      - Start, end(-1 for lenght-1), strand in a barcode is the true barcode.
       - "0,15,+"
       - "0,15,+"
     * - barcode_whitelist
-      - | path to the barcode whitelist
+      - | Path to the barcode whitelist.
 	| Cell barcode whitelist file. This is supposed to be a txt file where each line is a whitelisted barcode.
       - 
       -
@@ -88,46 +88,46 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
       - "_S*_L*_R1_001.fastq.gz"
       - "_S*_L*_R1_001.fastq.gz"
     * - umi_range
-      - start, end(-1 for length-1), strand in a UMI is the true UMI 
+      - Start, end(-1 for length-1), strand in a UMI is the true UMI. 
       - "16,-1,+"
       - "16,-1,+"
     * - umi_bam_field
-      - If BAM file is provided as input; provide bam field for UMI
+      - If BAM file is provided as input; provide bam field for UMI.
       - 
       - 
     * - **input_bam**
-      - | [trust4 option -b] Path to bam file
-        | Provide input fastqs or BAM but not both
+      - | [trust4 option -b] Path to bam file.
+        | **Either provide input_bam or input_fastqs_directories but not both.**
       - 
       - 
     * - bam_barcode_field
-      - | [trust4 option --barcode] BAM field for barcode
-	| Only use when BAM file is used as input
+      - | [trust4 option --barcode] BAM field for barcode.
+	| Only use when BAM file is used as input.
       - 
       - 
     * - bam_abnormal_unmap_flag
       - | [trust4 option --abnormalUnmapFlag] The flag in BAM for the unmapped read-pair is nonconcordant.
-	| Only use when BAM file is used as input
+	| Only use when BAM file is used as input.
       - 
       - 
     * - skipMateExtension
-      - [trust4 option --skipMateExtension] Do not extend assemblies with mate information, useful for SMART-seq
+      - [trust4 option --skipMateExtension] Do not extend assemblies with mate information, useful for SMART-seq.
       -
       - 
     * - mateIdSuffixLen
-      - [trust4 option --mateIdSuffixLen] The suffix length in read id for mate
+      - [trust4 option --mateIdSuffixLen] The suffix length in read id for mate.
       - 
       -
     * - noExtraction
-      - [trust4 option --noExtraction] Directly use the files from provided -1 -2/-u to assemble
+      - [trust4 option --noExtraction] Directly use the files from provided -1 -2/-u to assemble.
       - 
       -
     * - repseq
-      - [trust4 option --repseq] The data is from TCR-seq or BCR-seq
+      - [trust4 option --repseq] The data is from TCR-seq or BCR-seq.
       - 
       -
     * - outputReadAssignment
-      - [trust4 option --outputReadAssignment] Output read assignment results to the prefix_assign.out file 
+      - [trust4 option --outputReadAssignment] Output read assignment results to the prefix_assign.out file. 
       - 
       -
     * - docker_registry
@@ -234,16 +234,16 @@ Required inputs are highlighted **in bold**.
       - "gs://fc-e0000000-0000-0000-0000-000000000000/mm-10/genes.gtf"
       -
     * - **gene_name_list**
-      - Gene name list of interest
+      - Gene name list of interest.
       - 
       -
     * - **species**
-      - | Species name
+      - | Species name.
 	| The available species name can be found on `IMGT FTP`_.
       - "Homo sapien"
       -
     * - **ref_name**
-      - Reference name
+      - Reference name.
       - "trust4-human"
       -
     * - **output_directory**
