@@ -1,4 +1,4 @@
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get -qq update && \
@@ -13,24 +13,24 @@ RUN apt-get -qq update && \
         python3-pip
 
 RUN pip3 install --upgrade pip --no-cache-dir && \
-    pip3 install numpy==1.21.5 --no-cache-dir && \
-    pip3 install pandas==1.3.5 --no-cache-dir && \
-    pip3 install stratocumulus==0.1.3 --no-cache-dir
+    pip3 install numpy==1.22.3 --no-cache-dir && \
+    pip3 install pandas==1.4.1 --no-cache-dir && \
+    pip3 install stratocumulus==0.1.5 --no-cache-dir
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
-    apt-get update -y && apt-get install -y google-cloud-sdk=370.0.0-0
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - && \
+    apt-get update -y && apt-get install -y google-cloud-cli=378.0.0-0
 
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.4.13.zip" -o "awscliv2.zip" && \
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.4.27.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install && \
     rm awscliv2.zip
 
-RUN wget https://github.com/alexdobin/STAR/archive/refs/tags/2.7.10a_alpha_220207.tar.gz && \
-    tar -xzvf 2.7.10a_alpha_220207.tar.gz && \
-    rm 2.7.10a_alpha_220207.tar.gz && \
+RUN wget https://github.com/alexdobin/STAR/archive/refs/tags/2.7.10a_alpha_220314.tar.gz && \
+    tar -xzvf 2.7.10a_alpha_220314.tar.gz && \
+    rm 2.7.10a_alpha_220314.tar.gz && \
     mkdir /software && \
-    mv STAR-2.7.10a_alpha_220207 /software/STAR && \
+    mv STAR-2.7.10a_alpha_220314 /software/STAR && \
     cd /software/STAR/source && \
     make STAR && \
     mkdir -p /software/STAR/bin && \
