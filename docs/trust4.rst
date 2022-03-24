@@ -91,10 +91,6 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
       - [trust4 option \-\-umiRange] Start, end(-1 for length-1), strand in a UMI is the true UMI. 
       - "16,-1,+"
       - "16,-1,+"
-    * - umi_bam_field
-      - [trust4 option --UMI] If BAM file is provided as input; provide bam field for UMI.
-      - 
-      - 
     * - **input_bam**
       - | [trust4 option -b] Path to bam file.
         | **Either provide input_bam or input_fastqs_directories but not both.**
@@ -103,6 +99,10 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
     * - bam_barcode_field
       - | [trust4 option \-\-barcode] BAM field for barcode.
 	| Only use when BAM file is used as input.
+      - 
+      -
+    * - bam_umi_field
+      - [trust4 option --UMI] If BAM file is provided as input; provide bam field for UMI.
       - 
       - 
     * - bam_abnormal_unmap_flag
