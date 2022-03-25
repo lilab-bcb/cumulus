@@ -13,9 +13,9 @@ RUN apt-get -qq update && \
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
-    apt-get update -y && apt-get install -y google-cloud-sdk=357.0.0-0
+    apt-get update -y && apt-get install -y google-cloud-cli=378.0.0-0
 
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.2.39.zip" -o "awscliv2.zip" && \
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.4.27.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install && \
     rm awscliv2.zip
@@ -40,7 +40,7 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install zarr==2.8.3 --no-cache-dir && \
     python -m pip install pegasusio==0.3.1.post2 --no-cache-dir && \
     python -m pip install demuxEM==0.1.7 --no-cache-dir && \
-    python -m pip install stratocumulus==0.1.2 --no-cache-dir
+    python -m pip install stratocumulus==0.1.5 --no-cache-dir
 
 RUN apt-get -qq -y remove curl gnupg && \
     apt-get -qq -y autoremove && \
