@@ -266,6 +266,12 @@ task run_cellranger_count {
                             for l in flog:
                                 print(l, file=sys.stderr)
 
+            with open("count_tmp.log", 'r') as fin:
+                for line in fin:
+                    print(line, file=sys.stdout)
+
+            raise Exception("Cellranger count fails.")
+
         with open("count_tmp.log", 'r') as fin:
             for line in fin:
                 print(line, file=sys.stdout)
