@@ -252,7 +252,24 @@ task run_cellranger_count {
         if '~{secondary}' != 'true':
             call_args.append('--nosecondary')
         print(' '.join(call_args))
-        check_call(call_args)
+
+        try:
+            with open("count_tmp.log", 'w') as fout:
+                check_call(call_args, stdout=fout)
+        except CalledProcessError:
+            with open("count_tmp.log", 'r') as fin:
+                lines = fin.readlines()
+                for i in range(len(lines)):
+                    if lines[i].startswith("[error]"):
+                        log_filename = lines[i+1].strip()
+                        with open(log_filename, 'r') as flog:
+                            for l in flog:
+                                print(l, file=sys.stderr)
+
+        with open("count_tmp.log", 'r') as fin:
+            for line in fin:
+                print(line, file=sys.stdout)
+
         CODE
 
         strato sync --backend "~{backend}" -m results/outs "~{output_directory}"/~{sample_id}
