@@ -1,5 +1,5 @@
-Run TRUST4 for immune repertoire reconstruction from RNA-seq data
-----------------------------------------------------------------------
+Run TRUST4 for immune repertoire reconstruction
+-------------------------------------------------
 
 This ``TRUST4`` workflow extracts reads, assembles reads into immune receptor sequences and performs annotation.
 
@@ -28,7 +28,7 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
       -
     * - **input_fastqs_directories**
       - | A comma-separated list of input FASTQs directories (urls).
-	| **Either provide input_fastqs_directories or input_bam but not both.**
+        | **Either provide input_fastqs_directories or input_bam but not both.**
       - "/path/fastq_dir1,/path/fastq_dir2"
       -
     * - **output_directory**
@@ -37,20 +37,20 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
       -	  	  
     * - **genome**
       - Genome reference. It can be either of the following two formats:
-
-		- String. Pre-built `genome reference`_.
-
-		- Google bucket URL of a custom reference, must be a ``.tar.gz`` file.
+		    
+        - String. Pre-built `genome reference`_.
+        
+        - Google bucket URL of a custom reference, must be a ``.tar.gz`` file.
       - | "human_trust4",
-	| or "gs://user-bucket/trust4.tar.gz"
+        | or "gs://user-bucket/trust4.tar.gz"
       -
     * - **acronym_file**
       - | The link/path of an index file in TSV format for fetching preset genome references by their names.
-	| Set an GS URI if *backend* is ``gcp``; an S3 URI for ``aws`` backend; an absolute file path for ``local`` backend.
+	      | Set an GS URI if *backend* is ``gcp``; an S3 URI for ``aws`` backend; an absolute file path for ``local`` backend.
       - "s3://xxxx/index.tsv" or "gs://xxxx/index.tsv"
       -
     * - se_fastq_pattern	
-      - R2 Fastq pattern SE data.
+      - Fastq pattern SE data.
       - "_S*_L*_R2_001.fastq.gz"
       - "_S*_L*_R2_001.fastq.gz"
     * - pe_read1_fastq_pattern
@@ -67,7 +67,7 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
       - "0,-1"
     * - read2_range
       - | [trust4 option \-\-read2Range] Start, end(-1 for length-1) in -2 files for genomic sequence.
-	| Only use in case of paired-end data.
+	      | Only use in case of paired-end data.
       - "0,-1"
       - "0,-1"
     * - barcode_fastq_pattern
@@ -80,7 +80,7 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
       - "0,15,+"
     * - barcode_whitelist
       - | [trust4 option \-\-barcodeWhitelist] Path to the barcode whitelist.
-	| Cell barcode whitelist file. This is supposed to be a txt file where each line is a whitelisted barcode.
+	      | Cell barcode whitelist file. This is supposed to be a txt file where each line is a whitelisted barcode.
       - 
       -
     * - umi_fastq_pattern
@@ -98,7 +98,7 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
       - 
     * - bam_barcode_field
       - | [trust4 option \-\-barcode] BAM field for barcode.
-	| Only use when BAM file is used as input.
+	      | Only use when BAM file is used as input.
       - 
       -
     * - bam_umi_field
@@ -107,7 +107,7 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
       - 
     * - bam_abnormal_unmap_flag
       - | [trust4 option \-\-abnormalUnmapFlag] The flag in BAM for the unmapped read-pair is nonconcordant.
-	| Only use when BAM file is used as input.
+	      | Only use when BAM file is used as input.
       - 
       - 
     * - skipMateExtension
@@ -133,9 +133,9 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
     * - docker_registry
       - Docker registry to use:
 
-	  	- "quay.io/cumulus" for images on Red Hat registry;
+	  	  - "quay.io/cumulus" for images on Red Hat registry;
 
-		- "cumulusprod" for backup images on Docker Hub.
+		    - "cumulusprod" for backup images on Docker Hub.
       - "quay.io/cumulus"
       - "quay.io/cumulus"
     * - zones
@@ -157,9 +157,9 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
     * - backend
       - Cloud infrastructure backend to use. Available options:
 
-	    - "gcp" for Google Cloud;
-	    - "aws" for Amazon AWS;
-	    - "local" for local machine.
+        - "gcp" for Google Cloud;
+        - "aws" for Amazon AWS;
+        - "local" for local machine.
       - "gcp"
       - "gcp"
     * - preemptible
@@ -239,7 +239,7 @@ Required inputs are highlighted **in bold**.
       -
     * - **species**
       - | Species name.
-	| The available species name can be found on `IMGT FTP`_.
+        | The available species name can be found on `IMGT FTP`_.
       - "Homo sapien"
       -
     * - **ref_name**
