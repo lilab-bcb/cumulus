@@ -393,6 +393,9 @@ We've built the following scRNA-seq references for users' convenience:
     * - **GRCh38-and-mm10-2020-A**
       - Human GRCh38 (GENCODE v32/Ensembl 98) and mouse mm10 (GENCODE vM23/Ensembl 98)
 
+.. note::
+  For **snRNA-seq** data, please choose the corresponding scRNA-seq reference above, and add ``GeneFull`` in the *soloFeatures* input.
+
 ---------------------------
 
 Build STARSolo References
