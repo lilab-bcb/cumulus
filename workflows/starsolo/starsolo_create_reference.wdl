@@ -68,7 +68,7 @@ task run_starsolo_create_reference {
         python <<CODE
         from subprocess import check_call
 
-        call_args = ['STAR', '--runMode', 'genomeGenerate', '--runThreadN', '~{num_cpu}', '--genomeDir', './starsolo_ref', '--genomeFastaFiles', '~{input_fasta}', '--sjdbGTFfile', '~{input_gtf}']
+        call_args = ['STAR', '--runMode', 'genomeGenerate', '--runThreadN', '~{num_cpu}', '--genomeDir', 'starsolo-ref', '--genomeFastaFiles', '~{input_fasta}', '--sjdbGTFfile', '~{input_gtf}']
 
         mem_digit = ""
         for c in "~{memory}":
@@ -79,9 +79,7 @@ task run_starsolo_create_reference {
         mem_bytes = str(int(mem_digit) * 10**9)
         call_args.extend(['--limitGenomeGenerateRAM', mem_bytes])
 
-        print(' '.join(call_args))
         check_call(call_args)
-
         CODE
 
         tar -czf ~{genome}-starsolo.tar.gz starsolo-ref
