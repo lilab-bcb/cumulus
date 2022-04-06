@@ -65,7 +65,25 @@ task run_starsolo_create_reference {
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
 
-        STAR --runMode genomeGenerate --runThreadN ~{num_cpu} --genomeDir ./starsolo-ref --genomeFastaFiles ~{input_fasta} --sjdbGTFfile ~{input_gtf}
+        python <<CODE
+        from subprocess import check_call
+
+        call_args = ['STAR', '--runMode', 'genomeGenerate', '--runThreadN', '~{num_cpu}', '--genomeDir', './starsolo_ref', '--genomeFastaFiles', '~{input_fasta}', '--sjdbGTFfile', '~{input_gtf}']
+
+        mem_digit = ""
+        for c in "~{memory}":
+            if c.isdigit():
+                mem_digit += c
+            else:
+                break
+        mem_bytes = int(mem_digit) * 10**9
+        call_args.extend(['--limitGenomeGenerateRAM', mem_bytes])
+
+        print(' '.join(call_args))
+        check_call(call_args)
+
+        CODE
+
         tar -czf ~{genome}-starsolo.tar.gz starsolo-ref
         strato cp --backend ~{backend} -m ~{genome}-starsolo.tar.gz "~{output_directory}"/
     }
