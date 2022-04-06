@@ -76,7 +76,7 @@ task run_starsolo_create_reference {
                 mem_digit += c
             else:
                 break
-        mem_bytes = int(mem_digit) * 10**9
+        mem_bytes = str(int(mem_digit) * 10**9)
         call_args.extend(['--limitGenomeGenerateRAM', mem_bytes])
 
         print(' '.join(call_args))
