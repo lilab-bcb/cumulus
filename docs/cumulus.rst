@@ -48,7 +48,7 @@ You are free to add any other columns and these columns will be used in selectin
 
 #. Import *cumulus* workflow to your workspace.
 
-    Import by following instructions in `Import workflows to Terra`_. You should choose **github.com/klarman-cell-observatory/cumulus/Cumulus** for import.
+    Import by following instructions in `Import workflows to Terra`_. You should choose **github.com/lilab-bcb/cumulus/Cumulus** for import.
 
     Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cumulus* workflow in the drop-down menu.
 
@@ -1121,7 +1121,7 @@ Notice that Python, and Python package `anndata`_ with version at least ``0.6.22
 
 Execute the R code below to load the h5ad result into Seurat (working with both Seurat v2 and v3)::
 
-    source("https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cumulus/h5ad2seurat.R")
+    source("https://raw.githubusercontent.com/lilab-bcb/cumulus/master/workflows/cumulus/h5ad2seurat.R")
     ad <- import("anndata", convert = FALSE)
     test_ad <- ad$read_h5ad("output_name.focus_key.h5ad")
     result <- convert_h5ad_to_seurat(test_ad)
@@ -1145,7 +1145,7 @@ You also need to install *loomR* package in your R environment::
 
 Execute the R code below to load the loom file result into Seurat (working with Seurat v3 only)::
 
-    source("https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cumulus/loom2seurat.R")
+    source("https://raw.githubusercontent.com/lilab-bcb/cumulus/master/workflows/cumulus/loom2seurat.R")
     result <- convert_loom_to_seurat("output_name.focus_key.loom")
 
 In addition, if you want to set an active cluster label field for the resulting Seurat object, do the following::
@@ -1205,5 +1205,5 @@ Follow `Pegasus plotting tutorial`_ for visualizing your data in Python.
 .. _create a data table: https://support.terra.bio/hc/en-us/articles/360025758392
 .. _GMT: https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29
 .. _[Kobak et al. 2019]: https://www.nature.com/articles/s41467-019-13056-x
-.. _Pegasus plotting tutorial: https://pegasus.readthedocs.io/en/stable/_static/tutorials/plotting_tutorial.html
+.. _Pegasus plotting tutorial: https://pegasus-tutorials.readthedocs.io/en/latest/_static/tutorials/plotting_tutorial.html
 .. _reference list: ./cellranger/index.html#sample-sheet

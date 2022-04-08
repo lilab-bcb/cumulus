@@ -10,7 +10,7 @@ In this example, you'll learn how to perform Cellplex analysis on Cloud using `C
 
 You need to install the corresponding Cloud SDK tool on your local machine if not:
 
-* `Google Cloud SDK <https://cloud.google.com/sdk/docs/install>`_ for Google Cloud.
+* `gcloud CLI <https://cloud.google.com/sdk/docs/install>`_ for Google Cloud.
 * `AWS CLI v2 <https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html>`_ for Amazon AWS Cloud.
 
 And then install `Altocumulus <https://github.com/lilab-bcb/altocumulus>`_ in your Python environment. This is the tool for data transfer between local machine and Cloud VM instance.
@@ -235,12 +235,12 @@ To perform further downstream analysis on the singlets, please refer to `Pegasus
 .. _CellRanger workflow sample sheet format: ../cellranger/index.html#prepare-a-sample-sheet
 .. _Cumulus single-cell genome reference list: ../cellranger/index.html#sample-sheet
 .. _CellRanger workflow inputs: ../cellranger/index.html#workflow-input
-.. _cellranger_workflow: https://dockstore.org/workflows/github.com/klarman-cell-observatory/cumulus/Cellranger
+.. _cellranger_workflow: https://dockstore.org/workflows/github.com/lilab-bcb/cumulus/Cellranger
 .. _DemuxEM: https://demuxem.readthedocs.io
 .. _Souporcell: https://github.com/wheaton5/souporcell
 .. _Demultiplexing workflow sample sheet format: ../demultiplexing.html#prepare-a-sample-sheet
 .. _Demultiplexing workflow inputs: ../demultiplexing.html#workflow-inputs
-.. _demultiplexing: https://dockstore.org/workflows/github.com/klarman-cell-observatory/cumulus/Demultiplexing
+.. _demultiplexing: https://dockstore.org/workflows/github.com/lilab-bcb/cumulus/Demultiplexing
 .. _Cumulus workflow: ../cumulus.html
 .. _Pegasus: https://pegasus.readthedocs.io/en/stable/installation.html
 .. _Pegasus preprocess tools: https://pegasus.readthedocs.io/en/stable/api/index.html#preprocess

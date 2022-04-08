@@ -15,7 +15,7 @@ This example covers the cases of both Terra_ platform and a custom cloud server 
 
 If you use a Cromwell server on Cloud, on your local machine, you need to install the corresponding Cloud SDK tool if not:
 
-	* `Google Cloud SDK`_ if your Cloud bucket is on Google Cloud.
+	* `gcloud CLI`_ if your Cloud bucket is on Google Cloud.
 	* `AWS CLI v2`_ if your Cloud bucket is on Amazon AWS Cloud.
 
 And then install Altocumulus_ in your Python environment. This is the tool for data transfer between local machine and cloud bucket, as well as communication with the Cromwell server on cloud.
@@ -29,7 +29,7 @@ If you use Terra, after registering on Terra and creating a workspace there, you
 	* **Terra workspace name**. This is shown on your Terra workspace webpage, with format "*<workspace-namespace>/<workspace-name>*". For example, if your Terra workspace has full name ``ws-lab/ws-01``, then **ws-lab** is the namespace and **ws-01** is the workspace name winthin that namespace.
 	* The corresponding **Google Cloud Bucket** of your Terra workspace. You can check it under "*Google Bucket*" title on the right panel of your Terra workspace’s *Dashboard* tab. The bucket name associated with your workspace starts with ``fc-`` followed by a sequence of heximal numbers. For example, ``gs://fc-e0000000``, where "*gs://*" is the header of GS URI.
 
-Besides, install `Google Cloud SDK`_ and Altocumulus_ on your local machine for data uploading. These tools will be used for data transfer between local machine and Cloud bucket.
+Besides, install `gcloud CLI`_ and Altocumulus_ on your local machine for data uploading. These tools will be used for data transfer between local machine and Cloud bucket.
 
 Alternatively, you can also use Terra web UI for job submission instead of command-line submission. This will be discussed in Section `Run Analysis with Terra Web UI`_ below.
 
@@ -442,17 +442,17 @@ You can check the job's status in the *Job History* tab of your Terra workspace 
 
 .. _Terra: https://app.terra.bio/
 .. _Cromwell: https://cromwell.readthedocs.io
-.. _Google Cloud SDK: https://cloud.google.com/sdk/docs/install
+.. _gcloud CLI: https://cloud.google.com/sdk/docs/install
 .. _AWS CLI v2: https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html
 .. _Altocumulus: https://github.com/lilab-bcb/altocumulus
 .. _Cell Ranger sample sheet instruction: ../cellranger/index.html#prepare-a-sample-sheet
 .. _Cell Ranger workflow inputs: ../cellranger/index.html#workflow-input
-.. _cellranger_workflow: https://dockstore.org/workflows/github.com/klarman-cell-observatory/cumulus/Cellranger
-.. _demultiplexing: https://dockstore.org/workflows/github.com/klarman-cell-observatory/cumulus/Demultiplexing
+.. _cellranger_workflow: https://dockstore.org/workflows/github.com/lilab-bcb/cumulus/Cellranger
+.. _demultiplexing: https://dockstore.org/workflows/github.com/lilab-bcb/cumulus/Demultiplexing
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
 .. _Cumulus single-cell genome reference list: ../cellranger/index.html#sample-sheet
 .. _cumulus inputs: ../cumulus.html#global-inputs
-.. _cumulus: https://dockstore.org/workflows/github.com/klarman-cell-observatory/cumulus/Cumulus
+.. _cumulus: https://dockstore.org/workflows/github.com/lilab-bcb/cumulus/Cumulus
 .. _import workflows: ../cumulus_import.html
 .. _Run Analysis with Terra Web UI: ./example_hashing_citeseq.html#run-analysis-with-terra-web-ui
 .. _Pegasus: https://pegasus.readthedocs.io

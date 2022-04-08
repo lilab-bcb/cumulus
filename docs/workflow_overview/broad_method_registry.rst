@@ -1,8 +1,9 @@
-Latest and stable versions on Terra_
-------------------------------------
+Legacy versions on Broad Method Registry
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-Cumulus is a fast growing project. As a result, we frequently update WDL snapshot versions on Terra_.
-See below for latest and stable WDL versions you can use.
+As Cumulus is now switched to Dockstore_ for release, we no longer maintain the Cumulus workflows published on `Broad Method Registry`_.
+
+But Terra_ users can still check out the legacy snapshots listed below for usage.
 
 Stable version - v1.5.1
 ^^^^^^^^^^^^^^^^^^^^^^^^
@@ -598,4 +599,6 @@ Stable version - HTAPP v1
       - `3 <https://portal.firecloud.org/?return=terra#methods/scCloud/scCloud/3>`__
       - Run scCloud analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering and more
 
+.. _Dockstore: https://dockstore.org/
 .. _Terra: https://app.terra.bio
+.. _Broad Method Registry: https://portal.firecloud.org/?return=terra#methods

@@ -24,6 +24,7 @@ mm10_premrna	gs://regev-lab/resources/cellranger/refdata-cellranger-mm10_premrna
 GRCh38_premrna_and_mm10_premrna	gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38_premrna_and_mm10_premrna-1.2.0.tar.gz
 GRCh38-2020-A_arc_v2.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-arc-GRCh38-2020-A-2.0.0.tar.gz
 mm10-2020-A_arc_v2.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-arc-mm10-2020-A-2.0.0.tar.gz
+GRCh38_and_mm10-2020-A_atac_v2.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-atac-GRCh38-and-mm10-2020-A-2.0.0.tar.gz
 GRCh38-2020-A_arc_v1.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-arc-GRCh38-2020-A.tar.gz
 mm10-2020-A_arc_v1.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-arc-mm10-2020-A.tar.gz
 GRCh38_atac_v1.2.0	gs://regev-lab/resources/cellranger/refdata-cellranger-atac-GRCh38-1.2.0.tar.gz

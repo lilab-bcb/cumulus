@@ -11,7 +11,7 @@ This section mainly considers jobs starting from BCL files. If your job starts w
 1. Import ``spaceranger_workflow``
 ++++++++++++++++++++++++++++++++++
 
-	Import *spaceranger_workflow* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose workflow **github.com/klarman-cell-observatory/cumulus/SpaceRanger** to import.
+	Import *spaceranger_workflow* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose workflow **github.com/lilab-bcb/cumulus/Spaceranger** to import.
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *spaceranger_workflow* workflow in the drop-down menu.
 
@@ -45,18 +45,6 @@ This section mainly considers jobs starting from BCL files. If your job starts w
 
 Alternatively, users can submit jobs through command line interface (CLI) using `altocumulus <./command_line.html>`_, which will smartly upload BCL folders according to the above rules.
 
-.. note:: Broad users need to be on an UGER node (not a login node) in order to use the ``-m`` flag
-
-	Request an UGER node::
-
-		reuse UGER
-		qrsh -q interactive -l h_vmem=4g -pe smp 8 -binding linear:8 -P regevlab
-
-	The above command requests an interactive node with 4G memory per thread and 8 threads. Feel free to change the memory, thread, and project parameters.
-
-	Once you're connected to an UGER node, you can make gsutil_ available by running::
-
-		reuse Google-Cloud-SDK
 
 3. Prepare a sample sheet
 +++++++++++++++++++++++++
@@ -156,9 +144,12 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 
 Sometimes, users might want to perform demultiplexing locally and only run the count part on the cloud. This section describes how to only run the count part via ``spaceranger_workflow``.
 
-#. Copy your FASTQ files to the workspace using gsutil_ in your unix terminal.
+#. Copy your FASTQ files to the workspace using gsutil_ in your unix terminal. There are two cases:
 
-	You should upload folders of FASTQ files. The uploaded folder (for one flowcell) should contain one subfolder for each sample belong to the this flowcell. **In addition, the subfolder name and the sample name in your sample sheet MUST be the same.** Each subfolder contains FASTQ files for that sample. Please note that if your FASTQ file are downloaded from the Sequence Read Archive (SRA) from NCBI, you must rename your FASTQs to follow the bcl2fastq `file naming conventions`_.
+	- **Case 1**: All the FASTQ files are in one top-level folder. Then you can simply upload this folder to Cloud, and in your sample sheet, make sure **Sample** names are consistent with the filename prefix of their corresponding FASTQ files.
+	- **Case 2**: In the top-level folder, each sample has a dedicated subfolder containing its FASTQ files. In this case, you need to upload the whole top-level folder, and in your sample sheet, make sure **Sample** names and their corresponding subfolder names are identical.
+
+	Notice that if your FASTQ files are downloaded from the Sequence Read Archive (SRA) from NCBI, you must rename your FASTQs to follow the bcl2fastq `file naming conventions`_.
 
 	Example::
 
@@ -247,9 +238,9 @@ For spatial data, ``spaceranger_workflow`` takes Illumina outputs and related im
 		  - false
 		  - false
 		* - spaceranger_version
-		  - spaceranger version, could be 1.3.0
-		  - "1.3.0"
-		  - "1.3.0"
+		  - spaceranger version, could be: ``1.3.1``, ``1.3.0``
+		  - "1.3.1"
+		  - "1.3.1"
 		* - config_version
 		  - config docker version used for processing sample sheets, could be 0.2, 0.1
 		  - "0.2"

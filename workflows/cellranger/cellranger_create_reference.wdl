@@ -22,8 +22,8 @@ workflow cellranger_create_reference {
 
         # Which docker registry to use
         String docker_registry = "quay.io/cumulus"
-        # 6.1.1, 6.0.2, 6.0.1
-        String cellranger_version = "6.1.1"
+        # 6.1.2, 6.1.1
+        String cellranger_version = "6.1.2"
 
         # Disk space in GB
         Int disk_space = 100
@@ -242,7 +242,7 @@ task run_filter_gtf {
     runtime {
         docker: "~{docker_registry}/cellranger:~{cellranger_version}"
         zones: zones
-        memory: "~{memory}G"
+        memory: memory
         disks: "local-disk ~{disk_space} HDD"
         cpu: 1
         preemptible: preemptible
@@ -264,7 +264,7 @@ task run_cellranger_mkref {
         Int disk_space
         String zones
         Int num_cpu
-        Int memory
+        String memory
         Int preemptible
         Int awsMaxRetries
         String backend
@@ -299,7 +299,14 @@ task run_cellranger_mkref {
         for genome, fasta, gtf in zip(genome_list, fasta_list, gtf_list):
             call_args.extend(['--genome=' + genome, '--fasta=' + fasta, '--genes=' + gtf])
 
-        call_args.extend(['--nthreads=~{num_cpu}', '--memgb=~{memory}'])
+        mem_digit = ""
+        for c in "~{memory}":
+            if c.isdigit():
+                mem_digit += c
+            else:
+                break
+
+        call_args.extend(['--nthreads=~{num_cpu}', '--memgb=' + mem_digit])
         if '~{ref_version}' is not '':
             call_args.append('--ref-version=~{ref_version}')
 

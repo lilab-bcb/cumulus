@@ -1,27 +1,10 @@
 Run Terra pipelines via command line
 ----------------------------------------------
 
-You can run Terra pipelines via the command line by installing the **altocumulus** package.
+You can run Terra pipelines via the command line by installing the Altocumulus_ package (version ``2.0.0`` or later is required).
 
-Install ``altocumulus`` for Broad users
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-Request an UGER node::
-
-    reuse UGER
-    qrsh -q interactive -l h_vmem=4g -pe smp 8 -binding linear:8 -P regevlab
-
-The above command requests an interactive shell using the regevlab project with 4G memory per thread, 8 threads. Feel free to change the memory, thread, and project parameters.
-
-Add conda to your path::
-
-    reuse Anaconda3
-
-Activate the alto virtual environment::
-
-    source activate /seq/regev_genome_portal/conda_env/cumulus
-
-Install ``altocumulus`` for non-Broad users
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Install Altocumulus
+^^^^^^^^^^^^^^^^^^^^^
 
 #. Make sure you have ``conda`` installed. If you haven't installed conda_, use the following commands to install it on Linux::
 
@@ -39,7 +22,7 @@ Or use the following commdands for MacOS installation::
 
     where ``/Users/foo/miniconda3`` should be replaced by your own folder holding Miniconda3.
 
-#. Create a conda environment named "alto" and install ``altocumulus``::
+#. Create a conda environment named "alto" and install Altocumulus::
 
     conda create -n alto -y pip
     source activate alto
@@ -50,7 +33,7 @@ When the installation is done, type ``alto -h`` in terminal to see if you can se
 Set up Google Cloud Account
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Install `Google Cloud SDK <https://cloud.google.com/cloud-sdk>`_ on your local machine.
+Install `gcloud CLI`_ on your local machine.
 
 Then type the following command in your terminal
 
@@ -192,9 +175,9 @@ Required options are in bold.
         | \\-\\-bucket <[s3|gs]://<bucket-name>/<bucket-folder>>
       - | Cloud bucket folder for uploading local input data. Start with 's3://' if an AWS S3 bucket is used, 'gs://' for a Google bucket. Must be specified when '-o' option is used.
     * - | \\-\\-no-ssl-verify
-      - | Disable SSL verification for web requests. Not recommended for general usage, but can be useful for intra-networks which don't support SSL verification. 
+      - | Disable SSL verification for web requests. Not recommended for general usage, but can be useful for intra-networks which don't support SSL verification.
 
-Example import of any Cumulus workflow 
+Example import of any Cumulus workflow
 ++++++++++++++++++++++++++++++++++++++++++
 
 This example shows how to use ``alto cromwell run`` to run demultiplexing workflow on any backend.
@@ -222,4 +205,7 @@ This example shows how to use ``alto cromwell run`` to run demultiplexing workfl
     alto cromwell run -s 10.10.10.10 -p 3000 -m broadinstitute:cumulus:Demultiplexing:master \
                       -i cumulus_inputs.json
 
+
 .. _conda: https://docs.conda.io/en/latest/miniconda.html
+.. _Altocumulus: https://pypi.org/project/altocumulus/
+.. _gcloud CLI: https://cloud.google.com/sdk/docs/install

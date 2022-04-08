@@ -20,7 +20,7 @@ Prepare input data and import workflow
 2. Import ``demultiplexing``
 ++++++++++++++++++++++++++++++
 
-	Import *demultiplexing* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/klarman-cell-observatory/cumulus/Demultiplexing** to import.
+	Import *demultiplexing* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/lilab-bcb/cumulus/Demultiplexing** to import.
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *demultiplexing* workflow in the drop-down menu.
 
@@ -72,7 +72,7 @@ Prepare input data and import workflow
 
 	**3.2 Upload your sample sheet to the workspace bucket:**
 
-	Use gsutil_ (you already have it if you've installed Google Cloud SDK) in your unix terminal to upload your sample sheet to workspace bucket.
+	Use gsutil_ (you already have it if you've installed gcloud CLI) in your unix terminal to upload your sample sheet to workspace bucket.
 
 	Example::
 
