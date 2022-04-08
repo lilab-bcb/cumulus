@@ -16,6 +16,7 @@ workflows:
         - /.*/
       branches:
         - master
+        - aws-backend
   - name: Spaceranger
     subclass: WDL
     publish: true
