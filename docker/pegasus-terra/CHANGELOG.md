@@ -1,5 +1,12 @@
 # Changelog of Pegasus-Terra Docker Image
 
+## 1.6.0 - 2022/04/16
+
+* Image based on [terra-jupyter-base](https://github.com/DataBiosphere/terra-docker/tree/master/terra-jupyter-base) image version 1.0.4 at `us.gcr.io/broad-dsp-gcr-public/terra-jupyter-base:1.0.4`.
+* Update Pegasus to [v1.6.0](https://pegasus.readthedocs.io/en/stable/release_notes.html#version-1-6).
+* Add support on [DESeq2](https://bioconductor.org/packages/release/bioc/html/DESeq2.html) and [fgsea](https://bioconductor.org/packages/release/bioc/html/fgsea.html) packages.
+* Add support on [scVI-tools](https://scvi-tools.org/).
+
 ## 1.4.3 - 2021/07/25
 
 * Image based on [terra-jupyter-base](https://github.com/DataBiosphere/terra-docker/tree/master/terra-jupyter-base) image version 1.0.0 at `us.gcr.io/broad-dsp-gcr-public/terra-jupyter-base:0.0.20`, which adds the support of CUDA.
