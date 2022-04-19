@@ -13,6 +13,7 @@
         "h5py": "3.6.0",
         "harmony-pytorch": "0.1.7",
         "hnswlib": "0.6.2",
+        "jaxlib": "0.3.5",
         "jupyter": "1.0.0",
         "jupyterlab": "3.2.5",
         "leidenalg": "0.8.9",
