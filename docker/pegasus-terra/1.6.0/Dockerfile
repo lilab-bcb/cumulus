@@ -75,6 +75,7 @@ RUN pip3 -V && \
     pip3 install nmf-torch==0.1.1 && \
     pip3 install pegasuspy==1.6.0 && \
     pip3 install rpy2==3.5.1 && \
+    pip3 install jaxlib==0.3.5 && \
     pip3 install scvi-tools==0.16.0
 
 RUN conda clean -y -a
