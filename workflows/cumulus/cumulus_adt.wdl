@@ -116,6 +116,7 @@ task run_generate_count_matrix_ADTs {
         import re
         from subprocess import check_call, CalledProcessError, STDOUT, DEVNULL
         import os
+        import glob
 
         fastqs = []
 
@@ -137,7 +138,16 @@ task run_generate_count_matrix_ADTs {
                 check_call(call_args)
             fastqs.append(target)
 
-        call_args = ['generate_count_matrix_ADTs', '~{cell_barcodes}', '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
+        
+        # GUNZIP cell barcode file if necessary
+        cell_barcodes_file = '~{cell_barcodes}'
+        if cell_barcodes_file.endswith('.gz'):
+            call_args = ['gunzip', cell_barcodes_file]
+            print(' '.join(call_args))
+            check_call(call_args)
+            cell_barcodes_file = cell_barcodes_file[:-3]
+
+        call_args = ['generate_count_matrix_ADTs', cell_barcodes_file, '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
         if '~{data_type}' == 'crispr':
             call_args.extend(['--feature', 'crispr'])
             if '~{scaffold_sequence}' != '':
@@ -156,6 +166,12 @@ task run_generate_count_matrix_ADTs {
             call_args.extend(['--max-mismatch-cell', '1', '--umi-length', '10'])
         print(' '.join(call_args))
         check_call(call_args)
+
+        # GZIP all stat.csv
+        for stat_file in glob.iglob('~{sample_id}.*stat.csv'):
+            call_args = ['gzip', stat_file]
+            print(' '.join(call_args))
+            check_call(call_args)
         CODE
 
         if [ -f "~{sample_id}".stat.csv.gz ]
@@ -168,7 +184,7 @@ task run_generate_count_matrix_ADTs {
             filter_chimeric_reads ~{data_type} ~{feature_barcodes} "~{sample_id}.crispr.stat.csv.gz" ~{min_read_ratio} ~{sample_id}
         fi
 
-        strato cp --backend ~{backend} -m "~{sample_id}".*csv* "~{output_directory}/~{sample_id}/"
+        strato cp --backend ~{backend} -m "~{sample_id}".*csv* "~{sample_id}".report.txt "~{output_directory}/~{sample_id}/"
 
         if [ -f "~{sample_id}".umi_count.pdf ]
         then
@@ -178,6 +194,7 @@ task run_generate_count_matrix_ADTs {
 
     output {
         String output_count_directory = "~{output_directory}/~{sample_id}"
+        String output_text_summary = "~{output_directory}/~{sample_id}/~{sample_id}.report.txt"
         File monitoringLog = "monitoring.log"
     }
 
