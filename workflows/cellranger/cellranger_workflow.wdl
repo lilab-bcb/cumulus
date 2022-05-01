@@ -98,8 +98,8 @@ workflow cellranger_workflow {
 
         # 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
         String cellranger_version = "6.1.2"
-        # 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0
-        String cumulus_feature_barcoding_version = "0.7.0"
+        # 0.8.0, 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0
+        String cumulus_feature_barcoding_version = "0.8.0"
         # 2.0.0, 1.2.0, 1.1.0
         String cellranger_atac_version = "2.0.0"
         # 2.0.1, 2.0.0, 1.0.1, 1.0.0
@@ -531,8 +531,15 @@ workflow cellranger_workflow {
     }
 
     output {
-        Array[Array[String]?] fastq_outputs = [cellranger_mkfastq.output_fastqs_flowcell_directory, cellranger_atac_mkfastq.output_fastqs_flowcell_directory, cellranger_arc_mkfastq.output_fastqs_flowcell_directory]
-        Array[Array[String]?] count_outputs = [cellranger_count.output_count_directory, cellranger_vdj.output_vdj_directory, cumulus_adt.output_count_directory, cellranger_atac_count.output_count_directory, cellranger_arc_count.output_count_directory, cellranger_multi.output_multi_directory, cellranger_count_fbc.output_count_directory]
+        Array[Array[String]?] fastq_outputs = [cellranger_mkfastq.output_fastqs_flowcell_directory, cellranger_atac_mkfastq.output_fastqs_flowcell_directory, cellranger_arc_mkfastq.output_fastqs_flowcell_directory]        
+        Map[String, Array[String]?] count_outputs = {"gex": cellranger_count.output_count_directory,
+                                                     "vdj": cellranger_vdj.output_vdj_directory,
+                                                     "adt": cumulus_adt.output_count_directory,
+                                                     "atac": cellranger_atac_count.output_count_directory,
+                                                     "arc": cellranger_arc_count.output_count_directory,
+                                                     "multi": cellranger_multi.output_multi_directory,
+                                                     "fbc": cellranger_count_fbc.output_count_directory
+                                                    }
         File? count_matrix = generate_count_config.count_matrix
     }
 }
