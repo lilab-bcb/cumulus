@@ -34,7 +34,7 @@ workflow shareseq_workflow {
         # read2 fastq pattern
         String read2_fastq_pattern = "_S*_L*_R3_001.fastq.gz"
         # index fastq pattern
-        String index_fastq_pattern = "_S*_L*_R2_001.fastq.gz"        
+        String index_fastq_pattern = "_S*_L*_R2_001.fastq.gz"
 
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
@@ -60,7 +60,7 @@ workflow shareseq_workflow {
         # 0.1.4, 0.1.5
         String chromap_version = "0.1.5"
 
-        # Number of cpus shareseq_mkfastq 
+        # Number of cpus shareseq_mkfastq
         Int shareseq_mkfastq_num_cpu = 32
         # Memory string
         String shareseq_mkfastq_memory = "120G"
@@ -93,8 +93,10 @@ workflow shareseq_workflow {
         Int preemptible = 2
         # Max number of retries for AWS instance
         Int awsMaxRetries = 5
-                     
+        # Arn string of AWS queue
+        String awsQueueArn = ""
     }
+
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
@@ -112,7 +114,7 @@ workflow shareseq_workflow {
                 zones = zones,
                 preemptible = preemptible,
                 awsMaxRetries = awsMaxRetries,
-                backend = backend   
+                backend = backend
         }
 
         if (length(generate_mkfastq_input.bcl_csv) > 0) {
@@ -174,7 +176,7 @@ workflow shareseq_workflow {
                         preemptible = preemptible,
                         awsMaxRetries = awsMaxRetries,
                         backend = backend
-                }    
+                }
                 call sc.starsolo_count as starsolo_count {
                     input:
                         sample_id = sample_id,
@@ -193,7 +195,8 @@ workflow shareseq_workflow {
                         num_cpu = starsolo_num_cpu,
                         disk_space = starsolo_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
+                        awsMaxRetries = 0,
+                        awsQueueArn = awsQueueArn,
                         backend = backend
                 }
             }
@@ -218,8 +221,8 @@ workflow shareseq_workflow {
                         disk_space = shareseq_reorg_disk_space,
                         preemptible = preemptible,
                         awsMaxRetries = awsMaxRetries,
-                        backend = backend   
-                }    
+                        backend = backend
+                }
                 call cm.chromap_mapping as chromap_mapping {
                     input:
                         chromap_version = chromap_version,
@@ -242,15 +245,15 @@ workflow shareseq_workflow {
                         backend = backend
                 }
             }
-        }      
+        }
     }
     output {
         Array[String]? demuxed_fastqs = shareseq_mkfastq.output_fastqs_directory
         Array[String]? reorg_gex_fastqs = shareseq_reorg_gex.output_reorg_directory
-        Array[String]? reorg_atac_fastqs = shareseq_reorg_atac.output_reorg_directory 
+        Array[String]? reorg_atac_fastqs = shareseq_reorg_atac.output_reorg_directory
         Array[String]? gex_outputs = starsolo_count.output_count_directory
-        Array[String]? atac_outputs = chromap_mapping.output_aln_directory        
-    }      
+        Array[String]? atac_outputs = chromap_mapping.output_aln_directory
+    }
 }
 
 task generate_mkfastq_input {
@@ -279,7 +282,7 @@ task generate_mkfastq_input {
             df[c] = df[c].str.strip()
 
         mkfastq_cols = ["Lane","Sample","Index","Flowcell"]
-        for c in mkfastq_cols: 
+        for c in mkfastq_cols:
             if c not in df.columns:
                 print("To run SHARE-seq mkfastq, following column is required: " + c + ". Please correct sample sheet.", file = sys.stderr)
                 sys.exit(1)
@@ -344,7 +347,7 @@ task generate_count_config {
             df[c] = df[c].str.strip()
 
         count_cols = ["Sample","Flowcell","Type","Reference"]
-        for c in count_cols: 
+        for c in count_cols:
             if c not in df.columns:
                 print("To run SHARE-seq count (ATAC/GEX), following column is required: " + c + ". Please correct sample sheet.", file = sys.stderr)
                 sys.exit(1)
@@ -396,11 +399,11 @@ task generate_count_config {
                         print("Detected multiple references for sample " + sample_id + "!", file = sys.stderr)
                         sys.exit(1)
                     reference = df_local['Reference'].iat[0]
-                    
+
                 datatype2fo[datatype].write(sample_id + '\n')
                 foo1.write(sample_id + '\t' + ','.join(dirs) + '\n')
                 foo2.write(sample_id + '\t' + reference + '\n')
-                
+
         CODE
     }
 

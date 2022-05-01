@@ -61,6 +61,8 @@ workflow spaceranger_count {
         Int preemptible = 2
         # Number of maximum retries when running on AWS
         Int awsMaxRetries = 5
+        # Arn string of AWS queue
+        String awsQueueArn = ""
         # Backend
         String backend
     }
@@ -104,6 +106,7 @@ workflow spaceranger_count {
             disk_space = disk_space,
             preemptible = preemptible,
             awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 
@@ -142,6 +145,7 @@ task run_spaceranger_count {
         Int disk_space
         Int preemptible
         Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -169,11 +173,11 @@ task run_spaceranger_count {
                 call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]
                 print(' '.join(call_args))
                 check_call(call_args)
-            except CalledProcessError:                
+            except CalledProcessError:
                 if not os.path.exists(target):
-                    os.mkdir(target)    
+                    os.mkdir(target)
                 call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
-                check_call(call_args)    
+                check_call(call_args)
             fastqs.append('~{sample_id}_' + str(i))
 
         call_args = ['spaceranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local']
@@ -268,5 +272,6 @@ task run_spaceranger_count {
         cpu: num_cpu
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

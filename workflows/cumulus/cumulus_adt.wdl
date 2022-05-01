@@ -47,6 +47,8 @@ workflow cumulus_adt {
         Int preemptible = 2
         # Number of maximum retries when running on AWS
         Int awsMaxRetries = 5
+        # Arn string of AWS queue
+        String awsQueueArn = ""
         # Backend
         String backend = "gcp"
     }
@@ -75,6 +77,7 @@ workflow cumulus_adt {
             disk_space = disk_space,
             preemptible = preemptible,
             awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 
@@ -104,6 +107,7 @@ task run_generate_count_matrix_ADTs {
         Int disk_space
         Int preemptible
         Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -138,7 +142,7 @@ task run_generate_count_matrix_ADTs {
                 check_call(call_args)
             fastqs.append(target)
 
-        
+
         # GUNZIP cell barcode file if necessary
         cell_barcodes_file = '~{cell_barcodes}'
         if cell_barcodes_file.endswith('.gz'):
@@ -207,5 +211,6 @@ task run_generate_count_matrix_ADTs {
         cpu: 1
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

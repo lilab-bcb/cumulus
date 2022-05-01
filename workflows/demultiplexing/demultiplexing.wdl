@@ -23,6 +23,8 @@ workflow demultiplexing {
         Int preemptible = 2
         # Number of maximum retries when running on AWS
         Int awsMaxRetries = 5
+        # Arn string of AWS queue
+        String awsQueueArn = ""
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         # Backend
@@ -138,7 +140,8 @@ workflow demultiplexing {
                     memory = demuxEM_memory,
                     disk_space = demuxEM_disk_space,
                     preemptible = preemptible,
-                    awsMaxRetries = awsMaxRetries,
+                    awsMaxRetries = 0,
+                    awsQueueArn = awsQueueArn,
                     backend = backend
             }
         }
@@ -171,7 +174,8 @@ workflow demultiplexing {
                         memory = souporcell_memory,
                         zones = zones,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
+                        awsMaxRetries = 0,
+                        awsQueueArn = awsQueueArn,
                         backend = backend
                 }
             }
@@ -200,7 +204,8 @@ workflow demultiplexing {
                         memory = popscle_memory,
                         zones = zones,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
+                        awsMaxRetries = 0,
+                        awsQueueArn = awsQueueArn,
                         backend = backend
                 }
             }
