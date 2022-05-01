@@ -165,7 +165,6 @@ task generate_count_config {
         String docker_registry
         Int preemptible
         Int awsMaxRetries
-        String awsQueueArn
         String backend
     }
 
@@ -235,6 +234,5 @@ task generate_count_config {
         zones: zones
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
-        queueArn: awsQueueArn
     }
 }
