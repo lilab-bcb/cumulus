@@ -16,7 +16,6 @@ workflows:
         - /.*/
       branches:
         - master
-        - aws-backend
   - name: Spaceranger
     subclass: WDL
     publish: true
@@ -47,7 +46,6 @@ workflows:
         - /.*/
       branches:
         - master
-        - aws-backend
   - name: Demultiplexing
     subclass: WDL
     publish: true
