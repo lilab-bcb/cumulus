@@ -53,6 +53,8 @@ workflow popscle {
         Int preemptible
         # Number of maximum retries when running on AWS
         Int awsMaxRetries
+        # Arn string of AWS queue
+        String awsQueueArn
         # Backend
         String backend
     }
@@ -82,6 +84,7 @@ workflow popscle {
             zones = zones,
             preemptible = preemptible,
             awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 
@@ -118,6 +121,7 @@ task popscle_task {
         String zones
         Int preemptible
         Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -198,5 +202,6 @@ task popscle_task {
         cpu: num_cpu
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsMaxRetries
     }
 }

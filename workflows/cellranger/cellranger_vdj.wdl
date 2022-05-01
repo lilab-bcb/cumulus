@@ -12,7 +12,7 @@ workflow cellranger_vdj {
         # GRCh38_vdj, GRCm38_vdj or a URL to a tar.gz file
         String genome
 
-        # Index TSV file    
+        # Index TSV file
         File acronym_file
 
         # Do not align reads to reference V(D)J sequences before de novo assembly. Default: false
@@ -42,6 +42,8 @@ workflow cellranger_vdj {
         Int preemptible = 2
         # Max number of retries for AWS instance
         Int awsMaxRetries = 5
+        # Arn string of AWS queue
+        String awsQueueArn = ""
         # Backend
         String backend = "gcp"
     }
@@ -68,6 +70,7 @@ workflow cellranger_vdj {
             disk_space = disk_space,
             preemptible = preemptible,
             awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 
@@ -95,6 +98,7 @@ task run_cellranger_vdj {
         Int disk_space
         Int preemptible
         Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -155,5 +159,6 @@ task run_cellranger_vdj {
         cpu: num_cpu
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

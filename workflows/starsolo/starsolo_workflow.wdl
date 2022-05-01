@@ -80,6 +80,8 @@ workflow starsolo_workflow {
         Int preemptible = 2
         # Number of maximum retries when running on AWS
         Int awsMaxRetries = 5
+        # Arn string of AWS queue
+        String awsQueueArn = ""
         # backend choose from "gcp", "aws", "local"
         String backend = "gcp"
     }
@@ -141,7 +143,8 @@ workflow starsolo_workflow {
                     memory = memory,
                     disk_space = disk_space,
                     preemptible = preemptible,
-                    awsMaxRetries = awsMaxRetries,
+                    awsMaxRetries = 0,
+                    awsQueueArn = awsQueueArn,
                     backend = backend
             }
         }
@@ -162,6 +165,7 @@ task generate_count_config {
         String docker_registry
         Int preemptible
         Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -231,5 +235,6 @@ task generate_count_config {
         zones: zones
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

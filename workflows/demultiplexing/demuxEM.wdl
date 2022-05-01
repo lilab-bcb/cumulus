@@ -42,6 +42,8 @@ workflow demuxEM {
         Int preemptible
         # Number of maximum retries when running on AWS
         Int awsMaxRetries
+        # Arn string of AWS queue
+        String awsQueueArn
         # Backend
         String backend
     }
@@ -68,6 +70,7 @@ workflow demuxEM {
             disk_space = disk_space,
             preemptible = preemptible,
             awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 
@@ -101,6 +104,7 @@ task run_demuxEM {
         Int disk_space
         Int preemptible
         Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -152,5 +156,6 @@ task run_demuxEM {
         cpu: num_cpu
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }
