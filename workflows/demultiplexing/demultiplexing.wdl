@@ -213,7 +213,11 @@ workflow demultiplexing {
     }
 
     output {
-        Array[String] output_folders = select_all(flatten(select_all([demuxEM.output_folder, souporcell.output_folder, popscle.output_folder])))
+        Map[String, Array[String?]?] output_folders = {
+            "hashing": demuxEM.output_folder,
+            "souporcell": souporcell.output_folder,
+            "popscle": popscle.output_folder
+        }
         Array[File] output_zarr_files = select_all(flatten(select_all([demuxEM.output_zarr, souporcell.output_zarr, popscle.output_zarr])))
     }
 }
