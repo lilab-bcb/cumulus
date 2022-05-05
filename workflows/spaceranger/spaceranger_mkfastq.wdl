@@ -31,6 +31,8 @@ workflow spaceranger_mkfastq {
         Int preemptible = 2
         # Number of maximum retries when running on AWS
         Int awsMaxRetries = 5
+        # Arn string of AWS queue
+        String awsQueueArn = ""
         # Backend
         String backend
     }
@@ -50,6 +52,7 @@ workflow spaceranger_mkfastq {
             disk_space = disk_space,
             preemptible = preemptible,
             awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 
@@ -75,6 +78,7 @@ task run_spaceranger_mkfastq {
         Int disk_space
         Int preemptible
         Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -153,5 +157,6 @@ task run_spaceranger_mkfastq {
         cpu: num_cpu
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

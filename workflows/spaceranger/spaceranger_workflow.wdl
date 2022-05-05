@@ -57,6 +57,8 @@ workflow spaceranger_workflow {
         Int preemptible = 2
         # Number of maximum retries when running on AWS
         Int awsMaxRetries = 5
+        # Arn string of AWS queue
+        String awsQueueArn = ""
         # Backend
         String backend = "gcp"
     }
@@ -99,7 +101,8 @@ workflow spaceranger_workflow {
                         memory = memory,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
+                        awsMaxRetries = 0,
+                        awsQueueArn = awsQueueArn,
                         backend = backend
                 }
             }
@@ -147,7 +150,8 @@ workflow spaceranger_workflow {
                     memory = memory,
                     disk_space = count_disk_space,
                     preemptible = preemptible,
-                    awsMaxRetries = awsMaxRetries,
+                    awsMaxRetries = 0,
+                    awsQueueArn = awsQueueArn,
                     backend = backend
             }
         }

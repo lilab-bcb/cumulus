@@ -39,6 +39,8 @@ workflow cellranger_atac_count {
         Int preemptible = 2
         # Max number of retries for AWS instance
         Int awsMaxRetries = 5
+        # Arn string of AWS queue
+        String awsQueueArn = ""
         # Backend
         String backend = "gcp"
     }
@@ -66,6 +68,7 @@ workflow cellranger_atac_count {
             disk_space = disk_space,
             preemptible = preemptible,
             awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 
@@ -94,6 +97,7 @@ task run_cellranger_atac_count {
         Int disk_space
         Int preemptible
         Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -109,7 +113,7 @@ task run_cellranger_atac_count {
         import os
         from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
         from packaging import version
-        
+
         fastqs = []
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
             directory = re.sub('/+$', '', directory) # remove trailing slashes
@@ -126,7 +130,7 @@ task run_cellranger_atac_count {
                     os.mkdir(target)
                 call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
                 print(' '.join(call_args))
-                check_call(call_args)   
+                check_call(call_args)
             fastqs.append(target)
 
         call_args = ['cellranger-atac', 'count', '--id=results', '--reference=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local']
@@ -160,5 +164,6 @@ task run_cellranger_atac_count {
         cpu: num_cpu
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

@@ -37,6 +37,8 @@ workflow cellranger_atac_mkfastq {
         Int preemptible = 2
         # Max number of retries for AWS instance
         Int awsMaxRetries = 5
+        # Arn string of AWS queue
+        String awsQueueArn = ""
         # Backend
         String backend = "gcp"
     }
@@ -59,6 +61,7 @@ workflow cellranger_atac_mkfastq {
             disk_space = disk_space,
             preemptible = preemptible,
             awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 
@@ -87,6 +90,7 @@ task run_cellranger_atac_mkfastq {
         Int disk_space
         Int preemptible
         Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -166,5 +170,6 @@ task run_cellranger_atac_mkfastq {
         cpu: num_cpu
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

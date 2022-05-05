@@ -67,8 +67,8 @@ workflow cellranger_workflow {
         Int? crispr_barcode_pos
         # scaffold sequence for CRISPR, default is ""
         String? scaffold_sequence
-        # maximum hamming distance in feature barcodes
-        Int max_mismatch = 3
+        # maximum hamming distance in feature barcodes (change default to 2)
+        Int max_mismatch = 2
         # minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for data type crispr
         Float min_read_ratio = 0.1
 
@@ -150,6 +150,8 @@ workflow cellranger_workflow {
         Int preemptible = 2
         # Max number of retries for AWS instance
         Int awsMaxRetries = 5
+        # Arn string of AWS queue to use
+        String awsQueueArn = ""
     }
 
     # Output directory, with trailing slashes stripped
@@ -193,8 +195,9 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
-                        backend = backend
+                        awsMaxRetries = 0,
+                        backend = backend,
+                        awsQueueArn = awsQueueArn
                 }
             }
         }
@@ -219,8 +222,9 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
-                        backend = backend
+                        awsMaxRetries = 0,
+                        backend = backend,
+                        awsQueueArn = awsQueueArn
                 }
             }
         }
@@ -245,8 +249,9 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
-                        backend = backend
+                        awsMaxRetries = 0,
+                        backend = backend,
+                        awsQueueArn = awsQueueArn
                 }
             }
         }
@@ -292,8 +297,9 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = count_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
-                        backend = backend
+                        awsMaxRetries = 0,
+                        backend = backend,
+                        awsQueueArn = awsQueueArn
                 }
             }
 
@@ -328,8 +334,9 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = vdj_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
-                        backend = backend
+                        awsMaxRetries = 0,
+                        backend = backend,
+                        awsQueueArn = awsQueueArn
                 }
             }
 
@@ -367,8 +374,9 @@ workflow cellranger_workflow {
                         memory = feature_memory,
                         disk_space = feature_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
-                        backend = backend
+                        awsMaxRetries = 0,
+                        backend = backend,
+                        awsQueueArn = awsQueueArn
                 }
             }
         }
@@ -392,8 +400,9 @@ workflow cellranger_workflow {
                         memory = atac_memory,
                         disk_space = atac_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
-                        backend = backend
+                        awsMaxRetries = 0,
+                        backend = backend,
+                        awsQueueArn = awsQueueArn
                 }
             }
 
@@ -433,8 +442,9 @@ workflow cellranger_workflow {
                         memory = arc_memory,
                         disk_space = arc_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
-                        backend = backend
+                        awsMaxRetries = 0,
+                        backend = backend,
+                        awsQueueArn = awsQueueArn
                 }
             }
 
@@ -476,8 +486,9 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = count_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
-                        backend = backend
+                        awsMaxRetries = 0,
+                        backend = backend,
+                        awsQueueArn = awsQueueArn
                 }
             }
         }
@@ -506,8 +517,9 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = count_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
-                        backend = backend
+                        awsMaxRetries = 0,
+                        backend = backend,
+                        awsQueueArn = awsQueueArn
                 }
             }
 
@@ -526,7 +538,7 @@ workflow cellranger_workflow {
     }
 
     output {
-        Array[Array[String]?] fastq_outputs = [cellranger_mkfastq.output_fastqs_flowcell_directory, cellranger_atac_mkfastq.output_fastqs_flowcell_directory, cellranger_arc_mkfastq.output_fastqs_flowcell_directory]        
+        Array[Array[String]?] fastq_outputs = [cellranger_mkfastq.output_fastqs_flowcell_directory, cellranger_atac_mkfastq.output_fastqs_flowcell_directory, cellranger_arc_mkfastq.output_fastqs_flowcell_directory]
         Map[String, Array[String]?] count_outputs = {"gex": cellranger_count.output_count_directory,
                                                      "vdj": cellranger_vdj.output_vdj_directory,
                                                      "adt": cumulus_adt.output_count_directory,
