@@ -67,8 +67,8 @@ workflow cellranger_workflow {
         Int? crispr_barcode_pos
         # scaffold sequence for CRISPR, default is ""
         String? scaffold_sequence
-        # maximum hamming distance in feature barcodes
-        Int max_mismatch = 3
+        # maximum hamming distance in feature barcodes (change default to 2)
+        Int max_mismatch = 2
         # minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for data type crispr
         Float min_read_ratio = 0.1
 

@@ -26,8 +26,8 @@ workflow cumulus_adt {
         # scaffold sequence for CRISPR, default is ""
         String? scaffold_sequence
 
-        # maximum hamming distance in feature barcodes
-        Int max_mismatch = 3
+        # maximum hamming distance in feature barcodes, change default to 2.
+        Int max_mismatch = 2
         # minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for crispr
         Float min_read_ratio = 0.1
 
@@ -142,7 +142,6 @@ task run_generate_count_matrix_ADTs {
                 check_call(call_args)
             fastqs.append(target)
 
-
         # GUNZIP cell barcode file if necessary
         cell_barcodes_file = '~{cell_barcodes}'
         if cell_barcodes_file.endswith('.gz'):
@@ -166,6 +165,8 @@ task run_generate_count_matrix_ADTs {
                 call_args.append('--convert-cell-barcode')
         if '~{chemistry}' == 'SC3Pv3':
             call_args.extend(['--max-mismatch-cell', '0', '--umi-length', '12'])
+        elif '~{chemistry}' == 'multiome':
+            call_args.extend(['--max-mismatch-cell', '1', '--umi-length', '12'])
         else:
             call_args.extend(['--max-mismatch-cell', '1', '--umi-length', '10'])
         print(' '.join(call_args))

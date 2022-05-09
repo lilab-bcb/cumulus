@@ -69,6 +69,8 @@ Sample sheet
 		  - Single Cell 5′ paired-end (both R1 and R2 are used for alignment)
 		* - **SC5P-R2**
 		  - Single Cell 5′ R2-only (where only R2 is used for alignment)
+		* - **multiome**
+		  - 10x Multiome barcodes
 
 #. *DataType* column.
 
@@ -173,9 +175,9 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - "GTTTAAGAGCTAAGCTGGAA"
 		  - ""
 		* - max_mismatch
-		  - Maximum hamming distance in feature barcodes for the adt task
-		  - 3
-		  - 3
+		  - Maximum hamming distance in feature barcodes for the adt task (changed to 2 as default)
+		  - 2
+		  - 2
 		* - min_read_ratio
 		  - Minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for the adt task and crispr data type
 		  - 0.1
@@ -185,9 +187,9 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - "6.1.2"
 		  - "6.1.2"
 		* - cumulus_feature_barcoding_version
-		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0.
-		  - "0.7.0"
-		  - "0.7.0"
+		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.8.0, 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0.
+		  - "0.8.0"
+		  - "0.8.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
