@@ -15,22 +15,24 @@ RUN apt-get -qq update && \
 RUN pip3 install --upgrade pip --no-cache-dir && \
     pip3 install numpy==1.22.3 --no-cache-dir && \
     pip3 install pandas==1.4.1 --no-cache-dir && \
-    pip3 install stratocumulus==0.1.5 --no-cache-dir
+    pip3 install h5py==3.6.0 --no-cache-dir && \
+    pip3 install pegasusio==0.5.1.post1 --no-cache-dir && \
+    pip3 install stratocumulus==0.1.7 --no-cache-dir
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - && \
-    apt-get update -y && apt-get install -y google-cloud-cli=378.0.0-0
+    apt-get update -y && apt-get install -y google-cloud-cli=385.0.0-0
 
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.4.27.zip" -o "awscliv2.zip" && \
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.6.4.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install && \
     rm awscliv2.zip
 
-RUN wget https://github.com/alexdobin/STAR/archive/refs/tags/2.7.10a_alpha_220314.tar.gz && \
-    tar -xzvf 2.7.10a_alpha_220314.tar.gz && \
-    rm 2.7.10a_alpha_220314.tar.gz && \
+RUN wget https://github.com/alexdobin/STAR/archive/refs/tags/2.7.10a_alpha_220506.tar.gz && \
+    tar -xzvf 2.7.10a_alpha_220506.tar.gz && \
+    rm 2.7.10a_alpha_220506.tar.gz && \
     mkdir /software && \
-    mv STAR-2.7.10a_alpha_220314 /software/STAR && \
+    mv STAR-2.7.10a_alpha_220506 /software/STAR && \
     cd /software/STAR/source && \
     make STAR && \
     mkdir -p /software/STAR/bin && \
