@@ -16,7 +16,7 @@ RUN pip3 install --upgrade pip --no-cache-dir && \
     pip3 install numpy==1.22.3 --no-cache-dir && \
     pip3 install pandas==1.4.1 --no-cache-dir && \
     pip3 install h5py==3.6.0 --no-cache-dir && \
-    pip3 install pegasusio==0.5.1.post1 --no-cache-dir && \
+    pip3 install pegasusio==0.6.0 --no-cache-dir && \
     pip3 install stratocumulus==0.1.7 --no-cache-dir
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
@@ -44,7 +44,7 @@ RUN apt-get -qq -y remove curl gnupg wget curl && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log && \
     ln -s /usr/bin/python3 /usr/bin/python
 
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
 RUN chmod a+rx /software/monitor_script.sh
 
 ENV PATH=/software:/software/STAR/bin:$PATH
