@@ -15,7 +15,7 @@ RUN pip3 install --upgrade pip --no-cache-dir && \
     pip3 install numpy==1.21.5 --no-cache-dir && \
     pip3 install pandas==1.3.5 --no-cache-dir && \
     pip3 install h5py==3.6.0 --no-cache-dir && \
-    pip3 install pegasusio==0.6.0 --no-cache-dir && \
+    pip3 install pegasusio==0.6.1 --no-cache-dir && \
     pip3 install stratocumulus==0.1.7 --no-cache-dir
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
