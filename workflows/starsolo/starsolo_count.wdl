@@ -350,9 +350,9 @@ task run_starsolo {
         check_call(call_args)
 
         # Generate 10x h5 format output
-        def gen_10x_h5(file_path, outname):
+        def gen_10x_h5(file_path, outname, genome):
             print("Generate 10x h5 format file of "+file_path+"...")
-            data = io.read_input(file_path, genome="~{genome_name}")
+            data = io.read_input(file_path, genome=genome)
             io.write_output(data, outname+'.h5')
 
         if '~{soloFeatures}' == '':
@@ -363,9 +363,9 @@ task run_starsolo {
             prefix = "result/Solo.out/" + feature
             f_list = os.listdir(prefix)
             if 'raw' in f_list:
-                gen_10x_h5(prefix+'/raw', prefix+'/raw/'+feature)
+                gen_10x_h5(prefix+'/raw', prefix+'/raw/'+feature, "~{genome_name}")
             if 'filtered' in f_list:
-                gen_10x_h5(prefix+'/filtered', prefix+'/filtered/'+feature)
+                gen_10x_h5(prefix+'/filtered', prefix+'/filtered/'+feature, "~{genome_name}")
         CODE
 
         strato sync --backend ~{backend} -m result "~{output_directory}/~{sample_id}"
