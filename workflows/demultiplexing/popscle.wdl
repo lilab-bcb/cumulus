@@ -139,13 +139,13 @@ task popscle_task {
         from subprocess import check_call
 
         call_args = ['popscle', 'dsc-pileup', '--sam', '~{input_bam}', '--vcf', '~{ref_genotypes}', '--group-list', '~{sample_id}.barcodes.tsv', '--out', '~{sample_id}.plp']
-        if '~{tag_group}' is not '':
+        if '~{tag_group}' != '':
             call_args.extend(['--tag-group', '~{tag_group}'])
-        if '~{tag_UMI}' is not '':
+        if '~{tag_UMI}' != '':
             call_args.extend(['--tag-UMI', '~{tag_UMI}'])
-        if '~{min_MQ}' is not '':
+        if '~{min_MQ}' != '':
             call_args.extend(['--min-MQ', '~{min_MQ}'])
-        if '~{min_TD}' is not '':
+        if '~{min_TD}' != '':
             call_args.extend(['--min-TD', '~{min_TD}'])
 
         print(' '.join(call_args))
@@ -154,9 +154,9 @@ task popscle_task {
         call_args = ['popscle', '~{algorithm}', '--plp', '~{sample_id}.plp', '--out', 'result/~{sample_id}']
         if '~{algorithm}' == 'demuxlet':
             call_args.extend(['--vcf', '~{ref_genotypes}'])
-            if '~{field}' is not '':
+            if '~{field}' != '':
                 call_args.extend(['--field', '~{field}'])
-            if '~{alpha}' is not '':
+            if '~{alpha}' != '':
                 alpha_list = '~{alpha}'.split(',')
                 prefix_list = ['--alpha'] * len(alpha_list)
                 alpha_args = list(sum(list(zip(prefix_list, alpha_list)), ()))
@@ -177,7 +177,7 @@ task popscle_task {
         call_args = ['python', '/software/popscle_generate_zarr.py', cluster_result, '~{input_rna}', 'result/~{sample_id}_demux.zarr.zip', '--ref-genotypes', '~{ref_genotypes}']
         if '~{algorithm}' == 'freemuxlet':
             call_args.extend(['--cluster-genotypes', 'result/~{sample_id}.clust1.vcf.gz'])
-            if '~{donor_rename}' is not '':
+            if '~{donor_rename}' != '':
                 call_args.extend(['--donor-names', '~{donor_rename}'])
 
         print(' '.join(call_args))

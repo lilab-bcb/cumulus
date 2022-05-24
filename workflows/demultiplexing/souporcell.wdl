@@ -148,8 +148,8 @@ task run_souporcell {
 
         souporcell_call_args = ['souporcell_pipeline.py', '-i', '~{input_bam}', '-b', 'result/~{sample_id}.barcodes.tsv', '-f', 'genome_ref/fasta/genome.fa', '-t', '~{num_cpu}', '-o', 'result', '-k', '~{num_clusters}']
 
-        if '~{de_novo_mode}' is 'false':
-            assert '~{ref_genotypes}' is not ''
+        if '~{de_novo_mode}' == 'false':
+            assert '~{ref_genotypes}' != '', "Reference mode must have a reference genotype vcf file provided!"
             file_ext = '~{ref_genotypes}'.split('.')[-1]
             if file_ext == 'gz':
                 with open('ref_genotypes.vcf', 'w') as fout:
@@ -159,8 +159,8 @@ task run_souporcell {
 
             souporcell_call_args.extend(['--known_genotypes', 'ref_genotypes.vcf'])
         else:
-            assert '~{de_novo_mode}' is 'true'
-            if '~{common_variants}' is not '':
+            assert '~{de_novo_mode}' == 'true'
+            if '~{common_variants}' != '':
                 file_ext = '~{common_variants}'.split('.')[-1]
                 if file_ext == 'gz':
                     with open('common_variants.vcf', 'w') as fout:
@@ -169,8 +169,8 @@ task run_souporcell {
                     check_call(['mv', '~{common_variants}', 'common_variants.vcf'])
                 souporcell_call_args.extend(['--common_variants', 'common_variants.vcf'])
 
-        if '~{skip_remap}' is 'true':
-            if '~{de_novo_mode}' is 'true' and '~{common_variants}' is '':
+        if '~{skip_remap}' == 'true':
+            if '~{de_novo_mode}' == 'true' and '~{common_variants}' == '':
                 print("Warning: if de novo mode is true and no common variants provided, skip remap is not recommended and thus is turned off!")
             else:
                 check_call(['samtools', 'index', '-@', '~{num_cpu}', '~{input_bam}'])
@@ -233,10 +233,10 @@ task match_donors {
 
         call_args = ['python', '/opt/match_donors.py']
 
-        if '~{ref_genotypes}' is not '':
+        if '~{ref_genotypes}' != '':
             call_args.extend(['--ref-genotypes', '~{ref_genotypes}'])
 
-        if '~{donor_rename}' is not '':
+        if '~{donor_rename}' != '':
             call_args.extend(['--donor-names', '~{donor_rename}'])
 
         call_args.extend(['~{souporcell_genotypes_vcf}', '~{souporcell_cluster_tsv}', '~{input_rna}', '~{sample_id}_demux.zarr.zip'])
