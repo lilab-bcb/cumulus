@@ -116,21 +116,21 @@ task run_demuxEM {
         python <<CODE
         from subprocess import check_call
         call_args = ['demuxEM', '~{input_rna_h5}', '~{input_hto_csv}', '~{sample_id}', '-p', '~{num_cpu}']
-        if '~{genome}' is not '':
+        if '~{genome}' != '':
             call_args.extend(['--genome', '~{genome}'])
-        if '~{alpha_on_samples}' is not '':
+        if '~{alpha_on_samples}' != '':
             call_args.extend(['--alpha-on-samples', '~{alpha_on_samples}'])
-        if '~{min_num_genes}' is not '':
+        if '~{min_num_genes}' != '':
             call_args.extend(['--min-num-genes', '~{min_num_genes}'])
-        if '~{min_num_umis}' is not '':
+        if '~{min_num_umis}' != '':
             call_args.extend(['--min-num-umis', '~{min_num_umis}'])
-        if '~{min_signal_hashtag}' is not '':
+        if '~{min_signal_hashtag}' != '':
             call_args.extend(['--min-signal-hashtag', '~{min_signal_hashtag}'])
-        if '~{random_state}' is not '':
+        if '~{random_state}' != '':
             call_args.extend(['--random-state', '~{random_state}'])
-        if '~{generate_diagnostic_plots}' is 'true':
+        if '~{generate_diagnostic_plots}' == 'true':
             call_args.append('--generate-diagnostic-plots')
-        if '~{generate_gender_plot}' is not '':
+        if '~{generate_gender_plot}' != '':
             call_args.extend(['--generate-gender-plot', '~{generate_gender_plot}'])
         print(' '.join(call_args))
         check_call(call_args)

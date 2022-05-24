@@ -105,7 +105,7 @@ task run_cellranger_vdj_create_reference {
 
         call_args = ['cellranger', 'mkvdjref', '--genome=~{genome}', '--fasta=' + fa_file, '--genes=' + gtf_file]
 
-        if '~{ref_version}' is not '':
+        if '~{ref_version}' != '':
             call_args.append('--ref-version=~{ref_version}')
 
         print(' '.join(call_args))

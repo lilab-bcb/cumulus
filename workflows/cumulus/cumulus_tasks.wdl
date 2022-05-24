@@ -33,21 +33,21 @@ task run_cumulus_aggregate_matrices {
         from subprocess import check_call
 
         call_args = ['pegasus', 'aggregate_matrix', '~{input_count_matrix_csv}', '~{output_name}.aggr']
-        if '~{restrictions}' is not '':
+        if '~{restrictions}' != '':
             ress = '~{restrictions}'.split(';')
             for res in ress:
                 call_args.extend(['--restriction', res])
-        if '~{attributes}' is not '':
+        if '~{attributes}' != '':
             call_args.extend(['--attributes', '~{attributes}'])
-        if '~{default_reference}' is not '':
+        if '~{default_reference}' != '':
             call_args.extend(['--default-reference', '~{default_reference}'])
-        if '~{select_only_singlets}' is 'true':
+        if '~{select_only_singlets}' == 'true':
             call_args.append('--select-only-singlets')
-        if '~{remap_singlets}' is not '':
+        if '~{remap_singlets}' != '':
             call_args.extend(['--remap-singlets', '~{remap_singlets}'])
-        if '~{subset_singlets}' is not '':
+        if '~{subset_singlets}' != '':
             call_args.extend(['--subset-singlets', '~{subset_singlets}'])
-        if '~{minimum_number_of_genes}' is not '':
+        if '~{minimum_number_of_genes}' != '':
             call_args.extend(['--min-genes', '~{minimum_number_of_genes}'])
 
         print(' '.join(call_args))
@@ -186,162 +186,162 @@ task run_cumulus_cluster {
         from subprocess import check_call
 
         call_args = ['pegasus', 'cluster', '~{input_file}', '~{output_name}', '-p', '~{num_cpu}']
-        if '~{channel}' is not '':
+        if '~{channel}' != '':
             call_args.extend(['--channel', '~{channel}'])
-        if '~{black_list}' is not '':
+        if '~{black_list}' != '':
             call_args.extend(['--black-list', '~{black_list}'])
-        if '~{min_genes_before_filtration}' is not '':
+        if '~{min_genes_before_filtration}' != '':
             call_args.extend(['--min-genes-before-filtration', '~{min_genes_before_filtration}'])
-        if '~{select_singlets}' is 'true':
+        if '~{select_singlets}' == 'true':
             call_args.append('--select-singlets')
-        if '~{remap_singlets}' is not '':
+        if '~{remap_singlets}' != '':
             call_args.extend(['--remap-singlets', '~{remap_singlets}'])
-        if '~{subset_singlets}' is not '':
+        if '~{subset_singlets}' != '':
             call_args.extend(['--subset-singlets', '~{subset_singlets}'])
-        if '~{genome}' is not '':
+        if '~{genome}' != '':
             call_args.extend(['--genome', '~{genome}'])
-        if '~{focus}' is not '':
+        if '~{focus}' != '':
             call_args.extend(['--focus', '~{focus}'])
-        if '~{append}' is not '':
+        if '~{append}' != '':
             call_args.extend(['--append', '~{append}'])
-        if '~{output_filtration_results}' is 'true':
+        if '~{output_filtration_results}' == 'true':
             call_args.append('--output-filtration-results')
-        if '~{plot_filtration_results}' is 'true':
+        if '~{plot_filtration_results}' == 'true':
             call_args.append('--plot-filtration-results')
-        if '~{plot_filtration_figsize}' is not '':
+        if '~{plot_filtration_figsize}' != '':
             call_args.extend(['--plot-filtration-figsize', '~{plot_filtration_figsize}'])
-        if '~{output_h5ad}' is 'true':
+        if '~{output_h5ad}' == 'true':
             call_args.append('--output-h5ad')
-        if '~{output_loom}' is 'true':
+        if '~{output_loom}' == 'true':
             call_args.append('--output-loom')
-        if '~{correct_batch_effect}' is 'true':
+        if '~{correct_batch_effect}' == 'true':
             call_args.append('--correct-batch-effect')
-            if '~{correction_method}' is not '':
+            if '~{correction_method}' != '':
                 call_args.extend(['--correction-method', '~{correction_method}'])
-            if '~{batch_group_by}' is not '':
+            if '~{batch_group_by}' != '':
                 call_args.extend(['--batch-group-by', '~{batch_group_by}'])
-            if '~{correction_method}' == 'inmf' and '~{inmf_lambda}' is not '':
+            if '~{correction_method}' == 'inmf' and '~{inmf_lambda}' != '':
                 call_args.extend(['--inmf-lambda', '~{inmf_lambda}'])
-        if '~{min_genes}' is not '':
+        if '~{min_genes}' != '':
             call_args.extend(['--min-genes', '~{min_genes}'])
-        if '~{max_genes}' is not '':
+        if '~{max_genes}' != '':
             call_args.extend(['--max-genes', '~{max_genes}'])
-        if '~{min_umis}' is not '':
+        if '~{min_umis}' != '':
             call_args.extend(['--min-umis', '~{min_umis}'])
-        if '~{max_umis}' is not '':
+        if '~{max_umis}' != '':
             call_args.extend(['--max-umis', '~{max_umis}'])
-        if '~{mito_prefix}' is not '':
+        if '~{mito_prefix}' != '':
             call_args.extend(['--mito-prefix', '~{mito_prefix}'])
-        if '~{percent_mito}' is not '' :
+        if '~{percent_mito}' != '' :
             call_args.extend(['--percent-mito', '~{percent_mito}'])
-        if '~{gene_percent_cells}' is not '':
+        if '~{gene_percent_cells}' != '':
             call_args.extend(['--gene-percent-cells', '~{gene_percent_cells}'])
-        if '~{counts_per_cell_after}' is not '':
+        if '~{counts_per_cell_after}' != '':
             call_args.extend(['--counts-per-cell-after', '~{counts_per_cell_after}'])
-        if '~{random_state}' is not '':
+        if '~{random_state}' != '':
             call_args.extend(['--random-state', '~{random_state}'])
-        if '~{gene_signature_set}' is not '':
-            if '~{is_url}' is 'true':
+        if '~{gene_signature_set}' != '':
+            if '~{is_url}' == 'true':
                 call_args.extend(['--calc-signature-scores', 'gene_signature.gmt'])
             else:
                 call_args.extend(['--calc-signature-scores', '~{gene_signature_set}'])
-        if '~{no_select_hvf}' is 'true':
+        if '~{no_select_hvf}' == 'true':
             call_args.append('--no-select-hvf')
-        if '~{select_hvf_flavor}' is not '':
+        if '~{select_hvf_flavor}' != '':
             call_args.extend(['--select-hvf-flavor', '~{select_hvf_flavor}'])
-        if '~{select_hvf_ngenes}' is not '':
+        if '~{select_hvf_ngenes}' != '':
             call_args.extend(['--select-hvf-ngenes', '~{select_hvf_ngenes}'])
-        if '~{plot_hvf}' is 'true':
+        if '~{plot_hvf}' == 'true':
             call_args.append('--plot-hvf')
-        if '~{nPC}' is not '':
+        if '~{nPC}' != '':
             call_args.extend(['--pca-n', '~{nPC}'])
-        if '~{run_nmf}' is not '':
+        if '~{run_nmf}' != '':
             call_args.append('--nmf')
-        if '~{nmf_n}' is not '':
+        if '~{nmf_n}' != '':
             call_args.extend(['--nmf-n', '~{nmf_n}'])
-        if '~{knn_K}' is not '':
+        if '~{knn_K}' != '':
             call_args.extend(['--knn-K', '~{knn_K}'])
-        if '~{knn_full_speed}' is 'true':
+        if '~{knn_full_speed}' == 'true':
             call_args.append('--knn-full-speed')
-        if '~{run_diffmap}' is 'true':
+        if '~{run_diffmap}' == 'true':
             call_args.append('--diffmap')
-        if '~{diffmap_ndc}' is not '':
+        if '~{diffmap_ndc}' != '':
             call_args.extend(['--diffmap-ndc', '~{diffmap_ndc}'])
-        if '~{diffmap_maxt}' is not '':
+        if '~{diffmap_maxt}' != '':
             call_args.extend(['--diffmap-maxt', '~{diffmap_maxt}'])
-        if '~{run_louvain}' is 'true':
+        if '~{run_louvain}' == 'true':
             call_args.append('--louvain')
-        if '~{louvain_resolution}' is not '':
+        if '~{louvain_resolution}' != '':
             call_args.extend(['--louvain-resolution', '~{louvain_resolution}'])
-        if '~{louvain_class_label}' is not '':
+        if '~{louvain_class_label}' != '':
             call_args.extend(['--louvain-class-label', '~{louvain_class_label}'])
-        if '~{run_leiden}' is 'true':
+        if '~{run_leiden}' == 'true':
             call_args.append('--leiden')
-        if '~{leiden_resolution}' is not '':
+        if '~{leiden_resolution}' != '':
             call_args.extend(['--leiden-resolution', '~{leiden_resolution}'])
-        if '~{leiden_niter}' is not '':
+        if '~{leiden_niter}' != '':
             call_args.extend(['--leiden-niter', '~{leiden_niter}'])
-        if '~{leiden_class_label}' is not '':
+        if '~{leiden_class_label}' != '':
             call_args.extend(['--leiden-class-label', '~{leiden_class_label}'])
-        if '~{run_spectral_louvain}' is 'true':
+        if '~{run_spectral_louvain}' == 'true':
             call_args.append('--spectral-louvain')
-        if '~{spectral_louvain_basis}' is not '':
+        if '~{spectral_louvain_basis}' != '':
             call_args.extend(['--spectral-louvain-basis', '~{spectral_louvain_basis}'])
-        if '~{spectral_louvain_resolution}' is not '':
+        if '~{spectral_louvain_resolution}' != '':
             call_args.extend(['--spectral-louvain-resolution', '~{spectral_louvain_resolution}'])
-        if '~{spectral_louvain_class_label}' is not '':
+        if '~{spectral_louvain_class_label}' != '':
             call_args.extend(['--spectral-louvain-class-label', '~{spectral_louvain_class_label}'])
-        if '~{run_spectral_leiden}' is 'true':
+        if '~{run_spectral_leiden}' == 'true':
             call_args.append('--spectral-leiden')
-        if '~{spectral_leiden_basis}' is not '':
+        if '~{spectral_leiden_basis}' != '':
             call_args.extend(['--spectral-leiden-basis', '~{spectral_leiden_basis}'])
-        if '~{spectral_leiden_resolution}' is not '':
+        if '~{spectral_leiden_resolution}' != '':
             call_args.extend(['--spectral-leiden-resolution', '~{spectral_leiden_resolution}'])
-        if '~{spectral_leiden_class_label}' is not '':
+        if '~{spectral_leiden_class_label}' != '':
             call_args.extend(['--spectral-leiden-class-label', '~{spectral_leiden_class_label}'])
-        if '~{run_tsne}' is 'true':
+        if '~{run_tsne}' == 'true':
             call_args.append('--tsne')
-        if '~{tsne_perplexity}' is not '':
+        if '~{tsne_perplexity}' != '':
             call_args.extend(['--tsne-perplexity', '~{tsne_perplexity}'])
-        if '~{tsne_initialization}' is not '':
+        if '~{tsne_initialization}' != '':
             call_args.extend(['--tsne-initialization', '~{tsne_initialization}'])
-        if '~{run_umap}' is 'true':
+        if '~{run_umap}' == 'true':
             call_args.append('--umap')
-        if '~{umap_K}' is not '':
+        if '~{umap_K}' != '':
             call_args.extend(['--umap-K', '~{umap_K}'])
-        if '~{umap_min_dist}' is not '':
+        if '~{umap_min_dist}' != '':
             call_args.extend(['--umap-min-dist', '~{umap_min_dist}'])
-        if '~{umap_spread}' is not '':
+        if '~{umap_spread}' != '':
             call_args.extend(['--umap-spread', '~{umap_spread}'])
-        if '~{run_fle}' is 'true':
+        if '~{run_fle}' == 'true':
             call_args.append('--fle')
-        if '~{fle_K}' is not '':
+        if '~{fle_K}' != '':
             call_args.extend(['--fle-K', '~{fle_K}'])
-        if '~{fle_target_change_per_node}' is not '':
+        if '~{fle_target_change_per_node}' != '':
             call_args.extend(['--fle-target-change-per-node', '~{fle_target_change_per_node}'])
-        if '~{fle_target_steps}' is not '':
+        if '~{fle_target_steps}' != '':
             call_args.extend(['--fle-target-steps', '~{fle_target_steps}'])
-        if '~{net_down_sample_fraction}' is not '':
+        if '~{net_down_sample_fraction}' != '':
             call_args.extend(['--net-down-sample-fraction', '~{net_down_sample_fraction}'])
-        if '~{run_net_umap}' is 'true':
+        if '~{run_net_umap}' == 'true':
             call_args.append('--net-umap')
-        if '~{net_umap_out_basis}' is not '':
+        if '~{net_umap_out_basis}' != '':
             call_args.extend(['--net-umap-out-basis', '~{net_umap_out_basis}'])
-        if '~{run_net_fle}' is 'true':
+        if '~{run_net_fle}' == 'true':
             call_args.append('--net-fle')
-        if '~{net_fle_out_basis}' is not '':
+        if '~{net_fle_out_basis}' != '':
             call_args.extend(['--net-fle-out-basis', '~{net_fle_out_basis}'])
-        if '~{infer_doublets}' is 'true':
+        if '~{infer_doublets}' == 'true':
             call_args.append('--infer-doublets')
-        if '~{expected_doublet_rate}' is not '':
+        if '~{expected_doublet_rate}' != '':
             call_args.extend(['--expected-doublet-rate', '~{expected_doublet_rate}'])
-        if '~{doublet_cluster_attribute}' is not '':
+        if '~{doublet_cluster_attribute}' != '':
             call_args.extend(['--dbl-cluster-attr', '~{doublet_cluster_attribute}'])
-        if '~{citeseq}' is 'true':
+        if '~{citeseq}' == 'true':
             call_args.append('--citeseq')
-        if '~{citeseq_umap}' is 'true':
+        if '~{citeseq_umap}' == 'true':
             call_args.append('--citeseq-umap')
-        if '~{citeseq_umap_exclude}' is not '':
+        if '~{citeseq_umap_exclude}' != '':
             call_args.extend(['--citeseq-umap-exclude', '~{citeseq_umap_exclude}'])
         print(' '.join(call_args))
         check_call(call_args)
@@ -351,17 +351,17 @@ task run_cumulus_cluster {
         if output_directory != '':
             dest = output_directory + '/' + '~{output_name}' + '/'
             files = ['~{output_name}.zarr.zip', '~{output_name}.log']
-            if ('~{output_h5ad}' is 'true') or ('~{citeseq}' is 'true'):
+            if ('~{output_h5ad}' == 'true') or ('~{citeseq}' == 'true'):
                 files.extend(glob.glob('~{output_name}.*.h5ad'))
-            if '~{output_filtration_results}' is 'true':
+            if '~{output_filtration_results}' == 'true':
                 files.extend(glob.glob('~{output_name}.*.filt.xlsx'))
-            if ('~{no_select_hvf}' is not 'true') and ('~{plot_hvf}' is 'true'):
+            if ('~{no_select_hvf}' != 'true') and ('~{plot_hvf}' == 'true'):
                 files.extend(glob.glob('~{output_name}.*.hvf.pdf'))
-            if '~{plot_filtration_results}' is 'true':
+            if '~{plot_filtration_results}' == 'true':
                 files.extend(glob.glob('~{output_name}.*.filt.*.pdf'))
-            if '~{infer_doublets}' is 'true':
+            if '~{infer_doublets}' == 'true':
                 files.extend(glob.glob('~{output_name}.*.dbl.png'))
-            if '~{output_loom}' is 'true':
+            if '~{output_loom}' == 'true':
                 files.extend(glob.glob('~{output_name}.*.loom'))
             for file in files:
                 call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', file, dest]
@@ -496,42 +496,42 @@ task run_cumulus_de_analysis {
         print(' '.join(call_args))
         check_call(call_args)
         call_args = ['pegasus', 'de_analysis', '~{output_name}.h5ad', '~{output_name}.de.xlsx', '-p', '~{num_cpu}']
-        if '~{labels}' is '':
+        if '~{labels}' == '':
             call_args.extend(['--labels', 'louvain_labels'])
         else:
             call_args.extend(['--labels', '~{labels}'])
-        if '~{alpha}' is not '':
+        if '~{alpha}' != '':
             call_args.extend(['--alpha', '~{alpha}'])
-        if '~{t_test}' is 'true':
+        if '~{t_test}' == 'true':
             call_args.append('--t')
-        if '~{fisher}' is 'true':
+        if '~{fisher}' == 'true':
             call_args.append('--fisher')
         print(' '.join(call_args))
         check_call(call_args)
-        if '~{find_markers_lightgbm}' is 'true':
+        if '~{find_markers_lightgbm}' == 'true':
             call_args = ['pegasus', 'find_markers', '~{output_name}.h5ad', '~{output_name}.markers.xlsx', '-p', '~{num_cpu}']
-            if '~{labels}' is not '':
+            if '~{labels}' != '':
                 call_args.extend(['--labels', '~{labels}'])
-            if '~{remove_ribo}' is 'true':
+            if '~{remove_ribo}' == 'true':
                 call_args.append('--remove-ribo')
-            if '~{min_gain}' is not '':
+            if '~{min_gain}' != '':
                 call_args.extend(['--min-gain', '~{min_gain}'])
-            if '~{random_state}' is not '':
+            if '~{random_state}' != '':
                 call_args.extend(['--random-state', '~{random_state}'])
             print(' '.join(call_args))
             check_call(call_args)
-        if '~{annotate_cluster}' is 'true':
+        if '~{annotate_cluster}' == 'true':
             call_args = ['pegasus', 'annotate_cluster', '~{output_name}.h5ad', '~{output_name}.anno.txt']
-            if '~{organism}' is not '':
-                if '~{is_url}' is 'true':
+            if '~{organism}' != '':
+                if '~{is_url}' == 'true':
                     call_args.extend(['--markers', 'markers.json'])
                 else:
                     call_args.extend(['--markers', '~{organism}'])
-            if '~{annotate_de_test}' is not '':
+            if '~{annotate_de_test}' != '':
                 call_args.extend(['--de-test', '~{annotate_de_test}'])
-            if '~{alpha}' is not '':
+            if '~{alpha}' != '':
                 call_args.extend(['--de-alpha', '~{alpha}'])
-            if '~{minimum_report_score}' is not '':
+            if '~{minimum_report_score}' != '':
                 call_args.extend(['--minimum-report-score', '~{minimum_report_score}'])
             print(' '.join(call_args))
             check_call(call_args)
@@ -540,9 +540,9 @@ task run_cumulus_de_analysis {
         if output_directory != '':
             dest = output_directory + '/'
             files = ['~{output_name}.h5ad', '~{output_name}.de.xlsx']
-            if '~{find_markers_lightgbm}' is 'true':
+            if '~{find_markers_lightgbm}' == 'true':
                 files.append('~{output_name}.markers.xlsx')
-            if '~{annotate_cluster}' is 'true':
+            if '~{annotate_cluster}' == 'true':
                 files.append('~{output_name}.anno.txt')
             for file in files:
                 call_args = ['strato', 'cp', '--backend', '~{backend}', file, dest]
@@ -601,38 +601,38 @@ task run_cumulus_plot {
 
         python <<CODE
         from subprocess import check_call
-        if '~{plot_composition}' is not '':
+        if '~{plot_composition}' != '':
             pairs = '~{plot_composition}'.split(',')
             for pair in pairs:
                 lab, attr = pair.split(':')
                 call_args = ['pegasus', 'plot', 'compo', '--groupby', lab, '--condition', attr, '--style', 'normalized', '~{input_h5ad}', '~{output_name}.' + lab + '.' + attr + '.composition.pdf']
                 print(' '.join(call_args))
                 check_call(call_args)
-        if '~{plot_tsne}' is not '':
+        if '~{plot_tsne}' != '':
             call_args = ['pegasus', 'plot', 'scatter',  '--basis', 'tsne', '--attributes', '~{plot_tsne}', '~{input_h5ad}', '~{output_name}.tsne.pdf']
             print(' '.join(call_args))
             check_call(call_args)
-        if '~{plot_umap}' is not '':
+        if '~{plot_umap}' != '':
             call_args = ['pegasus', 'plot', 'scatter', '--basis', 'umap', '--attributes', '~{plot_umap}', '~{input_h5ad}', '~{output_name}.umap.pdf']
             print(' '.join(call_args))
             check_call(call_args)
-        if '~{plot_fle}' is not '':
+        if '~{plot_fle}' != '':
             call_args = ['pegasus', 'plot', 'scatter', '--basis', 'fle', '--attributes', '~{plot_fle}', '~{input_h5ad}', '~{output_name}.fle.pdf']
             print(' '.join(call_args))
             check_call(call_args)
-        if '~{plot_net_umap}' is not '':
+        if '~{plot_net_umap}' != '':
             call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_umap', '--attributes', '~{plot_net_umap}', '~{input_h5ad}', '~{output_name}.net.umap.pdf']
             print(' '.join(call_args))
             check_call(call_args)
-        if '~{plot_net_fle}' is not '':
+        if '~{plot_net_fle}' != '':
             call_args = ['pegasus', 'plot', 'scatter', '--basis', 'net_fle', '--attributes', '~{plot_net_fle}', '~{input_h5ad}', '~{output_name}.net.fle.pdf']
             print(' '.join(call_args))
             check_call(call_args)
-        if '~{plot_citeseq_umap}' is not '':
+        if '~{plot_citeseq_umap}' != '':
             call_args = ['pegasus', 'plot', 'scatter', '--basis', 'citeseq_umap', '--attributes', '~{plot_citeseq_umap}', '~{input_h5ad}', '~{output_name}.citeseq.umap.pdf']
             print(' '.join(call_args))
             check_call(call_args)
-        if '~{plot_nmf}' is not '':
+        if '~{plot_nmf}' != '':
             for i in range(int('~{nmf_n}')):
                 cur_factor = 'X_' + '~{plot_nmf}' + '@' + str(i)
                 call_args = ['pegasus', 'plot', 'scatter', '--basis', 'umap', '--attributes', cur_factor, '~{input_h5ad}', '~{output_name}.~{plot_nmf}_'+str(i)+'.umap.pdf']

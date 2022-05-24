@@ -183,7 +183,7 @@ task run_spaceranger_count {
         call_args = ['spaceranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local']
 
         def not_null(input_file):
-            return (input_file is not '') and (os.path.basename(input_file) != 'null')
+            return (input_file != '') and (os.path.basename(input_file) != 'null')
 
         def get_darkimages(darkimage, darkimagestr):
             darkimages = []
@@ -223,20 +223,20 @@ task run_spaceranger_count {
         else:
             call_args.append('--colorizedimage=~{colorizedimage}')
 
-        if ('~{area}' is '') and ('~{slide}' is ''):
+        if ('~{area}' == '') and ('~{slide}' == ''):
             call_args.append('--unknown-slide')
         else:
-            if '~{area}' is '':
+            if '~{area}' == '':
                 print("Please provide an input for the 'area' argument!", file = sys.stderr)
                 sys.exit(1)
-            if '~{slide}' is '':
+            if '~{slide}' == '':
                 print("Please provide an input for the 'slide' argument!", file = sys.stderr)
                 sys.exit(1)
             call_args.extend(['--area=~{area}', '--slide=~{slide}'])
             if not_null('~{slidefile}'):
                 call_args.append('--slidefile=~{slidefile}')
 
-        if '~{reorient_images}' is 'true':
+        if '~{reorient_images}' == 'true':
             call_args.append('--reorient-images')
         if not_null('~{loupe_alignment}'):
             if not has_image:
@@ -244,9 +244,9 @@ task run_spaceranger_count {
                 sys.exit(1)
             call_args.append('--loupe_alignment=~{loupe_alignment}')
 
-        if '~{no_bam}' is 'true':
+        if '~{no_bam}' == 'true':
             call_args.append('--no-bam')
-        if '~{secondary}' is not 'true':
+        if '~{secondary}' != 'true':
             call_args.append('--nosecondary')
 
         print(' '.join(call_args))
