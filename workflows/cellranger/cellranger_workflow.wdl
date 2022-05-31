@@ -28,6 +28,8 @@ workflow cellranger_workflow {
         Boolean delete_input_bcl_directory = false
         # Number of allowed mismatches per index
         Int? mkfastq_barcode_mismatches
+        # If 10x-supplied i7/i5 paired indices are specified, but the flowcell was run with only one sample index, allow the demultiplex to proceed using the i7 half of the sample index pair.
+        Boolean mkfastq_force_single_index = false
         # Only demultiplex samples identified by an i7-only sample index, ignoring dual-indexed samples.  Dual-indexed samples will not be demultiplexed.
         Boolean mkfastq_filter_single_index = false
         # Override the read lengths as specified in RunInfo.xml
@@ -185,6 +187,7 @@ workflow cellranger_workflow {
                         output_directory = output_directory_stripped,
                         delete_input_bcl_directory = delete_input_bcl_directory,
                         barcode_mismatches = mkfastq_barcode_mismatches,
+                        force_single_index = mkfastq_force_single_index,
                         filter_single_index = mkfastq_filter_single_index,
                         use_bases_mask = mkfastq_use_bases_mask,
                         delete_undetermined = mkfastq_delete_undetermined,
@@ -212,6 +215,7 @@ workflow cellranger_workflow {
                         output_directory = output_directory_stripped,
                         delete_input_bcl_directory = delete_input_bcl_directory,
                         barcode_mismatches = mkfastq_barcode_mismatches,
+                        force_single_index = mkfastq_force_single_index,
                         filter_single_index = mkfastq_filter_single_index,
                         use_bases_mask = mkfastq_use_bases_mask,
                         delete_undetermined = mkfastq_delete_undetermined,
@@ -239,6 +243,7 @@ workflow cellranger_workflow {
                         output_directory = output_directory_stripped,
                         delete_input_bcl_directory = delete_input_bcl_directory,
                         barcode_mismatches = mkfastq_barcode_mismatches,
+                        force_single_index = mkfastq_force_single_index,
                         filter_single_index = mkfastq_filter_single_index,
                         use_bases_mask = mkfastq_use_bases_mask,
                         delete_undetermined = mkfastq_delete_undetermined,

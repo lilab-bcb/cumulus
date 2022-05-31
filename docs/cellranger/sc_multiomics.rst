@@ -90,6 +90,10 @@ For single-cell multiomics data, ``cellranger_workflow`` takes Illumina outputs 
 	  - Number of mismatches allowed in matching barcode indices (bcl2fastq2 default is 1)
 	  - 0
 	  -
+	* - mkfastq_force_single_index
+	  - If 10x-supplied i7/i5 paired indices are specified, but the flowcell was run with only one sample index, allow the demultiplex to proceed using the i7 half of the sample index pair
+	  - false
+	  - false
 	* - mkfastq_filter_single_index
 	  - Only demultiplex samples identified by an i7-only sample index, ignoring dual-indexed samples. Dual-indexed samples will not be demultiplexed
 	  - false
