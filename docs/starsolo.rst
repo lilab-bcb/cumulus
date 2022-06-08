@@ -310,9 +310,9 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
       - | "BAM SortedByCoordinate" for *tenX_v3*, *tenX_v2*, *SeqWell* and *DropSeq* assay types,
         | "BAM Unsorted" otherwise.
     * - star_version
-      - STAR version to use. Currently support: ``2.7.9a``, ``2.7.10a`` (`2.7.10a_alpha_220506 <https://github.com/alexdobin/STAR/releases/tag/2.7.10a_alpha_220506>`_).
-      - "2.7.9a"
-      - "2.7.9a"
+      - STAR version to use. Currently support: ``2.7.9a``, ``2.7.10a`` (`2.7.10a_alpha_220601 <https://github.com/alexdobin/STAR/releases/tag/2.7.10a_alpha_220601>`_).
+      - "2.7.10a"
+      - "2.7.10a"
     * - docker_registry
       - Docker registry to use:
 
