@@ -155,9 +155,9 @@ For single-cell multiomics data, ``cellranger_workflow`` takes Illumina outputs 
 	  - "6.1.2"
 	  - "6.1.2"
 	* - cellranger_arc_version
-	  - cellranger-arc version, could be 2.0.0, 1.0.1, 1.0.0
-	  - "2.0.0"
-	  - "2.0.0"
+	  - cellranger-arc version, could be 2.0.1, 2.0.0, 1.0.1, 1.0.0
+	  - "2.0.1"
+	  - "2.0.1"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
