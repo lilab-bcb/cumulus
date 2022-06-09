@@ -366,9 +366,9 @@ See the table below for *star_solo* workflow outputs.
     * - Name
       - Type
       - Description
-    * - output_folder
-      - String
-      - | Google Bucket URI of output directory. Within it, each folder is for one sample in the input sample sheet.
+    * - count_outputs
+      - Array[String]
+      - | Google Bucket URI of output directories of all samples. Each folder is for one sample in the input sample sheet.
         | For the count matrices generated, taking ``Gene`` solo feature for example, they are in ``<output_folder>/<sample_id>/Solo.out/Gene/raw/`` and ``<output_folder>/<sample_id>/Solo.out/Gene/filtered/`` subfolders.
         | Inside each subfolder, there are 2 formats: ``mtx``, and ``h5`` following `10x HDF5 format`_.
     * - starsoloLogs

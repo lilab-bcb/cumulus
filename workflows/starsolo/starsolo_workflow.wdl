@@ -152,7 +152,7 @@ workflow starsolo_workflow {
 
     output {
         Array[File]? starsoloLogs = starsolo_count.starsoloLog
-        String output_folder = output_directory
+        Array[String]? count_outputs = starsolo_count.output_count_directory
     }
 
 }
