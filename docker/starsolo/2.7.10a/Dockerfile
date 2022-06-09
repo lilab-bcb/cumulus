@@ -28,11 +28,11 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.6.4.zip" -o "aw
     ./aws/install && \
     rm awscliv2.zip
 
-RUN wget https://github.com/alexdobin/STAR/archive/refs/tags/2.7.10a_alpha_220506.tar.gz && \
-    tar -xzvf 2.7.10a_alpha_220506.tar.gz && \
-    rm 2.7.10a_alpha_220506.tar.gz && \
+RUN wget https://github.com/alexdobin/STAR/archive/refs/tags/2.7.10a_alpha_220601.tar.gz && \
+    tar -xzvf 2.7.10a_alpha_220601.tar.gz && \
+    rm 2.7.10a_alpha_220601.tar.gz && \
     mkdir /software && \
-    mv STAR-2.7.10a_alpha_220506 /software/STAR && \
+    mv STAR-2.7.10a_alpha_220601 /software/STAR && \
     cd /software/STAR/source && \
     make STAR && \
     mkdir -p /software/STAR/bin && \
