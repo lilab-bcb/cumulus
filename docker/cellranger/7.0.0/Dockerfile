@@ -1,4 +1,5 @@
-FROM debian:bullseye-slim
+FROM --platform=linux/amd64 debian:bullseye-slim
+
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
