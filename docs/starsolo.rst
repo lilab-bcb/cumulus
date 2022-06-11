@@ -394,6 +394,10 @@ We've built the following scRNA-seq references for users' convenience:
       - Mouse mm10, comparable to cellranger reference 2020-A (GENCODE vM23/Ensembl 98)
     * - **GRCh38-and-mm10-2020-A**
       - Human GRCh38 (GENCODE v32/Ensembl 98) and mouse mm10 (GENCODE vM23/Ensembl 98)
+    * - **GRCh38-optimized-v1**
+      - Human GRCh38 scRNA-seq optimized transcriptome reference v1.0, introduced by `[Pool et al., bioRxiv 2022]`_.
+    * - **mm10-optimized-v1**
+      - Mouse mm10 scRNA-seq optimized transcriptome reference v1.0, introduced by `[Pool et al., bioRxiv 2022]`_.
 
 .. note::
   For **snRNA-seq** data, please choose the corresponding scRNA-seq reference above, and add ``GeneFull`` in the *soloFeatures* input.
@@ -455,9 +459,9 @@ Required inputs are highlighted **in bold**.
       - "quay.io/cumulus"
       - "quay.io/cumulus"
     * - star_version
-      - STAR version to use. Currently support: ``2.7.9a``.
-      - "2.7.9a"
-      - "2.7.9a"
+      - STAR version to use. Currently support: ``2.7.9a`` and ``2.7.10a`` (`2.7.10a_alpha_220601 <https://github.com/alexdobin/STAR/releases/tag/2.7.10a_alpha_220601>`_).
+      - "2.7.10a"
+      - "2.7.10a"
     * - num_cpu
       - Number of CPUs to request for count per sample.
       - 32
@@ -507,4 +511,5 @@ Required inputs are highlighted **in bold**.
 
 .. _Import workflows to Terra: ./cumulus_import.html
 .. _genome reference: ./starsolo.html#prebuilt-genome-references
+.. _[Pool et al., bioRxiv 2022]: https://www.biorxiv.org/content/10.1101/2022.04.26.489449v1
 .. _10x HDF5 format: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/advanced/h5_matrices
