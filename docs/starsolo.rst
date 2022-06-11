@@ -455,9 +455,9 @@ Required inputs are highlighted **in bold**.
       - "quay.io/cumulus"
       - "quay.io/cumulus"
     * - star_version
-      - STAR version to use. Currently support: ``2.7.9a``.
-      - "2.7.9a"
-      - "2.7.9a"
+      - STAR version to use. Currently support: ``2.7.9a`` and ``2.7.10a`` (`2.7.10a_alpha_220601 <https://github.com/alexdobin/STAR/releases/tag/2.7.10a_alpha_220601>`_).
+      - "2.7.10a"
+      - "2.7.10a"
     * - num_cpu
       - Number of CPUs to request for count per sample.
       - 32
