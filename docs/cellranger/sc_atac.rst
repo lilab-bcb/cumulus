@@ -131,7 +131,7 @@ Workflow input
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/common_peaks.bed"
 	  -
 	* - cellranger_atac_version
-	  - cellranger-atac version. Available options: 2.0.0, 1.2.0, 1.1.0
+	  - cellranger-atac version. Available options: 2.1.0, 2.0.0, 1.2.0, 1.1.0
 	  - "2.0.0"
 	  - "2.0.0"
 	* - docker_registry

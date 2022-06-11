@@ -45,7 +45,7 @@ workflow cellranger_workflow {
         # Expected number of recovered cells. Mutually exclusive with force_cells
         Int? expect_cells
         # If count reads mapping to intronic regions
-        Boolean include_introns = false
+        Boolean include_introns = true
         # If generate bam outputs. This is also a spaceranger argument.
         Boolean no_bam = false
         # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false.
@@ -98,11 +98,11 @@ workflow cellranger_workflow {
         # Index TSV file
         File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
 
-        # 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
+        # 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0
         String cellranger_version = "6.1.2"
         # 0.8.0, 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0
         String cumulus_feature_barcoding_version = "0.8.0"
-        # 2.0.0, 1.2.0, 1.1.0
+        # 2.1.0, 2.0.0, 1.2.0, 1.1.0
         String cellranger_atac_version = "2.0.0"
         # 2.0.1, 2.0.0, 1.0.1, 1.0.0
         String cellranger_arc_version = "2.0.1"

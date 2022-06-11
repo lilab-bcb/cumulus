@@ -94,7 +94,7 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be: ``6.1.2``, ``6.1.1``
+		  - cellranger version, could be: ``7.0.0``, ``6.1.2``, ``6.1.1``
 		  - "6.1.2"
 		  - "6.1.2"
 		* - docker_registry
@@ -213,9 +213,9 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 		  - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_atac_reference"
 		  -
 		* - cellranger_atac_version
-		  - cellranger-atac version, could be: 2.0.0, 1.2.0, 1.1.0
-		  - "2.0.0"
-		  - "2.0.0"
+		  - cellranger-atac version, could be: 2.1.0, 2.0.0, 1.2.0, 1.1.0
+		  - "2.1.0"
+		  - "2.1.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 

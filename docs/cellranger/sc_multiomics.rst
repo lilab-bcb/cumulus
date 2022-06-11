@@ -116,8 +116,8 @@ For single-cell multiomics data, ``cellranger_workflow`` takes Illumina outputs 
 	  -
 	* - include_introns
 	  - Turn this option on to also count reads mapping to intronic regions. With this option, users do not need to use pre-mRNA references. Note that if this option is set, cellranger_version must be >= 5.0.0. This option is used by *cellranger multi* and *cellranger count*.
-	  - false
-	  - false
+	  - true
+	  - true
 	* - arc_gex_exclude_introns
 	  - | Disable counting of intronic reads. In this mode, only reads that are exonic and compatible with annotated splice junctions in the reference are counted.
 	    | **Note:** using this mode will reduce the UMI counts in the feature-barcode matrix.
@@ -151,7 +151,7 @@ For single-cell multiomics data, ``cellranger_workflow`` takes Illumina outputs 
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/cmo_set.csv"
 	  -
 	* - cellranger_version
-	  - cellranger version, could be 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2
+	  - cellranger version, could be 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2
 	  - "6.1.2"
 	  - "6.1.2"
 	* - cellranger_arc_version
