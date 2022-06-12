@@ -100,8 +100,8 @@ workflow cellranger_workflow {
 
         # 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0
         String cellranger_version = "7.0.0"
-        # 0.8.0, 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0
-        String cumulus_feature_barcoding_version = "0.8.0"
+        # 0.9.0, 0.8.0, 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0
+        String cumulus_feature_barcoding_version = "0.9.0"
         # 2.1.0, 2.0.0, 1.2.0, 1.1.0
         String cellranger_atac_version = "2.1.0"
         # 2.0.1, 2.0.0, 1.0.1, 1.0.0
@@ -127,6 +127,8 @@ workflow cellranger_workflow {
         # Memory string for cellranger-atac count
         String atac_memory = "57.6G"
 
+        # Number of cpus for cumulus-adt
+        Int feature_num_cpu = 4
         # Optional memory string for cumulus_adt
         String feature_memory = "32G"
 
@@ -377,6 +379,7 @@ workflow cellranger_workflow {
                         docker_registry = docker_registry_stripped,
                         acronym_file = acronym_file,
                         zones = zones,
+                        num_cpu = feature_num_cpu,
                         memory = feature_memory,
                         disk_space = feature_disk_space,
                         preemptible = preemptible,
