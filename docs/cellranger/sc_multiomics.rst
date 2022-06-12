@@ -152,8 +152,8 @@ For single-cell multiomics data, ``cellranger_workflow`` takes Illumina outputs 
 	  -
 	* - cellranger_version
 	  - cellranger version, could be 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0
-	  - "6.1.2"
-	  - "6.1.2"
+	  - "7.0.0"
+	  - "7.0.0"
 	* - cellranger_arc_version
 	  - cellranger-arc version, could be 2.0.1, 2.0.0, 1.0.1, 1.0.0
 	  - "2.0.1"
