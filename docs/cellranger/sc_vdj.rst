@@ -119,7 +119,7 @@ For scIR-seq data, ``cellranger_workflow`` takes Illumina outputs as input and r
 	  - "auto"
 	  - "auto"
 	* - cellranger_version
-	  - cellranger version, could be 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
+	  - cellranger version, could be 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0
 	  - "6.1.2"
 	  - "6.1.2"
 	* - docker_registry
