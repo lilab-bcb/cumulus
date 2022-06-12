@@ -30,7 +30,7 @@ workflow cellranger_count {
         # Expected number of recovered cells. Mutually exclusive with force_cells
         Int? expect_cells
         # If count reads mapping to intronic regions
-        Boolean include_introns = false
+        Boolean include_introns = true
         # If generate bam outputs
         Boolean no_bam = false
         # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
@@ -245,7 +245,10 @@ task run_cellranger_count {
             call_args.append('--expect-cells=~{expect_cells}')
         if '~{include_introns}' == 'true':
             assert version.parse('~{cellranger_version}') >= version.parse('5.0.0')
-            call_args.append('--include-introns')
+            if version.parse('~{cellranger_version}') >= version.parse('7.0.0'):
+                call_args.extend(['--include-introns', '~{include_introns}'])
+            else:
+                call_args.append('--include-introns')
         if '~{no_bam}' == 'true':
             assert version.parse('~{cellranger_version}') >= version.parse('5.0.0')
             call_args.append('--no-bam')
