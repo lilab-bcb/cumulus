@@ -169,6 +169,7 @@ workflow cellranger_workflow {
         call generate_bcl_csv {
             input:
                 input_csv_file = input_csv_file,
+                output_dir = output_directory_stripped,
                 config_version = config_version,
                 docker_registry = docker_registry_stripped,
                 zones = zones,
@@ -559,6 +560,7 @@ workflow cellranger_workflow {
 task generate_bcl_csv {
     input {
         File input_csv_file
+        String output_dir
         String config_version
         String docker_registry
         String zones
@@ -577,6 +579,13 @@ task generate_bcl_csv {
         import sys
         import pandas as pd
         from collections import defaultdict
+
+        if "~{backend}" == 'gcp':
+            assert "~{output_dir}".startswith('gs://'), "Your output directory ~{output_dir} does not match ~{backend} backend"
+        elif "~{backend}" == 'aws':
+            assert "~{output_dir}".startswith('s3://'), "Your output directory ~{output_dir} does not match ~{backend} backend"
+        else:
+            assert (not "~{output_dir}".startswith('s3://')) and (not "~{output_dir}".startswith('gs://')), "Your output directory ~{output_dir} does not match ~{backend} backend"
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
         df.columns = df.columns.str.strip()
@@ -665,6 +674,13 @@ task generate_count_config {
         import sys
         import pandas as pd
         from collections import defaultdict
+
+        if "~{backend}" == 'gcp':
+            assert "~{output_dir}".startswith('gs://'), "Your output directory ~{output_dir} does not match ~{backend} backend"
+        elif "~{backend}" == 'aws':
+            assert "~{output_dir}".startswith('s3://'), "Your output directory ~{output_dir} does not match ~{backend} backend"
+        else:
+            assert (not "~{output_dir}".startswith('s3://')) and (not "~{output_dir}".startswith('gs://')), "Your output directory ~{output_dir} does not match ~{backend} backend"
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
         df.columns = df.columns.str.strip()
