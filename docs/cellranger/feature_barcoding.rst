@@ -221,6 +221,10 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - Memory size string for cellranger mkfastq
 		  - "120G"
 		  - "120G"
+		* - feature_num_cpu
+		  - Number of cpus for extracting feature count matrix
+		  - 4
+		  - 4
 		* - feature_memory
 		  - Optional memory string for extracting feature count matrix
 		  - "32G"
