@@ -28,6 +28,8 @@ workflow cellranger_workflow {
         Boolean delete_input_bcl_directory = false
         # Number of allowed mismatches per index
         Int? mkfastq_barcode_mismatches
+        # If 10x-supplied i7/i5 paired indices are specified, but the flowcell was run with only one sample index, allow the demultiplex to proceed using the i7 half of the sample index pair.
+        Boolean mkfastq_force_single_index = false
         # Only demultiplex samples identified by an i7-only sample index, ignoring dual-indexed samples.  Dual-indexed samples will not be demultiplexed.
         Boolean mkfastq_filter_single_index = false
         # Override the read lengths as specified in RunInfo.xml
@@ -43,7 +45,7 @@ workflow cellranger_workflow {
         # Expected number of recovered cells. Mutually exclusive with force_cells
         Int? expect_cells
         # If count reads mapping to intronic regions
-        Boolean include_introns = false
+        Boolean include_introns = true
         # If generate bam outputs. This is also a spaceranger argument.
         Boolean no_bam = false
         # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false.
@@ -96,12 +98,12 @@ workflow cellranger_workflow {
         # Index TSV file
         File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
 
-        # 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
-        String cellranger_version = "6.1.2"
-        # 0.8.0, 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0
-        String cumulus_feature_barcoding_version = "0.8.0"
-        # 2.0.0, 1.2.0, 1.1.0
-        String cellranger_atac_version = "2.0.0"
+        # 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0
+        String cellranger_version = "7.0.0"
+        # 0.9.0, 0.8.0, 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0
+        String cumulus_feature_barcoding_version = "0.9.0"
+        # 2.1.0, 2.0.0, 1.2.0, 1.1.0
+        String cellranger_atac_version = "2.1.0"
         # 2.0.1, 2.0.0, 1.0.1, 1.0.0
         String cellranger_arc_version = "2.0.1"
         # 0.2
@@ -125,6 +127,8 @@ workflow cellranger_workflow {
         # Memory string for cellranger-atac count
         String atac_memory = "57.6G"
 
+        # Number of cpus for cumulus-adt
+        Int feature_num_cpu = 4
         # Optional memory string for cumulus_adt
         String feature_memory = "32G"
 
@@ -167,6 +171,7 @@ workflow cellranger_workflow {
         call generate_bcl_csv {
             input:
                 input_csv_file = input_csv_file,
+                output_dir = output_directory_stripped,
                 config_version = config_version,
                 docker_registry = docker_registry_stripped,
                 zones = zones,
@@ -185,6 +190,7 @@ workflow cellranger_workflow {
                         output_directory = output_directory_stripped,
                         delete_input_bcl_directory = delete_input_bcl_directory,
                         barcode_mismatches = mkfastq_barcode_mismatches,
+                        force_single_index = mkfastq_force_single_index,
                         filter_single_index = mkfastq_filter_single_index,
                         use_bases_mask = mkfastq_use_bases_mask,
                         delete_undetermined = mkfastq_delete_undetermined,
@@ -212,6 +218,7 @@ workflow cellranger_workflow {
                         output_directory = output_directory_stripped,
                         delete_input_bcl_directory = delete_input_bcl_directory,
                         barcode_mismatches = mkfastq_barcode_mismatches,
+                        force_single_index = mkfastq_force_single_index,
                         filter_single_index = mkfastq_filter_single_index,
                         use_bases_mask = mkfastq_use_bases_mask,
                         delete_undetermined = mkfastq_delete_undetermined,
@@ -239,6 +246,7 @@ workflow cellranger_workflow {
                         output_directory = output_directory_stripped,
                         delete_input_bcl_directory = delete_input_bcl_directory,
                         barcode_mismatches = mkfastq_barcode_mismatches,
+                        force_single_index = mkfastq_force_single_index,
                         filter_single_index = mkfastq_filter_single_index,
                         use_bases_mask = mkfastq_use_bases_mask,
                         delete_undetermined = mkfastq_delete_undetermined,
@@ -371,6 +379,7 @@ workflow cellranger_workflow {
                         docker_registry = docker_registry_stripped,
                         acronym_file = acronym_file,
                         zones = zones,
+                        num_cpu = feature_num_cpu,
                         memory = feature_memory,
                         disk_space = feature_disk_space,
                         preemptible = preemptible,
@@ -554,6 +563,7 @@ workflow cellranger_workflow {
 task generate_bcl_csv {
     input {
         File input_csv_file
+        String output_dir
         String config_version
         String docker_registry
         String zones
@@ -572,6 +582,13 @@ task generate_bcl_csv {
         import sys
         import pandas as pd
         from collections import defaultdict
+
+        if "~{backend}" == 'gcp':
+            assert "~{output_dir}".startswith('gs://'), "Your output directory ~{output_dir} does not match ~{backend} backend"
+        elif "~{backend}" == 'aws':
+            assert "~{output_dir}".startswith('s3://'), "Your output directory ~{output_dir} does not match ~{backend} backend"
+        else:
+            assert (not "~{output_dir}".startswith('s3://')) and (not "~{output_dir}".startswith('gs://')), "Your output directory ~{output_dir} does not match ~{backend} backend"
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
         df.columns = df.columns.str.strip()
@@ -660,6 +677,13 @@ task generate_count_config {
         import sys
         import pandas as pd
         from collections import defaultdict
+
+        if "~{backend}" == 'gcp':
+            assert "~{output_dir}".startswith('gs://'), "Your output directory ~{output_dir} does not match ~{backend} backend"
+        elif "~{backend}" == 'aws':
+            assert "~{output_dir}".startswith('s3://'), "Your output directory ~{output_dir} does not match ~{backend} backend"
+        else:
+            assert (not "~{output_dir}".startswith('s3://')) and (not "~{output_dir}".startswith('gs://')), "Your output directory ~{output_dir} does not match ~{backend} backend"
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
         df.columns = df.columns.str.strip()
