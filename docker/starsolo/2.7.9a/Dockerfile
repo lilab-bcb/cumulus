@@ -14,13 +14,15 @@ RUN apt-get -qq update && \
 RUN pip3 install --upgrade pip --no-cache-dir && \
     pip3 install numpy==1.21.5 --no-cache-dir && \
     pip3 install pandas==1.3.5 --no-cache-dir && \
-    pip3 install stratocumulus==0.1.5 --no-cache-dir
+    pip3 install h5py==3.6.0 --no-cache-dir && \
+    pip3 install pegasusio==0.6.1 --no-cache-dir && \
+    pip3 install stratocumulus==0.1.7 --no-cache-dir
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
-    apt-get update -y && apt-get install -y google-cloud-cli=378.0.0-0
+    apt-get update -y && apt-get install -y google-cloud-cli=385.0.0-0
 
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.4.27.zip" -o "awscliv2.zip" && \
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.6.4.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install && \
     rm awscliv2.zip
@@ -37,7 +39,7 @@ RUN apt-get -qq -y remove curl gnupg wget curl && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log && \
     ln -s /usr/bin/python3 /usr/bin/python
 
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
 RUN chmod a+rx /software/monitor_script.sh
 
 ENV PATH=/software:/software/STAR/bin/Linux_x86_64:$PATH

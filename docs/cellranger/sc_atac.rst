@@ -102,6 +102,10 @@ Workflow input
 	  - Number of mismatches allowed in matching barcode indices (bcl2fastq2 default is 1)
 	  - 0
 	  -
+	* - mkfastq_force_single_index
+	  - If 10x-supplied i7/i5 paired indices are specified, but the flowcell was run with only one sample index, allow the demultiplex to proceed using the i7 half of the sample index pair
+	  - false
+	  - false
 	* - mkfastq_filter_single_index
 	  - Only demultiplex samples identified by an i7-only sample index, ignoring dual-indexed samples. Dual-indexed samples will not be demultiplexed
 	  - false
@@ -127,9 +131,9 @@ Workflow input
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/common_peaks.bed"
 	  -
 	* - cellranger_atac_version
-	  - cellranger-atac version. Available options: 2.0.0, 1.2.0, 1.1.0
-	  - "2.0.0"
-	  - "2.0.0"
+	  - cellranger-atac version. Available options: 2.1.0, 2.0.0, 1.2.0, 1.1.0
+	  - "2.1.0"
+	  - "2.1.0"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
@@ -263,10 +267,9 @@ To aggregate multiple scATAC-Seq samples, follow the instructions below:
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/common_peaks.bed"
 	  -
 	* - cellranger_atac_version
-	  - Cell Ranger ATAC version to use.
-	    Options: ``2.0.0``, ``1.2.0``, ``1.1.0``.
-	  - "2.0.0"
-	  - "2.0.0"
+	  - Cell Ranger ATAC version to use. Options: 2.1.0, 2.0.0, 1.2.0, 1.1.0.
+	  - "2.1.0"
+	  - "2.1.0"
 	* - zones
 	  - Google cloud zones
 	  - “us-central1-a us-west1-a”

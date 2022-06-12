@@ -105,7 +105,7 @@ task run_shareseq_mkfastq {
 
         python <<CODE
         from subprocess import check_call, CalledProcessError
-        if '~{delete_input_bcl_directory}' is 'true':
+        if '~{delete_input_bcl_directory}' == 'true':
             try:
                 call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_fastqs/']
                 print(' '.join(call_args))
@@ -118,7 +118,7 @@ task run_shareseq_mkfastq {
                 except CalledProcessError:
                     print("Failed to delete BCL directory.")
             except CalledProcessError:
-                print("Demultiplexing did not complete. Stop to delete BCL directory.")                
+                print("Demultiplexing did not complete. Stop to delete BCL directory.")
         CODE
     }
 

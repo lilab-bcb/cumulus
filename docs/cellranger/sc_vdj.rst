@@ -88,6 +88,10 @@ For scIR-seq data, ``cellranger_workflow`` takes Illumina outputs as input and r
 	  - Number of mismatches allowed in matching barcode indices (bcl2fastq2 default is 1)
 	  - 0
 	  -
+	* - mkfastq_force_single_index
+	  - If 10x-supplied i7/i5 paired indices are specified, but the flowcell was run with only one sample index, allow the demultiplex to proceed using the i7 half of the sample index pair
+	  - false
+	  - false
 	* - mkfastq_filter_single_index
 	  - Only demultiplex samples identified by an i7-only sample index, ignoring dual-indexed samples. Dual-indexed samples will not be demultiplexed
 	  - false
@@ -115,9 +119,9 @@ For scIR-seq data, ``cellranger_workflow`` takes Illumina outputs as input and r
 	  - "auto"
 	  - "auto"
 	* - cellranger_version
-	  - cellranger version, could be 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
-	  - "6.1.2"
-	  - "6.1.2"
+	  - cellranger version, could be 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0
+	  - "7.0.0"
+	  - "7.0.0"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 

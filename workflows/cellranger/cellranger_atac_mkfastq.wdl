@@ -13,6 +13,8 @@ workflow cellranger_atac_mkfastq {
         Boolean delete_input_bcl_directory = false
         # Number of allowed mismatches per index
         Int? barcode_mismatches
+        # If 10x-supplied i7/i5 paired indices are specified, but the flowcell was run with only one sample index, allow the demultiplex to proceed using the i7 half of the sample index pair.
+        Boolean force_single_index = false
         # Only demultiplex samples identified by an i7-only sample index, ignoring dual-indexed samples. Dual-indexed samples will not be demultiplexed.
         Boolean filter_single_index = false
         # Override the read lengths as specified in RunInfo.xml
@@ -50,6 +52,7 @@ workflow cellranger_atac_mkfastq {
             output_directory = sub(output_directory, "/+$", ""),
             delete_input_bcl_directory = delete_input_bcl_directory,
             barcode_mismatches = barcode_mismatches,
+            force_single_index = force_single_index,
             filter_single_index = filter_single_index,
             use_bases_mask = use_bases_mask,
             delete_undetermined = delete_undetermined,
@@ -79,6 +82,7 @@ task run_cellranger_atac_mkfastq {
         String output_directory
         Boolean delete_input_bcl_directory
         Int? barcode_mismatches
+        Boolean force_single_index
         Boolean filter_single_index
         String? use_bases_mask
         Boolean delete_undetermined
@@ -113,6 +117,8 @@ task run_cellranger_atac_mkfastq {
         barcode_mismatches = '~{barcode_mismatches}'
         if barcode_mismatches != '':
             mkfastq_args += ['--barcode-mismatches', barcode_mismatches]
+        if '~{force_single_index}' == 'true':
+            mkfastq_args.append('--force-single-index')
         if '~{filter_single_index}' == 'true':
             mkfastq_args.append('--filter-single-index')
         if '~{use_bases_mask}' != '':
@@ -141,7 +147,7 @@ task run_cellranger_atac_mkfastq {
 
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError
-        if '~{delete_input_bcl_directory}' is 'true':
+        if '~{delete_input_bcl_directory}' == 'true':
             try:
                 call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_atacfastqs/input_samplesheet.csv']
                 print(' '.join(call_args))

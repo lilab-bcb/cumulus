@@ -154,6 +154,10 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - Number of mismatches allowed in matching barcode indices (bcl2fastq2 default is 1)
 		  - 0
 		  -
+		* - mkfastq_force_single_index
+		  - If 10x-supplied i7/i5 paired indices are specified, but the flowcell was run with only one sample index, allow the demultiplex to proceed using the i7 half of the sample index pair
+		  - false
+		  - false
 		* - mkfastq_filter_single_index
 		  - Only demultiplex samples identified by an i7-only sample index, ignoring dual-indexed samples. Dual-indexed samples will not be demultiplexed
 		  - false
@@ -183,9 +187,9 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - 0.1
 		  - 0.1
 		* - cellranger_version
-		  - cellranger version, could be 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
-		  - "6.1.2"
-		  - "6.1.2"
+		  - cellranger version, could be 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0
+		  - "7.0.0"
+		  - "7.0.0"
 		* - cumulus_feature_barcoding_version
 		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.9.0, 0.8.0, 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0.
 		  - "0.9.0"

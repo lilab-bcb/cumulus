@@ -128,7 +128,7 @@ task run_spaceranger_mkfastq {
 
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError
-        if '~{delete_input_bcl_directory}' is 'true':
+        if '~{delete_input_bcl_directory}' == 'true':
             try:
                 call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_spatialfastqs/input_samplesheet.csv']
                 print(' '.join(call_args))

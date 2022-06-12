@@ -61,7 +61,8 @@ workflow starsolo_count {
             read2_fastq_pattern = read2_fastq_pattern,
             barcode_read = barcode_read,
             assay = assay,
-            genome = genome_file,
+            genome_file = genome_file,
+            genome_name = genome,
             output_directory = output_directory,
             outSAMtype = outSAMtype,
             soloType = soloType,
@@ -113,7 +114,8 @@ task run_starsolo {
         String read2_fastq_pattern
         String barcode_read
         String assay
-        File genome
+        File genome_file
+        String genome_name
         String output_directory
         String? outSAMtype
         String? soloType
@@ -156,13 +158,14 @@ task run_starsolo {
         monitor_script.sh > monitoring.log &
 
         mkdir genome_ref
-        tar -zxf "~{genome}" -C genome_ref --strip-components 1
-        rm "~{genome}"
+        tar -zxf "~{genome_file}" -C genome_ref --strip-components 1
+        rm "~{genome_file}"
 
         mkdir result
 
         python <<CODE
         import os, re
+        import pegasusio as io
         from fnmatch import fnmatch
         from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
 
@@ -345,6 +348,24 @@ task run_starsolo {
 
         print(' '.join(call_args))
         check_call(call_args)
+
+        # Generate 10x h5 format output
+        def gen_10x_h5(file_path, outname, genome):
+            print("Generate 10x h5 format file of "+file_path+"...")
+            data = io.read_input(file_path, genome=genome)
+            io.write_output(data, outname+'.h5')
+
+        if '~{soloFeatures}' == '':
+            feature_list = ['Gene']
+        for feature in feature_list:
+            if not feature in ['Gene', 'GeneFull', 'Velocyto']:
+                continue
+            prefix = "result/Solo.out/" + feature
+            f_list = os.listdir(prefix)
+            if 'raw' in f_list:
+                gen_10x_h5(prefix+'/raw', prefix+'/raw/'+feature, "~{genome_name}")
+            if 'filtered' in f_list:
+                gen_10x_h5(prefix+'/filtered', prefix+'/filtered/'+feature, "~{genome_name}")
         CODE
 
         strato sync --backend ~{backend} -m result "~{output_directory}/~{sample_id}"

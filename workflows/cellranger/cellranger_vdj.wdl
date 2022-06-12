@@ -134,7 +134,7 @@ task run_cellranger_vdj {
             fastqs.append(target)
 
         call_args = ['cellranger', 'vdj', '--chain=~{chain}', '--id=results', '--reference=ref_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local']
-        if '~{denovo}' is not 'false':
+        if '~{denovo}' != 'false':
             call_args.append('--denovo')
         print(' '.join(call_args))
         check_call(call_args)

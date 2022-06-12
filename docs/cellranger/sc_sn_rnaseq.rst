@@ -19,6 +19,10 @@ Sample sheet
 		  - Mouse mm10 (GENCODE vM23/Ensembl 98)
 		* - **GRCh38_and_mm10-2020-A**
 		  - Human GRCh38 (GENCODE v32/Ensembl 98) and mouse mm10 (GENCODE vM23/Ensembl 98)
+		* - **GRCh38-optimized-v1**
+		  - Human GRCh38 scRNA-seq optimized transcriptome reference v1.0, introduced by `[Pool et al. bioRxiv 2022]`_.
+		* - **mm10-optimized-v1**
+		  - Mouse mm10 scRNA-seq optimized transcriptome reference v1.0, introduced by `[Pool et al. bioRxiv 2022]`_.
 		* - **GRCh38_v3.0.0**
 		  - Human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation
 		* - **hg19_v3.0.0**
@@ -144,6 +148,10 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  - Number of mismatches allowed in matching barcode indices (bcl2fastq2 default is 1)
 		  - 0
 		  -
+		* - mkfastq_force_single_index
+		  - If 10x-supplied i7/i5 paired indices are specified, but the flowcell was run with only one sample index, allow the demultiplex to proceed using the i7 half of the sample index pair
+		  - false
+		  - false
 		* - mkfastq_filter_single_index
 		  - Only demultiplex samples identified by an i7-only sample index, ignoring dual-indexed samples. Dual-indexed samples will not be demultiplexed
 		  - false
@@ -166,8 +174,8 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  -
 		* - include_introns
 		  - Turn this option on to also count reads mapping to intronic regions. With this option, users do not need to use pre-mRNA references. Note that if this option is set, cellranger_version must be >= 5.0.0.
-		  - false
-		  - false
+		  - true
+		  - true
 		* - no_bam
 		  - Turn this option on to disable BAM file generation. This option is only available if cellranger_version >= 5.0.0.
 		  - false
@@ -177,9 +185,9 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  - false
 		  - false
 		* - cellranger_version
-		  - cellranger version, could be 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, or 2.2.0
-		  - "6.1.2"
-		  - "6.1.2"
+		  - cellranger version, could be: 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0
+		  - "7.0.0"
+		  - "7.0.0"
 		* - config_version
 		  - config docker version used for processing sample sheets, could be 0.2, 0.1
 		  - "0.2"
@@ -270,5 +278,6 @@ See the table below for important sc/snRNA-seq outputs.
 
 
 .. _Carly Ziegler: http://shaleklab.com/author/carly/
+.. _[Pool et al. bioRxiv 2022]: https://www.biorxiv.org/content/10.1101/2022.04.26.489449v1
 .. _[Kim et al. Cell 2020]: https://www.sciencedirect.com/science/article/pii/S0092867420304062
 .. _10x single cell RNA-seq sample index set names: https://support.10xgenomics.com/single-cell-gene-expression/index/doc/specifications-sample-index-sets-for-single-cell-3

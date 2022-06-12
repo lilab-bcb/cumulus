@@ -90,6 +90,10 @@ For single-cell multiomics data, ``cellranger_workflow`` takes Illumina outputs 
 	  - Number of mismatches allowed in matching barcode indices (bcl2fastq2 default is 1)
 	  - 0
 	  -
+	* - mkfastq_force_single_index
+	  - If 10x-supplied i7/i5 paired indices are specified, but the flowcell was run with only one sample index, allow the demultiplex to proceed using the i7 half of the sample index pair
+	  - false
+	  - false
 	* - mkfastq_filter_single_index
 	  - Only demultiplex samples identified by an i7-only sample index, ignoring dual-indexed samples. Dual-indexed samples will not be demultiplexed
 	  - false
@@ -112,8 +116,8 @@ For single-cell multiomics data, ``cellranger_workflow`` takes Illumina outputs 
 	  -
 	* - include_introns
 	  - Turn this option on to also count reads mapping to intronic regions. With this option, users do not need to use pre-mRNA references. Note that if this option is set, cellranger_version must be >= 5.0.0. This option is used by *cellranger multi* and *cellranger count*.
-	  - false
-	  - false
+	  - true
+	  - true
 	* - arc_gex_exclude_introns
 	  - | Disable counting of intronic reads. In this mode, only reads that are exonic and compatible with annotated splice junctions in the reference are counted.
 	    | **Note:** using this mode will reduce the UMI counts in the feature-barcode matrix.
@@ -147,13 +151,13 @@ For single-cell multiomics data, ``cellranger_workflow`` takes Illumina outputs 
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/cmo_set.csv"
 	  -
 	* - cellranger_version
-	  - cellranger version, could be 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2
-	  - "6.1.2"
-	  - "6.1.2"
+	  - cellranger version, could be 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0
+	  - "7.0.0"
+	  - "7.0.0"
 	* - cellranger_arc_version
-	  - cellranger-arc version, could be 2.0.0, 1.0.1, 1.0.0
-	  - "2.0.0"
-	  - "2.0.0"
+	  - cellranger-arc version, could be 2.0.1, 2.0.0, 1.0.1, 1.0.0
+	  - "2.0.1"
+	  - "2.0.1"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 

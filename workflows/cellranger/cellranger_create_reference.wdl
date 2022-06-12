@@ -22,8 +22,8 @@ workflow cellranger_create_reference {
 
         # Which docker registry to use
         String docker_registry = "quay.io/cumulus"
-        # 6.1.2, 6.1.1
-        String cellranger_version = "6.1.2"
+        # 7.0.0, 6.1.2, 6.1.1
+        String cellranger_version = "7.0.0"
 
         # Disk space in GB
         Int disk_space = 100
@@ -126,7 +126,7 @@ task generate_create_reference_config {
         python <<CODE
         import pandas as pd
 
-        if '~{input_sample_sheet}' is not '':
+        if '~{input_sample_sheet}' != '':
             df = pd.read_csv('~{input_sample_sheet}', header = 0, dtype = str, index_col = False, keep_default_na = False)
             df.columns = df.columns.str.strip()
             for c in df.columns:
@@ -210,7 +210,7 @@ task run_filter_gtf {
 
         output_gtf_file = input_gtf_file # in case no filtering
 
-        if '~{attributes}' is not '':
+        if '~{attributes}' != '':
             file_name += '.filt'
             output_gtf_file = file_name + '.gtf'
             call_args = ['cellranger', 'mkgtf', input_gtf_file, output_gtf_file]
@@ -221,7 +221,7 @@ task run_filter_gtf {
             check_call(call_args)
             input_gtf_file = output_gtf_file
 
-        if '~{pre_mrna}' is 'true':
+        if '~{pre_mrna}' == 'true':
             file_name += '.pre_mrna'
             output_gtf_file = file_name + '.gtf'
             call_args = ['awk', 'BEGIN\\x7BFS="\\\\t"; OFS="\\\\t"\\x7D \\x243 == "transcript" \\x7B\\x243="exon"; print\\x7D', input_gtf_file]
@@ -307,7 +307,7 @@ task run_cellranger_mkref {
                 break
 
         call_args.extend(['--nthreads=~{num_cpu}', '--memgb=' + mem_digit])
-        if '~{ref_version}' is not '':
+        if '~{ref_version}' != '':
             call_args.append('--ref-version=~{ref_version}')
 
         print(' '.join(call_args))

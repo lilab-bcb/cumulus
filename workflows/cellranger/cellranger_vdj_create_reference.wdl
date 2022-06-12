@@ -16,8 +16,8 @@ workflow cellranger_vdj_create_reference {
 
         # Which docker registry to use
         String docker_registry = "quay.io/cumulus"
-        # 6.1.2, 6.1.1
-        String cellranger_version = "6.1.2"
+        # 7.0.0, 6.1.2, 6.1.1
+        String cellranger_version = "7.0.0"
 
         # Disk space in GB
         Int disk_space = 100
@@ -105,7 +105,7 @@ task run_cellranger_vdj_create_reference {
 
         call_args = ['cellranger', 'mkvdjref', '--genome=~{genome}', '--fasta=' + fa_file, '--genes=' + gtf_file]
 
-        if '~{ref_version}' is not '':
+        if '~{ref_version}' != '':
             call_args.append('--ref-version=~{ref_version}')
 
         print(' '.join(call_args))
