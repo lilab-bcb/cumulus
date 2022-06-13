@@ -29,7 +29,7 @@ workflow cellranger_multi {
         # Expected number of recovered cells. Mutually exclusive with force_cells
         Int? expect_cells
         # If count reads mapping to intronic regions
-        Boolean include_introns = false
+        Boolean include_introns = true
         # If generate bam outputs
         Boolean no_bam = false
         # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false

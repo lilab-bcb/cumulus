@@ -8,7 +8,7 @@ workflow starsolo_create_reference {
         String output_directory
 
         String docker_registry = "quay.io/cumulus"
-        String star_version = "2.7.9a"
+        String star_version = "2.7.10a"
         Int num_cpu = 32
         Int disk_space = 100
         String memory = "80G"

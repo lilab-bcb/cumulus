@@ -131,9 +131,9 @@ Workflow input
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/common_peaks.bed"
 	  -
 	* - cellranger_atac_version
-	  - cellranger-atac version. Available options: 2.0.0, 1.2.0, 1.1.0
-	  - "2.0.0"
-	  - "2.0.0"
+	  - cellranger-atac version. Available options: 2.1.0, 2.0.0, 1.2.0, 1.1.0
+	  - "2.1.0"
+	  - "2.1.0"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
@@ -267,10 +267,9 @@ To aggregate multiple scATAC-Seq samples, follow the instructions below:
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/common_peaks.bed"
 	  -
 	* - cellranger_atac_version
-	  - Cell Ranger ATAC version to use.
-	    Options: ``2.0.0``, ``1.2.0``, ``1.1.0``.
-	  - "2.0.0"
-	  - "2.0.0"
+	  - Cell Ranger ATAC version to use. Options: 2.1.0, 2.0.0, 1.2.0, 1.1.0.
+	  - "2.1.0"
+	  - "2.1.0"
 	* - zones
 	  - Google cloud zones
 	  - “us-central1-a us-west1-a”

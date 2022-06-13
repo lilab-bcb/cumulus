@@ -38,6 +38,8 @@ workflow cumulus_adt {
 
         # Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
         String zones = "us-central1-b"
+        # Number of cpus per adt job
+        Int num_cpu = 4
         # Memory string, e.g. 32G
         String memory = "32G"
         # Disk space in GB
@@ -73,6 +75,7 @@ workflow cumulus_adt {
             cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
             docker_registry = docker_registry,
             zones = zones,
+            num_cpu = num_cpu,
             memory = memory,
             disk_space = disk_space,
             preemptible = preemptible,
@@ -103,6 +106,7 @@ task run_generate_count_matrix_ADTs {
         String cumulus_feature_barcoding_version
         String docker_registry
         String zones
+        Int num_cpu
         String memory
         Int disk_space
         Int preemptible
@@ -142,15 +146,7 @@ task run_generate_count_matrix_ADTs {
                 check_call(call_args)
             fastqs.append(target)
 
-        # GUNZIP cell barcode file if necessary
-        cell_barcodes_file = '~{cell_barcodes}'
-        if cell_barcodes_file.endswith('.gz'):
-            call_args = ['gunzip', cell_barcodes_file]
-            print(' '.join(call_args))
-            check_call(call_args)
-            cell_barcodes_file = cell_barcodes_file[:-3]
-
-        call_args = ['generate_count_matrix_ADTs', cell_barcodes_file, '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '--max-mismatch-feature', '~{max_mismatch}']
+        call_args = ['generate_count_matrix_ADTs', '~{cell_barcodes}', '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '-p', '~{num_cpu}', '--max-mismatch-feature', '~{max_mismatch}']
         if '~{data_type}' == 'crispr':
             call_args.extend(['--feature', 'crispr'])
             if '~{scaffold_sequence}' != '':
@@ -172,11 +168,6 @@ task run_generate_count_matrix_ADTs {
         print(' '.join(call_args))
         check_call(call_args)
 
-        # GZIP all stat.csv
-        for stat_file in glob.iglob('~{sample_id}.*stat.csv'):
-            call_args = ['gzip', stat_file]
-            print(' '.join(call_args))
-            check_call(call_args)
         CODE
 
         if [ -f "~{sample_id}".stat.csv.gz ]
@@ -209,7 +200,7 @@ task run_generate_count_matrix_ADTs {
         memory: memory
         bootDiskSizeGb: 12
         disks: "local-disk ~{disk_space} HDD"
-        cpu: 1
+        cpu: num_cpu
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
         queueArn: awsQueueArn

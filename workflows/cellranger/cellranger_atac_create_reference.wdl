@@ -4,8 +4,8 @@ workflow cellranger_atac_create_reference {
     input {
         # Which docker registry to use
         String docker_registry = "quay.io/cumulus"
-        # cellranger-atac version: 2.0.0, 1.2.0, 1.1.0
-        String cellranger_atac_version = "2.0.0"
+        # cellranger-atac version: 2.1.0, 2.0.0, 1.2.0, 1.1.0
+        String cellranger_atac_version = "2.1.0"
 
         # Disk space in GB
         Int disk_space = 100

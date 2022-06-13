@@ -187,13 +187,13 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - 0.1
 		  - 0.1
 		* - cellranger_version
-		  - cellranger version, could be 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0, 4.0.0, 3.1.0, 3.0.2, 2.2.0
-		  - "6.1.2"
-		  - "6.1.2"
+		  - cellranger version, could be 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0
+		  - "7.0.0"
+		  - "7.0.0"
 		* - cumulus_feature_barcoding_version
-		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.8.0, 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0.
-		  - "0.8.0"
-		  - "0.8.0"
+		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.9.0, 0.8.0, 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0.
+		  - "0.9.0"
+		  - "0.9.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -225,6 +225,10 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - Memory size string for cellranger mkfastq
 		  - "120G"
 		  - "120G"
+		* - feature_num_cpu
+		  - Number of cpus for extracting feature count matrix
+		  - 4
+		  - 4
 		* - feature_memory
 		  - Optional memory string for extracting feature count matrix
 		  - "32G"

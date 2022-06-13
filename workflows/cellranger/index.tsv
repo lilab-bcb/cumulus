@@ -1,6 +1,8 @@
 GRCh38-2020-A	gs://regev-lab/resources/cellranger/refdata-gex-GRCh38-2020-A.tar.gz
 mm10-2020-A	gs://regev-lab/resources/cellranger/refdata-gex-mm10-2020-A.tar.gz
 GRCh38_and_mm10-2020-A	gs://regev-lab/resources/cellranger/refdata-gex-GRCh38-and-mm10-2020-A.tar.gz
+GRCh38-optimized-v1	gs://regev-lab/resources/cellranger/GRCh38-optimized-v1.tar.gz
+mm10-optimized-v1	gs://regev-lab/resources/cellranger/mm10-optimized-v1.tar.gz
 GRCh38_v3.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-GRCh38-3.0.0.tar.gz
 hg19_v3.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-hg19-3.0.0.tar.gz
 mm10_v3.0.0	gs://regev-lab/resources/cellranger/refdata-cellranger-mm10-3.0.0.tar.gz
