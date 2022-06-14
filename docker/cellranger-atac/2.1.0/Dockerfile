@@ -15,7 +15,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.7.7.zip" -o "aw
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
 RUN python -m pip install --upgrade pip && \
-    python -m pip install pandas==1.3.5 && \
+    python -m pip install pandas==1.4.2 && \
     python -m pip install packaging==21.3 && \
     python -m pip install stratocumulus==0.1.5
 
