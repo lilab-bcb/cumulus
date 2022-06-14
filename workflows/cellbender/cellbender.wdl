@@ -133,6 +133,7 @@ task run_cellbender_remove_background_gpu {
     }
 
     command {
+
         cellbender remove-background \
            --input "${input_10x_h5_file_or_mtx_directory}" \
            --output "${sample_name}_out.h5" \
@@ -150,7 +151,7 @@ task run_cellbender_remove_background_gpu {
            ${"--learning-rate " + learning_rate} \
            ${true="--exclude-antibody-capture" false=" " exclude_antibody_capture}
 
-        gsutil -m cp ${sample_name}_out* ${output_directory}/${sample_name}/
+        strato cp ${sample_name}_out* ${output_directory}/${sample_name}/
     }
 
     output {
