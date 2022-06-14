@@ -154,7 +154,7 @@ task run_cellbender_remove_background_gpu {
            ~{"--learning-rate " + learning_rate} \
            ~{true="--exclude-antibody-capture" false=" " exclude_antibody_capture}
 
-        strato cp ${sample_name}_out* ~{output_directory}/${sample_name}/
+        strato cp --backend ~{backend} ${sample_name}_out* ~{output_directory}/${sample_name}/
     }
 
     output {
