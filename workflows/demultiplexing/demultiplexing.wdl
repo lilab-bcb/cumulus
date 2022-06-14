@@ -100,8 +100,8 @@ workflow demultiplexing {
         # Extra disk space (integer) in GB needed for popscle per pair
         Int popscle_extra_disk_space = 100
 
-        # Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: "0.2", "0.1"
-        String config_version = "0.2"
+        # Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: 0.3, 0.2, 0.1
+        String config_version = "0.3"
     }
 
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
@@ -109,6 +109,7 @@ workflow demultiplexing {
     call generate_demux_config as Config {
         input:
             input_sample_sheet = input_sample_sheet,
+            output_dir = output_directory_stripped,
             config_version = config_version,
             docker_registry = docker_registry,
             zones = zones,
@@ -225,6 +226,7 @@ workflow demultiplexing {
 task generate_demux_config {
     input {
         File input_sample_sheet
+        String output_dir
         String config_version
         String docker_registry
         String zones
@@ -236,6 +238,8 @@ task generate_demux_config {
     command {
         set -e
         export TMPDIR=/tmp
+
+        python /software/check_uri.py "~{backend}" "~{output_dir}"
 
         python <<CODE
         import re, sys

@@ -34,8 +34,8 @@ workflow spaceranger_workflow {
 
         # Space Ranger version: 1.3.1, 1.3.0
         String spaceranger_version = "1.3.1"
-        # Config version: 0.2
-        String config_version = "0.2"
+        # Config version
+        String config_version = "0.3"
 
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
@@ -76,6 +76,7 @@ workflow spaceranger_workflow {
         call generate_bcl_csv {
             input:
                 input_csv_file = input_csv_file,
+                output_dir = output_directory_stripped,
                 config_version = config_version,
                 docker_registry = docker_registry_stripped,
                 zones = zones,
@@ -113,6 +114,7 @@ workflow spaceranger_workflow {
         call generate_count_config {
             input:
                 input_csv_file = input_csv_file,
+                output_dir = output_directory_stripped,
                 fastq_dirs = spaceranger_mkfastq.output_fastqs_flowcell_directory,
                 config_version = config_version,
                 docker_registry = docker_registry_stripped,
@@ -179,6 +181,7 @@ workflow spaceranger_workflow {
 task generate_bcl_csv {
     input {
         File input_csv_file
+        String output_dir
         String config_version
         String docker_registry
         String zones
@@ -190,6 +193,8 @@ task generate_bcl_csv {
     command {
         set -e
         export TMPDIR=/tmp
+
+        python /software/check_uri.py "~{backend}" "~{output_dir}"
 
         python <<CODE
         import os
@@ -236,6 +241,7 @@ task generate_bcl_csv {
 task generate_count_config {
     input {
         File input_csv_file
+        String output_dir
         Array[String]? fastq_dirs
         String config_version
         String docker_registry
@@ -249,6 +255,8 @@ task generate_count_config {
     command {
         set -e
         export TMPDIR=/tmp
+
+        python /software/check_uri.py "~{backend}" "~{output_dir}"
 
         python <<CODE
         import os

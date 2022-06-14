@@ -106,8 +106,8 @@ workflow cellranger_workflow {
         String cellranger_atac_version = "2.1.0"
         # 2.0.1, 2.0.0, 1.0.1, 1.0.0
         String cellranger_arc_version = "2.0.1"
-        # 0.2
-        String config_version = "0.2"
+        # config version
+        String config_version = "0.3"
 
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
@@ -576,19 +576,14 @@ task generate_bcl_csv {
         set -e
         export TMPDIR=/tmp
 
+        python /software/check_uri.py "~{backend}" "~{output_dir}"
+
         python <<CODE
         import os
         import re
         import sys
         import pandas as pd
         from collections import defaultdict
-
-        if "~{backend}" == 'gcp':
-            assert "~{output_dir}".startswith('gs://'), "Your output directory ~{output_dir} does not match ~{backend} backend"
-        elif "~{backend}" == 'aws':
-            assert "~{output_dir}".startswith('s3://'), "Your output directory ~{output_dir} does not match ~{backend} backend"
-        else:
-            assert (not "~{output_dir}".startswith('s3://')) and (not "~{output_dir}".startswith('gs://')), "Your output directory ~{output_dir} does not match ~{backend} backend"
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
         df.columns = df.columns.str.strip()
@@ -671,19 +666,14 @@ task generate_count_config {
         set -e
         export TMPDIR=/tmp
 
+        python /software/check_uri.py "~{backend}" "~{output_dir}"
+
         python <<CODE
         import os
         import re
         import sys
         import pandas as pd
         from collections import defaultdict
-
-        if "~{backend}" == 'gcp':
-            assert "~{output_dir}".startswith('gs://'), "Your output directory ~{output_dir} does not match ~{backend} backend"
-        elif "~{backend}" == 'aws':
-            assert "~{output_dir}".startswith('s3://'), "Your output directory ~{output_dir} does not match ~{backend} backend"
-        else:
-            assert (not "~{output_dir}".startswith('s3://')) and (not "~{output_dir}".startswith('gs://')), "Your output directory ~{output_dir} does not match ~{backend} backend"
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
         df.columns = df.columns.str.strip()
