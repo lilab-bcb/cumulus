@@ -34,8 +34,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.6.4.zip" -o "aw
 ENV PATH=/home/user/miniconda/bin:$PATH
 ENV CONDA_AUTO_UPDATE_CONDA=false
 
-RUN conda install -y pytorch torchvision cudatoolkit=9.2 -c pytorch \
-&& conda install -y -c anaconda pytables \
+RUN conda install -y pytorch==1.11.0 cudatoolkit=10.2 -c pytorch \
 && conda clean -ya
 
 ENV DOCKER='true'
