@@ -5,7 +5,7 @@ workflow cellbender {
       # Sample name
       String sample_name
       # cellranger h5 file
-      File input_10x_h5_file_or_mtx_directory
+      File input_10x_h5_file
       # Outputs
       String output_directory
       # Docker image for cellbender remove-background version
@@ -45,7 +45,7 @@ workflow cellbender {
       # Boot disk space in GB needed per sample
       Int boot_disk_size_GB = 20
       # Number of maximum preemptible tries allowed
-      Int preemptible = 2
+      Int preemptible = 0
       # Number of maximum retries when running on AWS
       Int awsMaxRetries = 5
       # Arn string of AWS queue
@@ -63,7 +63,7 @@ workflow cellbender {
   call run_cellbender_remove_background_gpu {
       input:
           sample_name = sample_name,
-          input_10x_h5_file_or_mtx_directory = input_10x_h5_file_or_mtx_directory,
+          input_10x_h5_file = input_10x_h5_file,
           output_directory = output_directory,
           docker_registry = docker_registry,
           expected_cells = expected_cells,
@@ -104,7 +104,7 @@ workflow cellbender {
 task run_cellbender_remove_background_gpu {
     input {
         String sample_name
-        File input_10x_h5_file_or_mtx_directory
+        File input_10x_h5_file
         String output_directory
         String docker_registry
         String cellbender_version
@@ -135,42 +135,42 @@ task run_cellbender_remove_background_gpu {
     command {
 
         cellbender remove-background \
-           --input "${input_10x_h5_file_or_mtx_directory}" \
-           --output "${sample_name}_out.h5" \
+           --input "~{input_10x_h5_file}" \
+           --output "~{sample_name}_out.h5" \
            --cuda \
-           ${"--expected-cells " + expected_cells} \
-           ${"--total-droplets-included " + total_droplets_included} \
-           ${"--fpr " + fpr} \
-           ${"--model " + model} \
-           ${"--low-count-threshold " + low_count_threshold} \
-           ${"--epochs " + epochs} \
-           ${"--z-dim " + z_dim} \
-           ${"--z-layers " + z_layers} \
-           ${"--empty-drop-training-fraction " + empty_drop_training_fraction} \
-           ${"--blacklist-genes " + blacklist_genes} \
-           ${"--learning-rate " + learning_rate} \
-           ${true="--exclude-antibody-capture" false=" " exclude_antibody_capture}
+           ~{"--expected-cells " + expected_cells} \
+           ~{"--total-droplets-included " + total_droplets_included} \
+           ~{"--fpr " + fpr} \
+           ~{"--model " + model} \
+           ~{"--low-count-threshold " + low_count_threshold} \
+           ~{"--epochs " + epochs} \
+           ~{"--z-dim " + z_dim} \
+           ~{"--z-layers " + z_layers} \
+           ~{"--empty-drop-training-fraction " + empty_drop_training_fraction} \
+           ~{"--blacklist-genes " + blacklist_genes} \
+           ~{"--learning-rate " + learning_rate} \
+           ~{true="--exclude-antibody-capture" false=" " exclude_antibody_capture}
 
-        strato cp ${sample_name}_out* ${output_directory}/${sample_name}/
+        strato cp ${sample_name}_out* ~{output_directory}/${sample_name}/
     }
 
     output {
-        File log = "${sample_name}_out.log"
-        File pdf = "${sample_name}_out.pdf"
-        File csv = "${sample_name}_out_cell_barcodes.csv"
-        Array[File] h5_array = glob("${sample_name}_out*.h5")
-        String output_dir = "${output_directory}/${sample_name}"
+        File log = "~{sample_name}_out.log"
+        File pdf = "~{sample_name}_out.pdf"
+        File csv = "~{sample_name}_out_cell_barcodes.csv"
+        Array[File] h5_array = glob("~{sample_name}_out*.h5")
+        String output_dir = "~{output_directory}/${sample_name}"
     }
 
     runtime {
         docker: "~{docker_registry}/cellbender:~{cellbender_version}"
-        bootDiskSizeGb: "${boot_disk_size_GB}"
-        disks: "local-disk ${disk_space} HDD"
+        bootDiskSizeGb: "~{boot_disk_size_GB}"
+        disks: "local-disk ~{disk_space} HDD"
         memory: memory
         cpu: num_cpu
         zones: zones
         gpuCount: 1
-        gpuType: "${gpu_type}"
+        gpuType: "~{gpu_type}"
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
         queueArn: awsQueueArn
