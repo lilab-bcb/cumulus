@@ -1,4 +1,4 @@
-FROM debian:bullseye-slim
+FROM --platform=linux/amd64 debian:bullseye-slim
 SHELL ["/bin/bash", "-c"]
 
 ADD https://github.com/lilab-bcb/cumulus_feature_barcoding/archive/refs/tags/0.9.0.tar.gz /software/
