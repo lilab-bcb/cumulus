@@ -136,6 +136,9 @@ task run_cellbender_remove_background_gpu {
     }
 
     command {
+        set -e
+        export TMPDIR=/tmp
+        monitor_script.sh > monitoring.log &
 
         cellbender remove-background \
            --input "~{input_10x_h5_file}" \
