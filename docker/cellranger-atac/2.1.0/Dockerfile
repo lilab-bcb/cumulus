@@ -5,7 +5,7 @@ RUN apt-get update && \
     apt-get install --no-install-recommends -y alien unzip build-essential dpkg-dev curl gnupg procps python3 python3-pip && \
     echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    apt-get update && apt-get install -y google-cloud-cli=375.0.0-0
+    apt-get update && apt-get install -y google-cloud-cli=389.0.0-0
 
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.4.23.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
