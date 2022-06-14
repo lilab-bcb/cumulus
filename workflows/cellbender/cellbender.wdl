@@ -60,11 +60,14 @@ workflow cellbender {
       String backend = "gcp"
   }
 
+    # Output directory, with trailing slashes stripped
+    String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
+
   call run_cellbender_remove_background_gpu {
       input:
           sample_name = sample_name,
           input_10x_h5_file = input_10x_h5_file,
-          output_directory = output_directory,
+          output_directory = output_directory_stripped,
           docker_registry = docker_registry,
           expected_cells = expected_cells,
           total_droplets_included = total_droplets_included,
