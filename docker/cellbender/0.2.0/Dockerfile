@@ -54,6 +54,7 @@ RUN apt-get -qq -y remove curl gnupg wget curl && \
     ln -s /usr/bin/python3 /usr/bin/python
 
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
+RUN chmod a+rx /software/monitor_script.sh
 
 # Add cellbender command to PATH
-ENV PATH="~/miniconda/bin:${PATH}"
+ENV PATH=/software:~/miniconda/bin:$PATH
