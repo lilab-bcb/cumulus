@@ -134,13 +134,17 @@ task run_cellbender_remove_background_gpu {
         String backend
     }
 
+    String input_10x_h5_file_basename = basename(input_10x_h5_file)
+
     command {
         set -e
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
 
+        strato cp --backend ~{backend} ~{input_10x_h5_file} ~{input_10x_h5_file_basename}
+
         cellbender remove-background \
-           --input "~{input_10x_h5_file}" \
+           --input "~{input_10x_h5_file_basename}" \
            --output "~{sample_name}_out.h5" \
            --cuda \
            ~{"--expected-cells " + expected_cells} \
