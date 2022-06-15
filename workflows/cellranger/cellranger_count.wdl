@@ -249,6 +249,8 @@ task run_cellranger_count {
                 call_args.extend(['--include-introns', '~{include_introns}'])
             else:
                 call_args.append('--include-introns')
+        elif version.parse('~{cellranger_version}') >= version.parse('7.0.0'):
+            call_args.extend(['--include-introns', '~{include_introns}'])
         if '~{no_bam}' == 'true':
             assert version.parse('~{cellranger_version}') >= version.parse('5.0.0')
             call_args.append('--no-bam')

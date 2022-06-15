@@ -135,6 +135,7 @@ task run_cellranger_multi {
         import os
         import sys
         from subprocess import check_call, CalledProcessError, STDOUT, DEVNULL
+        from packaging import version
 
         samples = '~{input_samples}'.split(',')
         data_types = '~{input_data_types}'.split(',')
@@ -180,6 +181,8 @@ task run_cellranger_multi {
                 fout.write('expect-cells,~{expect_cells}\n')
             if '~{include_introns}' == 'true':
                 fout.write('include-introns,true\n')
+            elif version.parse('~{cellranger_version}') >= version.parse('7.0.0'):
+                fout.write('include-introns,false\n')
             if '~{secondary}' == 'false':
                 fout.write('no-secondary,true\n')
             if '~{no_bam}' == 'true':
