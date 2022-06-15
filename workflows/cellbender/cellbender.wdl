@@ -99,7 +99,6 @@ workflow cellbender {
 
   output {
     Array[String] count_outputs = run_cellbender_remove_background_gpu.output_dir
-    Array[File] monitoringLog = run_cellbender_remove_background_gpu.monitoringLog
   }
 
 }
