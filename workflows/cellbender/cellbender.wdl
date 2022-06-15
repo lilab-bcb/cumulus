@@ -60,122 +60,54 @@ workflow cellbender {
 
   # Output directory, with trailing slashes stripped
   String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
+  Array[Array[String]] output_table = read_tsv(input_csv_file)
 
-  call generate_config {
-      input:
-          input_csv_file = input_csv_file,
-          docker_registry = docker_registry,
-          zones = zones,
-          cellbender_version = cellbender_version,
-          preemptible = preemptible,
-          awsMaxRetries = awsMaxRetries,
-          backend = backend
-    } 
 
-  if (length(generate_config.sample_ids) > 0) {
-        scatter (sample_id in generate_config.sample_ids) {
-            call run_cellbender_remove_background_gpu {
-                input:
-                    sample_name = sample_id,
-                    input_10x_h5_file = generate_config.sample2dir[sample_id],
-                    output_directory = output_directory_stripped,
-                    docker_registry = docker_registry,
-                    expected_cells = expected_cells,
-                    total_droplets_included = total_droplets_included,
-                    model = model,
-                    low_count_threshold = low_count_threshold,
-                    fpr = fpr,
-                    epochs = epochs,
-                    z_dim = z_dim,
-                    z_layers = z_layers,
-                    empty_drop_training_fraction = empty_drop_training_fraction,
-                    blacklist_genes = blacklist_genes,
-                    learning_rate = learning_rate,
-                    exclude_antibody_capture = exclude_antibody_capture,
-                    zones = zones,
-                    disk_space = disk_space,
-                    cellbender_version = cellbender_version,
-                    boot_disk_size_GB = boot_disk_size_GB,
-                    num_cpu = num_cpu,
-                    memory = memory,
-                    preemptible = preemptible,
-                    awsMaxRetries = awsMaxRetries,
-                    awsQueueArn = awsQueueArn,
-                    gpu_type = gpu_type,
-                    backend = backend
-            }
+  scatter (row in output_table) {
+      call run_cellbender_remove_background_gpu {
+          input:
+              sample_name = row[0],
+              input_10x_h5_file = row[1],
+              output_directory = output_directory_stripped,
+              docker_registry = docker_registry,
+              expected_cells = expected_cells,
+              total_droplets_included = total_droplets_included,
+              model = model,
+              low_count_threshold = low_count_threshold,
+              fpr = fpr,
+              epochs = epochs,
+              z_dim = z_dim,
+              z_layers = z_layers,
+              empty_drop_training_fraction = empty_drop_training_fraction,
+              blacklist_genes = blacklist_genes,
+              learning_rate = learning_rate,
+              exclude_antibody_capture = exclude_antibody_capture,
+              zones = zones,
+              disk_space = disk_space,
+              cellbender_version = cellbender_version,
+              boot_disk_size_GB = boot_disk_size_GB,
+              num_cpu = num_cpu,
+              memory = memory,
+              preemptible = preemptible,
+              awsMaxRetries = awsMaxRetries,
+              awsQueueArn = awsQueueArn,
+              gpu_type = gpu_type,
+              backend = backend
+
         }
     }        
 
   output {
-    Array[String]? count_outputs = run_cellbender_remove_background_gpu.output_dir
-    Array[File]? monitoringLog = run_cellbender_remove_background_gpu.monitoringLog
+    Array[String] count_outputs = run_cellbender_remove_background_gpu.output_dir
+    Array[File] monitoringLog = run_cellbender_remove_background_gpu.monitoringLog
   }
 
-}    
-
-task generate_config {
-    input {
-        File input_csv_file
-        String zones
-        String cellbender_version
-        String docker_registry
-        Int preemptible
-        Int awsMaxRetries
-        String backend
-    }
-
-    command {
-        set -e
-        export TMPDIR=/tmp
-
-        python <<CODE
-        import re, sys
-        import pandas as pd
-        from subprocess import check_call
-
-        df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False, sep="\t")
-        df.columns = df.columns.str.strip()
-        for c in df.columns:
-            df[c] = df[c].str.strip()
-        
-        cellbender_cols = ["Sample","Location"]
-        for c in cellbender_cols:
-            if c not in df.columns:
-                print("To run Cellbender, following column is required: " + c + ". Please correct sample sheet.", file = sys.stderr)
-                sys.exit(1)       
-
-        regex_pat = re.compile('[^a-zA-Z0-9_-]')
-        if any(df['Sample'].str.contains(regex_pat)):
-            print('Sample must contain only alphanumeric characters, hyphens, and underscores.')
-            print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &')
-            sys.exit(1)
-
-        with open('sample_ids.txt', 'w') as fo1, open('sample2dir.txt', 'w') as fo2:
-            for sample_id in df['Sample'].unique():
-                df_local = df.loc[df['Sample'] == sample_id]
-                dirs = df_local['Location'].values
-                fo1.write(sample_id + '\n')
-                fo2.write(sample_id + '\t' + ','.join(dirs) + '\n')
-        CODE
-    }
-    output {
-        Array[String] sample_ids = read_lines('sample_ids.txt')
-        Map[String, String] sample2dir = read_map('sample2dir.txt')
-    }
-
-    runtime {
-        docker: "~{docker_registry}/cellbender:~{cellbender_version}"
-        zones: zones
-        preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
-    }    
 }
 
 task run_cellbender_remove_background_gpu {
     input {
         String sample_name
-        File input_10x_h5_file
+        String input_10x_h5_file
         String output_directory
         String docker_registry
         String cellbender_version
@@ -246,6 +178,4 @@ task run_cellbender_remove_background_gpu {
         maxRetries: if backend == "aws" then awsMaxRetries else 0
         queueArn: awsQueueArn
     }
-
 }
-
