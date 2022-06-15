@@ -58,8 +58,8 @@ workflow cellbender {
       String backend = "gcp"
   }
 
-    # Output directory, with trailing slashes stripped
-    String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
+  # Output directory, with trailing slashes stripped
+  String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
   call generate_config {
       input:
