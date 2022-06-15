@@ -2,14 +2,14 @@ version 1.0
 
 workflow cellbender {
   input {
-      # Input csv file
-      File input_csv_file
+      # Input tsv file
+      File input_tsv_file
       # Outputs
       String output_directory
       # Docker image for cellbender remove-background version
       String docker_registry = "quay.io/cumulus"
       # Cellbender version to use. Currently support: 0.2.0
-      String cellbender_version = "0.2.0"      
+      String cellbender_version = "0.2.0"
 
       # Expected cells
       Int? expected_cells
@@ -60,14 +60,14 @@ workflow cellbender {
 
   # Output directory, with trailing slashes stripped
   String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
-  Array[Array[String]] output_table = read_tsv(input_csv_file)
+  Array[Array[String]] sample_list = read_tsv(input_tsv_file)
 
 
-  scatter (row in output_table) {
+  scatter (sample in sample_list) {
       call run_cellbender_remove_background_gpu {
           input:
-              sample_name = row[0],
-              input_10x_h5_file = row[1],
+              sample_name = sample[0],
+              input_10x_h5_file = sample[1],
               output_directory = output_directory_stripped,
               docker_registry = docker_registry,
               expected_cells = expected_cells,
@@ -95,7 +95,7 @@ workflow cellbender {
               backend = backend
 
         }
-    }        
+    }
 
   output {
     Array[String] count_outputs = run_cellbender_remove_background_gpu.output_dir
@@ -157,12 +157,12 @@ task run_cellbender_remove_background_gpu {
            ~{"--learning-rate " + learning_rate} \
            ~{true="--exclude-antibody-capture" false=" " exclude_antibody_capture}
 
-        strato cp --backend ~{backend} ~{sample_name}_out* ~{output_directory}/${sample_name}/
+        strato cp --backend ~{backend} ~{sample_name}_out* ~{output_directory}/~{sample_name}/
     }
 
     output {
         File monitoringLog = "monitoring.log"
-        String output_dir = "~{output_directory}/${sample_name}"
+        String output_dir = "~{output_directory}/~{sample_name}"
     }
 
     runtime {
