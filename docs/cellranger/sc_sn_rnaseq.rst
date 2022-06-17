@@ -19,10 +19,6 @@ Sample sheet
 		  - Mouse mm10 (GENCODE vM23/Ensembl 98)
 		* - **GRCh38_and_mm10-2020-A**
 		  - Human GRCh38 (GENCODE v32/Ensembl 98) and mouse mm10 (GENCODE vM23/Ensembl 98)
-		* - **GRCh38-optimized-v1**
-		  - Human GRCh38 scRNA-seq optimized transcriptome reference v1.0, introduced by `[Pool et al. bioRxiv 2022]`_.
-		* - **mm10-optimized-v1**
-		  - Mouse mm10 scRNA-seq optimized transcriptome reference v1.0, introduced by `[Pool et al. bioRxiv 2022]`_.
 		* - **GRCh38_v3.0.0**
 		  - Human GRCh38, cellranger reference 3.0.0, Ensembl v93 gene annotation
 		* - **hg19_v3.0.0**

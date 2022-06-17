@@ -13,6 +13,10 @@ Sample sheet
 
 		* - Keyword
 		  - Description
+		* - **GRCh38_vdj_v7.0.0**
+		  - Human GRCh38 V(D)J sequences, cellranger reference 7.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
+		* - **GRCm38_vdj_v7.0.0**
+		  - Mouse GRCm38 V(D)J sequences, cellranger reference 7.0.0, annotation built from Ensembl *Mus_musculus.GRCm38.94.gtf*
 		* - **GRCh38_vdj_v5.0.0**
 		  - Human GRCh38 V(D)J sequences, cellranger reference 5.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
 		* - **GRCm38_vdj_v5.0.0**
