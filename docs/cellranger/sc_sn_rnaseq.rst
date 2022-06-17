@@ -274,6 +274,5 @@ See the table below for important sc/snRNA-seq outputs.
 
 
 .. _Carly Ziegler: http://shaleklab.com/author/carly/
-.. _[Pool et al. bioRxiv 2022]: https://www.biorxiv.org/content/10.1101/2022.04.26.489449v1
 .. _[Kim et al. Cell 2020]: https://www.sciencedirect.com/science/article/pii/S0092867420304062
 .. _10x single cell RNA-seq sample index set names: https://support.10xgenomics.com/single-cell-gene-expression/index/doc/specifications-sample-index-sets-for-single-cell-3
