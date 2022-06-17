@@ -106,7 +106,7 @@ workflow cellbender {
 task run_cellbender_remove_background_gpu {
     input {
         String sample_name
-        String input_10x_h5_file
+        File input_10x_h5_file
         String output_directory
         String docker_registry
         String cellbender_version
@@ -134,17 +134,13 @@ task run_cellbender_remove_background_gpu {
         String backend
     }
 
-    String input_10x_h5_file_basename = basename(input_10x_h5_file)
-
     command {
         set -e
         export TMPDIR=/tmp
         monitor_script.sh > monitoring.log &
 
-        strato cp --backend ~{backend} ~{input_10x_h5_file} ~{input_10x_h5_file_basename}
-
         cellbender remove-background \
-           --input "~{input_10x_h5_file_basename}" \
+           --input "~{input_10x_h5_file}" \
            --output "~{sample_name}_out.h5" \
            --cuda \
            ~{"--expected-cells " + expected_cells} \
