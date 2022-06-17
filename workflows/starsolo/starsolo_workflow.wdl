@@ -84,6 +84,8 @@ workflow starsolo_workflow {
         String awsQueueArn = ""
         # backend choose from "gcp", "aws", "local"
         String backend = "gcp"
+        # Config version
+        String config_version = "0.3"
     }
 
     # Output directory, with trailing slashes stripped
@@ -92,12 +94,13 @@ workflow starsolo_workflow {
     call generate_count_config {
         input:
             input_csv_file = input_csv_file,
+            output_dir = output_directory_stripped,
             docker_registry = docker_registry,
             zones = zones,
-            star_version = star_version,
             preemptible = preemptible,
             awsMaxRetries = awsMaxRetries,
-            backend = backend
+            backend = backend,
+            config_version = config_version,
     }
 
     if (length(generate_count_config.sample_ids) > 0) {
@@ -160,22 +163,24 @@ workflow starsolo_workflow {
 task generate_count_config {
     input {
         File input_csv_file
+        String output_dir
         String zones
-        String star_version
         String docker_registry
         Int preemptible
         Int awsMaxRetries
         String backend
+        String config_version
     }
 
     command {
         set -e
         export TMPDIR=/tmp
 
+        python /software/check_uri.py "~{backend}" "~{output_dir}"
+
         python <<CODE
         import re, sys
         import pandas as pd
-        from subprocess import check_call
 
         df = pd.read_csv('~{input_csv_file}', header = 0, dtype = str, index_col = False)
         df.columns = df.columns.str.strip()
@@ -230,7 +235,7 @@ task generate_count_config {
     }
 
     runtime {
-        docker: "~{docker_registry}/starsolo:~{star_version}"
+        docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
