@@ -1,6 +1,8 @@
 # Start from nvidia-docker image with drivers pre-installed to use a GPU
 FROM nvcr.io/nvidia/cuda:11.7.0-base-ubuntu22.04
 
+LABEL description="This docker is inspired by https://github.com/broadinstitute/CellBender/blob/master/docker/Dockerfile."
+
 # Install curl and sudo and git and miniconda and pytorch, cudatoolkit, pytables, and cellbender
 RUN apt-get update && apt-get install -y --no-install-recommends \
     curl \
