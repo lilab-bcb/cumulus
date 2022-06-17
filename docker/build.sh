@@ -41,11 +41,12 @@ then
 fi
 
 REGISTRY=$1
+PLATFORM="linux/amd64"
 
 if [ "$build" = true ]
 then
-    echo "docker build -t ${DOCKER} --pull ."
-    docker build -t "${DOCKER}" --pull .
+    echo "docker build -t ${DOCKER} --pull --platform ${PLATFORM} ."
+    docker build -t "${DOCKER}" --pull --platform "${PLATFORM}" .
 fi
 
 if [ "$push" = true ]
