@@ -2,7 +2,7 @@ version 1.0
 
 workflow cellbender {
     meta {
-        description: "This WDL is inspired by the official CellBender WDL (https://portal.firecloud.org/#methods/cellbender/remove-background/11/wdl), with adding the support of scattering over multiple samples."
+        description: "This WDL is modified from the official BSD-3-Clause licensed CellBender WDL (https://portal.firecloud.org/#methods/cellbender/remove-background/11/wdl), with adding the support of scattering over multiple samples."
     }
 
     input {
