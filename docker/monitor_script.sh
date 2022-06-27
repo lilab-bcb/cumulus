@@ -2,9 +2,19 @@
 
 declare -a TEMP=$(mktemp /temp_monitoring.XXXXXXXX)
 
+if [[ -z "${BACKEND}" ]]; then
+        backend=""
+else
+        backend=${BACKEND}
+fi
+
 function get_disk_info() {
         # df command and cromwell root field
-        df | grep cromwell_root
+        if [ "$backend" = "aws" ]; then
+                df | grep '/$'
+        else
+                df | grep cromwell_root
+        fi
 }
 
 function get_disk_usage() {
@@ -97,7 +107,12 @@ function print_summary() {
         echo \#CPU: $(nproc)
         # multiply by 10^-6 to convert KB to GB
         echo Total Memory: $(echo $(get_mem_total) 1000000 | awk '{ print $1/$2 }')G
-        echo Total Disk space: $(df -h | grep cromwell_root | awk '{ print $2}')
+
+        if [ "$backend" = "aws" ]; then
+                echo Total Disk space: $(df -h | grep '/$' | awk '{ print $2 }')
+        else
+                echo Total Disk space: $(df -h | grep cromwell_root | awk '{ print $2}')
+        fi
 }
 
 function main() {
