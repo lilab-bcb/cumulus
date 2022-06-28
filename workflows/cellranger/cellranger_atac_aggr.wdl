@@ -103,6 +103,7 @@ task run_cellranger_atac_aggr {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
         mkdir -p genome_dir
         tar xf ~{genome_file} -C genome_dir --strip-components 1

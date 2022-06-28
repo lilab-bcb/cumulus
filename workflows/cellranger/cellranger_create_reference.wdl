@@ -189,6 +189,7 @@ task run_filter_gtf {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         python <<CODE
@@ -273,6 +274,7 @@ task run_cellranger_mkref {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         python <<CODE

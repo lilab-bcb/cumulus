@@ -29,7 +29,7 @@ workflow chromap_create_reference {
         Int? kmer
         # Minimum window size
         Int? mini_win_size
-        
+
         # Output directory, URL
         String output_directory
     }
@@ -50,7 +50,7 @@ workflow chromap_create_reference {
             genome = genome,
             kmer = kmer,
             mini_win_size = mini_win_size,
-            input_fasta = input_fasta,           
+            input_fasta = input_fasta,
             output_dir = output_directory_stripped
     }
 
@@ -80,12 +80,13 @@ task run_chromap_create_reference {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
-        
+
         mkdir -p ~{genome}
 
         chromap -i ~{"-k" + kmer} ~{"-w" + mini_win_size} -r ~{input_fasta} -o ~{genome}/ref.index
-        
+
         mv ~{input_fasta} ~{genome}/ref.fa
         tar -czf ~{genome}.tar.gz ~{genome}
         strato cp --backend ~{backend} -m ~{genome}.tar.gz "~{output_dir}"/
@@ -106,6 +107,3 @@ task run_chromap_create_reference {
         maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
-
-
-

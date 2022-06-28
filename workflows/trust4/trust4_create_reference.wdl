@@ -53,7 +53,7 @@ workflow trust4_create_reference {
             annotation_gtf = annotation_gtf,
             gene_name_list = gene_name_list,
             species = species,
-            ref_name = ref_name,           
+            ref_name = ref_name,
             output_dir = output_directory_stripped
     }
 
@@ -84,8 +84,9 @@ task run_trust4_create_reference {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
-        
+
         mkdir -p ~{ref_name}
 
         python <<CODE
@@ -103,9 +104,9 @@ task run_trust4_create_reference {
         if ref_fa.endswith('.gz'):
             ref_fa = uncompress_file(ref_fa)
         if annotation_gtf.endswith('.gz'):
-            annotation_gtf = uncompress_file(annotation_gtf)     
+            annotation_gtf = uncompress_file(annotation_gtf)
 
-        with open('~{ref_name}/bcrtcr.fa', "w") as outfile1: 
+        with open('~{ref_name}/bcrtcr.fa', "w") as outfile1:
             call_args = ['perl', '/BuildDatabaseFa.pl', ref_fa, annotation_gtf, '~{gene_name_list}']
             print(' '.join(call_args))
             run(call_args, stdout = outfile1, check = True)
@@ -118,9 +119,9 @@ task run_trust4_create_reference {
         CODE
 
         tar -czf ~{ref_name}.tar.gz ~{ref_name}
-        
+
         strato cp --backend ~{backend} -m ~{ref_name}.tar.gz ~{output_dir}/
-        
+
 
     }
 
@@ -139,6 +140,3 @@ task run_trust4_create_reference {
         maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
-
-
-

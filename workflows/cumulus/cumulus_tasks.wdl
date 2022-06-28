@@ -28,6 +28,8 @@ task run_cumulus_aggregate_matrices {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
+        monitor_script.sh > monitoring.log &
 
         python <<CODE
         from subprocess import check_call
@@ -63,7 +65,8 @@ task run_cumulus_aggregate_matrices {
     }
 
     output {
-        File output_zarr = '~{output_name}.aggr.zarr.zip'
+        File output_zarr = "~{output_name}.aggr.zarr.zip"
+        File monitoringLog = "monitoring.log"
     }
 
     runtime {
@@ -176,6 +179,7 @@ task run_cumulus_cluster {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         if [ ~{is_url} == true ]; then
@@ -413,6 +417,7 @@ task run_cumulus_cirro_output {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         cirro prepare_data --out "~{output_name}".cirro ~{input_h5ad}
@@ -483,6 +488,7 @@ task run_cumulus_de_analysis {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         if [ ~{is_url} == true ]; then

@@ -105,6 +105,7 @@ task run_cellranger_vdj {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
         mkdir -p ref_dir
         tar xf ~{genome_file} -C ref_dir --strip-components 1

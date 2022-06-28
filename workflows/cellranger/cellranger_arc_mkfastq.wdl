@@ -103,6 +103,7 @@ task run_cellranger_arc_mkfastq {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
         strato cp --backend ~{backend} -r -m ~{input_bcl_directory} .
 

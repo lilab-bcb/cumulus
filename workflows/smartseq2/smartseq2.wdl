@@ -161,6 +161,8 @@ task run_rsem {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
+        monitor_script.sh > monitoring.log &
 
         mkdir -p rsem_ref
         tar xf ~{reference} -C rsem_ref --strip-components 1
@@ -185,6 +187,7 @@ task run_rsem {
         File rsem_cnt = "~{sample_name}.stat/~{sample_name}.cnt"
         File rsem_model = "~{sample_name}.stat/~{sample_name}.model"
         File rsem_theta = "~{sample_name}.stat/~{sample_name}.theta"
+        File monitoringLog = "monitoring.log"
     }
 
     runtime {
@@ -217,6 +220,8 @@ task generate_count_matrix {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
+        monitor_script.sh > monitoring.log &
 
         generate_matrix_ss2.py ~{sep=',' gene_results} ~{sep=',' count_results} count_matrix
         strato sync --backend ~{backend} -m count_matrix "~{output_directory}"/count_matrix
@@ -224,6 +229,7 @@ task generate_count_matrix {
 
     output {
         String output_count_matrix = "~{output_directory}/count_matrix"
+        File monitoringLog = "monitoring.log"
     }
 
     runtime {

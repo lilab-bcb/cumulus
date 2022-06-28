@@ -87,6 +87,7 @@ task run_shareseq_reorg {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         mkdir -p _out_reorg
