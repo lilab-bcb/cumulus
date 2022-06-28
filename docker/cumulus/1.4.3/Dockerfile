@@ -62,12 +62,12 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install harmony-pytorch==0.1.6 --no-cache-dir && \
     python -m pip install cirrocumulus==1.1.17.post1 --no-cache-dir && \
     python -m pip install annoy==1.17.0 --no-cache-dir && \
-    python -m pip install pegasusio==0.4.1 --no-cache-dir && \
+    python -m pip install pegasusio==0.6.1 --no-cache-dir && \
     python -m pip install demuxEM==0.1.6 --no-cache-dir && \
     python -m pip install forceatlas2-python==1.1 --no-cache-dir && \
     python -m pip install nmf-torch==0.1.1 --no-cache-dir && \
     python -m pip install pegasuspy==1.4.3 --no-cache-dir && \
-    python -m pip install stratocumulus==0.1.1 --no-cache-dir
+    python -m pip install stratocumulus==0.1.7 --no-cache-dir
 
 RUN apt-get -qq -y remove curl gnupg unzip && \
     apt-get -qq -y autoremove && \
@@ -75,7 +75,7 @@ RUN apt-get -qq -y remove curl gnupg unzip && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
 
 RUN mkdir /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
 RUN chmod a+rx /software/monitor_script.sh
 
 ENV PATH=/software:$PATH

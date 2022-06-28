@@ -18,19 +18,19 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install pandas==1.2.5 --no-cache-dir && \
     python -m pip install packaging==21.0 --no-cache-dir && \
-    python -m pip install stratocumulus==0.1.3 --no-cache-dir
+    python -m pip install stratocumulus==0.1.7 --no-cache-dir
 
 RUN mkdir /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseq_reorg/scripts/gzip_utils.hpp /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseq_reorg/scripts/barcode_utils.hpp /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseq_reorg/scripts/shareseq_reorg_barcodes.cpp /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseq_reorg/scripts/Makefile /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/shareseq/shareseq_reorg/scripts/gzip_utils.hpp /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/shareseq/shareseq_reorg/scripts/barcode_utils.hpp /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/shareseq/shareseq_reorg/scripts/shareseq_reorg_barcodes.cpp /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/shareseq/shareseq_reorg/scripts/Makefile /software
 RUN cd /software && make clean && make all && cd ..
 
 RUN mkdir /indices
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseq_reorg/indices/shareseq_barcode_index.csv /indices/
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/shareseq/shareseq_reorg/indices/shareseq_flanking_sequence.csv /indices/
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/shareseq/shareseq_reorg/indices/shareseq_barcode_index.csv /indices/
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/shareseq/shareseq_reorg/indices/shareseq_flanking_sequence.csv /indices/
 
 RUN apt-get -qq -y remove alien curl gnupg python3-pip unzip && \
     apt-get -qq -y autoremove && \

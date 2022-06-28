@@ -16,10 +16,10 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.4.20.zip" -o "a
 RUN pip3 install --upgrade pip && \
     pip3 install pandas==1.2.5 && \
     pip3 install packaging==21.0 && \
-    pip3 install stratocumulus==0.1.5
+    pip3 install stratocumulus==0.1.7
 
 RUN mkdir /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
 ADD cellranger-arc-2.0.1.tar.gz /software
 
 #ADD bcl2fastq2-v2-20-0-linux-x86-64.zip /software/

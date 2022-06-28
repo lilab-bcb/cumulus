@@ -17,7 +17,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.4.27.zip" -o "a
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
 RUN python -m pip install --upgrade pip --no-cache-dir && \
-    python -m pip install stratocumulus==0.1.5 --no-cache-dir
+    python -m pip install stratocumulus==0.1.7 --no-cache-dir
 
 RUN mkdir /software && \
     wget https://github.com/haowenz/chromap/archive/refs/tags/v0.1.5.zip && \
@@ -32,7 +32,7 @@ RUN apt-get -qq -y remove curl gnupg unzip wget && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
 
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
 RUN chmod a+rx /software/monitor_script.sh
 
 ENV PATH=/software:/software/chromap-0.1.5:$PATH

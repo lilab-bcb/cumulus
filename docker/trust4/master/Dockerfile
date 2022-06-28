@@ -17,7 +17,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.4.20.zip" -o "a
 RUN ln -s /usr/bin/python3 /usr/bin/python
 
 RUN python -m pip install --upgrade pip --no-cache-dir && \
-    python -m pip install stratocumulus==0.1.5 --no-cache-dir
+    python -m pip install stratocumulus==0.1.7 --no-cache-dir
 
 RUN mkdir /software && \
     git clone https://github.com/liulab-dfci/TRUST4.git && \
@@ -30,8 +30,8 @@ RUN apt-get -qq -y remove curl unzip python3-pip gnupg && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log && \
     rm -f /usr/bin/python && ln -s /usr/bin/python3 /usr/bin/python
- 
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
 RUN chmod a+rx /software/monitor_script.sh /software/TRUST4/BuildDatabaseFa.pl /software/TRUST4/BuildImgtAnnot.pl
 
 RUN ln -s /software/TRUST4/BuildDatabaseFa.pl .

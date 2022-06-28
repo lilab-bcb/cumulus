@@ -46,12 +46,12 @@ RUN pip install --upgrade pip && \
     pip install argparse==1.4.0 && \
     pip install networkx==2.5.1 && \
     pip install pegasusio==0.3.1.post2 && \
-    pip install stratocumulus==0.1.3
+    pip install stratocumulus==0.1.7
 
 RUN mkdir /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/demultiplexing/souporcell/extract_barcodes_from_rna.py /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/demultiplexing/popscle/popscle_generate_zarr.py /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/demultiplexing/souporcell/extract_barcodes_from_rna.py /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/demultiplexing/popscle/popscle_generate_zarr.py /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
 RUN chmod a+rx /software/monitor_script.sh
 
 ENV PATH=/software:$PATH
