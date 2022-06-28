@@ -64,16 +64,16 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install argparse==1.4.0 --no-cache-dir && \
     python -m pip install networkx==2.5.1 --no-cache-dir && \
     python -m pip install pegasusio==0.3.1.post2 --no-cache-dir && \
-    python -m pip install stratocumulus==0.1.3 --no-cache-dir
+    python -m pip install stratocumulus==0.1.7 --no-cache-dir
 
 RUN apt-get -qq -y remove curl gnupg wget && \
     apt-get -qq -y autoremove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
 
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/demultiplexing/souporcell/extract_barcodes_from_rna.py /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/demultiplexing/popscle/popscle_generate_zarr.py /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/demultiplexing/souporcell/extract_barcodes_from_rna.py /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/demultiplexing/popscle/popscle_generate_zarr.py /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
 RUN chmod a+rx /software/monitor_script.sh
 
 ENV PATH=/software/popscle/bin:/software:$PATH

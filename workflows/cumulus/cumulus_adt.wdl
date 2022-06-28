@@ -118,6 +118,7 @@ task run_generate_count_matrix_ADTs {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         python <<CODE

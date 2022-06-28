@@ -20,7 +20,7 @@ RUN python -m pip install --upgrade pip && \
     python -m pip install stratocumulus==0.1.7
 
 RUN mkdir /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
 ADD cellranger-atac-2.1.0.tar.gz /software
 
 RUN apt-get -qq -y autoremove && \

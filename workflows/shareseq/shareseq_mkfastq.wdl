@@ -91,6 +91,7 @@ task run_shareseq_mkfastq {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         strato sync --backend ~{backend} -m ~{input_bcl_directory} ~{run_id}

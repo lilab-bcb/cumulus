@@ -140,6 +140,7 @@ task run_cellbender_remove_background_gpu {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         cellbender remove-background \

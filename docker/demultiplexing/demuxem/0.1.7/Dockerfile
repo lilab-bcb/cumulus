@@ -48,7 +48,7 @@ RUN apt-get -qq -y remove curl gnupg && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
 
 RUN mkdir /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
 RUN chmod a+rx /software/monitor_script.sh
 
 ENV PATH=/software:$PATH

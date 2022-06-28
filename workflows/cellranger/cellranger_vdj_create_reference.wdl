@@ -79,6 +79,7 @@ task run_cellranger_vdj_create_reference {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         python <<CODE

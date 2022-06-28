@@ -75,6 +75,7 @@ task rsem_prepare_reference {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         mkdir ~{reference_name}_~{aligner}

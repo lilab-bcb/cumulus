@@ -13,8 +13,8 @@ workflow trust4 {
 
         # Keywords or a URL to a tar.gz file
         String genome
-        # Index TSV file 
-        File acronym_file        
+        # Index TSV file
+        File acronym_file
 
         # Number of cpus per trust4 job
         Int num_cpu = 8
@@ -31,7 +31,7 @@ workflow trust4 {
         String? pe_read2_fastq_pattern
         # start, end(-1 for length-1), in -1/-u files for genomic sequence
         String? read1_range
-        # start, end(-1 for length-1), in -2 files for genomic sequence 
+        # start, end(-1 for length-1), in -2 files for genomic sequence
         String? read2_range
 
         # Barcode Fastq pattern
@@ -42,7 +42,7 @@ workflow trust4 {
         File? barcode_whitelist
         # UMI Fastq pattern
         String umi_fastq_pattern = "_S*_L*_R1_001.fastq.gz"
-        # start, end(-1 for length-1), strand in a UMI is the true UMI 
+        # start, end(-1 for length-1), strand in a UMI is the true UMI
         String umi_range = "16,-1,+"
 
         # path to bam file
@@ -62,7 +62,7 @@ workflow trust4 {
         Boolean? noExtraction
         # the data is from TCR-seq or BCR-seq
         Boolean? repseq
-        # output read assignment results to the prefix_assign.out file 
+        # output read assignment results to the prefix_assign.out file
         Boolean? outputReadAssignment
 
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
@@ -74,7 +74,7 @@ workflow trust4 {
         # Number of preemptible tries
         Int preemptible = 2
         # Max number of retries for AWS instance
-        Int awsMaxRetries = 5  
+        Int awsMaxRetries = 5
     }
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
@@ -104,7 +104,7 @@ workflow trust4 {
             barcode_whitelist = barcode_whitelist,
             umi_fastq_pattern = umi_fastq_pattern,
             umi_range = umi_range,
-            input_bam = input_bam,            
+            input_bam = input_bam,
             bam_barcode_field = bam_barcode_field,
             bam_umi_field = bam_umi_field,
             bam_abnormal_unmap_flag = bam_abnormal_unmap_flag,
@@ -117,7 +117,7 @@ workflow trust4 {
             zones = zones,
             preemptible = preemptible,
             awsMaxRetries = awsMaxRetries,
-            backend = backend                                    
+            backend = backend
     }
 
 
@@ -134,7 +134,7 @@ task run_trust4 {
             String sample_id
             String? input_fastqs_directories
             String output_directory
-            File genome_file 
+            File genome_file
             Int num_cpu
             String memory
             Int disk_space
@@ -167,9 +167,10 @@ task run_trust4 {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
         mkdir -p genome_dir
-        tar xf ~{genome_file} -C genome_dir --strip-components 1   
+        tar xf ~{genome_file} -C genome_dir --strip-components 1
 
         python <<CODE
         import re
@@ -183,19 +184,19 @@ task run_trust4 {
             sys.exit("Please provide either Fastq OR BAM as input (not both)")
 
         call_args = ['run-trust4', '-f', 'genome_dir/bcrtcr.fa' ,
-                     '--ref', 'genome_dir/IMGT+C.fa','-t', '~{num_cpu}', '--od', 
+                     '--ref', 'genome_dir/IMGT+C.fa','-t', '~{num_cpu}', '--od',
                      'trust4_~{sample_id}', '-o', '~{sample_id}']
 
         if '~{input_bam}' != '':
             if '~{bam_barcode_field}' != '':
-                call_args.extend(['--barcode', '~{bam_barcode_field}'])  
+                call_args.extend(['--barcode', '~{bam_barcode_field}'])
             if '~{bam_umi_field}' != '':
                 call_args.extend(['--UMI', '~{bam_umi_field}'])
             if '~{bam_abnormal_unmap_flag}' != '':
                 call_args.extend(['--abnormalUnmapFlag', '~{bam_abnormal_unmap_flag}'])
             call_args.extend(['-b', '~{input_bam}'])
         else:
-            assert '~{input_fastqs_directories}' != '' 
+            assert '~{input_fastqs_directories}' != ''
 
             fastq_dirs = []
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
@@ -207,7 +208,7 @@ task run_trust4 {
                     check_call(strato_call_args, stdout=DEVNULL, stderr=STDOUT)
                     strato_call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]
                     print(' '.join(strato_call_args))
-                    check_call(strato_call_args)     
+                    check_call(strato_call_args)
                 except CalledProcessError:
                     if not os.path.exists(target):
                         os.mkdir(target)
@@ -226,7 +227,7 @@ task run_trust4 {
             else:
                 for se_fastq_dir in fastq_dirs:
                     call_args.extend(['-u', Path(se_fastq_dir, '~{sample_id}~{se_fastq_pattern}')])
-            
+
             if '~{read1_range}' != '':
                 call_args.extend(['--read1Range'] + '~{read1_range}'.split(','))
 
@@ -235,7 +236,7 @@ task run_trust4 {
                     call_args.extend(['--barcode', Path(barcode_fastq_dir, '~{sample_id}~{barcode_fastq_pattern}')])
 
             if '~{umi_fastq_pattern}' != '':
-                for umi_fastq_dir in fastq_dirs: 
+                for umi_fastq_dir in fastq_dirs:
                     call_args.extend(['--UMI', Path(umi_fastq_dir, '~{sample_id}~{umi_fastq_pattern}')])
 
         def uncompress_file(compressed_file):
