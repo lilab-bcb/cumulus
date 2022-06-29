@@ -1,15 +1,15 @@
-FROM debian:buster-slim
+FROM debian:bullseye-slim
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
     apt-get install -y wget build-essential curl unzip wget zlib1g-dev python3 python3-pip gnupg && \
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
-    apt-get update && apt-get install -y google-cloud-cli=378.0.0-0 && \
+    apt-get update && apt-get install -y google-cloud-cli=392.0.0-0 && \
     apt-get -qq -y autoremove && \
     apt-get clean
 
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.4.27.zip" -o "awscliv2.zip" && \
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.7.11.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install && \
     rm awscliv2.zip

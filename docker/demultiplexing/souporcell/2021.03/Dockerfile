@@ -3,15 +3,14 @@ SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
     apt-get install -y wget build-essential curl libncurses5-dev zlib1g-dev libbz2-dev liblzma-dev git unzip && \
-    apt-get install --no-install-recommends -y lsb-release gnupg && \
-    export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
-    echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    apt-get update && apt-get install -y google-cloud-sdk=357.0.0-0 && \
+    apt-get install --no-install-recommends -y gnupg && \
+    echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
+    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - && \
+    apt-get update -y && apt-get install -y google-cloud-cli=392.0.0-0 && \
     apt-get -qq -y autoremove && \
     apt-get clean
 
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.2.39.zip" -o "awscliv2.zip" && \
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.7.11.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install && \
     rm awscliv2.zip
@@ -56,8 +55,9 @@ RUN cd /opt && \
 ENV PATH=/opt/souporcell:/opt/souporcell/troublet/target/release:$PATH
 
 RUN conda install -y python=3.6.13 && \
-    conda install -y -c conda-forge numpy=1.19.5 pandas=1.1.5 scipy=1.5.3 pyvcf=0.6.8 pystan=2.19.1.1 anndata=0.7.6 zarr=2.8.3 networkx=2.5.1 && \
-    conda install -y -c bioconda pysam=0.16.0.1 pyfaidx=0.6.2 pegasusio=0.2.10
+    conda install -y -c conda-forge mamba=0.17.0 && \
+    mamba install -y -c conda-forge numpy=1.19.5 pandas=1.1.5 scipy=1.5.3 pyvcf=0.6.8 pystan=2.19.1.1 anndata=0.7.6 zarr=2.8.3 networkx=2.5.1 && \
+    mamba install -y -c bioconda pysam=0.16.0.1 pyfaidx=0.6.2 pegasusio=0.2.10
 
 RUN pip install stratocumulus==0.1.7
 
