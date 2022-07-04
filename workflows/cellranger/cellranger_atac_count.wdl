@@ -15,6 +15,10 @@ workflow cellranger_atac_count {
         # Index TSV file
         File acronym_file
 
+        # Chemistry to use. If auto full analysis will be made if ARC-v1, just the individual ATAC library from a
+        # multiome assay will be used
+        String chemistry = "auto"
+
         # Force pipeline to use this number of cells, bypassing the cell detection algorithm
         Int? force_cells
         # Choose the algorithm for dimensionality reduction prior to clustering and tsne: 'lsa' (default), 'plsa', or 'pca'.
@@ -60,6 +64,7 @@ workflow cellranger_atac_count {
             force_cells = force_cells,
             dim_reduce = dim_reduce,
             peaks = peaks,
+            chemistry = chemistry,
             cellranger_atac_version = cellranger_atac_version,
             docker_registry = docker_registry,
             zones = zones,
@@ -80,6 +85,7 @@ workflow cellranger_atac_count {
     }
 }
 
+
 task run_cellranger_atac_count {
     input {
         String sample_id
@@ -89,6 +95,7 @@ task run_cellranger_atac_count {
         Int? force_cells
         String? dim_reduce
         File? peaks
+        String chemistry
         String cellranger_atac_version
         String docker_registry
         String zones
@@ -141,6 +148,8 @@ task run_cellranger_atac_count {
         if '~{peaks}' != '':
             assert version.parse('~{cellranger_atac_version}') >= version.parse('2.0.0')
             call_args.append('--peaks=~{peaks}')
+        if '~{chemistry}.casefold() == 'ARC-v1'.casefold():
+            call_args.append('--chemistry=ARC-v1')
         print(' '.join(call_args))
         check_call(call_args)
         CODE
