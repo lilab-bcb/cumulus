@@ -16,7 +16,6 @@ workflows:
         - /.*/
       branches:
         - master
-        - sergio_dev
   - name: Spaceranger
     subclass: WDL
     publish: true
