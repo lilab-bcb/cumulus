@@ -148,7 +148,7 @@ task run_cellranger_atac_count {
         if '~{peaks}' != '':
             assert version.parse('~{cellranger_atac_version}') >= version.parse('2.0.0')
             call_args.append('--peaks=~{peaks}')
-        if '~{chemistry}.casefold() == 'ARC-v1'.casefold():
+        if '~{chemistry}'.casefold() == 'ARC-v1'.casefold():
             call_args.append('--chemistry=ARC-v1')
         print(' '.join(call_args))
         check_call(call_args)
