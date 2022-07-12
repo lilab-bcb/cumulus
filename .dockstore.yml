@@ -16,7 +16,6 @@ workflows:
         - /.*/
       branches:
         - master
-        - sergio_dev
   - name: Spaceranger
     subclass: WDL
     publish: true
@@ -169,6 +168,21 @@ workflows:
     subclass: WDL
     publish: true
     primaryDescriptorPath: /workflows/smartseq2/smartseq2_create_reference.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
+  - name: CellBender
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/cellbender/cellbender.wdl
     testParameterFiles:
       - /test/dummy.json
     authors:
