@@ -209,4 +209,4 @@ See the table below for important scIR-seq outputs.
 	  - Task output. A excel spreadsheet containing QCs for each sample.
 
 
-.. _10x single cell V(D)J sample index set names: https://support.10xgenomics.com/single-cell-vdj/sequencing/doc/specifications-sample-index-sets-for-single-cell-vdj
+.. _10x single cell V(D)J sample index set names: https://www.10xgenomics.com/support/single-cell-immune-profiling/documentation/steps/sequencing/sample-index-sets-for-single-cell-immune-profiling
