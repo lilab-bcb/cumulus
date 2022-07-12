@@ -402,6 +402,7 @@ workflow cellranger_workflow {
                         force_cells = force_cells,
                         dim_reduce = atac_dim_reduce,
                         peaks = peaks,
+                        chemistry = generate_count_config.sample2chemistry[sample_id],
                         cellranger_atac_version = cellranger_atac_version,
                         docker_registry = docker_registry_stripped,
                         zones = zones,
@@ -797,7 +798,7 @@ task generate_count_config {
                     foo5.write(sample_id + '\t' + feature_barcode_file + '\n')
                     n_fbf += 1
 
-                if datatype in ['rna', 'adt', 'citeseq', 'hashing', 'cmo', 'crispr']:
+                if datatype in ['rna', 'adt', 'citeseq', 'hashing', 'cmo', 'crispr', 'atac']:
                     if df_local['Chemistry'].unique().size > 1:
                         print("Detected multiple chemistry strings for sample " + sample_id + "!", file = sys.stderr)
                         sys.exit(1)
