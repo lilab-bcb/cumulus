@@ -50,8 +50,7 @@ Sample sheet
 
 #. *Chemistry* column.
 
-	By default is **auto**, which will not specify a given chemistry.  To analyze just the individual ATAC library from
-    a multiome assay using cellranger-atac countm, use ARC-v1 in the Chemistry column.
+	By default is **auto**, which will not specify a given chemistry. To analyze just the individual ATAC library from a 10x multiome assay using cellranger-atac count, use ``ARC-v1`` in the Chemistry column.
 
 #. *DataType* column.
 
