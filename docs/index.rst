@@ -25,6 +25,7 @@ Release Highlights in Current Stable
    spaceranger
    starsolo
    demultiplexing
+   cellbender
    cumulus
    command_line
    examples/index

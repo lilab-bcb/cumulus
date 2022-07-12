@@ -101,7 +101,7 @@ workflow cellbender {
     }
 
     output {
-        Array[String] count_outputs = run_cellbender_remove_background_gpu.output_dir
+        Array[String] cellbender_outputs = run_cellbender_remove_background_gpu.output_dir
     }
 
 }
