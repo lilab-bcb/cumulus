@@ -18,6 +18,7 @@
 * *CellRanger*: For **antibody/hashing/citeseq/crispr** data,
 
     * *cumulus_feature_barcoding* v0.9.0+ now supports multi-threading and faster gzip file I/O.
+* Workflows check if ``output_directory`` is a valid Cloud URI based on the given ``backend`` value before execution. (Feature request `#322 <https://github.com/lilab-bcb/cumulus/issues/322>`_ )
 
 **Updates:**
 
