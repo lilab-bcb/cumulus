@@ -376,7 +376,7 @@ task run_cumulus_cluster {
 
     output {
         File output_zarr = "~{output_name}.zarr.zip"
-        Array[File] output_h5ad = glob("~{output_name}.*.h5ad")
+        Array[File] output_h5ad_file = glob("~{output_name}.*.h5ad")
         Array[File] output_filt_xlsx = glob("~{output_name}.*.filt.xlsx")
         Array[File] output_filt_plot = glob("~{output_name}.*.filt.*.pdf")
         Array[File] output_hvf_plot = glob("~{output_name}.*.hvf.pdf")

@@ -386,8 +386,8 @@ workflow cumulus {
             backend = backend
     }
 
-    if (length(cluster.output_h5ad) > 0) {
-        scatter (focus_h5ad in cluster.output_h5ad) {
+    if (length(cluster.output_h5ad_file) > 0) {
+        scatter (focus_h5ad in cluster.output_h5ad_file) {
             String focus_prefix = basename(focus_h5ad, ".h5ad")
 
             if (perform_de_analysis) {
@@ -493,7 +493,7 @@ workflow cumulus {
         File? output_aggr_zarr = aggregate_matrices.output_zarr
         File output_zarr = cluster.output_zarr
         File output_cluster_log = cluster.output_log
-        Array[File] output_h5ad = cluster.output_h5ad
+        Array[File] output_h5ad_file = cluster.output_h5ad_file
         Array[File] output_filt_xlsx = cluster.output_filt_xlsx
         Array[File] output_filt_plot = cluster.output_filt_plot
         Array[File] output_hvf_plot = cluster.output_hvf_plot
