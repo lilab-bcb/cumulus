@@ -126,6 +126,7 @@ task run_generate_count_matrix_ADTs {
         from subprocess import check_call, CalledProcessError, STDOUT, DEVNULL
         import os
         import glob
+        from fpdf import FPDF
 
         fastqs = []
 
@@ -169,6 +170,18 @@ task run_generate_count_matrix_ADTs {
         print(' '.join(call_args))
         check_call(call_args)
 
+        pdf=FPDF()
+        pdf.add_page()
+        report_file = '~{sample_id}'+'.report.txt'
+        with open(report_file,"r") as rh:
+            for x in f:
+                if "Section" in x or "Total number of reads" in x:
+                    pdf.set_font('Arial', 'B', 15)
+                    pdf.cell(2, 10, txt = x, ln = 1, align = 'L')
+                else:
+                    pdf.set_font('Arial', '', 10)
+                    pdf.cell(2, 5, txt = x, ln = 1, align = 'L')
+            pdf.output('~{sample_id}'+'.report.pdf')
         CODE
 
         if [ -f "~{sample_id}".stat.csv.gz ]
@@ -181,7 +194,7 @@ task run_generate_count_matrix_ADTs {
             filter_chimeric_reads ~{data_type} ~{feature_barcodes} "~{sample_id}.crispr.stat.csv.gz" ~{min_read_ratio} ~{sample_id}
         fi
 
-        strato cp --backend ~{backend} -m "~{sample_id}".*csv* "~{sample_id}".report.txt "~{output_directory}/~{sample_id}/"
+        strato cp --backend ~{backend} -m "~{sample_id}".*csv* "~{sample_id}".report.pdf "~{output_directory}/~{sample_id}/"
 
         if [ -f "~{sample_id}".umi_count.pdf ]
         then
