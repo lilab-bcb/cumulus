@@ -32,7 +32,8 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install pandas==1.4.2 --no-cache-dir && \
     python -m pip install matplotlib==3.5.2 --no-cache-dir && \
     python -m pip install stratocumulus==0.1.7 --no-cache-dir && \
-    python -m pip install pegasuspy --no-cache-dir
+    python -m pip install pegasuspy --no-cache-dir && \
+    python -m pip install fpdf --no-cache-dir
 
 RUN tar -xzf /software/0.10.0.tar.gz -C /software && \
     cd /software/cumulus_feature_barcoding-0.10.0 && make clean && make all && cd ../.. && \
