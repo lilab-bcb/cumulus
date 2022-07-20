@@ -84,12 +84,29 @@ workflow cumulus_adt {
             backend = backend
     }
 
+    call run_generate_ridge_plot {
+        input:
+            sample_id = sample_id,
+            data_type = data_type,
+            output_count_directory = run_generate_count_matrix_ADTs.output_count_directory,
+            cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
+            docker_registry = docker_registry,
+            zones = zones,
+            num_cpu = num_cpu,
+            memory = memory,
+            disk_space = disk_space,
+            preemptible = preemptible,
+            awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
+            backend = backend
+    }
+
     output {
         String output_count_directory = run_generate_count_matrix_ADTs.output_count_directory
+        String ridge_plot_pdf = run_generate_ridge_plot.ridge_plot_pdf
         File monitoringLog = run_generate_count_matrix_ADTs.monitoringLog
     }
 }
-
 task run_generate_count_matrix_ADTs {
     input {
         String sample_id
@@ -169,7 +186,7 @@ task run_generate_count_matrix_ADTs {
             call_args.extend(['--max-mismatch-cell', '1', '--umi-length', '10'])
         print(' '.join(call_args))
         check_call(call_args)
-
+     
         pdf=FPDF()
         pdf.add_page()
         report_file = '~{sample_id}'+'.report.txt'
@@ -204,7 +221,100 @@ task run_generate_count_matrix_ADTs {
 
     output {
         String output_count_directory = "~{output_directory}/~{sample_id}"
-        String output_text_summary = "~{output_directory}/~{sample_id}/~{sample_id}.report.txt"
+        String output_text_summary = "~{output_directory}/~{sample_id}/~{sample_id}.report.pdf"
+        File monitoringLog = "monitoring.log"
+    }
+
+    runtime {
+        docker: "~{docker_registry}/cumulus_feature_barcoding:~{cumulus_feature_barcoding_version}"
+        zones: zones
+        memory: memory
+        bootDiskSizeGb: 12
+        disks: "local-disk ~{disk_space} HDD"
+        cpu: num_cpu
+        preemptible: preemptible
+        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
+    }
+}
+
+task run_generate_ridge_plot {
+    input {
+        String sample_id
+        String output_count_directory
+        String cumulus_feature_barcoding_version
+        String docker_registry
+        String zones
+        Int num_cpu
+        String memory
+        Int disk_space
+        Int preemptible
+        Int awsMaxRetries
+        String awsQueueArn
+        String backend
+    }
+
+    command {
+        set -e
+        export TMPDIR=/tmp
+        export BACKEND=~{backend}
+        monitor_script.sh > monitoring.log &
+
+        python <<CODE
+
+        import pegasus as pg
+        from matplotlib.backends.backend_pdf import PdfPages
+        from PyPDF2 import PdfFileMerger
+        from glob import glob
+        import matplotlib.pyplot as plt
+
+        call_args = ["strato", "cp", "--backend", "~{backend}", "~{output_count_directory}/~{sample_id}/~{sample_id}.*.csv" , "."]
+        print(' '.join(call_args))
+        check_call(call_args)
+
+        call_args = ["strato", "cp", "--backend", "~{backend}", "~{output_count_directory}/~{sample_id}/~{sample_id}.report.pdf" , "."]
+        print(' '.join(call_args))
+        check_call(call_args)
+
+        def chunk_list(var_names, chunk_size):
+            for i in range(0, len(var_names), chunk_size):
+            yield var_names[i:i + chunk_size]  
+
+        for count_matrix_file in glob("~{sample_id}.*.csv"):
+            count_matrix = os.path.splitext(os.path.basename(count_matrix_file))[0]
+            data = pg.read_input(count_matrix_file)
+            pg.arcsinh(data)
+
+            with PdfPages(count_matrix+"_ridge_plot.pdf") as ridgep_figs:
+                firstPage = plt.figure(figsize=(10, 10))
+                firstPage.clf()
+                txt = count_matrix
+                firstPage.text(0.5,0.5,txt, transform=firstPage.transFigure, size=24, ha="center")
+                ridgep_figs.savefig()
+                plt.close()
+                for feat_list in chunk_list(data.var_names,8):
+                    fig = pg.ridgeplot(data,feat_list[0:len(feat_list)],return_fig=True)
+                    fig.set_figheight(10)
+                    fig.set_figwidth(10)
+                    ridgep_figs.savefig(fig, pad_inches=1, bbox_inches="tight")
+
+        merger = PdfFileMerger()
+        report_pdf = ~{sample_id}.report.pdf
+        ridgeplot_pdf_list = glob("*_ridge_plot.pdf")
+        files_to_merge = [report_pdf] + ridgeplot_pdf_list
+        for pdf in files_to_merge:
+            merger.append(pdf)
+        with open("~{sample_id}"+".report_ridgeplot.pdf", "wb") as new_file:
+            merger.write(new_file)        
+
+        CODE
+        
+        strato cp --backend "~{backend}" -m "~{sample_id}"_ridge_plot.pdf "~{output_count_directory}/~{sample_id}/"
+
+    }
+
+    output {
+        String ridge_plot_pdf = "~{output_count_directory}/~{sample_id}/~{sample_id}_ridge_plot.pdf"
         File monitoringLog = "monitoring.log"
     }
 
