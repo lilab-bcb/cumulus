@@ -1,3 +1,8 @@
+2.1.1 :small:`July 18, 2022`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Make *cumulus* workflow work with Cromwell v81+.
+
 2.1.0 :small:`July 13, 2022`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
