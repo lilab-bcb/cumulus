@@ -33,7 +33,8 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install matplotlib==3.5.2 --no-cache-dir && \
     python -m pip install stratocumulus==0.1.7 --no-cache-dir && \
     python -m pip install pegasuspy --no-cache-dir && \
-    python -m pip install fpdf --no-cache-dir
+    python -m pip install fpdf --no-cache-dir && \
+    python -m pip install PyPDF2
 
 RUN tar -xzf /software/0.10.0.tar.gz -C /software && \
     cd /software/cumulus_feature_barcoding-0.10.0 && make clean && make all && cd ../.. && \
@@ -43,6 +44,10 @@ RUN apt-get -qq -y remove gnupg && \
     apt-get -qq -y autoremove && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
+
+ADD convert_to_pdf.py /software
+ADD generate_ridgeplots.py /software
+ADD merge_pdf.py /software
 
 RUN chmod a+rx /software/*
 

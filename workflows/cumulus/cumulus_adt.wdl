@@ -87,7 +87,6 @@ workflow cumulus_adt {
     call run_generate_ridge_plot {
         input:
             sample_id = sample_id,
-            data_type = data_type,
             output_count_directory = run_generate_count_matrix_ADTs.output_count_directory,
             cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
             docker_registry = docker_registry,
@@ -143,7 +142,6 @@ task run_generate_count_matrix_ADTs {
         from subprocess import check_call, CalledProcessError, STDOUT, DEVNULL
         import os
         import glob
-        from fpdf import FPDF
 
         fastqs = []
 
@@ -187,18 +185,11 @@ task run_generate_count_matrix_ADTs {
         print(' '.join(call_args))
         check_call(call_args)
      
-        pdf=FPDF()
-        pdf.add_page()
         report_file = '~{sample_id}'+'.report.txt'
-        with open(report_file,"r") as rh:
-            for x in f:
-                if "Section" in x or "Total number of reads" in x:
-                    pdf.set_font('Arial', 'B', 15)
-                    pdf.cell(2, 10, txt = x, ln = 1, align = 'L')
-                else:
-                    pdf.set_font('Arial', '', 10)
-                    pdf.cell(2, 5, txt = x, ln = 1, align = 'L')
-            pdf.output('~{sample_id}'+'.report.pdf')
+        call_args = ['convert_to_pdf.py', report_file, '~{sample_id}'+'.report.pdf']
+        print(' '.join(call_args))
+        check_call(call_args)
+
         CODE
 
         if [ -f "~{sample_id}".stat.csv.gz ]
@@ -262,9 +253,6 @@ task run_generate_ridge_plot {
 
         python <<CODE
 
-        import pegasus as pg
-        from matplotlib.backends.backend_pdf import PdfPages
-        from PyPDF2 import PdfFileMerger
         from glob import glob
         import matplotlib.pyplot as plt
 
@@ -276,36 +264,20 @@ task run_generate_ridge_plot {
         print(' '.join(call_args))
         check_call(call_args)
 
-        def chunk_list(var_names, chunk_size):
-            for i in range(0, len(var_names), chunk_size):
-            yield var_names[i:i + chunk_size]  
-
         for count_matrix_file in glob("~{sample_id}.*.csv"):
+            output_plot_pdf = count_matrix+"_ridge_plot.pdf"
             count_matrix = os.path.splitext(os.path.basename(count_matrix_file))[0]
-            data = pg.read_input(count_matrix_file)
-            pg.arcsinh(data)
+            call_args = ["generate_ridgeplots.py", count_matrix_file, count_matrix, output_plot_pdf]
+            print(' '.join(call_args))
+            check_call(call_args)
 
-            with PdfPages(count_matrix+"_ridge_plot.pdf") as ridgep_figs:
-                firstPage = plt.figure(figsize=(10, 10))
-                firstPage.clf()
-                txt = count_matrix
-                firstPage.text(0.5,0.5,txt, transform=firstPage.transFigure, size=24, ha="center")
-                ridgep_figs.savefig()
-                plt.close()
-                for feat_list in chunk_list(data.var_names,8):
-                    fig = pg.ridgeplot(data,feat_list[0:len(feat_list)],return_fig=True)
-                    fig.set_figheight(10)
-                    fig.set_figwidth(10)
-                    ridgep_figs.savefig(fig, pad_inches=1, bbox_inches="tight")
-
-        merger = PdfFileMerger()
         report_pdf = ~{sample_id}.report.pdf
         ridgeplot_pdf_list = glob("*_ridge_plot.pdf")
-        files_to_merge = [report_pdf] + ridgeplot_pdf_list
-        for pdf in files_to_merge:
-            merger.append(pdf)
-        with open("~{sample_id}"+".report_ridgeplot.pdf", "wb") as new_file:
-            merger.write(new_file)        
+        files_to_merge = ",".join([report_pdf] + ridgeplot_pdf_list)
+
+        call_args = ["merge_pdf.py", files_to_merge, "~{sample_id}"+".report_ridgeplot.pdf"]
+        print(' '.join(call_args))
+        check_call(call_args)
 
         CODE
         
