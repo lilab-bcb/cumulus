@@ -4,6 +4,10 @@ import sys
 def convert_txt_pdf(report_file,output_file):
     pdf=FPDF()
     pdf.add_page()
+    pdf.set_font('Arial', 'B', 20)
+    sample_name = report_file.split(".")[0]
+    pdf.cell(200, 80, sample_name, 0, 1, 'C')
+    pdf.add_page()
     with open(report_file,"r") as rh:
         for x in rh:
             if "Section" in x or "Total number of reads" in x:

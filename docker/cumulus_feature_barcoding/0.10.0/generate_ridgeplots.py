@@ -1,6 +1,7 @@
 import pegasus as pg
 from matplotlib.backends.backend_pdf import PdfPages
 import sys
+import matplotlib.pyplot as plt
 
 def chunk_list(var_names, chunk_size):
     for i in range(0, len(var_names), chunk_size):

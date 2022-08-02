@@ -202,7 +202,7 @@ task run_generate_count_matrix_ADTs {
             filter_chimeric_reads ~{data_type} ~{feature_barcodes} "~{sample_id}.crispr.stat.csv.gz" ~{min_read_ratio} ~{sample_id}
         fi
 
-        strato cp --backend ~{backend} -m "~{sample_id}".*csv* "~{sample_id}".report.pdf "~{output_directory}/~{sample_id}/"
+        strato cp --backend ~{backend} -m "~{sample_id}".*csv* "~{sample_id}".report.txt "~{sample_id}".report.pdf "~{output_directory}/~{sample_id}/"
 
         if [ -f "~{sample_id}".umi_count.pdf ]
         then
@@ -254,7 +254,6 @@ task run_generate_ridge_plot {
         python <<CODE
 
         from glob import glob
-        import matplotlib.pyplot as plt
 
         call_args = ["strato", "cp", "--backend", "~{backend}", "~{output_count_directory}/~{sample_id}/~{sample_id}.*.csv" , "."]
         print(' '.join(call_args))
@@ -271,7 +270,7 @@ task run_generate_ridge_plot {
             print(' '.join(call_args))
             check_call(call_args)
 
-        report_pdf = ~{sample_id}.report.pdf
+        report_pdf = "~{sample_id}.report.pdf"
         ridgeplot_pdf_list = glob("*_ridge_plot.pdf")
         files_to_merge = ",".join([report_pdf] + ridgeplot_pdf_list)
 
