@@ -266,8 +266,8 @@ task run_generate_ridge_plot {
         check_call(call_args)
 
         for count_matrix_file in glob("~{sample_id}.*.csv"):
-            output_plot_pdf = count_matrix+"_ridge_plot.pdf"
             count_matrix = os.path.splitext(os.path.basename(count_matrix_file))[0]
+            output_plot_pdf = count_matrix+"_ridge_plot.pdf"
             call_args = ["python", "/software/generate_ridgeplots.py", count_matrix_file, count_matrix, output_plot_pdf]
             print(' '.join(call_args))
             check_call(call_args)
