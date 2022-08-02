@@ -287,7 +287,7 @@ task run_generate_ridge_plot {
     }
 
     output {
-        String ridge_plot_pdf = "~{output_count_directory}/~{sample_id}_report_ridgeplot.pdf"
+        String ridge_plot_pdf = "~{output_count_directory}/~{sample_id}.report_ridgeplot.pdf"
         File monitoringLog = "monitoring.log"
     }
 
