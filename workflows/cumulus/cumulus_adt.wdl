@@ -256,12 +256,12 @@ task run_generate_ridge_plot {
         from glob import glob
         from subprocess import check_call
         import os 
-        
-        call_args = ["strato", "cp", "--backend", "~{backend}", "~{output_count_directory}/~{sample_id}/~{sample_id}.*.csv" , "."]
+
+        call_args = ["strato", "cp", "--backend", "~{backend}", "~{output_count_directory}/~{sample_id}.*.csv" , "."]
         print(' '.join(call_args))
         check_call(call_args)
 
-        call_args = ["strato", "cp", "--backend", "~{backend}", "~{output_count_directory}/~{sample_id}/~{sample_id}.report.pdf" , "."]
+        call_args = ["strato", "cp", "--backend", "~{backend}", "~{output_count_directory}/~{sample_id}.report.pdf" , "."]
         print(' '.join(call_args))
         check_call(call_args)
 
