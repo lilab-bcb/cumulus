@@ -186,7 +186,7 @@ task run_generate_count_matrix_ADTs {
         check_call(call_args)
      
         report_file = '~{sample_id}'+'.report.txt'
-        call_args = ['convert_to_pdf.py', report_file, '~{sample_id}'+'.report.pdf']
+        call_args = ['python', 'convert_to_pdf.py', report_file, '~{sample_id}'+'.report.pdf']
         print(' '.join(call_args))
         check_call(call_args)
 
@@ -266,7 +266,7 @@ task run_generate_ridge_plot {
         for count_matrix_file in glob("~{sample_id}.*.csv"):
             output_plot_pdf = count_matrix+"_ridge_plot.pdf"
             count_matrix = os.path.splitext(os.path.basename(count_matrix_file))[0]
-            call_args = ["generate_ridgeplots.py", count_matrix_file, count_matrix, output_plot_pdf]
+            call_args = ["python", "generate_ridgeplots.py", count_matrix_file, count_matrix, output_plot_pdf]
             print(' '.join(call_args))
             check_call(call_args)
 
@@ -274,7 +274,7 @@ task run_generate_ridge_plot {
         ridgeplot_pdf_list = glob("*_ridge_plot.pdf")
         files_to_merge = ",".join([report_pdf] + ridgeplot_pdf_list)
 
-        call_args = ["merge_pdf.py", files_to_merge, "~{sample_id}"+".report_ridgeplot.pdf"]
+        call_args = ["python", "merge_pdf.py", files_to_merge, "~{sample_id}"+".report_ridgeplot.pdf"]
         print(' '.join(call_args))
         check_call(call_args)
 
