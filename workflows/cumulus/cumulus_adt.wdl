@@ -282,12 +282,12 @@ task run_generate_ridge_plot {
 
         CODE
         
-        strato cp --backend "~{backend}" -m "~{sample_id}"_ridge_plot.pdf "~{output_count_directory}/~{sample_id}/"
+        strato cp --backend "~{backend}" -m "~{sample_id}".report_ridgeplot.pdf "~{output_count_directory}/"
 
     }
 
     output {
-        String ridge_plot_pdf = "~{output_count_directory}/~{sample_id}/~{sample_id}_ridge_plot.pdf"
+        String ridge_plot_pdf = "~{output_count_directory}/~{sample_id}_report_ridgeplot.pdf"
         File monitoringLog = "monitoring.log"
     }
 
