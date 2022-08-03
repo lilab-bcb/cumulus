@@ -130,7 +130,7 @@ task run_cellranger_atac_count {
                 call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
                 print(' '.join(call_args))
                 check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-                call_args = ['strato', 'cp', '--backend','~{backend}','-r', '-m', directory + '/~{sample_id}', target]
+                call_args = ['strato', 'sync', '--backend', '-m', directory + '/~{sample_id}', target]
                 print(' '.join(call_args))
                 check_call(call_args)
             except CalledProcessError:
