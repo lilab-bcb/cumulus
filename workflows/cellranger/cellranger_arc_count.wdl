@@ -146,7 +146,7 @@ task run_cellranger_arc_count {
                     call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/' + samples[i] + '/']
                     print(' '.join(call_args))
                     check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-                    call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory + '/' + samples[i], target]
+                    call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/' + samples[i], target]
                     print(' '.join(call_args))
                     check_call(call_args)
                 except CalledProcessError:
