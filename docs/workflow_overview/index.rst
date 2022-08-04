@@ -31,6 +31,10 @@ Cumulus workflows are written in WDL_ language, and published on Dockstore_. Bel
       - 0.1.0
       - 2018-07-27
       - Run cumulus analysis module for variable gene selection, batch correction, PCA, diffusion map, clustering, visualization, differential expression analysis, cell type annotation, etc.
+    * - `Cellbender <https://dockstore.org/workflows/github.com/lilab-bcb/cumulus/CellBender>`_
+      - 2.1.0
+      - 2022-07-13
+      - Run CellBender tool to remove technical artifacts from high-throughput single-cell/single-nucleus RNA sequencing data.
     * - `Cellranger_create_reference <https://dockstore.org/workflows/github.com/lilab-bcb/cumulus/Cellranger_create_reference>`_
       - 0.12.0
       - 2019-12-14
