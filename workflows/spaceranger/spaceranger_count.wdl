@@ -289,7 +289,10 @@ task run_spaceranger_count {
         
         if not_null('~{loupe_alignment}'):
             call_args.append('--loupe_alignment=~{loupe_alignment}')
-
+        elif len(darkimages) > 0 or has_cimage:
+            # see here: https://support.10xgenomics.com/spatial-gene-expression/software/pipelines/latest/using/image-recommendations
+            print("Automatic fiducial alignment of fluorescene images is not supported. Please provide manual alignment JSON files via the LoupeAlignment column in the sample sheet!", file = sys.stderr)
+            sys.exit(1)
         if '~{no_bam}' == 'true':
             call_args.append('--no-bam')
         if '~{secondary}' != 'true':
