@@ -60,3 +60,4 @@ SC5P-PE	gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
 SC5P-R2	gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
 multiome	gs://regev-lab/resources/cellranger/737K-arc-v1.txt.gz
 null_file	gs://regev-lab/resources/cellranger/null
+human_probe_v2  gs://regev-lab/resources/cellranger/Visium_Human_Transcriptome_Probe_Set_v2.0_GRCh38-2020-A.csv
