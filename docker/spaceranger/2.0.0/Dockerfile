@@ -21,7 +21,7 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install stratocumulus==0.1.7 --no-cache-dir
 
 RUN mkdir /software
-ADD https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/docker/monitor_script.sh /software
+ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
 ADD spaceranger-2.0.0.tar.gz /software
 
 RUN apt-get -qq -y autoremove && \
@@ -29,5 +29,5 @@ RUN apt-get -qq -y autoremove && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
 
 RUN chmod a+rx /software/monitor_script.sh
-ENV PATH=/software:/software/spaceranger-1.3.1:$PATH
+ENV PATH=/software:/software/spaceranger-2.0.0:$PATH
 ENV TMPDIR=/tmp
