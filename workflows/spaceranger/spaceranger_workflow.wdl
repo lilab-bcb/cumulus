@@ -5,7 +5,7 @@ import "spaceranger_count.wdl" as src
 
 workflow spaceranger_workflow {
     input {
-        # 5 - 14 columns (Sample, Reference, Flowcell, Lane, Index, [ProbeSet, Image, DarkImage, ColorizedImage, Slide, Area, SlideFile, ReorientImages, LoupeAlignment, TargetPanel])
+        # 5 - 15 columns (Sample, Reference, Flowcell, Lane, Index, [ProbeSet, Image, DarkImage, ColorizedImage, CytaImage, Slide, Area, SlideFile, LoupeAlignment, TargetPanel])
         File input_csv_file
         # Output directory, gs URL
         String output_directory
@@ -27,13 +27,28 @@ workflow spaceranger_workflow {
 
         # For spaceranger count
 
+        # Use with automatic image alignment to specify that images may not be in canonical orientation with the hourglass in the top left corner of the image. The automatic fiducial alignment will attempt to align any rotation or mirroring of the image.
+        Boolean reorient_images = true
+        # Whether to filter the probe set using the "included" column of the probe set CSV. Default: true
+        Boolean filter_probes = true
+
+        # Index of DAPI channel (1-indexed) of fluorescence image, only used in the CytaAssist case, with dark background image.
+        Int? dapi_index
+        # Use this option if the slide serial number and area identifier have been lost. Choose from visium-1, visium-2 and visium-2-large.
+        String? unknown_slide
+
         # If generate bam outputs. This is also a spaceranger argument.
         Boolean no_bam = false
         # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false. This is also a spaceranger argument.
         Boolean secondary = false
 
-        # Space Ranger version: 1.3.1, 1.3.0
-        String spaceranger_version = "1.3.1"
+        # Hard trim the input Read 1 to this length before analysis
+        Int? r1_length
+        # Hard trim the input Read 2 to this length before analysis
+        Int? r2_length
+
+        # Space Ranger version: 2.0.0, 1.3.1, 1.3.0
+        String spaceranger_version = "2.0.0"
         # Config version
         String config_version = "0.3"
 
@@ -131,20 +146,25 @@ workflow spaceranger_workflow {
                     sample_id = sample_row[0],
                     input_fastqs_directories = sample_row[1],
                     output_directory = output_directory_stripped,
-                    genome = sample_row[2],
-                    probeset = sample_row[3],
                     acronym_file = acronym_file,
+                    genome = sample_row[2],
+                    probe_set = sample_row[3],
+                    filter_probes = filter_probes,
                     image = sample_row[4],
                     darkimagestr = sample_row[5],
                     colorizedimage = sample_row[6],
-                    slide = sample_row[7],
-                    area = sample_row[8],
-                    slidefile = sample_row[9],
-                    reorient_images = (sample_row[10] == 'true'),
+                    cytaimage = sample_row[7],
+                    dapi_index = dapi_index,
+                    slide = sample_row[8],
+                    area = sample_row[9],
+                    slidefile = sample_row[10],
+                    reorient_images = reorient_images,
                     loupe_alignment = sample_row[11],
                     target_panel = sample_row[12],
                     no_bam = no_bam,
                     secondary = secondary,
+                    r1_length = r1_length,
+                    r2_length = r2_length,
                     spaceranger_version = spaceranger_version,
                     docker_registry = docker_registry_stripped,
                     zones = zones,
@@ -277,7 +297,7 @@ task generate_count_config {
                 print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &', file = sys.stderr)
                 sys.exit(1)
 
-        for c in ['Image', 'ColorizedImage', 'SlideFile', 'LoupeAlignment', 'TargetPanel']:
+        for c in ['Image', 'ColorizedImage', 'CytaImage', 'SlideFile', 'LoupeAlignment', 'TargetPanel']:
             if c not in df.columns:
                 df[c] = '~{null_file}'
             else:
@@ -288,11 +308,6 @@ task generate_count_config {
                 df[c] = ''
             else:
                 df.loc[df[c].isna(), c] = ''
-
-        if 'ReorientImages' not in df.columns:
-            df['ReorientImages'] = 'false'
-        else:
-            df.loc[df['ReorientImages'].isna(), 'ReorientImages'] = 'false'
 
         def parse_fastq_dirs(dirs_str):
             r2f = dict()
@@ -313,7 +328,7 @@ task generate_count_config {
             else:
                 dirs = df_local['Flowcell'].values # if start from count step
             out_str = df_local['Sample'].iat[0] + '\t' + ','.join(dirs) + '\t' + df_local['Reference'].iat[0]
-            for c in ['ProbeSet', 'Image', 'DarkImage', 'ColorizedImage', 'Slide', 'Area', 'SlideFile', 'ReorientImages', 'LoupeAlignment', 'TargetPanel']:
+            for c in ['ProbeSet', 'Image', 'DarkImage', 'ColorizedImage', 'CytaImage', 'Slide', 'Area', 'SlideFile', 'LoupeAlignment', 'TargetPanel']:
                 out_str += '\t' + df_local[c].iat[0]
             print(out_str)
         CODE
