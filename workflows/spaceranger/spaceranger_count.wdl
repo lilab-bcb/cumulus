@@ -263,7 +263,7 @@ task run_spaceranger_count {
             call_args.append('--image=~{image}')
         elif len(darkimages) > 0:
             call_args.extend(['--darkimage=' + x for x in darkimages])
-            if has_cyta and '~{dapi_index} != '':
+            if has_cyta and '~{dapi_index}' != '':
                 call_args.append('--dapi-index=~{dapi_index}')
         else:
             call_args.append('--colorizedimage=~{colorizedimage}')
