@@ -232,12 +232,19 @@ task run_spaceranger_count {
             return darkimages
 
         has_cyta = not_null('~{cytaimage}')
+        probe_set = "~{probe_set}"
+        probe_set = "" if probe_set is None else probe_set
         if not_null('~{probe_file}'):
-            call_args.extend(['--probe-set=~{probe_file}', '--filter-probes=~{filter_probes}'])
-            if has_cyta and "~{probe_set}" == "human_probe_v1":
+            call_args.append('--probe-set=~{probe_file}')
+            if version.parse('~{spaceranger_version}') >= version.parse('2.0.0'):
+                call_args.append('--filter-probes=~{filter_probes}')
+            else:
+                if '~{filter_probes}' == 'false':
+                    call_args.append('--no-probe-filter')
+            if has_cyta and probe_set == "human_probe_v1":
                 print("CytAssit enabled FFPE is only compatible with human probe set v2!", file = sys.stderr)
                 sys.exit(1)
-            if not has_cyta and "~{probe_set}" == "human_probe_v2":
+            if not has_cyta and probe_set == "human_probe_v2":
                 print("Non-CytAssist enabled FFPE is only compatible with human probe set v1!", file = sys.stderr)
                 sys.exit(1)
 
