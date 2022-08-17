@@ -233,7 +233,6 @@ task run_spaceranger_count {
 
         has_cyta = not_null('~{cytaimage}')
         probe_set = "~{probe_set}"
-        probe_set = "" if probe_set is None else probe_set
         if not_null('~{probe_file}'):
             call_args.append('--probe-set=~{probe_file}')
             if version.parse('~{spaceranger_version}') >= version.parse('2.0.0'):
