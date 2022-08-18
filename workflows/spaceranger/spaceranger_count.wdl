@@ -233,6 +233,7 @@ task run_spaceranger_count {
 
         has_cyta = not_null('~{cytaimage}')
         probe_set = "~{probe_set}"
+        dapi_idx = "~{dapi_index}"
         if not_null('~{probe_file}'):
             call_args.append('--probe-set=~{probe_file}')
             if version.parse('~{spaceranger_version}') >= version.parse('2.0.0'):
@@ -269,7 +270,7 @@ task run_spaceranger_count {
             call_args.append('--image=~{image}')
         elif len(darkimages) > 0:
             call_args.extend(['--darkimage=' + x for x in darkimages])
-            if has_cyta and '~{dapi_index}' != '':
+            if has_cyta and dapi_idx != '':
                 call_args.append('--dapi-index=~{dapi_index}')
         else:
             call_args.append('--colorizedimage=~{colorizedimage}')
