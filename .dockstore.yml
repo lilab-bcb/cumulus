@@ -31,7 +31,6 @@ workflows:
         - /.*/
       branches:
         - master
-        - minor_bugs
   - name: STARsolo
     subclass: WDL
     publish: true
