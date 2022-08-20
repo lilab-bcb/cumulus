@@ -252,7 +252,7 @@ task run_spaceranger_count {
         has_image = not_null('~{image}')
         darkimages = get_darkimages('~{sep=";" darkimage}', '~{darkimagestr}')
         has_cimage = not_null('~{colorizedimage}')
-        
+
         ntrue = has_image + (len(darkimages) > 0) + has_cimage
         if ntrue == 0 and not has_cyta:
             print("Please set one of the following arguments: image, darkimage, colorizedimage or cytaimage!", file = sys.stderr)
@@ -290,8 +290,11 @@ task run_spaceranger_count {
                 call_args.append('--slidefile=~{slidefile}')
 
         if not has_cyta:
-            call_args.append('--reorient-images=~{reorient_images}')
-        
+            if version.parse('~{spaceranger_version}') >= version.parse('2.0.0'):
+                call_args.append('--reorient-images=~{reorient_images}')
+            elif '~{reorient_images}' == 'true':
+                call_args.append('--reorient-images')
+
         if not_null('~{loupe_alignment}'):
             call_args.append('--loupe_alignment=~{loupe_alignment}')
         elif len(darkimages) > 0 or has_cimage:

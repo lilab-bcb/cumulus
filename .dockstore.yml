@@ -31,6 +31,7 @@ workflows:
         - /.*/
       branches:
         - master
+        - yiming
   - name: STARsolo
     subclass: WDL
     publish: true
