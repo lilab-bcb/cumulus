@@ -41,7 +41,7 @@ then
 fi
 
 REGISTRY=$1
-PLATFORM="linux/amd64"
+PLATFORM="linux/x86_64"
 
 if [ "$build" = true ]
 then
