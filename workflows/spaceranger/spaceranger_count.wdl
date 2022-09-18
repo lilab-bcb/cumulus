@@ -296,7 +296,7 @@ task run_spaceranger_count {
                 call_args.append('--reorient-images')
 
         if not_null('~{loupe_alignment}'):
-            call_args.append('--loupe_alignment=~{loupe_alignment}')
+            call_args.append('--loupe-alignment=~{loupe_alignment}')
         elif len(darkimages) > 0 or has_cimage:
             # see here: https://support.10xgenomics.com/spatial-gene-expression/software/pipelines/latest/using/image-recommendations
             print("Automatic fiducial alignment of fluorescene images is not supported. Please provide manual alignment JSON files via the LoupeAlignment column in the sample sheet!", file = sys.stderr)
