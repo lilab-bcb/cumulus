@@ -290,7 +290,8 @@ task run_spaceranger_count {
                 call_args.append('--slidefile=~{slidefile}')
 
         if not has_cyta:
-            if version.parse('~{spaceranger_version}') >= version.parse('2.0.0'):
+            if (version.parse('~{spaceranger_version}') >= version.parse('2.0.0')) and (not not_null('~{loupe_alignment}')):
+                # The argument '--reorient-images <true|false>' cannot be used with '--loupe-alignment <PATH>'
                 call_args.append('--reorient-images=~{reorient_images}')
             elif '~{reorient_images}' == 'true':
                 call_args.append('--reorient-images')
