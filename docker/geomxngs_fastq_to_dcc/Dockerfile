@@ -30,4 +30,8 @@ ADD $VERSION/bin/ /var/GeoMxNGSPipeline
 ADD src /software/scripts
 RUN chmod a+rx /software/monitor_script.sh && chmod a+rx /var/GeoMxNGSPipeline/geomxngspipeline
 RUN touch /var/GeoMxNGSPipeline/agreement_cli_yes
+RUN apt-get -qq -y remove git python3-pip \
+    && apt-get -qq -y autoremove \
+    && apt-get autoclean \
+    && rm -rf /var/lib/apt/lists/*
 ENV PATH=/software:$PATH:/var/GeoMxNGSPipeline
