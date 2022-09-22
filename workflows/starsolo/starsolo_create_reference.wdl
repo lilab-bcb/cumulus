@@ -16,6 +16,7 @@ workflow starsolo_create_reference {
         String backend = "gcp"
         Int preemptible = 2
         Int awsMaxRetries = 5
+        String awsQueueArn = ""
     }
 
     # Output directory, with trailing slashes stripped
@@ -35,7 +36,8 @@ workflow starsolo_create_reference {
             zones = zones,
             backend = backend,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries
+            awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn
     }
 
     output {
@@ -58,6 +60,7 @@ task run_starsolo_create_reference {
         String backend
         Int preemptible
         Int awsMaxRetries
+        String awsQueueArn
     }
 
     command {
@@ -100,5 +103,6 @@ task run_starsolo_create_reference {
         cpu: num_cpu
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

@@ -115,6 +115,7 @@ workflow demultiplexing {
             zones = zones,
             preemptible = preemptible,
             awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 
@@ -141,7 +142,7 @@ workflow demultiplexing {
                     memory = demuxEM_memory,
                     disk_space = demuxEM_disk_space,
                     preemptible = preemptible,
-                    awsMaxRetries = 0,
+                    awsMaxRetries = awsMaxRetries,
                     awsQueueArn = awsQueueArn,
                     backend = backend
             }
@@ -175,7 +176,7 @@ workflow demultiplexing {
                         memory = souporcell_memory,
                         zones = zones,
                         preemptible = preemptible,
-                        awsMaxRetries = 0,
+                        awsMaxRetries = awsMaxRetries,
                         awsQueueArn = awsQueueArn,
                         backend = backend
                 }
@@ -205,7 +206,7 @@ workflow demultiplexing {
                         memory = popscle_memory,
                         zones = zones,
                         preemptible = preemptible,
-                        awsMaxRetries = 0,
+                        awsMaxRetries = awsMaxRetries,
                         awsQueueArn = awsQueueArn,
                         backend = backend
                 }
@@ -232,6 +233,7 @@ task generate_demux_config {
         String zones
         Int preemptible
         Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -290,5 +292,6 @@ task generate_demux_config {
         zones: zones
         preemptible: preemptible
         maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }
