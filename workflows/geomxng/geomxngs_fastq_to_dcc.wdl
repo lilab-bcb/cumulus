@@ -97,7 +97,7 @@ task geomxngs_task {
     }
 
     runtime {
-        docker: "~{docker_registry}/geomxngspipeline:~{geomxngs_version}"
+        docker: "~{docker_registry}/geomxngs_fastq_to_dcc:~{geomxngs_version}"
         zones: zones
         memory: memory
         bootDiskSizeGb: 12
