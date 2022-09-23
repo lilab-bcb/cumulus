@@ -2,6 +2,42 @@ geomxngs_fastq_to_dcc
 -----------------------------------------------------------------------------------------
 Processes FASTQ sequencing files into digital count conversion (DCC) files using NanoString's GeoMx NGS Pipeline
 
+Non Broad Institute users that wish to run geomxngs_fastq_to_dcc must create a custom docker image containing the
+NanoString's GeoMx NGS software.
+
+Docker Instructions (for Non-Broad Institute Users)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Please note that if you're a Broad Institute member and are not able to pull the docker image, please check
+https://app.terra.bio/#groups to see that you're a member of the all_broad_users group. If not, please contact
+Terra support and ask to be added to the all_broad_users@firecloud.org group.
+
+Download NanoString's GeoMx NGS Pipeline software from `the NanoString website <https://nanostring.com/products/geomx-digital-spatial-profiler/software-updates/>`_,
+which requires registration. Download the Linux zip file (for example GeoMxNGSPipeline_Linux_2.3.3.10.zip)
+to the same directory as your Dockerfile.
+
+You can host your private docker images in the `Google Artifact Registry`_.
+
+Docker Example
+^^^^^^^^^^^^^^^
+In this example we create a docker image for running ``geomxngs_fastq_to_dcc`` using GeoMx NGS Pipeline software 2.3.3.10.
+
+#. Create a GCP project or reuse an existing project.
+#. Enable the Google Artifact Registry
+#. Clone the cumulus repository::
+
+    git clone https://github.com/lilab-bcb/cumulus.git
+
+#. Ensure you have `Docker installed`_
+#. Download the GeoMx NGS Pipeline software from `the NanoString website <https://nanostring.com/products/geomx-digital-spatial-profiler/software-updates/>`_,
+#. Build, tag, and push the docker. Remember to replace us-central1-docker.pkg.dev/my-lab-1234 with your docker registry URL::
+
+    cd cumulus/docker/geomxngs_fastq_to_dcc/
+    docker build --build-arg GEOMX_ZIP=GeoMxNGSPipeline_Linux_2.3.3.10.zip --platform linux/x86_64 -t geomxngs_fastq_to_dcc-2.3.3.10 .
+    docker tag geomxngs_fastq_to_dcc-2.3.3.10 us-central1-docker.pkg.dev/my-lab-1234/geomxngs_fastq_to_dcc:2.3.3.10
+    docker push us-central1-docker.pkg.dev/my-lab-1234/geomxngs_fastq_to_dcc:2.3.3.10
+
+
+
 Workflow Input
 ^^^^^^^^^^^^^^
 Workflow inputs are described below (required inputs in bold).
@@ -86,3 +122,7 @@ Workflow Output
     * - count_matrix_metadata
       - URL to a count matrix metadata in text format. All columns from dataset file are included; each row describes one AOI (area of illumination)
       - String
+
+
+.. _`Google Artifact Registry`: https://cloud.google.com/artifact-registry
+.. _`Docker installed`: https://www.docker.com/products/docker-desktop

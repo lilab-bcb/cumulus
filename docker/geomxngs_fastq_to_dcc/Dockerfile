@@ -2,13 +2,11 @@ FROM debian:bullseye-slim
 
 SHELL ["/bin/bash", "-c"]
 
-
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y alien unzip dpkg-dev curl gnupg lsb-release procps python3 python3-pip build-essential libboost-iostreams-dev rsync && \
-    export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" && \
-    echo "deb http://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
-    curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - && \
-    apt-get update && apt-get install -y google-cloud-sdk=357.0.0-0
+    apt-get install --no-install-recommends -y curl unzip ca-certificates python3 python3-pip rsync
+
+RUN curl -o google-cloud-cli.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-403.0.0-linux-x86_64.tar.gz && \
+    tar xf google-cloud-cli.tar.gz && ./google-cloud-sdk/install.sh -q --usage-reporting=false
 
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.2.39.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
@@ -25,8 +23,10 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
-ARG VERSION
-ADD $VERSION/bin/ /var/GeoMxNGSPipeline
+ARG GEOMX_ZIP
+ADD $GEOMX_ZIP /software
+RUN unzip -d /software/GeoMxNGSPipeline /software/$GEOMX_ZIP && \
+    cd /software/GeoMxNGSPipeline/ && tar xf GeoMxNGSPipeline.tgz && mv /software/GeoMxNGSPipeline /var/GeoMxNGSPipeline && rm /software/$GEOMX_ZIP
 ADD src /software/scripts
 RUN chmod a+rx /software/monitor_script.sh && chmod a+rx /var/GeoMxNGSPipeline/geomxngspipeline
 RUN touch /var/GeoMxNGSPipeline/agreement_cli_yes
@@ -34,4 +34,4 @@ RUN apt-get -qq -y remove git python3-pip \
     && apt-get -qq -y autoremove \
     && apt-get autoclean \
     && rm -rf /var/lib/apt/lists/*
-ENV PATH=/software:$PATH:/var/GeoMxNGSPipeline
+ENV PATH=/software:/google-cloud-sdk/bin/:/var/GeoMxNGSPipeline:$PATH

@@ -18,23 +18,12 @@ workflow geomxngs_dcc_to_count_matrix {
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f"
         String backend = "gcp"
         String aws_queue_arn = ""
+        Int max_retries = 0
     }
     Map[String, String] acronym2url = read_map(acronym_file)
     Boolean is_pkc_url = sub(pkc, "^.+\\.(zip|pkc)$", "URL") == "URL"
     File pkc_file = (if is_pkc_url then pkc else acronym2url[pkc])
 
-    parameter_meta {
-        ini: "Configuration file in INI format, containing pipeline processing parameters"
-        dcc_zip: "Zip file of DCCs"
-        dataset :"Data QC and annotation file (Excel) downloaded from instrument after uploading DCC zip file; we only use the first tab (SegmentProperties)"
-        pkc:"PKC alias or PKC file (zipped or not); PKC refers to NanoString Probe Kit Configuration"
-        lab_worksheet:"A text file containing library setups"
-        output_directory:"Output results directory URL"
-        docker_registry:"Docker registry"
-        backend:"gcp, aws, or local"
-        extra_disk_space:"Extra disk space in GB"
-        preemptible: "Number of preemptible tries"
-    }
 
     output {
         String count_matrix_h5ad = geomxngs_dcc_to_count_matrix_task.count_matrix_h5ad
@@ -58,7 +47,8 @@ workflow geomxngs_dcc_to_count_matrix {
             backend = backend,
             aws_queue_arn = aws_queue_arn,
             docker_registry = docker_registry,
-            docker_version=docker_version
+            docker_version=docker_version,
+            max_retries=max_retries
     }
 }
 
@@ -79,6 +69,7 @@ task geomxngs_dcc_to_count_matrix_task {
         String aws_queue_arn
         String docker_registry
         String docker_version
+        Int max_retries
     }
     Int disk_space = ceil(extra_disk_space + size(dcc_zip, 'GB')*2 + size(ini, 'GB') + size(dataset, 'GB') + size(pkc, 'GB') + size(lab_worksheet, 'GB'))
     String output_directory_trailing_slash = sub(output_directory, "[/\\s]+$", "") + '/'
@@ -116,7 +107,7 @@ task geomxngs_dcc_to_count_matrix_task {
         cpu: cpu
         preemptible: preemptible
         queueArn: aws_queue_arn
-        maxRetries: 0
+        maxRetries: max_retries
     }
 
 }

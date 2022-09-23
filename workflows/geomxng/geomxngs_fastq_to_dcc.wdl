@@ -6,7 +6,7 @@ workflow geomxngs_fastq_to_dcc {
         String fastq_directory
         String output_directory
         File? fastq_rename
-        String docker_registry
+        String docker_registry = "gcr.io/broad-cumulus"
         String geomxngs_version = "2.3.3.10"
         Int cpu = 4
         Int disk_space = 500
@@ -16,19 +16,9 @@ workflow geomxngs_fastq_to_dcc {
         String backend = "gcp"
         String aws_queue_arn = ""
         Boolean delete_fastq_directory = false
+        Int max_retries = 0
     }
-    parameter_meta {
-        ini: "Configuration file in INI format, containing pipeline processing parameters"
-        fastq_directory: "FASTQ directory URL"
-        output_directory :"Output URL"
-        fastq_rename: "Optional 2 column TSV file with no header used to map original FASTQ names to FASTQ names that GeoMX recognizes."
-        cpu:"Number of CPUs"
-        docker_registry:"Docker registry"
-        geomxngs_version:"Pipeline version"
-        backend:"gcp, aws, or local"
-        disk_space:"Disk space in GB"
-        preemptible: "Number of preemptible tries"
-    }
+
 
     output {
         String geomxngs_output = geomxngs_task.geomxngs_output
@@ -50,7 +40,8 @@ workflow geomxngs_fastq_to_dcc {
             preemptible = preemptible,
             zones = zones,
             backend = backend,
-            aws_queue_arn = aws_queue_arn
+            aws_queue_arn = aws_queue_arn,
+            max_retries=max_retries
     }
 
 }
@@ -71,6 +62,7 @@ task geomxngs_task {
         String backend
         String aws_queue_arn
         Boolean delete_fastq_directory
+        Int max_retries
     }
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
     String local_ini = basename(ini)
@@ -113,7 +105,7 @@ task geomxngs_task {
         cpu: cpu
         preemptible: preemptible
         queueArn: aws_queue_arn
-        maxRetries:0
+        maxRetries:max_retries
     }
 
 }
