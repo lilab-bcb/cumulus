@@ -18,7 +18,6 @@ workflow geomxngs_dcc_to_count_matrix {
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f"
         String backend = "gcp"
         String aws_queue_arn = ""
-        Int max_retries = 0
     }
     Map[String, String] acronym2url = read_map(acronym_file)
     Boolean is_pkc_url = sub(pkc, "^.+\\.(zip|pkc)$", "URL") == "URL"
@@ -47,8 +46,7 @@ workflow geomxngs_dcc_to_count_matrix {
             backend = backend,
             aws_queue_arn = aws_queue_arn,
             docker_registry = docker_registry,
-            docker_version=docker_version,
-            max_retries=max_retries
+            docker_version=docker_version
     }
 }
 
@@ -69,7 +67,6 @@ task geomxngs_dcc_to_count_matrix_task {
         String aws_queue_arn
         String docker_registry
         String docker_version
-        Int max_retries
     }
     Int disk_space = ceil(extra_disk_space + size(dcc_zip, 'GB')*2 + size(ini, 'GB') + size(dataset, 'GB') + size(pkc, 'GB') + size(lab_worksheet, 'GB'))
     String output_directory_trailing_slash = sub(output_directory, "[/\\s]+$", "") + '/'
@@ -107,7 +104,6 @@ task geomxngs_dcc_to_count_matrix_task {
         cpu: cpu
         preemptible: preemptible
         queueArn: aws_queue_arn
-        maxRetries: max_retries
     }
 
 }

@@ -16,7 +16,6 @@ workflow geomxngs_fastq_to_dcc {
         String backend = "gcp"
         String aws_queue_arn = ""
         Boolean delete_fastq_directory = false
-        Int max_retries = 0
     }
 
 
@@ -40,8 +39,7 @@ workflow geomxngs_fastq_to_dcc {
             preemptible = preemptible,
             zones = zones,
             backend = backend,
-            aws_queue_arn = aws_queue_arn,
-            max_retries=max_retries
+            aws_queue_arn = aws_queue_arn
     }
 
 }
@@ -62,7 +60,6 @@ task geomxngs_task {
         String backend
         String aws_queue_arn
         Boolean delete_fastq_directory
-        Int max_retries
     }
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
     String local_ini = basename(ini)
@@ -105,7 +102,6 @@ task geomxngs_task {
         cpu: cpu
         preemptible: preemptible
         queueArn: aws_queue_arn
-        maxRetries:max_retries
     }
 
 }
