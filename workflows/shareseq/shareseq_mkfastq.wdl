@@ -34,8 +34,8 @@ workflow shareseq_mkfastq {
         Int disk_space = 1500
         # Number of preemptible tries
         Int preemptible = 2
-        # Max number of retries for AWS instance
-        Int awsMaxRetries = 5
+        # Arn string of AWS queue
+        String awsQueueArn = ""
         # Backend
         String backend = "gcp"
     }
@@ -56,7 +56,7 @@ workflow shareseq_mkfastq {
             memory = memory,
             disk_space = disk_space,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 
@@ -82,7 +82,7 @@ task run_shareseq_mkfastq {
         String memory
         Int disk_space
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -136,6 +136,6 @@ task run_shareseq_mkfastq {
         disks: "local-disk ~{disk_space} HDD"
         cpu: num_cpu
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

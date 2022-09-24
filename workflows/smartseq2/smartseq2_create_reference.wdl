@@ -26,10 +26,10 @@ workflow smartseq2_create_reference {
         Int disk_space = (if aligner != "star" then 40 else 120)
         # Number of preemptible tries
         Int preemptible = 2
-        # Number of maximum retries when running on AWS
-        Int awsMaxRetries = 5
         # backend choose from "gcp", "aws", "local"
         String backend = "gcp"
+        # Arn string of AWS queue to use
+        String awsQueueArn = ""
     }
 
     # Output directory, with trailing slashes and spaces stripped
@@ -49,7 +49,7 @@ workflow smartseq2_create_reference {
             memory=memory,
             disk_space=disk_space,
             preemptible=preemptible,
-            awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 }
@@ -68,7 +68,7 @@ task rsem_prepare_reference {
         String memory
         Int disk_space
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -97,6 +97,6 @@ task rsem_prepare_reference {
         memory: memory
         disks: "local-disk " + disk_space + " HDD"
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

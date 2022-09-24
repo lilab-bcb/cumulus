@@ -31,10 +31,10 @@ workflow smartseq2 {
 
         # Number of preemptible tries
         Int preemptible = 2
-        # Number of maximum retries when running on AWS
-        Int awsMaxRetries = 5
         # backend choose from "gcp", "aws", "local"
         String backend = "gcp"
+        # Arn string of AWS queue to use
+        String awsQueueArn = ""
     }
 
     # Output directory, with trailing slashes and spaces stripped
@@ -75,7 +75,7 @@ workflow smartseq2 {
                     memory = memory,
                     disk_space_multiplier = disk_space_multiplier,
                     preemptible = preemptible,
-                    awsMaxRetries = awsMaxRetries,
+                    awsQueueArn = awsQueueArn,
                     backend = backend
             }
         }
@@ -98,7 +98,7 @@ workflow smartseq2 {
                     memory = memory,
                     disk_space_multiplier = disk_space_multiplier,
                     preemptible = preemptible,
-                    awsMaxRetries = awsMaxRetries,
+                    awsQueueArn = awsQueueArn,
                     backend = backend
             }
         }
@@ -115,7 +115,7 @@ workflow smartseq2 {
             memory = memory,
             disk_space = generate_count_matrix_disk_space,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 
@@ -150,7 +150,7 @@ task run_rsem {
         String memory
         Float disk_space_multiplier
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -198,7 +198,7 @@ task run_rsem {
         disks: "local-disk " + ceil(size(reference, "GB")*5 + (disk_space_multiplier * (size(read1, "GB") + size(read2, "GB"))) + 1)+ " HDD"
         cpu: num_cpu
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }
 
@@ -213,7 +213,7 @@ task generate_count_matrix {
         String memory
         Int disk_space
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -240,6 +240,6 @@ task generate_count_matrix {
         disks: "local-disk ~{disk_space} HDD"
         cpu: 1
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }
