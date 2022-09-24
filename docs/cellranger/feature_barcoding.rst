@@ -253,10 +253,10 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - Number of preemptible tries
 		  - 2
 		  - 2
-		* - awsMaxRetries
-		  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
-		  - 5
-		  - 5
+		* - awsQueueArn
+		  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+		  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
+		  - ""
 
 Parameters used for feature count matrix extraction
 +++++++++++++++++++++++++++++++++++++++++++++++++++

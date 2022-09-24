@@ -185,10 +185,10 @@ Workflow input
 	  - Number of preemptible tries
 	  - 2
 	  - 2
-	* - awsMaxRetries
-	  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
-	  - 5
-	  - 5
+	* - awsQueueArn
+	  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+	  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
+	  - ""
 
 Workflow output
 +++++++++++++++
@@ -298,6 +298,10 @@ To aggregate multiple scATAC-Seq samples, follow the instructions below:
 	  - Number of preemptible tries.
 	  - 2
 	  - 2
+	* - awsQueueArn
+	  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+	  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
+	  - ""
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
@@ -307,7 +311,7 @@ To aggregate multiple scATAC-Seq samples, follow the instructions below:
 	  - "quay.io/cumulus"
 	  - "quay.io/cumulus"
 
-1. Check out the output in ``output_directory/aggr_id`` folder, where ``output_directory`` and ``aggr_id`` are the inputs you set in Step 2.
+3. Check out the output in ``output_directory/aggr_id`` folder, where ``output_directory`` and ``aggr_id`` are the inputs you set in Step 2.
 
 
 .. _10x single cell ATAC sample index set names: https://support.10xgenomics.com/single-cell-atac/sequencing/doc/specifications-sample-index-sets-for-single-cell-atac

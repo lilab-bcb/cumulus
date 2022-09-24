@@ -133,10 +133,10 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - Number of preemptible tries
 		  - 2
 		  - 2
-		* - awsMaxRetries
-		  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
-		  - 5
-		  - 5
+		* - awsQueueArn
+		  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+		  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
+		  - ""
 
 5. Workflow output
 ==================
@@ -248,10 +248,10 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 		  - Number of preemptible tries
 		  - 2
 		  - 2
-		* - awsMaxRetries
-		  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
-		  - 5
-		  - 5
+		* - awsQueueArn
+		  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+		  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
+		  - ""
 
 4. Workflow output
 ==================
@@ -355,10 +355,10 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - Number of preemptible tries
 		  - 2
 		  - 2
-		* - awsMaxRetries
-		  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
-		  - 5
-		  - 5
+		* - awsQueueArn
+		  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+		  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
+		  - ""
 
 4. Workflow output
 ==================
