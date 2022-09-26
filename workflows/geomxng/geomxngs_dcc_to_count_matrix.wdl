@@ -23,6 +23,21 @@ workflow geomxngs_dcc_to_count_matrix {
     Boolean is_pkc_url = sub(pkc, "^.+\\.(zip|pkc)$", "URL") == "URL"
     File pkc_file = (if is_pkc_url then pkc else acronym2url[pkc])
 
+    parameter_meta {
+        dcc_zip:"DCC zip file from geomxngs_fastq_to_dcc workflow output"
+        ini:"Configuration file in INI format, containing pipeline processing parameters"
+        dataset:"Data QC and annotation file (Excel) downloaded from instrument after uploading DCC zip file; we only use the first tab (SegmentProperties)"
+        pkc:"GeoMx DSP configuration file to associate assay targets with GeoMx HybCode barcodes and Seq Code primers"
+        lab_worksheet:"A text file containing library setups"
+        output_directory:"URL to write results (e.g. s3://foo/bar/out or gs://foo/bar/out)"
+        backend:"Backend for computation (aws, gcp, or local)"
+        docker_registry:"Docker registry"
+        extra_disk_space:"Extra disk space in GB"
+        preemptible: "Number of preemptible tries"
+        memory:"Memory string"
+        cpu:"Number of CPUs"
+        aws_queue_arn:"The arn URI of the AWS job queue to be used (e.g. arn:aws:batch:us-east-1:xxxxx). Only works when backend is aws."
+    }
 
     output {
         String count_matrix_h5ad = geomxngs_dcc_to_count_matrix_task.count_matrix_h5ad

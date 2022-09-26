@@ -6,7 +6,7 @@ workflow geomxngs_fastq_to_dcc {
         String fastq_directory
         String output_directory
         File? fastq_rename
-        String docker_registry = "gcr.io/broad-cumulus"
+        String docker_registry = "quay.io/cumulus"
         String geomxngs_version = "2.3.3.10"
         Int cpu = 4
         Int disk_space = 500
@@ -18,6 +18,22 @@ workflow geomxngs_fastq_to_dcc {
         Boolean delete_fastq_directory = false
     }
 
+    parameter_meta {
+        ini:"Configuration file in INI format, containing pipeline processing parameters"
+        fastq_directory:"FASTQ directory URL (e.g. s3://foo/bar/fastqs or gs://foo/bar/fastqs)"
+        output_directory:"URL to write results (e.g. s3://foo/bar/out or gs://foo/bar/out)"
+        fastq_rename:"Optional 2 column TSV file with no header used to map original FASTQ names to FASTQ names that GeoMX recognizes"
+        docker_registry :"Docker registry"
+        geomxngs_version : "Version of the geomx software, currently only 2.3.3.10"
+        cpu:"Number of CPUs"
+        disk_space : "Disk space in GB"
+        memory : "Memory string"
+        preemptible :"Number of preemptible tries"
+        zones : "Google cloud zones"
+        backend : "Backend for computation (aws, gcp, or local)"
+        aws_queue_arn : "The arn URI of the AWS job queue to be used (e.g. arn:aws:batch:us-east-1:xxxxx). Only works when backend is aws"
+        delete_fastq_directory:"Whether to delete the input fastqs upon successful completion"
+    }
 
     output {
         String geomxngs_output = geomxngs_task.geomxngs_output
