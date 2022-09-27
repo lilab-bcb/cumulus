@@ -3,7 +3,7 @@ FROM debian:bullseye-slim
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y curl unzip ca-certificates python3 python3-pip rsync
+    apt-get install --no-install-recommends -y curl expect unzip ca-certificates python3 python3-pip rsync
 
 RUN curl -o google-cloud-cli.tar.gz https://dl.google.com/dl/cloudsdk/channels/rapid/downloads/google-cloud-cli-403.0.0-linux-x86_64.tar.gz && \
     tar xf google-cloud-cli.tar.gz && ./google-cloud-sdk/install.sh -q --usage-reporting=false
@@ -28,10 +28,11 @@ ADD $GEOMX_ZIP /software
 RUN unzip -d /software/GeoMxNGSPipeline /software/$GEOMX_ZIP && \
     cd /software/GeoMxNGSPipeline/ && tar xf GeoMxNGSPipeline.tgz && mv /software/GeoMxNGSPipeline /var/GeoMxNGSPipeline && rm /software/$GEOMX_ZIP
 ADD src /software/scripts
-RUN chmod a+rx /software/monitor_script.sh && chmod a+rx /var/GeoMxNGSPipeline/geomxngspipeline
+RUN chmod a+rx /software/monitor_script.sh && chmod a+rx /var/GeoMxNGSPipeline/geomxngspipeline && chmod a+rx /software/scripts/geomx_expect.exp
 RUN touch /var/GeoMxNGSPipeline/agreement_cli_yes
 RUN apt-get -qq -y remove git python3-pip \
     && apt-get -qq -y autoremove \
     && apt-get autoclean \
-    && rm -rf /var/lib/apt/lists/*
-ENV PATH=/software:/google-cloud-sdk/bin/:/var/GeoMxNGSPipeline:$PATH
+    && rm -rf /var/lib/apt/lists/* \
+ENV DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
+ENV PATH=/software:/software/scripts/:/google-cloud-sdk/bin/:/var/GeoMxNGSPipeline:$PATH
