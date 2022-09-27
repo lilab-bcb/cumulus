@@ -78,23 +78,25 @@ task geomxngs_task {
         Boolean delete_fastq_directory
     }
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
-    String local_ini = basename(ini)
-    # update cpus in ini fie
+
+
 
     command {
         set -e
+        export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
         monitor_script.sh > monitoring.log &
 
-        python /software/scripts/update-cpu.py --ini ~{ini} --cpu ~{cpu} --out ~{local_ini}
+         # update cpus in ini fie
+        python /software/scripts/update-cpu.py --ini ~{ini} --cpu ~{cpu} --out local.ini
 
         mkdir fastqs
         strato sync --backend ~{backend} -m ~{fastq_directory} fastqs/
-
+        cp -r ~{fastq_directory} fastqs/
         if [[ '~{fastq_rename}' != '' ]]; then
             python /software/scripts/rename-fastqs.py --fastqs fastqs --rename ~{fastq_rename}
         fi
 
-        geomxngspipeline --in=fastqs --out=results --ini=~{local_ini} ~{true="--check-illumina-naming=false" false="" geomxngs_version!="2.2.0.2"}
+        geomx_expect.exp
         strato sync --backend ~{backend} -m results ~{output_directory_stripped}
         if [[ '~{delete_fastq_directory}' = 'true' ]]; then
             python /software/scripts/delete-url.py --backend ~{backend} --url ~{fastq_directory}
