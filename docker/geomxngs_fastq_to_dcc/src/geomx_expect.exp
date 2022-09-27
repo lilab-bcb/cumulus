@@ -11,6 +11,6 @@ if {$force_conservative} {
 
 
 set timeout -1
-spawn geomxngspipeline --ini=local.ini --in=fastqs --out=results
+spawn geomxngspipeline --ini=local.ini --in=fastqs --out=results --check-illumina-naming=false
 send -- "2"
 expect eof
