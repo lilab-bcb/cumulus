@@ -79,8 +79,6 @@ task geomxngs_task {
     }
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
-
-
     command {
         set -e
         export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
@@ -91,7 +89,6 @@ task geomxngs_task {
 
         mkdir fastqs
         strato sync --backend ~{backend} -m ~{fastq_directory} fastqs/
-        cp -r ~{fastq_directory} fastqs/
         if [[ '~{fastq_rename}' != '' ]]; then
             python /software/scripts/rename-fastqs.py --fastqs fastqs --rename ~{fastq_rename}
         fi
