@@ -100,7 +100,7 @@ task geomxngs_dcc_to_count_matrix_task {
         --dataset ~{dataset} \
         --out results
 
-        strato cp --backend ~{backend} -m -r results/ ~{output_directory_trailing_slash}
+        strato cp --backend ~{backend} -m -r results/* ~{output_directory_trailing_slash}
     }
 
     output {
