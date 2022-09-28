@@ -15,7 +15,7 @@ workflow starsolo_create_reference {
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String backend = "gcp"
         Int preemptible = 2
-        Int awsMaxRetries = 5
+        String awsQueueArn = ""
     }
 
     # Output directory, with trailing slashes stripped
@@ -35,7 +35,7 @@ workflow starsolo_create_reference {
             zones = zones,
             backend = backend,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries
+            awsQueueArn = awsQueueArn
     }
 
     output {
@@ -57,7 +57,7 @@ task run_starsolo_create_reference {
         String zones
         String backend
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
     }
 
     command {
@@ -99,6 +99,6 @@ task run_starsolo_create_reference {
         disks: "local-disk ~{disk_space} HDD"
         cpu: num_cpu
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

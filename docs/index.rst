@@ -46,6 +46,14 @@ Release Highlights in Current Stable
    drop_seq
 
 .. toctree::
+   :caption: GeoMx Digital Spatial Profiler
+   :maxdepth: 1
+   :hidden:
+
+   geomxngs_fastq_to_dcc
+   geomxngs_dcc_to_count_matrix
+
+.. toctree::
    :caption: Others
    :maxdepth: 1
    :hidden:

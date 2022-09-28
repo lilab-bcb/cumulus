@@ -16,8 +16,8 @@ workflow chromap_create_reference {
 
         # Number of preemptible tries
         Int preemptible = 2
-        # Max number of retries for AWS instance
-        Int awsMaxRetries = 5
+        # Arn string of AWS queue
+        String awsQueueArn = ""
         # Backend
         String backend = "gcp"
 
@@ -45,7 +45,7 @@ workflow chromap_create_reference {
             zones = zones,
             memory = memory,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend,
             genome = genome,
             kmer = kmer,
@@ -68,7 +68,7 @@ task run_chromap_create_reference {
         String zones
         String memory
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
         String backend
         String genome
         File input_fasta
@@ -104,6 +104,6 @@ task run_chromap_create_reference {
         disks: "local-disk ~{disk_space} HDD"
         cpu: 1
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

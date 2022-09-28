@@ -16,10 +16,10 @@ workflow cellranger_atac_create_reference {
 
         # Number of preemptible tries
         Int preemptible = 2
-        # Max number of retries for AWS instance
-        Int awsMaxRetries = 5
         # Backend
         String backend = "gcp"
+        # Arn string of AWS queue
+        String awsQueueArn = ""
 
         # Organism name
         String organism = ""
@@ -49,7 +49,7 @@ workflow cellranger_atac_create_reference {
             zones = zones,
             memory = memory,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend,
             organism = organism,
             genome = genome,
@@ -75,7 +75,7 @@ task run_cellranger_atac_create_reference {
         String memory
 
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
         String backend
 
         String? organism
@@ -126,6 +126,6 @@ task run_cellranger_atac_create_reference {
         disks: "local-disk ~{disk_space} HDD"
         cpu: 1
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

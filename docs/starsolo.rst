@@ -349,10 +349,10 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
       - Number of maximum preemptible tries allowed. This works only when *backend* is ``gcp``.
       - 2
       - 2
-    * - awsMaxRetries
-      - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
-      - 5
-      - 5
+    * - awsQueueArn
+      - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+      - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
+      - ""
 
 Workflow outputs
 ^^^^^^^^^^^^^^^^^^^
@@ -486,10 +486,10 @@ Required inputs are highlighted **in bold**.
       - Number of maximum preemptible tries allowed. This works only when *backend* is ``gcp``.
       - 2
       - 2
-    * - awsMaxRetries
-      - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
-      - 5
-      - 5
+    * - awsQueueArn
+      - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+      - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
+      - ""
 
 4. Workflow Output
 +++++++++++++++++++

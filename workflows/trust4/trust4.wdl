@@ -73,8 +73,8 @@ workflow trust4 {
         String backend = "gcp"
         # Number of preemptible tries
         Int preemptible = 2
-        # Max number of retries for AWS instance
-        Int awsMaxRetries = 5
+        # Arn string of AWS queue
+        String awsQueueArn = ""
     }
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
@@ -116,7 +116,7 @@ workflow trust4 {
             docker_registry = docker_registry_stripped,
             zones = zones,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 
@@ -130,38 +130,38 @@ workflow trust4 {
 
 task run_trust4 {
     input {
-            String trust4_version
-            String sample_id
-            String? input_fastqs_directories
-            String output_directory
-            File genome_file
-            Int num_cpu
-            String memory
-            Int disk_space
-            String se_fastq_pattern
-            String? pe_read1_fastq_pattern
-            String? pe_read2_fastq_pattern
-            String? read1_range
-            String? read2_range
-            String barcode_fastq_pattern
-            String barcode_range
-            File? barcode_whitelist
-            String umi_fastq_pattern
-            String umi_range
-            File? input_bam
-            String? bam_barcode_field
-            String? bam_umi_field
-            String? bam_abnormal_unmap_flag
-            Boolean? skipMateExtension
-            Int? mateIdSuffixLen
-            Boolean? noExtraction
-            Boolean? repseq
-            Boolean? outputReadAssignment
-            String docker_registry
-            String zones
-            Int preemptible
-            Int awsMaxRetries
-            String backend
+        String trust4_version
+        String sample_id
+        String? input_fastqs_directories
+        String output_directory
+        File genome_file
+        Int num_cpu
+        String memory
+        Int disk_space
+        String se_fastq_pattern
+        String? pe_read1_fastq_pattern
+        String? pe_read2_fastq_pattern
+        String? read1_range
+        String? read2_range
+        String barcode_fastq_pattern
+        String barcode_range
+        File? barcode_whitelist
+        String umi_fastq_pattern
+        String umi_range
+        File? input_bam
+        String? bam_barcode_field
+        String? bam_umi_field
+        String? bam_abnormal_unmap_flag
+        Boolean? skipMateExtension
+        Int? mateIdSuffixLen
+        Boolean? noExtraction
+        Boolean? repseq
+        Boolean? outputReadAssignment
+        String docker_registry
+        String zones
+        Int preemptible
+        String awsQueueArn
+        String backend
     }
 
     command {
@@ -286,6 +286,6 @@ task run_trust4 {
         disks: "local-disk ~{disk_space} HDD"
         cpu: num_cpu
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

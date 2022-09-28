@@ -152,8 +152,6 @@ workflow cellranger_workflow {
 
         # Number of preemptible tries
         Int preemptible = 2
-        # Max number of retries for AWS instance
-        Int awsMaxRetries = 5
         # Arn string of AWS queue to use
         String awsQueueArn = ""
     }
@@ -176,7 +174,7 @@ workflow cellranger_workflow {
                 docker_registry = docker_registry_stripped,
                 zones = zones,
                 preemptible = preemptible,
-                awsMaxRetries = awsMaxRetries,
+                awsQueueArn = awsQueueArn,
                 backend = backend
         }
 
@@ -201,7 +199,6 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = 0,
                         backend = backend,
                         awsQueueArn = awsQueueArn
                 }
@@ -229,7 +226,6 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = 0,
                         backend = backend,
                         awsQueueArn = awsQueueArn
                 }
@@ -257,7 +253,6 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = 0,
                         backend = backend,
                         awsQueueArn = awsQueueArn
                 }
@@ -277,7 +272,7 @@ workflow cellranger_workflow {
                 docker_registry = docker_registry_stripped,
                 zones = zones,
                 preemptible = preemptible,
-                awsMaxRetries = awsMaxRetries,
+                awsQueueArn = awsQueueArn,
                 backend = backend,
                 null_file = null_file
         }
@@ -305,7 +300,6 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = count_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = 0,
                         backend = backend,
                         awsQueueArn = awsQueueArn
                 }
@@ -319,7 +313,7 @@ workflow cellranger_workflow {
                     docker_registry = docker_registry_stripped,
                     zones = zones,
                     preemptible = preemptible,
-                    awsMaxRetries = awsMaxRetries,
+                    awsQueueArn = awsQueueArn,
                     backend = backend
             }
         }
@@ -342,7 +336,6 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = vdj_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = 0,
                         backend = backend,
                         awsQueueArn = awsQueueArn
                 }
@@ -356,7 +349,7 @@ workflow cellranger_workflow {
                     docker_registry = docker_registry_stripped,
                     zones = zones,
                     preemptible = preemptible,
-                    awsMaxRetries = awsMaxRetries,
+                    awsQueueArn = awsQueueArn,
                     backend = backend
             }
         }
@@ -383,7 +376,6 @@ workflow cellranger_workflow {
                         memory = feature_memory,
                         disk_space = feature_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = 0,
                         backend = backend,
                         awsQueueArn = awsQueueArn
                 }
@@ -410,7 +402,6 @@ workflow cellranger_workflow {
                         memory = atac_memory,
                         disk_space = atac_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = 0,
                         backend = backend,
                         awsQueueArn = awsQueueArn
                 }
@@ -424,7 +415,7 @@ workflow cellranger_workflow {
                     docker_registry = docker_registry_stripped,
                     zones = zones,
                     preemptible = preemptible,
-                    awsMaxRetries = awsMaxRetries,
+                    awsQueueArn = awsQueueArn,
                     backend = backend
             }
         }
@@ -452,7 +443,6 @@ workflow cellranger_workflow {
                         memory = arc_memory,
                         disk_space = arc_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = 0,
                         backend = backend,
                         awsQueueArn = awsQueueArn
                 }
@@ -466,7 +456,7 @@ workflow cellranger_workflow {
                     docker_registry = docker_registry_stripped,
                     zones = zones,
                     preemptible = preemptible,
-                    awsMaxRetries = awsMaxRetries,
+                    awsQueueArn = awsQueueArn,
                     backend = backend
             }
         }
@@ -496,7 +486,6 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = count_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = 0,
                         backend = backend,
                         awsQueueArn = awsQueueArn
                 }
@@ -527,7 +516,6 @@ workflow cellranger_workflow {
                         memory = memory,
                         disk_space = count_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = 0,
                         backend = backend,
                         awsQueueArn = awsQueueArn
                 }
@@ -541,7 +529,7 @@ workflow cellranger_workflow {
                     docker_registry = docker_registry_stripped,
                     zones = zones,
                     preemptible = preemptible,
-                    awsMaxRetries = awsMaxRetries,
+                    awsQueueArn = awsQueueArn,
                     backend = backend
             }
         }
@@ -569,7 +557,7 @@ task generate_bcl_csv {
         String docker_registry
         String zones
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -643,7 +631,7 @@ task generate_bcl_csv {
         docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }
 
@@ -658,7 +646,7 @@ task generate_count_config {
         String docker_registry
         String zones
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
         String backend
         String null_file
     }
@@ -886,7 +874,7 @@ task generate_count_config {
         docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }
 
@@ -898,7 +886,7 @@ task collect_summaries {
         String docker_registry
         String zones
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -932,6 +920,6 @@ task collect_summaries {
         docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

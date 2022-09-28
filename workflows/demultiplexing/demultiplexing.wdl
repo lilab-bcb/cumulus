@@ -21,8 +21,6 @@ workflow demultiplexing {
         String docker_registry = "quay.io/cumulus"
         # Number of preemptible tries
         Int preemptible = 2
-        # Number of maximum retries when running on AWS
-        Int awsMaxRetries = 5
         # Arn string of AWS queue
         String awsQueueArn = ""
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
@@ -114,7 +112,7 @@ workflow demultiplexing {
             docker_registry = docker_registry,
             zones = zones,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 
@@ -141,7 +139,6 @@ workflow demultiplexing {
                     memory = demuxEM_memory,
                     disk_space = demuxEM_disk_space,
                     preemptible = preemptible,
-                    awsMaxRetries = 0,
                     awsQueueArn = awsQueueArn,
                     backend = backend
             }
@@ -175,7 +172,6 @@ workflow demultiplexing {
                         memory = souporcell_memory,
                         zones = zones,
                         preemptible = preemptible,
-                        awsMaxRetries = 0,
                         awsQueueArn = awsQueueArn,
                         backend = backend
                 }
@@ -205,7 +201,6 @@ workflow demultiplexing {
                         memory = popscle_memory,
                         zones = zones,
                         preemptible = preemptible,
-                        awsMaxRetries = 0,
                         awsQueueArn = awsQueueArn,
                         backend = backend
                 }
@@ -231,7 +226,7 @@ task generate_demux_config {
         String docker_registry
         String zones
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -289,6 +284,6 @@ task generate_demux_config {
         docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

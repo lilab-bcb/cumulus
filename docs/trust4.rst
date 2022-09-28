@@ -34,12 +34,12 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
     * - **output_directory**
       - GS URL of output directory.
       - "gs://fc-e0000000-0000-0000-0000-000000000000/trust4_result"
-      -	  	  
+      -
     * - **genome**
       - Genome reference. It can be either of the following two formats:
-		    
+
         - String. Pre-built `genome reference`_.
-        
+
         - Google bucket URL of a custom reference, must be a ``.tar.gz`` file.
       - | "human_trust4",
         | or "gs://user-bucket/trust4.tar.gz"
@@ -49,18 +49,18 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
 	      | Set an GS URI if *backend* is ``gcp``; an S3 URI for ``aws`` backend; an absolute file path for ``local`` backend.
       - "s3://xxxx/index.tsv" or "gs://xxxx/index.tsv"
       -
-    * - se_fastq_pattern	
+    * - se_fastq_pattern
       - Fastq pattern SE data.
       - "_S*_L*_R2_001.fastq.gz"
       - "_S*_L*_R2_001.fastq.gz"
     * - pe_read1_fastq_pattern
       - R1 Fastq pattern for PE data.
       - "_S*_L*_R1_001.fastq.gz"
-      - 
+      -
     * - pe_read2_fastq_pattern
       - R2 Fastq pattern for PE data.
       - "_S*_L*_R2_001.fastq.gz"
-      - 
+      -
     * - read1_range
       - [trust4 option \-\-read1Range] Start, end(-1 for length-1) in -1/-u files for genomic sequence.
       - "0,-1"
@@ -81,54 +81,54 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
     * - barcode_whitelist
       - | [trust4 option \-\-barcodeWhitelist] Path to the barcode whitelist.
 	      | Cell barcode whitelist file. This is supposed to be a txt file where each line is a whitelisted barcode.
-      - 
+      -
       -
     * - umi_fastq_pattern
       - UMI Fastq pattern
       - "_S*_L*_R1_001.fastq.gz"
       - "_S*_L*_R1_001.fastq.gz"
     * - umi_range
-      - [trust4 option \-\-umiRange] Start, end(-1 for length-1), strand in a UMI is the true UMI. 
+      - [trust4 option \-\-umiRange] Start, end(-1 for length-1), strand in a UMI is the true UMI.
       - "16,-1,+"
       - "16,-1,+"
     * - **input_bam**
       - | [trust4 option -b] Path to bam file.
         | **Either provide input_bam or input_fastqs_directories but not both.**
-      - 
-      - 
+      -
+      -
     * - bam_barcode_field
       - | [trust4 option \-\-barcode] BAM field for barcode.
 	      | Only use when BAM file is used as input.
-      - 
+      -
       -
     * - bam_umi_field
       - [trust4 option --UMI] If BAM file is provided as input; provide bam field for UMI.
-      - 
-      - 
+      -
+      -
     * - bam_abnormal_unmap_flag
       - | [trust4 option \-\-abnormalUnmapFlag] The flag in BAM for the unmapped read-pair is nonconcordant.
 	      | Only use when BAM file is used as input.
-      - 
-      - 
+      -
+      -
     * - skipMateExtension
       - [trust4 option \-\-skipMateExtension] Do not extend assemblies with mate information, useful for SMART-seq.
       -
-      - 
+      -
     * - mateIdSuffixLen
       - [trust4 option \-\-mateIdSuffixLen] The suffix length in read id for mate.
-      - 
+      -
       -
     * - noExtraction
       - [trust4 option \-\-noExtraction] Directly use the files from provided -1 -2/-u to assemble.
-      - 
+      -
       -
     * - repseq
       - [trust4 option \-\-repseq] The data is from TCR-seq or BCR-seq.
-      - 
+      -
       -
     * - outputReadAssignment
-      - [trust4 option \-\-outputReadAssignment] Output read assignment results to the prefix_assign.out file. 
-      - 
+      - [trust4 option \-\-outputReadAssignment] Output read assignment results to the prefix_assign.out file.
+      -
       -
     * - docker_registry
       - Docker registry to use:
@@ -166,10 +166,10 @@ Below are inputs for *TRUST4* workflow. Notice that required inputs are in bold.
       - Number of maximum preemptible tries allowed. This works only when *backend* is ``gcp``.
       - 2
       - 2
-    * - awsMaxRetries
-      - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
-      - 5
-      - 5
+    * - awsQueueArn
+      - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+      - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
+      - ""
 
 Workflow outputs
 ^^^^^^^^^^^^^^^^^^^
@@ -235,7 +235,7 @@ Required inputs are highlighted **in bold**.
       -
     * - **gene_name_list**
       - Gene name list of interest.
-      - 
+      -
       -
     * - **species**
       - | Species name.
@@ -286,10 +286,10 @@ Required inputs are highlighted **in bold**.
       - Number of maximum preemptible tries allowed. This works only when *backend* is ``gcp``.
       - 2
       - 2
-    * - awsMaxRetries
-      - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
-      - 5
-      - 5
+    * - awsQueueArn
+      - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+      - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
+      - ""
 
 2. Workflow Output
 +++++++++++++++++++

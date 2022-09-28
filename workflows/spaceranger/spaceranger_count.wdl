@@ -76,8 +76,6 @@ workflow spaceranger_count {
         Int disk_space = 500
         # Number of preemptible tries
         Int preemptible = 2
-        # Number of maximum retries when running on AWS
-        Int awsMaxRetries = 5
         # Arn string of AWS queue
         String awsQueueArn = ""
         # Backend
@@ -129,7 +127,6 @@ workflow spaceranger_count {
             memory = memory,
             disk_space = disk_space,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries,
             awsQueueArn = awsQueueArn,
             backend = backend
     }
@@ -175,7 +172,6 @@ task run_spaceranger_count {
         String memory
         Int disk_space
         Int preemptible
-        Int awsMaxRetries
         String awsQueueArn
         String backend
     }
@@ -290,13 +286,14 @@ task run_spaceranger_count {
                 call_args.append('--slidefile=~{slidefile}')
 
         if not has_cyta:
-            if version.parse('~{spaceranger_version}') >= version.parse('2.0.0'):
-                call_args.append('--reorient-images=~{reorient_images}')
-            elif '~{reorient_images}' == 'true':
-                call_args.append('--reorient-images')
+            if not not_null('~{loupe_alignment}'):  # The argument '--reorient-images <true|false>' cannot be used with '--loupe-alignment <PATH>'
+                if version.parse('~{spaceranger_version}') >= version.parse('2.0.0'):
+                    call_args.append('--reorient-images=~{reorient_images}')
+                elif '~{reorient_images}' == 'true':
+                    call_args.append('--reorient-images')
 
         if not_null('~{loupe_alignment}'):
-            call_args.append('--loupe_alignment=~{loupe_alignment}')
+            call_args.append('--loupe-alignment=~{loupe_alignment}')
         elif len(darkimages) > 0 or has_cimage:
             # see here: https://support.10xgenomics.com/spatial-gene-expression/software/pipelines/latest/using/image-recommendations
             print("Automatic fiducial alignment of fluorescene images is not supported. Please provide manual alignment JSON files via the LoupeAlignment column in the sample sheet!", file = sys.stderr)
@@ -336,7 +333,6 @@ task run_spaceranger_count {
         disks: "local-disk ~{disk_space} HDD"
         cpu: num_cpu
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
         queueArn: awsQueueArn
     }
 }

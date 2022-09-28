@@ -14,7 +14,6 @@ task run_cumulus_aggregate_matrices {
         String memory
         Int disk_space
         Int preemptible
-        Int awsMaxRetries
         String backend
         String? restrictions
         String? attributes
@@ -77,7 +76,6 @@ task run_cumulus_aggregate_matrices {
         disks: "local-disk ~{disk_space} HDD"
         cpu: 1
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
 
@@ -93,7 +91,6 @@ task run_cumulus_cluster {
         String memory
         Int disk_space
         Int preemptible
-        Int awsMaxRetries
         String backend
         String? channel
         String? black_list
@@ -394,7 +391,6 @@ task run_cumulus_cluster {
         disks: "local-disk ~{disk_space} HDD"
         cpu: num_cpu
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
 
@@ -410,7 +406,6 @@ task run_cumulus_cirro_output {
         Int disk_space
         Int num_cpu
         Int preemptible
-        Int awsMaxRetries
         String backend
     }
 
@@ -449,7 +444,6 @@ task run_cumulus_cirro_output {
         disks: "local-disk ~{disk_space} HDD"
         cpu: num_cpu
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
 
@@ -465,7 +459,6 @@ task run_cumulus_de_analysis {
         String memory
         Int disk_space
         Int preemptible
-        Int awsMaxRetries
         String backend
         String? labels
         Boolean? t_test
@@ -573,7 +566,6 @@ task run_cumulus_de_analysis {
         disks: "local-disk ~{disk_space} HDD"
         cpu: num_cpu
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
 
@@ -588,7 +580,6 @@ task run_cumulus_plot {
         String memory
         Int disk_space
         Int preemptible
-        Int awsMaxRetries
         String backend
         String? plot_composition
         String? plot_tsne
@@ -676,7 +667,6 @@ task run_cumulus_plot {
         disks: "local-disk ~{disk_space} HDD"
         cpu: 1
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
 
@@ -692,7 +682,6 @@ task run_cumulus_scp_output {
         String memory
         Int disk_space
         Int preemptible
-        Int awsMaxRetries
         String backend
     }
 
@@ -728,6 +717,5 @@ task run_cumulus_scp_output {
         disks: "local-disk ~{disk_space} HDD"
         cpu: 1
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
     }
 }
