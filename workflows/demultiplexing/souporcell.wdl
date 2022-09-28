@@ -40,8 +40,6 @@ workflow souporcell {
         String memory
         # Number of preemptible tries
         Int preemptible
-        # Number of maximum retries when running on AWS
-        Int awsMaxRetries
         # Arn string of AWS queue
         String awsQueueArn
         # Backend
@@ -72,7 +70,6 @@ workflow souporcell {
             disk_space = disk_space,
             memory = memory,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries,
             awsQueueArn = awsQueueArn,
             backend = backend
     }
@@ -92,7 +89,6 @@ workflow souporcell {
             memory = memory,
             disk_space = disk_space,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries,
             awsQueueArn = awsQueueArn,
             backend = backend
     }
@@ -126,7 +122,6 @@ task run_souporcell {
         Int disk_space
         String memory
         Int preemptible
-        Int awsMaxRetries
         String awsQueueArn
         String backend
     }
@@ -196,7 +191,6 @@ task run_souporcell {
         disks: "local-disk ~{disk_space} HDD"
         cpu: num_cpu
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
         queueArn: awsQueueArn
     }
 }
@@ -217,7 +211,6 @@ task match_donors {
         String memory
         Int disk_space
         Int preemptible
-        Int awsMaxRetries
         String awsQueueArn
         String backend
     }
@@ -267,7 +260,6 @@ task match_donors {
         memory: memory
         disks: "local-disk ~{disk_space} HDD"
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
         queueArn: awsQueueArn
     }
 }

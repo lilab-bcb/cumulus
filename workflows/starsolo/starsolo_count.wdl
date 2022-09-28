@@ -43,7 +43,6 @@ workflow starsolo_count {
         Int num_cpu
         Int disk_space
         Int preemptible
-        Int awsMaxRetries
         String awsQueueArn
         String backend
     }
@@ -94,7 +93,6 @@ workflow starsolo_count {
             num_cpu = num_cpu,
             disk_space = disk_space,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries,
             awsQueueArn = awsQueueArn,
             backend = backend
     }
@@ -147,7 +145,6 @@ task run_starsolo {
         Int num_cpu
         Int disk_space
         Int preemptible
-        Int awsMaxRetries
         String awsQueueArn
         String backend
     }
@@ -385,7 +382,6 @@ task run_starsolo {
         disks: "local-disk ~{disk_space} HDD"
         cpu: num_cpu
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
         queueArn: awsQueueArn
     }
 }

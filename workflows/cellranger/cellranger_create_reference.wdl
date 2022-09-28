@@ -36,10 +36,10 @@ workflow cellranger_create_reference {
 
         # Number of preemptible tries
         Int preemptible = 2
-        # Max number of retries for AWS instance
-        Int awsMaxRetries = 5
         # Backend
         String backend = "gcp"
+        # Arn string of AWS queue
+        String awsQueueArn = ""
     }
 
     # Output directory, with trailing slashes stripped
@@ -56,7 +56,7 @@ workflow cellranger_create_reference {
             cellranger_version = cellranger_version,
             zones = zones,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 
@@ -72,7 +72,7 @@ workflow cellranger_create_reference {
                 zones = zones,
                 memory = memory,
                 preemptible = preemptible,
-                awsMaxRetries = awsMaxRetries,
+                awsQueueArn = awsQueueArn,
                 backend = backend
         }
     }
@@ -93,7 +93,7 @@ workflow cellranger_create_reference {
             num_cpu = num_cpu,
             zones = zones,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 
@@ -115,7 +115,7 @@ task generate_create_reference_config {
         String docker_registry
         String zones
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -166,7 +166,7 @@ task generate_create_reference_config {
         docker: "~{docker_registry}/cellranger:~{cellranger_version}"
         zones: zones
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }
 
@@ -182,7 +182,7 @@ task run_filter_gtf {
         String zones
         String memory
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -247,7 +247,7 @@ task run_filter_gtf {
         disks: "local-disk ~{disk_space} HDD"
         cpu: 1
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }
 
@@ -267,7 +267,7 @@ task run_cellranger_mkref {
         Int num_cpu
         String memory
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -332,6 +332,6 @@ task run_cellranger_mkref {
         disks: "local-disk ~{disk_space} HDD"
         cpu: num_cpu
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

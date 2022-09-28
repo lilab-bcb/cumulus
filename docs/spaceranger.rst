@@ -256,11 +256,11 @@ For spatial data, ``spaceranger_workflow`` takes Illumina outputs and related im
 		* - r1_length
 		  - Hard trim the input Read 1 to this length before analysis
 		  - 28
-		  - 
+		  -
 		* - r2_length
 		  - Hard trim the input Read 1 to this length before analysis. This value will be set to 50 automatically for FFPE samples if spaceranger version < 2.0.0.
 		  - 50
-		  - 
+		  -
 		* - spaceranger_version
 		  - spaceranger version, could be: ``2.0.0``, ``1.3.1``, ``1.3.0``
 		  - "2.0.0"
@@ -315,10 +315,10 @@ For spatial data, ``spaceranger_workflow`` takes Illumina outputs and related im
 		  - Number of preemptible tries. This works only when *backend* is ``gcp``.
 		  - 2
 		  - 2
-		* - awsMaxRetries
-		  - Number of maximum retries when running on AWS. This works only when *backend* is ``aws``.
-		  - 5
-		  - 5
+		* - awsQueueArn
+		  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+		  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
+		  - ""
 
 Workflow output
 +++++++++++++++

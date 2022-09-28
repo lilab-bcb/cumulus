@@ -28,10 +28,10 @@ workflow cellranger_vdj_create_reference {
 
         # Number of preemptible tries
         Int preemptible = 2
-        # Max number of retries for AWS instance
-        Int awsMaxRetries = 5
         # Backend
         String backend = "gcp"
+        # Arn string of AWS queue
+        String awsQueueArn = ""
     }
 
     # Output directory, with trailing slashes stripped
@@ -45,7 +45,7 @@ workflow cellranger_vdj_create_reference {
             zones = zones,
             memory = memory,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend,
             input_fasta = input_fasta,
             input_gtf = input_gtf,
@@ -67,7 +67,7 @@ task run_cellranger_vdj_create_reference {
         String zones
         String memory
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
         String backend
         File input_fasta
         File input_gtf
@@ -129,6 +129,6 @@ task run_cellranger_vdj_create_reference {
         disks: "local-disk ~{disk_space} HDD"
         cpu: 1
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

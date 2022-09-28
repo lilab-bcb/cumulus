@@ -89,8 +89,8 @@ workflow chromap_mapping {
         String backend = "gcp"
         # Number of preemptible tries
         Int preemptible = 2
-        # Max number of retries for AWS instance
-        Int awsMaxRetries = 5
+        # Arn string of AWS queue
+        String awsQueueArn = ""
     }
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
@@ -139,7 +139,7 @@ workflow chromap_mapping {
             num_cpu = num_cpu,
             memory = memory,
             preemptible = preemptible,
-            awsMaxRetries = awsMaxRetries,
+            awsQueueArn = awsQueueArn,
             backend = backend
     }
 
@@ -153,45 +153,45 @@ workflow chromap_mapping {
 
 task run_chromap {
     input {
-            String chromap_version
-            String read1_fastq_pattern
-            String read2_fastq_pattern
-            String barcode_fastq_pattern
-            String sample_id
-            String output_directory
-            String input_fastqs_directories
-            File genome_file
-            String? preset
-            File? barcode_whitelist
-            File? barcode_translate
-            Boolean? output_mappings_not_in_whitelist
-            String? output_format
-            String? read_format
-            Boolean? split_alignment
-            Int? max_edit_dist_e
-            Int? min_num_minimizer_s
-            String? ignore_minimizer_times_f
-            Int? max_insert_size_l
-            Int? min_mapq_q
-            Int? min_read_length
-            Boolean? trim_adaptors
-            Boolean? remove_pcr_duplicates
-            Boolean? remove_pcr_duplicates_at_bulk_level
-            Boolean? remove_pcr_duplicates_at_cell_level
-            Boolean? tn5_shift
-            Boolean? low_mem
-            Int? bc_error_threshold
-            Float? bc_probability_threshold
-            File? chr_order
-            File? pairs_natural_chr_order
-            String docker_registry
-            String zones
-            Int num_cpu
-            String memory
-            Int disk_space
-            Int preemptible
-            Int awsMaxRetries
-            String backend
+        String chromap_version
+        String read1_fastq_pattern
+        String read2_fastq_pattern
+        String barcode_fastq_pattern
+        String sample_id
+        String output_directory
+        String input_fastqs_directories
+        File genome_file
+        String? preset
+        File? barcode_whitelist
+        File? barcode_translate
+        Boolean? output_mappings_not_in_whitelist
+        String? output_format
+        String? read_format
+        Boolean? split_alignment
+        Int? max_edit_dist_e
+        Int? min_num_minimizer_s
+        String? ignore_minimizer_times_f
+        Int? max_insert_size_l
+        Int? min_mapq_q
+        Int? min_read_length
+        Boolean? trim_adaptors
+        Boolean? remove_pcr_duplicates
+        Boolean? remove_pcr_duplicates_at_bulk_level
+        Boolean? remove_pcr_duplicates_at_cell_level
+        Boolean? tn5_shift
+        Boolean? low_mem
+        Int? bc_error_threshold
+        Float? bc_probability_threshold
+        File? chr_order
+        File? pairs_natural_chr_order
+        String docker_registry
+        String zones
+        Int num_cpu
+        String memory
+        Int disk_space
+        Int preemptible
+        String awsQueueArn
+        String backend
     }
 
     command {
@@ -378,6 +378,6 @@ task run_chromap {
         disks: "local-disk ~{disk_space} HDD"
         cpu: num_cpu
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

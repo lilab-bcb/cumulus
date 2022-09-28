@@ -91,8 +91,6 @@ workflow shareseq_workflow {
 
         # Number of preemptible tries
         Int preemptible = 2
-        # Max number of retries for AWS instance
-        Int awsMaxRetries = 5
         # Arn string of AWS queue
         String awsQueueArn = ""
     }
@@ -113,7 +111,7 @@ workflow shareseq_workflow {
                 docker_registry = docker_registry_stripped,
                 zones = zones,
                 preemptible = preemptible,
-                awsMaxRetries = awsMaxRetries,
+                awsQueueArn = awsQueueArn,
                 backend = backend
         }
 
@@ -136,7 +134,7 @@ workflow shareseq_workflow {
                         memory = shareseq_mkfastq_memory,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
+                        awsQueueArn = awsQueueArn,
                         backend = backend
                 }
             }
@@ -152,7 +150,7 @@ workflow shareseq_workflow {
                 docker_registry = docker_registry_stripped,
                 zones = zones,
                 preemptible = preemptible,
-                awsMaxRetries = awsMaxRetries,
+                awsQueueArn = awsQueueArn,
                 backend = backend
         }
 
@@ -174,7 +172,7 @@ workflow shareseq_workflow {
                         memory = shareseq_reorg_memory,
                         disk_space = shareseq_reorg_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
+                        awsQueueArn = awsQueueArn,
                         backend = backend
                 }
                 call sc.starsolo_count as starsolo_count {
@@ -195,7 +193,6 @@ workflow shareseq_workflow {
                         num_cpu = starsolo_num_cpu,
                         disk_space = starsolo_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = 0,
                         awsQueueArn = awsQueueArn,
                         backend = backend
                 }
@@ -220,7 +217,7 @@ workflow shareseq_workflow {
                         memory = shareseq_reorg_memory,
                         disk_space = shareseq_reorg_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
+                        awsQueueArn = awsQueueArn,
                         backend = backend
                 }
                 call cm.chromap_mapping as chromap_mapping {
@@ -241,7 +238,7 @@ workflow shareseq_workflow {
                         num_cpu = chromap_num_cpu,
                         memory = chromap_memory,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
+                        awsQueueArn = awsQueueArn,
                         backend = backend
                 }
             }
@@ -263,7 +260,7 @@ task generate_mkfastq_input {
         String docker_registry
         String zones
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
     command {
@@ -314,7 +311,7 @@ task generate_mkfastq_input {
         docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }
 
@@ -326,7 +323,7 @@ task generate_count_config {
         String docker_registry
         String zones
         Int preemptible
-        Int awsMaxRetries
+        String awsQueueArn
         String backend
     }
 
@@ -418,6 +415,6 @@ task generate_count_config {
         docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
+        queueArn: awsQueueArn
     }
 }

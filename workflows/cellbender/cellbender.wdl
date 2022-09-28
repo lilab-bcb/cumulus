@@ -48,8 +48,6 @@ workflow cellbender {
         Int boot_disk_size_GB = 20
         # Number of maximum preemptible tries allowed
         Int preemptible = 0
-        # Number of maximum retries when running on AWS
-        Int awsMaxRetries = 5
         # Arn string of AWS queue
         String awsQueueArn = ""
         # Number of CPUs to request per sample
@@ -93,7 +91,6 @@ workflow cellbender {
                 num_cpu = num_cpu,
                 memory = memory,
                 preemptible = preemptible,
-                awsMaxRetries = awsMaxRetries,
                 awsQueueArn = awsQueueArn,
                 gpu_type = gpu_type,
                 backend = backend
@@ -129,7 +126,6 @@ task run_cellbender_remove_background_gpu {
         Int disk_space
         Int boot_disk_size_GB
         Int preemptible
-        Int awsMaxRetries
         String awsQueueArn
         Int num_cpu
         String memory
@@ -178,7 +174,6 @@ task run_cellbender_remove_background_gpu {
         gpuCount: 1
         gpuType: "~{gpu_type}"
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
         queueArn: awsQueueArn
     }
 }

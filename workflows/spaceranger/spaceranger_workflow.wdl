@@ -70,8 +70,6 @@ workflow spaceranger_workflow {
 
         # Number of preemptible tries
         Int preemptible = 2
-        # Number of maximum retries when running on AWS
-        Int awsMaxRetries = 5
         # Arn string of AWS queue
         String awsQueueArn = ""
         # Backend
@@ -96,7 +94,6 @@ workflow spaceranger_workflow {
                 docker_registry = docker_registry_stripped,
                 zones = zones,
                 preemptible = preemptible,
-                awsMaxRetries = awsMaxRetries,
                 awsQueueArn = awsQueueArn,
                 backend = backend
         }
@@ -118,7 +115,6 @@ workflow spaceranger_workflow {
                         memory = memory,
                         disk_space = mkfastq_disk_space,
                         preemptible = preemptible,
-                        awsMaxRetries = awsMaxRetries,
                         awsQueueArn = awsQueueArn,
                         backend = backend
                 }
@@ -137,7 +133,6 @@ workflow spaceranger_workflow {
                 zones = zones,
                 null_file = null_file,
                 preemptible = preemptible,
-                awsMaxRetries = awsMaxRetries,
                 awsQueueArn = awsQueueArn,
                 backend = backend
         }
@@ -174,7 +169,6 @@ workflow spaceranger_workflow {
                     memory = memory,
                     disk_space = count_disk_space,
                     preemptible = preemptible,
-                    awsMaxRetries = awsMaxRetries,
                     awsQueueArn = awsQueueArn,
                     backend = backend
             }
@@ -188,7 +182,6 @@ workflow spaceranger_workflow {
                 docker_registry = docker_registry_stripped,
                 zones = zones,
                 preemptible = preemptible,
-                awsMaxRetries = awsMaxRetries,
                 awsQueueArn = awsQueueArn,
                 backend = backend
         }
@@ -209,7 +202,6 @@ task generate_bcl_csv {
         String docker_registry
         String zones
         Int preemptible
-        Int awsMaxRetries
         String awsQueueArn
         String backend
     }
@@ -258,7 +250,6 @@ task generate_bcl_csv {
         docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
         queueArn: awsQueueArn
     }
 }
@@ -273,7 +264,6 @@ task generate_count_config {
         String zones
         String null_file
         Int preemptible
-        Int awsMaxRetries
         String awsQueueArn
         String backend
     }
@@ -348,7 +338,6 @@ task generate_count_config {
         docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
         queueArn: awsQueueArn
     }
 }
@@ -361,7 +350,6 @@ task collect_summaries {
         String docker_registry
         String zones
         Int preemptible
-        Int awsMaxRetries
         String awsQueueArn
         String backend
     }
@@ -396,7 +384,6 @@ task collect_summaries {
         docker: "~{docker_registry}/config:~{config_version}"
         zones: zones
         preemptible: preemptible
-        maxRetries: if backend == "aws" then awsMaxRetries else 0
         queueArn: awsQueueArn
     }
 }

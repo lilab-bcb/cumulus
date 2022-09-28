@@ -162,13 +162,9 @@ Below are inputs for *CellBender* workflow. Notice that required inputs are **in
       - Number of maximum preemptible tries allowed. Only works when *backend* is ``gcp``.
       - 2
       - 2
-    * - awsMaxRetries
-      - Number of maximum retries when running on AWS. Only works when *backend* is ``aws``.
-      - 5
-      - 5
     * - awsQueueArn
-      - The Arn URI of the AWS job queue to be used. Only works when *backend* is ``aws``.
-      - "arn:aws:batch:us-east-1:xxxxxx"
+      - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+      - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
       - ""
 
 ----------
