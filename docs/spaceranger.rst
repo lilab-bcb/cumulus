@@ -1,7 +1,10 @@
-Run Space Ranger tools using spaceranger_workflow
--------------------------------------------------
+10x Visium
+----------
 
-``spaceranger_workflow`` wraps Space Ranger to process spatial transcriptomics data.
+Run Space Ranger tools using spaceranger_workflow
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+``spaceranger_workflow`` wraps Space Ranger to process 10x Visium data.
 
 A general step-by-step instruction
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
@@ -101,7 +104,7 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		* - SlideFile
 		  - Slide layout file indicating capture spot and fiducial spot positions. Only required if internet access is not available.
 		* - LoupeAlignment
-		  - Alignment file produced by the manual Loupe alignment step. Image column must be supplied in this case.
+		  - Alignment file produced by the manual Loupe alignment step.
 		* - TargetPanel
 		  - Cloud bucket url for a target panel CSV for targeted gene expression analysis.
 

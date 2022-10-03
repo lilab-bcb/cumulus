@@ -62,6 +62,7 @@ A brief description of the sample sheet format is listed below **(required colum
         - ``SlideSeq``
         - ``ShareSeq``
         - ``None``
+        
         If not specified, use the default ``tenX_v3``.
 
 **3.2 Assay-specific preset STARsolo options**

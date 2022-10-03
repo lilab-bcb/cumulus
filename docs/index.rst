@@ -22,13 +22,20 @@ Release Highlights in Current Stable
    :hidden:
 
    cellranger/index
-   spaceranger
    starsolo
    demultiplexing
    cellbender
    cumulus
    command_line
    examples/index
+
+.. toctree::
+   :caption: Spatial transcriptomics 
+   :maxdepth: 1
+   :hidden:
+
+   spaceranger
+   geomxngs/index
 
 .. toctree::
    :caption: SMART-Seq2 and bulk RNA-seq
@@ -45,13 +52,6 @@ Release Highlights in Current Stable
 
    drop_seq
 
-.. toctree::
-   :caption: GeoMx Digital Spatial Profiler
-   :maxdepth: 1
-   :hidden:
-
-   geomxngs_fastq_to_dcc
-   geomxngs_dcc_to_count_matrix
 
 .. toctree::
    :caption: Others
