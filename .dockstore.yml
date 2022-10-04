@@ -46,6 +46,36 @@ workflows:
         - /.*/
       branches:
         - master
+  - name: GeoMxFastqToDCC
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/geomxng/geomxngs_fastq_to_dcc.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
+  - name: GeoMxDCCToCountMatrix
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/geomxng/geomxngs_dcc_to_count_matrix.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
   - name: Demultiplexing
     subclass: WDL
     publish: true
