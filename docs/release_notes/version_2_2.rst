@@ -5,8 +5,8 @@
 
 * Add `Nanostring GeoMx DSP`_ workflows. It consists of two steps:
 
-    * **GeoMxFastqToDCC** workflow to convert FASTQ files into DCC files by wrapping Nanostring GeoMx Digital Spatial NGS Pipeline.
-    * **GeoMxDCCToCountMatrix** workflow to generate probe count matrix from DCC files with pathologists' annotation.
+    * **GeoMx_fastq_to_dcc** workflow to convert FASTQ files into DCC files by wrapping Nanostring GeoMx Digital Spatial NGS Pipeline.
+    * **GeoMx_dcc_to_count_matrix** workflow to generate probe count matrix from DCC files with pathologists' annotation.
 
 **Updates:**
 
