@@ -23,6 +23,14 @@ Cumulus workflows are written in WDL_ language, and published on Dockstore_. Bel
       - 1.2.0
       - 2021-01-19
       - Run STARsolo to generate gene-count matrices fro FASTQ files.
+    * - `GeoMxFastqToDCC <https://dockstore.org/workflows/github.com/lilab-bcb/cumulus/GeoMxFastqToDCC>`_
+      - 2.2.0
+      - 2022-10-04
+      - Run Nanostring GeoMx Digital Spatial NGS Pipeline, and convert FASTQ files into DCC files.
+    * - `GeoMxDCCToCountMatrix <https://dockstore.org/workflows/github.com/lilab-bcb/cumulus/GeoMxDCCToCountMatrix>`_
+      - 2.2.0
+      - 2022-10-04
+      - Take the DCC zip file from *GeoMxFastqToDCC* workflow, as well as other output of GeoMx DSP machine as the input, and generate an Area Of Interest (AOI) by probe count matrix with pathologists' annotation.
     * - `Demultiplexing <https://dockstore.org/workflows/github.com/lilab-bcb/cumulus/Demultiplexing>`_
       - 0.3.0
       - 2018-10-24

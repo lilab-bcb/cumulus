@@ -88,7 +88,7 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		* - **Index**
 		  - Sample index (e.g. SI-GA-A12).
 		* - ProbeSet
-		  - Probe set for FFPE samples. **Choosing** from ``human_probe_v1`` (10x human probe set, CytoAssist-incompatible), ``human_probe_v2`` (10x human probe set, CytoAssist-compatible) and ``mouse_probe_v1`` (10x mouse probe set). Alternatively, a CSV file describing the probe set can be directly used. Setting ProbeSet to ```` for a sample implies the sample is not FFPE.
+		  - Probe set for FFPE samples. **Choosing** from ``human_probe_v1`` (10x human probe set, CytoAssist-incompatible), ``human_probe_v2`` (10x human probe set, CytoAssist-compatible) and ``mouse_probe_v1`` (10x mouse probe set). Alternatively, a CSV file describing the probe set can be directly used. Setting ProbeSet to ``""`` for a sample implies the sample is not FFPE.
 		* - Image
 		  - Cloud bucket url for a brightfield tissue H&E image in .jpg or .tiff format. This column is mutually exclusive with DarkImage and ColorizedImage columns.
 		* - DarkImage
