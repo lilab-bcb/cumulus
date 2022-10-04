@@ -5,7 +5,7 @@
 Release Highlights in Current Stable
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. include:: release_notes/version_2_1.rst
+.. include:: release_notes/version_2_2.rst
 
 .. toctree::
    :maxdepth: 1
@@ -30,7 +30,7 @@ Release Highlights in Current Stable
    examples/index
 
 .. toctree::
-   :caption: Spatial transcriptomics 
+   :caption: Spatial transcriptomics
    :maxdepth: 1
    :hidden:
 
