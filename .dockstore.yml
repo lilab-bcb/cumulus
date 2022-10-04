@@ -46,7 +46,7 @@ workflows:
         - /.*/
       branches:
         - master
-  - name: GeoMxFastqToDCC
+  - name: GeoMx_fastq_to_dcc
     subclass: WDL
     publish: true
     primaryDescriptorPath: /workflows/geomxng/geomxngs_fastq_to_dcc.wdl
@@ -61,7 +61,7 @@ workflows:
         - /.*/
       branches:
         - master
-  - name: GeoMxDCCToCountMatrix
+  - name: GeoMx_dcc_to_count_matrix
     subclass: WDL
     publish: true
     primaryDescriptorPath: /workflows/geomxng/geomxngs_dcc_to_count_matrix.wdl
