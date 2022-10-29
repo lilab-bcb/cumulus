@@ -838,7 +838,7 @@ task generate_count_config {
                     sys.exit(1)
                 if len(probeset_set) == 1:
                     n_probeset += 1
-                    fo_s2probeset.write(link_id + '\t' + list(probeset_set[0]) + '\n')
+                    fo_s2probeset.write(link_id + '\t' + list(probeset_set)[0] + '\n')
 
                 foo1.write(link_id + '\t' + ','.join(link2dir[link_id]) + '\n')
                 foo2.write(link_id + '\t' + ','.join(link2dt[link_id]) + '\n')
