@@ -837,7 +837,7 @@ task generate_count_config {
                     print("Link '" + link_id + "' contains multiple probe sets!", file = sys.stderr)
                     sys.exit(1)
                 if len(probeset_set) == 1:
-                    n_probset += 1
+                    n_probeset += 1
                     fo_s2probeset.write(link_id + '\t' + list(probset_set[0]) + '\n')
 
                 foo1.write(link_id + '\t' + ','.join(link2dir[link_id]) + '\n')
