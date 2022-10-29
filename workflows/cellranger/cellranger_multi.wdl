@@ -18,7 +18,7 @@ workflow cellranger_multi {
         # Keywords or a URL to a tar.gz file
         String genome
         # Keyword to a preset probe set CSV file
-        String probe_set = ""
+        String probe_set = "null"
 
         # CMO set CSV file, delaring CMO constructs and associated barcodes
         File? cmo_set
@@ -64,7 +64,7 @@ workflow cellranger_multi {
     File genome_file = (if is_genome_uri then genome else acronym2uri[genome])
 
     # If probe set is specified
-    File probe_set_file = (if probe_set != "" then acronym2uri[probe_set] else acronym2uri["null_file"])
+    File probe_set_file = (if probe_set != "null" then acronym2uri[probe_set] else acronym2uri["null_file"])
 
     call run_cellranger_multi {
         input:

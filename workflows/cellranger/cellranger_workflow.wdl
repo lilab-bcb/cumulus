@@ -473,6 +473,7 @@ workflow cellranger_workflow {
                         output_directory = output_directory_stripped,
                         acronym_file = acronym_file,
                         genome = generate_count_config.sample2genome[link_id],
+                        probe_set = generate_count_config.sample2probeset[link_id],
                         cmo_set = cmo_set,
                         include_introns = include_introns,
                         no_bam = no_bam,
@@ -588,7 +589,7 @@ task generate_bcl_csv {
         multiomics = defaultdict(set)
         for idx, row in df.iterrows():
             row['Flowcell'] = re.sub('/+$', '', row['Flowcell'])
-            if row['DataType'] not in ['rna', 'vdj', 'adt', 'citeseq', 'hashing', 'cmo', 'crispr', 'atac']:
+            if row['DataType'] not in ['rna', 'vdj', 'adt', 'citeseq', 'hashing', 'cmo', 'crispr', 'atac', 'frp']:
                 print("Unknown DataType " + row['DataType'] + " is detected!", file = sys.stderr)
                 sys.exit(1)
             if ('Link' in row) and pd.notnull(row['Link']) and (row['Link'] != ''):
@@ -682,7 +683,7 @@ task generate_count_config {
 
         for idx, row in df.iterrows():
             row['Flowcell'] = re.sub('/+$', '', row['Flowcell'])
-            if row['DataType'] not in ['rna', 'vdj', 'adt', 'citeseq', 'cmo', 'crispr', 'atac', 'hashing']:
+            if row['DataType'] not in ['rna', 'vdj', 'adt', 'citeseq', 'cmo', 'crispr', 'atac', 'hashing', 'frp']:
                 print("Unknown DataType " + row['DataType'] + " is detected!", file = sys.stderr)
                 sys.exit(1)
             if re.search('[^a-zA-Z0-9_-]', row['Sample']) is not None:
@@ -708,9 +709,9 @@ task generate_count_config {
              open('sample2dir.txt', 'w') as foo1, open('sample2datatype.txt', 'w') as foo2, open('sample2genome.txt', 'w') as foo3, \
              open('sample2chemistry.txt', 'w') as foo4, open('sample2fbf.txt', 'w') as foo5, open('count_matrix.csv', 'w') as foo6, \
              open('link_arc_ids.txt', 'w') as fo5, open('link_multi_ids.txt', 'w') as fo6, open('link_fbc_ids.txt', 'w') as fo7, \
-             open('link2sample.txt', 'w') as foo7:
+             open('link2sample.txt', 'w') as foo7, open('sample2probeset.txt', 'w') as fo_s2probeset:
 
-            n_ref = n_chem = n_fbf = n_link = 0 # this mappings can be empty
+            n_ref = n_chem = n_fbf = n_link = n_probeset = 0 # this mappings can be empty
             foo6.write('Sample,Location,Bam,BamIndex,Barcodes,Reference,Chemistry\n') # count_matrix.csv
             datatype2fo = dict([('rna', fo1), ('vdj', fo2), ('adt', fo3), ('citeseq', fo3), ('hashing', fo3), ('cmo', fo3), ('crispr', fo3), ('atac', fo4)])
 
@@ -720,6 +721,7 @@ task generate_count_config {
             link2dt = defaultdict(list)
             link2fbf = defaultdict(list)
             link2ref = defaultdict(set)
+            link2probset = defaultdict(set)
 
             for sample_id in df['Sample'].unique():
                 df_local = df.loc[df['Sample'] == sample_id]
@@ -735,14 +737,24 @@ task generate_count_config {
                     dirs = df_local['Flowcell'].values # if start from count step
 
                 reference = 'null'
-                if datatype in ['rna', 'vdj', 'atac']:
+                if datatype in ['rna', 'vdj', 'atac', 'frp']:
                     if df_local['Reference'].unique().size > 1:
                         print("Detected multiple references for sample " + sample_id + "!", file = sys.stderr)
                         sys.exit(1)
                     reference = df_local['Reference'].iat[0]
 
+                probeset = 'null'
+                if datatype == 'frp':
+                    if 'ProbeSet' not in df_local.columns:
+                        probeset = 'FRP_human_probe_v1'
+                    else:
+                        if df_local['ProbeSet'].unique().size > 1:
+                            print("Detected multiple probe sets for sample " + sample_id + "!", file = sys.stderr)
+                            sys.exit(1)
+                        probeset = df_local['ProbeSet'].iat[0]
+
                 feature_barcode_file = 'null'
-                if datatype in ['rna', 'adt', 'citeseq', 'hashing', 'cmo', 'crispr']:
+                if datatype in ['rna', 'adt', 'citeseq', 'hashing', 'cmo', 'crispr', 'frp']:
                     has_fbf = ('FeatureBarcodeFile' in df_local.columns) and isinstance(df_local['FeatureBarcodeFile'].iat[0], str) and (df_local['FeatureBarcodeFile'].iat[0] != '')
                     if has_fbf:
                         if df_local['FeatureBarcodeFile'].unique().size > 1:
@@ -755,11 +767,15 @@ task generate_count_config {
                             sys.exit(1)
                         feature_barcode_file = '~{null_file}'
 
-                if 'Link' in df_local: # if multiomics
-                    if df_local['Link'].unique().size > 1:
-                        print("Detected multiple Link values for sample '" + sample_id + "'!", file = sys.stderr)
-                        sys.exit(1)
-                    link = df_local['Link'].iat[0]
+                if ('Link' in df_local) or (datatype == 'frp'): # if multiomics or FRP (Fixed RNA Profiling)
+                    if 'Link' in df_local:
+                        if df_local['Link'].unique().size > 1:
+                            print("Detected multiple Link values for sample '" + sample_id + "'!", file = sys.stderr)
+                            sys.exit(1)
+                        link = df_local['Link'].iat[0]
+                    else:
+                        link = sample_id
+
                     if pd.notnull(link) and (link != ''):
                         multiomics[link].add(datatype)
                         size = dirs.size
@@ -771,6 +787,7 @@ task generate_count_config {
                         link2fbf[link].extend([feature_barcode_file] * size)
                         if reference != 'null':
                             link2ref[link].add(reference)
+                        link2probset[link].add(probeset)
                         continue
 
                 datatype2fo[datatype].write(sample_id + '\n')
@@ -815,6 +832,14 @@ task generate_count_config {
                     n_ref += 1
                     foo3.write(link_id + '\t' + list(ref_set)[0] + '\n')
 
+                probeset_set = link2probset.get(link_id, set())
+                if len(probeset_set) > 1:
+                    print("Link '" + link_id + "' contains multiple probe sets!", file = sys.stderr)
+                    sys.exit(1)
+                if len(probeset_set) == 1:
+                    n_probset += 1
+                    fo_s2probeset.write(link_id + '\t' + list(probset_set[0]) + '\n')
+
                 foo1.write(link_id + '\t' + ','.join(link2dir[link_id]) + '\n')
                 foo2.write(link_id + '\t' + ','.join(link2dt[link_id]) + '\n')
                 foo7.write(link_id + '\t' + ','.join(link2sample[link_id]) + '\n')
@@ -834,6 +859,10 @@ task generate_count_config {
                     fo6.write(link_id + '\n')
                     foo5.write(link_id + '\t' + ','.join(link2fbf[link_id]) + '\n')
                     n_fbf += 1
+                elif 'frp' in multiomics[link_id]:
+                    fo6.write(link_id + '\n')
+                    foo5.write(link_id + '\t' + ','.join(link2fbf[link_id]) + '\n')
+                    n_fbf += 1
                 else:
                     if not multiomics[link_id].issubset(set(['rna', 'crispr', 'citeseq', 'hashing'])):
                         print("CellRanger count only works with RNA/CRISPR/CITESEQ/HASHING data! Link '" + link_id + "' contains " + ', '.join(list(multiomics[link_id])) + '.', file = sys.stderr)
@@ -844,6 +873,8 @@ task generate_count_config {
 
             if n_ref == 0:
                 foo3.write('null\tnull\n')
+            if n_probeset == 0:
+                fo_s2probeset('null\tnull\n')
             if n_chem == 0:
                 foo4.write('null\tnull\n')
             if n_fbf == 0:
@@ -864,6 +895,7 @@ task generate_count_config {
         Map[String, String] sample2dir = read_map('sample2dir.txt')
         Map[String, String] sample2datatype = read_map('sample2datatype.txt')
         Map[String, String] sample2genome = read_map('sample2genome.txt')
+        Map[String, String] sample2probeset = read_map('sample2probeset.txt')
         Map[String, String] sample2chemistry = read_map('sample2chemistry.txt')
         Map[String, String] sample2fbf = read_map('sample2fbf.txt')
         Map[String, String] link2sample = read_map('link2sample.txt')
