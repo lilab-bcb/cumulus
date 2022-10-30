@@ -254,11 +254,12 @@ task run_cellranger_multi {
                 has_cmo = True
 
             has_frp = False
-            if frp_file != '':
-                if has_cmo:
-                    raise Exception("Cannot have both CMO and FRP sample files!")
-                with open(frp_file, 'r') as fin:
-                    write_csv_wise(['sample_id', 'probe_barcode_ids', 'description', 'expect_cells', 'force_cells'], fin, fout)
+            if 'frp' in data_types:
+                if frp_file != '':
+                    if has_cmo:
+                        raise Exception("Cannot have both CMO and FRP sample files!")
+                    with open(frp_file, 'r') as fin:
+                        write_csv_wise(['sample_id', 'probe_barcode_ids', 'description', 'expect_cells', 'force_cells'], fin, fout)
                 has_frp = True
 
             if (not has_cmo) and (not has_frp):
