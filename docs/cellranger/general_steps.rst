@@ -85,7 +85,10 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 			| **cmo** refers to cell multiplexing oligos used in 10x Genomics' CellPlex assay,
 			| **crispr** refers to Perturb-seq guide tag data,
 			| **atac** refers to scATAC-Seq data (*cellranger-atac count*),
+			| **frp** refers to Fixed RNA Profiling (FRP) gene expression data,
 			| This column is optional and the default data type is *rna*.
+		* - ProbeSet
+		  - Probe set reference for FRP samples. Currently ``FRP_human_probe_v1`` is the only available and thus the default reference. Only works for samples of *DataType* ``frp``.
 		* - FeatureBarcodeFile
 		  -
 		  	| Google bucket urls pointing to feature barcode files for *rna*, *citeseq*, *hashing*, *cmo* and *crispr* data.
@@ -94,7 +97,7 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		  	| This column is only required for targeted gene expression analysis (*rna*), CITE-Seq (*citeseq*), cell-hashing or nucleus-hashing (*hashing*), CellPlex (*cmo*) and Perturb-seq (*crispr*).
 		* - Link
 		  -
-			| Designed for Single Cell Multiome	ATAC + Gene Expression, Feature Barcoding, or CellPlex.
+			| Designed for Single Cell Multiome	ATAC + Gene Expression, Feature Barcoding, CellPlex, or FRP.
 			| Link multiple modalities together using a single link name.
 			| cellranger-arc count, cellranger count, or cellranger multi will be triggered automatically depending on the modalities.
 			| If empty string is provided, no link is assumed.

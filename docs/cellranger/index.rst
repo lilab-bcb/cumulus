@@ -43,6 +43,13 @@ Single-cell multiomics
 
 .. include:: sc_multiomics.rst
 
+--------------------------
+
+Fixed RNA Profiling
+^^^^^^^^^^^^^^^^^^^^
+
+.. include:: fixed_rna_profiling.rst
+
 ---------------------------------
 
 Build Cell Ranger References
