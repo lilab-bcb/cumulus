@@ -98,14 +98,14 @@ workflow cellranger_workflow {
         # Index TSV file
         File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
 
-        # 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0
-        String cellranger_version = "7.0.0"
+        # 7.0.1, 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0
+        String cellranger_version = "7.0.1"
         # 0.11.0, 0.10.0, 0.9.0, 0.8.0, 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0
         String cumulus_feature_barcoding_version = "0.11.0"
         # 2.1.0, 2.0.0, 1.2.0, 1.1.0
         String cellranger_atac_version = "2.1.0"
-        # 2.0.1, 2.0.0, 1.0.1, 1.0.0
-        String cellranger_arc_version = "2.0.1"
+        # 2.0.2, 2.0.1, 2.0.0, 1.0.1, 1.0.0
+        String cellranger_arc_version = "2.0.2"
         # config version
         String config_version = "0.3"
 
