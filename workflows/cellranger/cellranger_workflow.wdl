@@ -874,7 +874,7 @@ task generate_count_config {
             if n_ref == 0:
                 foo3.write('null\tnull\n')
             if n_probeset == 0:
-                fo_s2probeset('null\tnull\n')
+                fo_s2probeset.write('null\tnull\n')
             if n_chem == 0:
                 foo4.write('null\tnull\n')
             if n_fbf == 0:
