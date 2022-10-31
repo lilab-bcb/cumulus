@@ -24,9 +24,9 @@ copyright = '2022 Genentech, Inc. and the Broad Institute, Inc. All rights reser
 author = 'Yiming Yang, Joshua Gould and Bo Li'
 
 # The short X.Y version
-version = '2.2'
+version = '2.3'
 # The full version, including alpha/beta/rc tags
-release = '2.2.0'
+release = '2.3.0'
 
 
 # -- General configuration ---------------------------------------------------
