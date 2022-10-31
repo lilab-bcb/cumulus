@@ -16,7 +16,6 @@ workflows:
         - /.*/
       branches:
         - master
-        - cellranger-ffpe
   - name: Spaceranger
     subclass: WDL
     publish: true
