@@ -17,6 +17,8 @@ workflow cellranger_multi {
 
         # Keywords or a URL to a tar.gz file
         String genome
+        # Keyword to a preset probe set CSV file
+        String probe_set = "null"
 
         # CMO set CSV file, delaring CMO constructs and associated barcodes
         File? cmo_set
@@ -56,11 +58,13 @@ workflow cellranger_multi {
         String backend = "gcp"
     }
 
-    Map[String, String] acronym2gsurl = read_map(acronym_file)
-    # If reference is a url
-    Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
+    Map[String, String] acronym2uri = read_map(acronym_file)
+    # If reference is a URI
+    Boolean is_genome_uri = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
+    File genome_file = (if is_genome_uri then genome else acronym2uri[genome])
 
-    File genome_file = (if is_url then genome else acronym2gsurl[genome])
+    # If probe set is specified
+    File probe_set_file = (if probe_set != "null" then acronym2uri[probe_set] else acronym2uri["null_file"])
 
     call run_cellranger_multi {
         input:
@@ -71,6 +75,7 @@ workflow cellranger_multi {
             input_fbf = input_fbf,
             output_directory = output_directory,
             genome_file = genome_file,
+            probe_set_file = probe_set_file,
             cmo_set = cmo_set,
             force_cells = force_cells,
             expect_cells = expect_cells,
@@ -102,6 +107,7 @@ task run_cellranger_multi {
         String input_fbf
         String output_directory
         File genome_file
+        File probe_set_file
         File? cmo_set
         Int? force_cells
         Int? expect_cells
@@ -140,12 +146,15 @@ task run_cellranger_multi {
 
         target_panel = set()
         cmo_file = set()
+        frp_file = set()
         feature_file = set()
         for dtype, fbf in zip(data_types, fbfs):
             if dtype == 'rna':
                 target_panel.add(fbf)
             elif dtype == 'cmo':
                 cmo_file.add(fbf)
+            elif dtype == 'frp':
+                frp_file.add(fbf)
             else:
                 feature_file.add(fbf)
 
@@ -161,13 +170,29 @@ task run_cellranger_multi {
             check_call(call_args)
             return os.path.abspath(os.path.basename(file_loc))
 
+        def is_null_file(filename):
+            return filename == "" or os.path.basename(filename) == "null"
+
         target_panel = _locate_file(target_panel, 'target panel')
         cmo_file = _locate_file(cmo_file, 'CMO sample')
         feature_file = _locate_file(feature_file, 'feature reference')
+        frp_file = _locate_file(frp_file, 'FRP sample')
 
         with open('multi.csv', 'w') as fout:
             fout.write('[gene-expression]\n')
             fout.write('reference,' + os.path.abspath('genome_dir') + '\n')
+
+            if is_null_file('~{probe_set_file}'):
+                if '~{include_introns}' == 'true':
+                    fout.write('include-introns,true\n')
+                elif version.parse('~{cellranger_version}') >= version.parse('7.0.0'):
+                    fout.write('include-introns,false\n')
+            else:
+                if version.parse('~{cellranger_version}') >= version.parse('7.0.0'):
+                    fout.write('probe-set,~{probe_set_file}\n')
+                else:
+                    print("Fixed RNA Profiling only works in Cell Ranger v7.0.0+!", file=sys.stderr)
+                    sys.exit(1)
             if '~{cmo_set}' != '':
                 fout.write('cmo-set,~{cmo_set}\n')
             if target_panel != '':
@@ -176,10 +201,6 @@ task run_cellranger_multi {
                 fout.write('force-cells,~{force_cells}\n')
             if '~{expect_cells}' != '':
                 fout.write('expect-cells,~{expect_cells}\n')
-            if '~{include_introns}' == 'true':
-                fout.write('include-introns,true\n')
-            elif version.parse('~{cellranger_version}') >= version.parse('7.0.0'):
-                fout.write('include-introns,false\n')
             if '~{secondary}' == 'false':
                 fout.write('no-secondary,true\n')
             if '~{no_bam}' == 'true':
@@ -206,7 +227,7 @@ task run_cellranger_multi {
                     print(' '.join(call_args))
                     check_call(call_args)
                 feature_type = ''
-                if data_types[i] == 'rna':
+                if data_types[i] in ['rna', 'frp']:
                     feature_type = 'Gene Expression'
                 elif data_types[i] == 'crispr':
                     feature_type = 'CRISPR Guide Capture'
@@ -219,13 +240,31 @@ task run_cellranger_multi {
                     sys.exit(1)
                 fout.write(samples[i] + ',' + os.path.abspath(target) + ',' +  feature_type + '\n')
 
-            if cmo_file == '':
-                print("Cannot locate a CMO sample file!", file = sys.stderr)
-                sys.exit(1)
-            fout.write('\n[samples]\nsample_id,cmo_ids\n')
-            with open(cmo_file) as fin:
-                for line in fin:
-                    fout.write(line)
+            def write_csv_wise(full_columns, fin, fout):
+                lines = fin.readlines()
+                columns = full_columns[0:len(lines[0].split(','))]
+                fout.write("\n[samples]\n" + ",".join(columns) + "\n")
+                for l in lines:
+                    fout.write(l)
+
+            has_cmo = False
+            if cmo_file != '':
+                with open(cmo_file, 'r') as fin:
+                    write_csv_wise(['sample_id', 'cmo_ids', 'description'], fin, fout)
+                has_cmo = True
+
+            has_frp = False
+            if 'frp' in data_types:
+                if frp_file != '':
+                    if has_cmo:
+                        raise Exception("Cannot have both CMO and FRP sample files!")
+                    with open(frp_file, 'r') as fin:
+                        write_csv_wise(['sample_id', 'probe_barcode_ids', 'description', 'expect_cells', 'force_cells'], fin, fout)
+                has_frp = True
+
+            if (not has_cmo) and (not has_frp):
+                raise Exception("Cannot locate CMO or FRP sample file!")
+
 
         call_args = ['cellranger', 'multi', '--id=results', '--csv=multi.csv', '--jobmode=local']
         print(' '.join(call_args))
