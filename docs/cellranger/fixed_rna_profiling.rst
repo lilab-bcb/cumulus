@@ -32,6 +32,8 @@ Sample Sheet
           - Description
         * - **FRP_human_probe_v1**
           - FRP probe set for human
+        * - **FRP_mouse_probe_v1**
+          - FRP probe set for mouse
 
     If *ProbeSet* column is not set, use **FRP_human_probe_v1** by default.
 
