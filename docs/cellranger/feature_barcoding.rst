@@ -191,9 +191,9 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - "7.0.1"
 		  - "7.0.1"
 		* - cumulus_feature_barcoding_version
-		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.11.0, 0.10.0, 0.9.0, 0.8.0, 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0.
-		  - "0.11.0"
-		  - "0.11.0"
+		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.11.1, 0.11.0, 0.10.0, 0.9.0, 0.8.0, 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0.
+		  - "0.11.1"
+		  - "0.11.1"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
