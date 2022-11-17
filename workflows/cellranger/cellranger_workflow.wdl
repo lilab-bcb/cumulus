@@ -594,7 +594,7 @@ task generate_bcl_csv {
                 sys.exit(1)
             if ('Link' in row) and pd.notnull(row['Link']) and (row['Link'] != ''):
                 multiomics[row['Link']].add(row['DataType'])
-            if row['DataType'] in ['vdj', 'adt', 'citeseq', 'hashing', 'cmo', 'crispr']:
+            if row['DataType'] in ['vdj', 'adt', 'citeseq', 'hashing', 'cmo', 'crispr', 'frp']:
                 row['DataType'] = 'rna'
             if re.search('[^a-zA-Z0-9_-]', row['Sample']) is not None:
                 print('Sample must contain only alphanumeric characters, hyphens, and underscores.', file = sys.stderr)
