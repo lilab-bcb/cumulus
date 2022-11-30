@@ -36,7 +36,7 @@ workflow starsolo_count {
         String? soloUMIfiltering
         String? soloCellFilter
         String? soloOutFormatFeaturesGeneField3
-        Int? limitBAMsortRAM
+        Float? limitBAMsortRAM
         Int? outBAMsortingBinsN
         String docker_registry
         String star_version
@@ -142,7 +142,7 @@ task run_starsolo {
         String? soloUMIfiltering
         String? soloCellFilter
         String? soloOutFormatFeaturesGeneField3
-        Int? limitBAMsortRAM
+        Float? limitBAMsortRAM
         Int? outBAMsortingBinsN
         String docker_registry
         String version

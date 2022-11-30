@@ -71,7 +71,7 @@ workflow starsolo_workflow {
         # Reference Index TSV
         File acronym_file = "gs://regev-lab/resources/starsolo/index.tsv"
         # Maximum available RAM (bytes) for sorting BAM. If =0, it will be set to the genome index size. 0 value can only be used with --genomeLoad NoSharedMemory option.
-        Int? limitBAMsortRAM
+        Float? limitBAMsortRAM
         # Number of genome bins fo coordinate-sorting. Default: 50
         Int? outBAMsortingBinsN
         # Disk space in GB needed per sample
