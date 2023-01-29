@@ -30,12 +30,16 @@ Sample Sheet
 
         * - Keyword
           - Description
+        * - **FRP_human_probe_v1.0.1**
+          - FRP probe set v1.0.1 for human. *Only work with Cell Ranger v7.1+*.
+        * - **FRP_mouse_probe_v1.0.1**
+          - FRP probe set v1.0.1 for mouse. *Only work with Cell Ranger v7.1+*.
         * - **FRP_human_probe_v1**
-          - FRP probe set for human
+          - FRP probe set v1.0 for human. Work with Cell Ranger v7.0+.
         * - **FRP_mouse_probe_v1**
-          - FRP probe set for mouse
+          - FRP probe set v1.0 for mouse. Work with Cell Ranger v7.0+.
 
-    If *ProbeSet* column is not set, use **FRP_human_probe_v1** by default.
+    If *ProbeSet* column is not set, use **FRP_human_probe_v1.0.1** by default.
 
 #. *FeatureBarcodeFile* column.
 
@@ -136,9 +140,9 @@ For FRP data, ``cellranger_workflow`` takes Illumina outputs as input and runs `
       - false
       - false
     * - cellranger_version
-      - Cell Ranger version to use. Available versions working for FRP data: 7.0.1, 7.0.0.
-      - "7.0.1"
-      - "7.0.1"
+      - Cell Ranger version to use. Available versions working for FRP data: 7.1.0, 7.0.1, 7.0.0.
+      - "7.1.0"
+      - "7.1.0"
     * - docker_registry
       - Docker registry to use for cellranger_workflow. Options:
 
