@@ -47,8 +47,8 @@ workflow spaceranger_workflow {
         # Hard trim the input Read 2 to this length before analysis
         Int? r2_length
 
-        # Space Ranger version: 2.0.0, 1.3.1, 1.3.0
-        String spaceranger_version = "2.0.0"
+        # Space Ranger version: 2.0.1, 2.0.0, 1.3.1, 1.3.0
+        String spaceranger_version = "2.0.1"
         # Config version
         String config_version = "0.3"
 
