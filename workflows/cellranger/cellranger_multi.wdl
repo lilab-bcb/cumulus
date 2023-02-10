@@ -276,6 +276,7 @@ task run_cellranger_multi {
 
     output {
         String output_multi_directory = "~{output_directory}/~{link_id}"
+        File multi_csv = "multi.csv"
         File monitoringLog = "monitoring.log"
     }
 
