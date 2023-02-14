@@ -46,7 +46,6 @@ workflows:
         - /.*/
       branches:
         - master
-        - starsolo
   - name: GeoMx_fastq_to_dcc
     subclass: WDL
     publish: true
