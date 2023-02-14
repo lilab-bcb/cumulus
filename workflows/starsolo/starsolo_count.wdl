@@ -36,6 +36,8 @@ workflow starsolo_count {
         String? soloUMIfiltering
         String? soloCellFilter
         String? soloOutFormatFeaturesGeneField3
+        Float? limitBAMsortRAM
+        Int? outBAMsortingBinsN
         String docker_registry
         String star_version
         String zones
@@ -86,6 +88,8 @@ workflow starsolo_count {
             soloUMIfiltering = soloUMIfiltering,
             soloCellFilter = soloCellFilter,
             soloOutFormatFeaturesGeneField3 = soloOutFormatFeaturesGeneField3,
+            limitBAMsortRAM = limitBAMsortRAM,
+            outBAMsortingBinsN = outBAMsortingBinsN,
             docker_registry = docker_registry,
             version = star_version,
             zones = zones,
@@ -138,6 +142,8 @@ task run_starsolo {
         String? soloUMIfiltering
         String? soloCellFilter
         String? soloOutFormatFeaturesGeneField3
+        Float? limitBAMsortRAM
+        Int? outBAMsortingBinsN
         String docker_registry
         String version
         String zones
@@ -341,6 +347,11 @@ task run_starsolo {
             args_dict['--soloCellFilter'] = remove_extra_space('~{soloCellFilter}').split(' ')
         if '~{soloOutFormatFeaturesGeneField3}' != '':
             args_dict['--soloOutFormatFeaturesGeneField3'] = remove_extra_space('~{soloOutFormatFeaturesGeneField3}').split(' ')
+
+        if '~{limitBAMsortRAM}' != '':
+            args_dict['--limitBAMsortRAM'] = '~{limitBAMsortRAM}'
+        if '~{outBAMsortingBinsN}' != '':
+            args_dict['--outBAMsortingBinsN'] = '~{outBAMsortingBinsN}'
 
         call_args += generate_args_list(args_dict)
 

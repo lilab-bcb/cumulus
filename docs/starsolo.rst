@@ -62,7 +62,7 @@ A brief description of the sample sheet format is listed below **(required colum
         - ``SlideSeq``
         - ``ShareSeq``
         - ``None``
-        
+
         If not specified, use the default ``tenX_v3``.
 
 **3.2 Assay-specific preset STARsolo options**
@@ -310,6 +310,14 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
       - "BAM SortedByCoordinate"
       - | "BAM SortedByCoordinate" for *tenX_v3*, *tenX_v2*, *SeqWell* and *DropSeq* assay types,
         | "BAM Unsorted" otherwise.
+    * - limitBAMsortRAM
+      - [STAR option] Maximum available RAM (bytes) for sorting BAM. If ``0``, it will be set to the genome index size.
+      - 0
+      - 0
+    * - outBAMsortingBinsN
+      - [STAR option] Number of genome bins fo coordinate-sorting.
+      - 50
+      - 50
     * - star_version
       - STAR version to use. Currently support: ``2.7.9a``, ``2.7.10a`` (`2.7.10a_alpha_220601 <https://github.com/alexdobin/STAR/releases/tag/2.7.10a_alpha_220601>`_).
       - "2.7.10a"
