@@ -232,7 +232,9 @@ souporcell inputs
 	* - souporcell_version
 	  - souporcell version to use. Available versions:
 
-	    - ``2021.03``: Based on commitment `1bd9f1 <https://github.com/wheaton5/souporcell/tree/1bd9f11d70eaee6ac14713de09c377c285ca2787>`_ on 2021/03/07.
+	    - ``2022.12``: Based on commitment `9fb527 <https://github.com/wheaton5/souporcell/tree/9fb5271ae9f2257ea9a8552dfda3d4b7080be194>`_ on 2022/12/13.
+		
+		- ``2021.03``: Based on commitment `1bd9f1 <https://github.com/wheaton5/souporcell/tree/1bd9f11d70eaee6ac14713de09c377c285ca2787>`_ on 2021/03/07.
 
 	    - ``2020.07``: Based on commitment `0d09fb <https://github.com/wheaton5/souporcell/tree/0d09fbe26d878adb294b536c4f41a7718c0d0f9d>`_ on 2020/07/27.
 
