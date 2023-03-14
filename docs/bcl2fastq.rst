@@ -30,7 +30,7 @@ In this example, we create a docker image on Google Cloud (GCP) for running ``ce
     RUN apt-get update && \
         apt-get install -y --no-install-recommends zlib1g-dev
 
-    ADD bcl2fastq-v2-20-0-tar.zip /software/
+    ADD bcl2fastq2-v2-20-0-tar.zip /software/
     RUN cd /software && \
         unzip -d /software/ /software/bcl2fastq2-v2-20-0-tar.zip && \
         tar -zxf /software/bcl2fastq2-v2.20.0.422-Source.tar.gz
@@ -41,13 +41,13 @@ In this example, we create a docker image on Google Cloud (GCP) for running ``ce
     ENV BUILD=/software/bcl2fastq-build
 
     RUN mkdir ${BUILD} && \
-    cd ${BUILD} && \
-    chmod ugo+x ${SOURCE}/src/configure && \
-    chmod ugo+x ${SOURCE}/src/cmake/bootstrap/installCmake.sh && \
-    ${SOURCE}/src/configure --prefix=${INSTALL_DIR} && \
-    make && \
-    make install && \
-    rm -rf /software/bcl2fastq-build
+        cd ${BUILD} && \
+        chmod ugo+x ${SOURCE}/src/configure && \
+        chmod ugo+x ${SOURCE}/src/cmake/bootstrap/installCmake.sh && \
+        ${SOURCE}/src/configure --prefix=${INSTALL_DIR} && \
+        make && \
+        make install && \
+        rm -rf /software/bcl2fastq-build
 
     ENV PATH=$INSTALL_DIR/bin:$PATH
 
