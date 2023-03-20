@@ -11,7 +11,7 @@ workflow InferCNV {
         Boolean HMM = false
         String? ref_group_names
 
-        String docker_registry = "cumulusbeta"
+        String docker_registry = "cumulusprod"
         String inferCNV_version = "1.5.1"
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
