@@ -163,9 +163,7 @@ task run_inferCNV {
         check_call(call_args)
         CODE
 
-        gsutil -q -m rsync -r inferCNV_result ~{output_directory}/~{sample_id}/inferCNV_result
-        # mkdir -p ~{output_directory}/~{sample_id}
-        # cp -r inferCNV_result ~{output_directory}/~{sample_id}/
+        strato sync inferCNV_result "~{output_directory}/~{sample_id}/inferCNV_result"
     }
 
     output {
@@ -230,9 +228,7 @@ task gen_CNV_metrics {
 
         mkdir result
         cp ~{sample_id}.cnv.zarr.zip *.pdf result/
-        gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}/cnv_result
-        # mkdir -p ~{output_directory}/~{sample_id}/cnv_result
-        # cp result/* ~{output_directory}/~{sample_id}/cnv_result/
+        strato sync result "~{output_directory}/~{sample_id}/cnv_result"
     }
 
     output {
