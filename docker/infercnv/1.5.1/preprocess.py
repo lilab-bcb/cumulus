@@ -7,7 +7,7 @@ zarr_file = sys.argv[1]
 out_name = sys.argv[2]
 
 data = pg.read_input(f"{zarr_file}")
-data.select_matrix('raw.X')
+data.select_matrix('counts')
 
 df_raw_count = pd.DataFrame(data=np.transpose(data.X.toarray()), index=data.var['featureid'], columns=data.obs_names)
 df_raw_count.to_csv(f"{out_name}.csv", sep='\t')
