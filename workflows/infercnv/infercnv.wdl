@@ -11,8 +11,9 @@ workflow InferCNV {
         Boolean HMM = false
         String? ref_group_names
 
-        String docker_registry = "cumulusprod"
+        String docker_registry = "quay.io/cumulus"
         String inferCNV_version = "1.5.1"
+        String backend = "gcp"
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         Int memory = 20
@@ -27,6 +28,7 @@ workflow InferCNV {
             sample_id = sample_id,
             docker_registry = docker_registry,
             version = inferCNV_version,
+            backend = backend,
             zones = zones,
             preemptible = preemptible,
             memory = memory,
@@ -46,6 +48,7 @@ workflow InferCNV {
             ref_group_names = ref_group_names,
             docker_registry = docker_registry,
             version = inferCNV_version,
+            backend = backend,
             zones = zones,
             memory = memory,
             disk_space = disk_space,
@@ -61,6 +64,7 @@ workflow InferCNV {
             sample_annotation_csv = preprocess.sample_annotation,
             docker_registry = docker_registry,
             version = inferCNV_version,
+            backend = backend,
             zones = zones,
             memory = memory,
             disk_space = disk_space,
@@ -82,6 +86,7 @@ task preprocess {
         String sample_id
         String docker_registry
         String version
+        String backend
         String zones
         Int preemptible
         Int memory
@@ -91,6 +96,7 @@ task preprocess {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         python /software/preprocess.py ~{input_zarr} ~{sample_id}
@@ -127,6 +133,7 @@ task run_inferCNV {
 
         String docker_registry
         String version
+        String backend
         String zones
         Int memory
         Int disk_space
@@ -136,6 +143,7 @@ task run_inferCNV {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         python <<CODE
@@ -185,6 +193,7 @@ task gen_CNV_metrics {
         File sample_annotation_csv
         String docker_registry
         String version
+        String backend
         String zones
         Int memory
         Int disk_space
@@ -194,6 +203,7 @@ task gen_CNV_metrics {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         Rscript /software/calc_cnv_metrics.R ~{input_cnv_obj} ~{sample_id}_cnv
