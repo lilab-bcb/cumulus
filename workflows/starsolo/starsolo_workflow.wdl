@@ -64,8 +64,8 @@ workflow starsolo_workflow {
         String? soloOutFormatFeaturesGeneField3
         # Number of CPUs to request per sample
         Int num_cpu = 32
-        # STAR version to use. Currently support: 2.7.10a
-        String star_version = "2.7.10a"
+        # STAR version to use. Currently support: 2.7.10b
+        String star_version = "2.7.10b"
         # Docker registry, default to quay.io/cumulus
         String docker_registry = "quay.io/cumulus"
         # Reference Index TSV
