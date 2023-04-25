@@ -20,7 +20,7 @@ workflow geomxngs_fastq_to_dcc {
 
     parameter_meta {
         ini:"Configuration file in INI format, containing pipeline processing parameters"
-        fastq_directory:"FASTQ directory URL (e.g. s3://foo/bar/fastqs or gs://foo/bar/fastqs)"
+        fastq_directory:"FASTQ directory URL (e.g. s3://foo/bar/fastqs or gs://foo/bar/fastqs). Separate multiple directories with a comma"
         output_directory:"URL to write results (e.g. s3://foo/bar/out or gs://foo/bar/out)"
         fastq_rename:"Optional 2 column TSV file with no header used to map original FASTQ names to FASTQ names that GeoMX recognizes"
         docker_registry :"Docker registry"
@@ -84,21 +84,100 @@ task geomxngs_task {
         export DOTNET_SYSTEM_GLOBALIZATION_INVARIANT=1
         monitor_script.sh > monitoring.log &
 
-         # update cpus in ini fie
-        python /software/scripts/update-cpu.py --ini ~{ini} --cpu ~{cpu} --out local.ini
-
         mkdir fastqs
-        strato sync --backend ~{backend} -m ~{fastq_directory} fastqs/
-        if [[ '~{fastq_rename}' != '' ]]; then
-            python /software/scripts/rename-fastqs.py --fastqs fastqs --rename ~{fastq_rename}
-        fi
+
+        python <<CODE
+        import os
+        import pandas as pd
+        from subprocess import check_call
+        import configparser
+        # update cpus in ini file
+        ini_path = '~{ini}'
+        cpu = '~{cpu}' # can only write strings to ini file
+        output_path = 'local.ini'
+
+        config = configparser.ConfigParser()
+        config.optionxform = str  # prevent conversion of keys to lowercase
+        config.read(ini_path)
+        processing_keys = ["Processing", "Processing_v2"]
+        found = False
+        for processing_key in processing_keys:
+            if processing_key in config:
+                config[processing_key]["threads"] = cpu
+                found = True
+                break
+        if not found:
+            raise ValueError("Processing section not found")
+        with open(output_path, "wt") as out:
+            config.write(out)
+
+        # download and rename fastqs
+        rename = '~{fastq_rename}'
+        remote_fastq_dirs = '~{fastq_directory}'.split(',')
+        backend = '~{backend}'
+        local_fastq_dirs = []
+        if len(remote_fastq_dirs) == 1:
+            local_fastq_dirs.append('fastqs')
+            check_call(['strato', 'sync', '--backend', backend, '-m', remote_fastq_dirs[0], 'fastqs/'])
+        else:  # geomx pipeline only works with one directory of fastqs
+            for i in range(len(remote_fastq_dirs)):
+                local_fastq_dir = 'fastqs-' + str(i + 1)
+                local_fastq_dirs.append(local_fastq_dir)
+                os.makedirs(local_fastq_dir, exist_ok=True)
+                check_call(
+                    ['strato', 'sync', '--backend', backend, '-m', remote_fastq_dirs[i], local_fastq_dir])
+
+        if rename:
+            df = pd.read_csv(rename, sep="\t", header=None, names=["original_name", "new_name"])
+            df = df.dropna()
+            # strip path
+            df["original_name"] = df["original_name"].str.split("/").str[-1]
+            df["new_name"] = df["new_name"].str.split("/").str[-1]
+
+            for i in range(len(df)):
+                d = df.iloc[i]
+                original_name = d["original_name"]
+                new_name = d["new_name"]
+                for local_fastq_dir in local_fastq_dirs:
+                    src = os.path.join(local_fastq_dir, original_name)
+                    if os.path.exists(src):
+                        os.rename(src, os.path.join(local_fastq_dir, new_name))
+        # Illumina convention: SampleName_S1_L001_R1_001.fastq.gz
+        # add a digit to sample name to ensure it's unique. For example:
+        # HITS5483936 to HITS5483936-1
+        if len(local_fastq_dirs) > 1:
+            local_dir = "fastqs"
+            for local_fastq_dir in local_fastq_dirs:
+                for f in os.listdir(local_fastq_dir):
+                    file_name = os.path.basename(f)
+                    dest = os.path.join(local_dir, file_name)
+                    counter = 1
+                    while os.path.exists(dest):
+                        name_tokens = file_name.split('_')
+                        name_tokens[1] = name_tokens[1] + '-' + str(counter)
+                        dest = os.path.join(local_dir, '_'.join(name_tokens))
+                        counter = counter + 1
+                    os.rename(os.path.join(local_fastq_dir, f), dest)
+        CODE
 
         geomx_expect.exp
         strato sync --backend ~{backend} -m results ~{output_directory_stripped}
-        if [[ '~{delete_fastq_directory}' = 'true' ]]; then
-            python /software/scripts/delete-url.py --backend ~{backend} --url ~{fastq_directory}
-        fi
 
+        python <<CODE
+        from subprocess import check_call
+        delete_fastq_directory = '~{delete_fastq_directory}' == 'true'
+        if delete_fastq_directory:
+            urls = '~{fastq_directory}'.split(',')
+            for url in urls:
+                if not url.endswith("/"):
+                    url += "/"
+                try:
+                    call_args = ["strato", "rm", "--backend", backend, "-m", "-r", url]
+                    check_call(call_args)
+                    print("Deleted " + url)
+                except:
+                    print("Failed to delete " + url)
+        CODE
     }
 
     output {
