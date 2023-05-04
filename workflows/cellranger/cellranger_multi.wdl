@@ -64,7 +64,8 @@ workflow cellranger_multi {
     File genome_file = (if is_genome_uri then genome else acronym2uri[genome])
 
     # If probe set is specified
-    File probe_set_file = (if probe_set != "null" then acronym2uri[probe_set] else acronym2uri["null_file"])
+    Boolean is_probeset_uri = sub(probe_set, "^.+\\.csv$", "URL") == "URL"
+    File probe_set_file = (if probe_set != "null" then (if is_probeset_uri then probe_set else acronym2uri[probe_set]) else acronym2uri["null_file"])
 
     call run_cellranger_multi {
         input:
