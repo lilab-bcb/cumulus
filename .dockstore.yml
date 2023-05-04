@@ -16,6 +16,7 @@ workflows:
         - /.*/
       branches:
         - master
+        - custom-probeset
   - name: Spaceranger
     subclass: WDL
     publish: true
