@@ -40,6 +40,7 @@ Sample Sheet
           - FRP probe set v1.0 for mouse. Work with Cell Ranger v7.0+.
 
     If *ProbeSet* column is not set, use **FRP_human_probe_v1.0.1** by default.
+    Custom probe set references are also accepted. Simply put the GS or S3 URI of the custom probe set CSV file for this column.
 
 #. *FeatureBarcodeFile* column.
 
