@@ -224,3 +224,4 @@ workflows:
         - /.*/
       branches:
         - master
+        - multiple_samples
