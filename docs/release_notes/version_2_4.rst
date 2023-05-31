@@ -3,6 +3,10 @@
 
 **Improve:**
 
+* In Cellranger workflow:
+
+    * Fixed RNA Profiling now accepts custom probe set references.
+
 * In STARsolo workflow:
 
     * Add *limitBAMsortRAM* and *outBAMsortingBinsN* inputs to handle out-of-memory error in BAM sorting phase.
