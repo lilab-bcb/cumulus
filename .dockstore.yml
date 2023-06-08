@@ -16,6 +16,7 @@ workflows:
         - /.*/
       branches:
         - master
+        - fix-frp
   - name: Spaceranger
     subclass: WDL
     publish: true
