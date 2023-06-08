@@ -787,7 +787,8 @@ task generate_count_config {
                         link2fbf[link].extend([feature_barcode_file] * size)
                         if reference != 'null':
                             link2ref[link].add(reference)
-                        link2probset[link].add(probeset)
+                        if probeset != 'null':
+                            link2probset[link].add(probeset)
                         continue
 
                 datatype2fo[datatype].write(sample_id + '\n')
