@@ -136,17 +136,22 @@ if __name__ == "__main__":
             if line == "Annotations":
                 break
         lab_worksheet_df = pd.read_csv(lab_worksheet_in, sep="\t")
-    lab_worksheet_df["roi"] = lab_worksheet_df["roi"].str.replace("=", "").str.replace('"', "")
+
+    roi_column = lab_worksheet_df.columns[lab_worksheet_df.columns.str.lower().get_loc('roi')]
+    slide_name_column = lab_worksheet_df.columns[lab_worksheet_df.columns.str.lower().get_loc('slide name')]
+    segment_column = lab_worksheet_df.columns[lab_worksheet_df.columns.str.lower().get_loc('segment')]
+    lab_worksheet_df[roi_column] = lab_worksheet_df[roi_column].str.replace("=", "").str.replace('"', "")
     lab_worksheet_df["id"] = (
-        lab_worksheet_df["slide name"]
+        lab_worksheet_df[slide_name_column]
         + " | "
-        + lab_worksheet_df["roi"]
+        + lab_worksheet_df[roi_column]
         + " | "
-        + lab_worksheet_df["segment"]
+        + lab_worksheet_df[segment_column]
     )
     lab_worksheet_df = lab_worksheet_df.set_index("id")
     # keep slide name for controls
-    lab_worksheet_df = lab_worksheet_df.rename({"slide name": "SlideName"}, axis=1)
+
+    lab_worksheet_df = lab_worksheet_df.rename({slide_name_column: "SlideName"}, axis=1)
 
     dataset_df = pd.read_excel(dataset_path, index_col="SegmentDisplayName")
     lab_worksheet_controls_df = lab_worksheet_df[~lab_worksheet_df.index.isin(dataset_df.index)]
