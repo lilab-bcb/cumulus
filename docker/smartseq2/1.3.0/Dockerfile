@@ -15,6 +15,7 @@ RUN apt-get -qq update && apt-get -qq -y install --no-install-recommends ca-cert
     && python -m pip install numpy==1.20.1 --no-cache-dir \
     && python -m pip install pandas==1.2.2 --no-cache-dir \
     && python -m pip install pegasusio==0.2.10 --no-cache-dir \
+    && python -m pip install stratocumulus==0.1.7 --no-cache-dir \
     && export CLOUD_SDK_REPO="cloud-sdk-$(lsb_release -c -s)" \
     && echo "deb https://packages.cloud.google.com/apt $CLOUD_SDK_REPO main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
     && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key add - \
