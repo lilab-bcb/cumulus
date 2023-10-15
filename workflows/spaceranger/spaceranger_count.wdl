@@ -196,16 +196,16 @@ task run_spaceranger_count {
             directory = re.sub('/+$', '', directory) # remove trailing slashes
             target = '~{sample_id}' + "_" + str(i)
             try:
-                call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
+                call_args = ['strato', 'exists', directory + '/~{sample_id}/']
                 print(' '.join(call_args))
                 check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-                call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]
+                call_args = ['strato', 'sync', '-m', directory + '/~{sample_id}', target]
                 print(' '.join(call_args))
                 check_call(call_args)
             except CalledProcessError:
                 if not os.path.exists(target):
                     os.mkdir(target)
-                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
+                call_args = ['strato', 'cp', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
                 check_call(call_args)
             fastqs.append('~{sample_id}_' + str(i))
 
@@ -221,7 +221,7 @@ task run_spaceranger_count {
             elif darkimagestr != '':
                 for i, file in enumerate(darkimagestr.split(';')):
                     local_file = '_' + str(i) + '_' + os.path.basename(file)
-                    call_args = ['strato', 'cp', '--backend', '~{backend}', file, local_file]
+                    call_args = ['strato', 'cp', file, local_file]
                     print(' '.join(call_args))
                     check_call(call_args)
                     darkimages.append(local_file)
@@ -315,7 +315,7 @@ task run_spaceranger_count {
         check_call(call_args)
         CODE
 
-        strato sync --backend ~{backend} -m results/outs "~{output_directory}/~{sample_id}"
+        strato sync -m results/outs "~{output_directory}/~{sample_id}"
     }
 
     output {
