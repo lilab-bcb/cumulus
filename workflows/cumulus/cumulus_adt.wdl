@@ -129,16 +129,16 @@ task run_generate_count_matrix_ADTs {
             directory = re.sub('/+$', '', directory) # remove trailing slashes
             target = '~{sample_id}_' + str(i)
             try:
-                call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
+                call_args = ['strato', 'exists', directory + '/~{sample_id}/']
                 print(' '.join(call_args))
                 check_call(call_args, stderr=STDOUT, stdout=DEVNULL)
-                call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]
+                call_args = ['strato', 'sync', '-m', directory + '/~{sample_id}', target]
                 print(' '.join(call_args))
                 check_call(call_args)
             except CalledProcessError:
                 if not os.path.exists(target):
                     os.mkdir(target)
-                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
+                call_args = ['strato', 'cp', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
                 print(' '.join(call_args))
                 check_call(call_args)
             fastqs.append(target)
@@ -177,11 +177,11 @@ task run_generate_count_matrix_ADTs {
             filter_chimeric_reads ~{data_type} ~{feature_barcodes} "~{sample_id}.crispr.stat.csv.gz" ~{min_read_ratio} ~{sample_id}
         fi
 
-        strato cp --backend ~{backend} -m "~{sample_id}".*csv* "~{sample_id}".report.txt "~{output_directory}/~{sample_id}/"
+        strato cp -m "~{sample_id}".*csv* "~{sample_id}".report.txt "~{output_directory}/~{sample_id}/"
 
         if [ -f "~{sample_id}".umi_count.pdf ]
         then
-            strato cp --backend ~{backend} "~{sample_id}".umi_count.pdf "~{output_directory}/~{sample_id}/"
+            strato cp "~{sample_id}".umi_count.pdf "~{output_directory}/~{sample_id}/"
         fi
     }
 
