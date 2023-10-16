@@ -16,7 +16,6 @@ workflows:
         - /.*/
       branches:
         - master
-        - 10x-new-release
   - name: Spaceranger
     subclass: WDL
     publish: true
@@ -32,7 +31,6 @@ workflows:
         - /.*/
       branches:
         - master
-        - 10x-new-release
   - name: STARsolo
     subclass: WDL
     publish: true
