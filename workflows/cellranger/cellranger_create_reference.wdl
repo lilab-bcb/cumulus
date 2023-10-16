@@ -317,7 +317,7 @@ task run_cellranger_mkref {
         CODE
 
         tar -czf ~{output_genome}.tar.gz ~{output_genome}
-        strato cp --backend ~{backend} ~{output_genome}.tar.gz "~{output_dir}"/
+        strato cp ~{output_genome}.tar.gz "~{output_dir}"/
     }
 
     output {
