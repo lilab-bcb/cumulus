@@ -22,8 +22,8 @@ workflow cellranger_create_reference {
 
         # Which docker registry to use
         String docker_registry = "quay.io/cumulus"
-        # 7.1.0, 7.0.1, 7.0.0, 6.1.2, 6.1.1
-        String cellranger_version = "7.1.0"
+        # 7.2.0, 7.1.0, 7.0.1, 7.0.0, 6.1.2, 6.1.1
+        String cellranger_version = "7.2.0"
 
         # Disk space in GB
         Int disk_space = 100
@@ -317,7 +317,7 @@ task run_cellranger_mkref {
         CODE
 
         tar -czf ~{output_genome}.tar.gz ~{output_genome}
-        strato cp --backend ~{backend} ~{output_genome}.tar.gz "~{output_dir}"/
+        strato cp ~{output_genome}.tar.gz "~{output_dir}"/
     }
 
     output {

@@ -85,7 +85,7 @@ task run_spaceranger_mkfastq {
         export TMPDIR=/tmp
         export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
-        strato sync --backend ~{backend} -m ~{input_bcl_directory} ~{run_id}
+        strato sync -m ~{input_bcl_directory} ~{run_id}
 
         python <<CODE
         import os
@@ -121,13 +121,13 @@ task run_spaceranger_mkfastq {
 
         CODE
 
-        strato sync --backend ~{backend} -m results/outs "~{output_directory}/~{run_id}_spatialfastqs"
+        strato sync -m results/outs "~{output_directory}/~{run_id}_spatialfastqs"
 
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError
         if '~{delete_input_bcl_directory}' == 'true':
             try:
-                call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_spatialfastqs/input_samplesheet.csv']
+                call_args = ['strato', 'exists', '~{output_directory}/~{run_id}_spatialfastqs/input_samplesheet.csv']
                 print(' '.join(call_args))
                 check_output(call_args)
                 call_args = ['strato', 'rm', '-m', '-r', '~{input_bcl_directory}']

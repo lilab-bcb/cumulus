@@ -320,9 +320,9 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be: 7.1.0, 7.0.1, 7.0.0, 6.1.2, 6.1.1
-		  - "7.1.0"
-		  - "7.1.0"
+		  - cellranger version, could be: 7.2.0, 7.1.0, 7.0.1, 7.0.0, 6.1.2, 6.1.1
+		  - "7.2.0"
+		  - "7.2.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
