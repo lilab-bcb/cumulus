@@ -10,7 +10,6 @@ RUN apt-get -qq update && \
     python -m pip install numpy==1.26.1 && \
     python -m pip install pandas==2.1.1 && \
     python -m pip install XlsxWriter==3.1.9 && \
-    python -m pip install boto3==1.28.68 && \
     apt-get -qq -y remove python3-pip && \
     apt-get -qq -y autoremove && \
     apt-get clean && \
