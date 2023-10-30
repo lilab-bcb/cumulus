@@ -63,8 +63,8 @@ workflow demultiplexing {
         Boolean souporcell_skip_remap = false
         # A comma-separated list of donor names for renaming clusters achieved by souporcell
         String souporcell_rename_donors = ""
-        # Souporcell version to use. Available versions: "2022.12", "2021.03", "2020.07" 
-        String souporcell_version = "2022.12"
+        # Souporcell version to use. Available versions: "2.5"
+        String souporcell_version = "2.5"
         # Number of CPUs to request for souporcell per pair
         Int souporcell_num_cpu = 32
         # Disk space (integer) in GB needed for souporcell per pair
