@@ -63,6 +63,8 @@ RUN cd /opt && \
     rm v2.5.tar.gz && \
     mv souporcell-2.5 souporcell && \
     cd souporcell/troublet && \
+    cargo build --release && \
+    cd /opt/souporcell/souporcell && \
     cargo build --release
 
 ENV PATH=/opt/souporcell:/opt/souporcell/troublet/target/release:$PATH
