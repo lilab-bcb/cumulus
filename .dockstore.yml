@@ -91,7 +91,6 @@ workflows:
         - /.*/
       branches:
         - master
-        - upgrade-souporcell
   - name: Cumulus
     subclass: WDL
     publish: true
