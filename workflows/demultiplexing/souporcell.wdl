@@ -245,7 +245,7 @@ task match_donors {
 
         mkdir result
         mv match_donors.log "~{sample_id}"_demux.zarr.zip ~{souporcell_cluster_tsv} ~{souporcell_genotypes_vcf} result/
-        strato sync --backend ~{backend} -m result "~{output_directory}/~{sample_id}"
+        strato sync -m result "~{output_directory}/~{sample_id}"
     }
 
     output {
