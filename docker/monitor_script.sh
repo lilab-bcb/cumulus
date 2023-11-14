@@ -56,6 +56,10 @@ function has_gpu_driver() {
         fi
 }
 
+function get_gpu_model() {
+        nvidia-smi --query-gpu=gpu_name --format=csv,noheader
+}
+
 function get_gpu_total() {
         # GPU memory size in MB
         nvidia-smi --query-gpu=memory.total --format=csv,noheader | awk 'BEGIN { FS=" " } ; { print $1 }'
@@ -138,8 +142,8 @@ function print_summary() {
         echo Total Memory: $(echo $(get_mem_total) 1000000 | awk '{ print $1/$2 }')G
 
         if has_gpu_driver; then
-                # convert MB to GB
-                echo Total GPU Memory: $(echo $(get_gpu_total) 1000 | awk '{ print $1/$2 }')G
+                # Convert MB to GB
+                echo GPU Model: $(get_gpu_model), Total GPU Memory: $(echo $(get_gpu_total) 1000 | awk '{ print $1/$2 }')G
         fi
 
         if [ "$backend" = "aws" ]; then
