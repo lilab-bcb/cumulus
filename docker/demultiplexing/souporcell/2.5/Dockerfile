@@ -69,13 +69,16 @@ RUN cd /opt && \
 
 ENV PATH=/opt/souporcell:/opt/souporcell/troublet/target/release:$PATH
 
-RUN python -m pip install pegasusio==0.8.1 && \
-    python -m pip install pysam && \
+RUN python -m pip install pysam==0.22.0 && \
     python -m pip install git+https://github.com/stan-dev/pystan2.git@master && \
-    python -m pip install pyfaidx && \
+    python -m pip install pyfaidx==0.7.2.2 && \
     python -m pip install "setuptools<58" --upgrade && \
-    python -m pip install pyvcf && \
-    python -m pip install scipy && \
+    python -m pip install pyvcf==0.6.8 && \
+    python -m pip install scipy==1.11.3 && \
+    python -m pip install anndata==0.10.3 && \
+    python -m pip install zarr==2.16.1 && \
+    python -m pip install networkx==3.2.1 && \
+    python -m pip install pegasusio==0.8.1 && \
     python -m pip install stratocumulus==0.2.1
 
 RUN cd /opt && \
