@@ -748,7 +748,7 @@ task generate_count_config {
                 probeset = 'null'
                 if datatype == 'frp':
                     if 'ProbeSet' not in df_local.columns:
-                        probeset = 'FRP_human_probe_v1'
+                        probeset = 'FRP_human_probe_v1.0.1'
                     else:
                         if df_local['ProbeSet'].unique().size > 1:
                             print("Detected multiple probe sets for sample " + sample_id + "!", file = sys.stderr)
