@@ -177,10 +177,10 @@ For FRP data, ``cellranger_workflow`` takes Illumina outputs as input and runs `
       - Optional disk space in GB for mkfastq
       - 1500
       - 1500
-    * - count_disk_space
+    * - multi_disk_space
       - Disk space in GB needed for cellranger multi
-      - 500
-      - 500
+      - 2000
+      - 2000
     * - backend
       - Cloud backend for file transfer and computation. Available options:
 
