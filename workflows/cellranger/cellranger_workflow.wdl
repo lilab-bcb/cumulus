@@ -141,6 +141,8 @@ workflow cellranger_workflow {
         Int mkfastq_disk_space = 1500
         # Optional disk space needed for cell ranger count.
         Int count_disk_space = 500
+        # Optional disk space needed for cell ranger multi.
+        Int multi_disk_space = 1500
         # Optional disk space needed for cell ranger vdj.
         Int vdj_disk_space = 500
         # Optional disk space needed for cumulus_adt
@@ -485,7 +487,7 @@ workflow cellranger_workflow {
                         zones = zones,
                         num_cpu = num_cpu,
                         memory = memory,
-                        disk_space = count_disk_space,
+                        disk_space = multi_disk_space,
                         preemptible = preemptible,
                         backend = backend,
                         awsQueueArn = awsQueueArn
@@ -746,7 +748,7 @@ task generate_count_config {
                 probeset = 'null'
                 if datatype == 'frp':
                     if 'ProbeSet' not in df_local.columns:
-                        probeset = 'FRP_human_probe_v1'
+                        probeset = 'FRP_human_probe_v1.0.1'
                     else:
                         if df_local['ProbeSet'].unique().size > 1:
                             print("Detected multiple probe sets for sample " + sample_id + "!", file = sys.stderr)
