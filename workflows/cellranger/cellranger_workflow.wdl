@@ -142,7 +142,7 @@ workflow cellranger_workflow {
         # Optional disk space needed for cell ranger count.
         Int count_disk_space = 500
         # Optional disk space needed for cell ranger multi.
-        Int multi_disk_space = 2000
+        Int multi_disk_space = 1500
         # Optional disk space needed for cell ranger vdj.
         Int vdj_disk_space = 500
         # Optional disk space needed for cumulus_adt
