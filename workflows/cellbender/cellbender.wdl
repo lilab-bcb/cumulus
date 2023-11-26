@@ -6,12 +6,13 @@ workflow cellbender {
     }
 
     input {
-        # Input tsv file
-        File input_tsv_file
+        # Input csv file
+        File input_csv_file
         # Outputs
         String output_directory
         # Docker image for cellbender remove-background version
         String docker_registry = "quay.io/cumulus"
+        String config_version = "0.3"
         # Cellbender version to use. Currently support: 0.2.0
         String cellbender_version = "0.2.0"
 
@@ -62,18 +63,28 @@ workflow cellbender {
 
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
-    Array[Array[String]] sample_list = read_tsv(input_tsv_file)
 
+    call cellbender_config {
+        input:
+            input_csv = input_csv_file,
+            output_directory = output_directory_stripped,
+            backend = backend,
+            docker_registry = docker_registry,
+            version = config_version,
+            zones = zones,
+            preemptible = preemptible,
+            awsQueueArn = awsQueueArn
+    }
 
-    scatter (sample in sample_list) {
+    scatter (sample in cellbender_config.sample_list) {
         call run_cellbender_remove_background_gpu {
             input:
                 sample_name = sample[0],
                 input_10x_h5_file = sample[1],
                 output_directory = output_directory_stripped,
                 docker_registry = docker_registry,
-                expected_cells = expected_cells,
-                total_droplets_included = total_droplets_included,
+                expected_cells = if sample[2] != "null" then sample[2] else expected_cells,
+                total_droplets_included = if sample[3] != "null" then sample[3] else total_droplets_included,
                 model = model,
                 low_count_threshold = low_count_threshold,
                 fpr = fpr,
@@ -101,6 +112,57 @@ workflow cellbender {
         Array[String] cellbender_outputs = run_cellbender_remove_background_gpu.output_dir
     }
 
+}
+
+task cellbender_config {
+    input {
+        File input_csv
+        String output_directory
+        String backend
+        String docker_registry
+        String version
+        String zones
+        Int preemptible
+        String awsQueueArn
+    }
+
+    command <<<
+        set -e
+        export TMPDIR=/tmp
+        export BACKEND=~{backend}
+
+        python /software/check_uri.py "~{backend}" "~{output_directory}"
+
+        python <<CODE
+        import pandas as pd
+
+        df = pd.read_csv("~{input_csv}", header = 0, dtype = str, index_col = False)
+        df.columns = df.columns.str.strip()
+
+        for c in df.columns:
+            df[c] = df[c].str.strip()
+
+        if 'ExpectedCells' not in df.columns:
+            df['ExpectedCells'] = 'null'
+        if 'TotalDroplets' not in df.columns:
+            df['TotalDroplets'] = 'null'
+
+        with open("sample_list.tsv", 'w') as fout:
+            for idx, row in df.iterrows():
+                fout.write(row['Sample']+'\t'+row['RNAFile']+'\t'+row['ExpectedCells']+'\t'+row['TotalDroplets']+'\n')
+        CODE
+    >>>
+
+    output {
+        Array[Array[String]] sample_list = read_tsv("sample_list.tsv")
+    }
+
+    runtime {
+        docker: "~{docker_registry}/config:~{version}"
+        zones: zones
+        preemptible: preemptible
+        queueArn: awsQueueArn
+    }
 }
 
 task run_cellbender_remove_background_gpu {
