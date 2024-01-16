@@ -12,8 +12,8 @@ workflow cellbender {
         String output_directory
         # Docker image for cellbender remove-background version
         String docker_registry = "quay.io/cumulus"
-        # Cellbender version to use. Currently support: 0.2.0
-        String cellbender_version = "0.2.0"
+        # Cellbender version to use. Currently support: 0.3.0, 0.2.0
+        String cellbender_version = "0.3.0"
 
         # Expected cells
         Int? expected_cells
