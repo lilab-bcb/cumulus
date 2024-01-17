@@ -1,28 +1,24 @@
 # Start from nvidia-docker image with drivers pre-installed to use a GPU
-FROM nvcr.io/nvidia/cuda:11.8.0-base-ubuntu22.04
+FROM nvcr.io/nvidia/cuda:11.7.1-base-ubuntu22.04
 
 LABEL description="This docker is modified from the official BSD-3-Clause licensed CellBender dockerfile (https://github.com/broadinstitute/CellBender/blob/master/docker/Dockerfile)."
 
 # Install curl and sudo and git and miniconda and pytorch, cudatoolkit, pytables, and cellbender
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    curl \
-    wget \
-    ca-certificates \
-    unzip \
-    sudo \
-&& sudo apt-get install -y --no-install-recommends \
-    git \
-    bzip2 \
-    python3 \
-    python3-pip \
-&& sudo rm -rf /var/lib/apt/lists/* \
-&& curl -so ~/miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh \
-&& chmod +x ~/miniconda.sh \
-&& ~/miniconda.sh -b -p /home/user/miniconda \
-&& rm ~/miniconda.sh
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+        curl \
+        wget \
+        rsync \
+        ca-certificates \
+        unzip
 
-RUN pip3 install --upgrade pip --no-cache-dir && \
-    pip3 install stratocumulus==0.2.1 --no-cache-dir
+RUN curl -so miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-py37_23.1.0-1-Linux-x86_64.sh && \
+    bash miniconda.sh -b -p /opt/miniconda3 && \
+    rm miniconda.sh
+
+ENV PATH=/opt/miniconda3/bin:$PATH \
+    DOCKER=true \
+    CONDA_AUTO_UPDATE_CONDA=false
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - && \
@@ -33,13 +29,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.15.10.zip" -o "
     ./aws/install && \
     rm awscliv2.zip
 
-ENV PATH=/home/user/miniconda/bin:$PATH
-ENV CONDA_AUTO_UPDATE_CONDA=false
-
-RUN conda install -y pytorch==2.1.2 cudatoolkit=11.8 -c pytorch \
-&& conda clean -ya
-
-ENV DOCKER='true'
+RUN pip install stratocumulus==0.2.1
 
 RUN wget https://github.com/broadinstitute/CellBender/archive/refs/tags/v0.3.0.tar.gz && \
     tar -xzf v0.3.0.tar.gz && \
@@ -49,14 +39,12 @@ RUN wget https://github.com/broadinstitute/CellBender/archive/refs/tags/v0.3.0.t
     cd /software/CellBender && \
     pip install -e .
 
-RUN apt-get -qq -y remove curl gnupg wget curl && \
-    apt-get -qq -y autoremove && \
+RUN apt-get -qq -y autoremove && \
     apt-get clean && \
-    rm -rf /var/lib/apt/lists/* /var/log/dpkg.log && \
-    ln -s /usr/bin/python3 /usr/bin/python
+    rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
 
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
 RUN chmod a+rx /software/monitor_script.sh
 
 # Add cellbender command to PATH
-ENV PATH=/software:~/miniconda/bin:$PATH
+ENV PATH=/software:$PATH
