@@ -63,13 +63,15 @@ Below are inputs for *CellBender* workflow. Notice that required inputs are **in
       - "gs://fc-e0000000-0000-0000-0000-000000000000/my-project/cellbender_output"
       -
     * - expected_cells
-      - Number of cells expected in the dataset (a rough estimate within a factor of 2 is sufficient).
+      - | Number of cells expected in the dataset (a rough estimate within a factor of 2 is sufficient).
+        | **Notice:** If *cellbender_version* is ``0.3.0``, no need to specify this parameter.
       - 2048
-      - ``None``
+      - Automatically inferred from data
     * - total_droplets_included
-      - The number of droplets from the rank-ordered UMI plot that will be analyzed. The largest *total_droplets_included* droplets will have their cell probabilities inferred as an output.
+      - | The number of droplets from the rank-ordered UMI plot that will be analyzed. The largest *total_droplets_included* droplets will have their cell probabilities inferred as an output.
+        | **Notice:** If *cellbender_version* is ``0.3.0``, no need to specify this parameter.
       - 25000
-      - 25000
+      - Automatically inferred from data
     * - model
       - Which model is being used for count data:
 
@@ -127,9 +129,9 @@ Below are inputs for *CellBender* workflow. Notice that required inputs are **in
       - "quay.io/cumulus"
       - "quay.io/cumulus"
     * - cellbender_version
-      - CellBender version to use. Currently available: ``0.2.0``.
-      - "0.2.0"
-      - "0.2.0"
+      - CellBender version to use. Currently available: ``0.3.0``, ``0.2.0``.
+      - "0.3.0"
+      - "0.3.0"
     * - zones
       - Google cloud zones to consider for execution. Only works if *backend* is ``gcp``.
       - "us-east1-d us-west1-a us-west1-b"

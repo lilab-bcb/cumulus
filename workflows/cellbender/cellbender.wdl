@@ -12,8 +12,8 @@ workflow cellbender {
         String output_directory
         # Docker image for cellbender remove-background version
         String docker_registry = "quay.io/cumulus"
-        # Cellbender version to use. Currently support: 0.2.0
-        String cellbender_version = "0.2.0"
+        # Cellbender version to use. Currently support: 0.3.0, 0.2.0
+        String cellbender_version = "0.3.0"
 
         # Expected cells
         Int? expected_cells
@@ -156,7 +156,7 @@ task run_cellbender_remove_background_gpu {
            ~{"--learning-rate " + learning_rate} \
            ~{true="--exclude-antibody-capture" false=" " exclude_antibody_capture}
 
-        strato cp --backend ~{backend} ~{sample_name}_out* ~{output_directory}/~{sample_name}/
+        strato cp ~{sample_name}_out* ~{output_directory}/~{sample_name}/
     }
 
     output {
