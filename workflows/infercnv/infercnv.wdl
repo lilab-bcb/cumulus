@@ -5,12 +5,13 @@ workflow InferCNV {
         File input_zarr
         String sample_id
         String output_directory
-        File gene_ordering_csv
+        String gene_ordering
         String protocol = "tenX"
         Boolean cluster_by_groups = true
         Boolean HMM = false
         String? ref_group_names
 
+        File acronym_file = "gs://cumulus-ref/resources/infercnv/index.tsv"
         String docker_registry = "quay.io/cumulus"
         String inferCNV_version = "1.5.1"
         String backend = "gcp"
@@ -21,6 +22,10 @@ workflow InferCNV {
     }
 
     String output_directory_stripped = sub(output_directory, "/+$", "")
+
+    Map[String, String] acronym2uri = read_map(acronym_file)
+    Boolean is_uri = sub(gene_ordering, "^.+\\.(csv|txt)$", "URI") == "URI"
+    File gene_ordering_csv = (if is_uri then gene_ordering else acronym2uri[gene_ordering])
 
     call preprocess {
         input:
@@ -218,10 +223,11 @@ task gen_CNV_metrics {
         plt.figure(figsize = (8, 6))
         plt.subplots_adjust(hspace = 0.3, bottom = 0.3)
         plt.title("Square-root of CNV products of sample ~{sample_id}")
-        ax = sns.violinplot(x = 'infercnv_cell_types', y = 'sqrt_cnv', data = data.obs, cut = 0, linewidth = 1)
+        ax = sns.violinplot(x = 'infercnv_cell_types', y = 'sqrt_cnv', hue = 'infercnv_cell_types', data = data.obs, cut = 0, linewidth = 1)
         ax.set_ylabel("Sqrt CNV product")
         ax.set_xlabel("Sample-specific cell types")
         ax.set_xticklabels(ax.get_xticklabels(), rotation = -90)
+        plt.tight_layout()
         plt.savefig("~{sample_id}.cnv.pdf", dpi = 300)
         plt.close()
         CODE

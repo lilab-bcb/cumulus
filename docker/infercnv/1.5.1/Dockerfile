@@ -16,20 +16,20 @@ RUN apt-get -qq update && \
         python3-dev && \
     echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg  add - && \
-    apt-get update -y && apt-get install -y google-cloud-cli=422.0.0-0
+    apt-get update -y && apt-get install -y google-cloud-cli=463.0.0-0
 
 RUN rm /usr/bin/python && ln -s /usr/bin/python3 /usr/bin/python
 
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.11.4.zip" -o "awscliv2.zip" && \
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.15.18.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install && \
     rm awscliv2.zip
 
 RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install Cython --no-cache-dir && \
-    python -m pip install pegasusio==0.8.0 && \
-    python -m pip install pegasuspy==1.7.1 && \
-    python -m pip install stratocumulus==0.2.0
+    python -m pip install pegasusio==0.9.0 && \
+    python -m pip install pegasuspy==1.9.0 && \
+    python -m pip install stratocumulus==0.2.1
 
 
 RUN apt-get -qq -y autoremove && \
