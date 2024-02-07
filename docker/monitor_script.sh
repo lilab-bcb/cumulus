@@ -2,9 +2,19 @@
 
 declare -a TEMP=$(mktemp /temp_monitoring.XXXXXXXX)
 
+if [[ -z "${BACKEND}" ]]; then
+        backend=""
+else
+        backend=${BACKEND}
+fi
+
 function get_disk_info() {
         # df command and cromwell root field
-        df | grep cromwell_root
+        if [ "$backend" = "aws" ]; then
+                df | grep '/$'
+        else
+                df | grep cromwell_root
+        fi
 }
 
 function get_disk_usage() {
@@ -35,6 +45,36 @@ function get_mem_usage() {
         # usage = 100 * mem_used / mem_total
         local -r mem_used=$(($mem_total-$mem_available))
         echo "$mem_used" "$mem_total" "%"| awk '{ print 100*($1/$2)$3 }'
+}
+
+function has_gpu_driver() {
+        if [ -x "$(command -v nvidia-smi)" ]
+        then
+                true
+        else
+                false
+        fi
+}
+
+function get_gpu_model() {
+        nvidia-smi --query-gpu=gpu_name --format=csv,noheader
+}
+
+function get_gpu_total() {
+        # GPU memory size in MB
+        nvidia-smi --query-gpu=memory.total --format=csv,noheader | awk 'BEGIN { FS=" " } ; { print $1 }'
+}
+
+function get_gpu_available() {
+        nvidia-smi --query-gpu=memory.free --format=csv,noheader | awk 'BEGIN { FS=" " } ; { print $1 }'
+}
+
+function get_gpu_usage() {
+        local -r gpu_total=$(get_gpu_total)
+        local -r gpu_available=$(get_gpu_available)
+
+        local -r gpu_used=$(($gpu_total-$gpu_available))
+        echo "$gpu_used" "$gpu_total" "%" | awk '{ print 100*($1/$2)$3 }'
 }
 
 function get_cpu_info() {
@@ -82,6 +122,9 @@ function print_usage() {
         echo [$(date)]
         echo \* CPU usage: "$(get_cpu_usage)"
         echo \* Memory usage: "$(get_mem_usage)"
+        if has_gpu_driver; then
+                echo \* GPU Memory usage: "$(get_gpu_usage)"
+        fi
         echo \* Disk usage: $(get_disk_usage)
 }
 
@@ -97,7 +140,17 @@ function print_summary() {
         echo \#CPU: $(nproc)
         # multiply by 10^-6 to convert KB to GB
         echo Total Memory: $(echo $(get_mem_total) 1000000 | awk '{ print $1/$2 }')G
-        echo Total Disk space: $(df -h | grep cromwell_root | awk '{ print $2}')
+
+        if has_gpu_driver; then
+                # Convert MB to GB
+                echo GPU Model: $(get_gpu_model), Total GPU Memory: $(echo $(get_gpu_total) 1000 | awk '{ print $1/$2 }')G
+        fi
+
+        if [ "$backend" = "aws" ]; then
+                echo Total Disk space: $(df -h | grep '/$' | awk '{ print $2 }')
+        else
+                echo Total Disk space: $(df -h | grep cromwell_root | awk '{ print $2}')
+        fi
 }
 
 function main() {

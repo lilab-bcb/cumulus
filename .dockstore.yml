@@ -1,0 +1,226 @@
+# Template from https://docs.dockstore.org/en/stable/getting-started/github-apps/github-apps.html
+version: 1.2
+workflows:
+  - name: Cellranger
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/cellranger/cellranger_workflow.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
+  - name: Spaceranger
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/spaceranger/spaceranger_workflow.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
+  - name: STARsolo
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/starsolo/starsolo_workflow.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
+  - name: GeoMx_fastq_to_dcc
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/geomxng/geomxngs_fastq_to_dcc.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
+  - name: GeoMx_dcc_to_count_matrix
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/geomxng/geomxngs_dcc_to_count_matrix.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
+  - name: Demultiplexing
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/demultiplexing/demultiplexing.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
+  - name: Cumulus
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/cumulus/cumulus.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
+  - name: Smart-Seq2
+    subclass: WDL
+    primaryDescriptorPath: /workflows/smartseq2/smartseq2.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
+  - name: Cellranger_atac_aggr
+    subclass: WDL
+    primaryDescriptorPath: /workflows/cellranger/cellranger_atac_aggr.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
+  - name: Cellranger_create_reference
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/cellranger/cellranger_create_reference.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
+  - name: Cellranger_atac_create_reference
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/cellranger/cellranger_atac_create_reference.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
+  - name: Cellranger_vdj_create_reference
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/cellranger/cellranger_vdj_create_reference.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
+  - name: STARsolo_create_reference
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/starsolo/starsolo_create_reference.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
+  - name: Smart-Seq2_create_reference
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/smartseq2/smartseq2_create_reference.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master
+  - name: CellBender
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/cellbender/cellbender.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - master

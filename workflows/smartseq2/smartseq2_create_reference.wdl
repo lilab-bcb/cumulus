@@ -8,28 +8,32 @@ workflow smartseq2_create_reference {
         File gtf
         # Output directory, gs URL
         String output_directory
-        # Output reference name 
+        # Output reference name
         String reference_name
         # Aligner name, either "bowtie2", "star" or "hisat2-hca"
         String aligner = "hisat2-hca"
         # Docker version
-        String smartseq2_version = "1.1.0"
+        String smartseq2_version = "1.3.0"
+        # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
+        String docker_registry = "quay.io/cumulus"
         # Google Cloud Zones
         String zones = "us-central1-b"
         # Number of cpus per job
         Int cpu = (if aligner != "star" then 8 else 32)
-        # Memory to use 
+        # Memory to use
         String memory = (if aligner != "star" then "7.2G" else "120G")
         # disk space in GB, set to 120 for STAR (STAR requires at least 100G)
         Int disk_space = (if aligner != "star" then 40 else 120)
-        # Number of preemptible tries 
+        # Number of preemptible tries
         Int preemptible = 2
-        # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
-        String docker_registry = "cumulusprod"    
+        # backend choose from "gcp", "aws", "local"
+        String backend = "gcp"
+        # Arn string of AWS queue to use
+        String awsQueueArn = ""
     }
 
-    # Output directory, with trailing slashes stripped
-    String output_directory_stripped = sub(output_directory, "/+$", "")
+    # Output directory, with trailing slashes and spaces stripped
+    String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
     call rsem_prepare_reference {
         input:
@@ -39,12 +43,14 @@ workflow smartseq2_create_reference {
             reference_name = reference_name,
             aligner = aligner,
             smartseq2_version=smartseq2_version,
+            docker_registry=docker_registry,
             zones=zones,
-            preemptible=preemptible,
             cpu=cpu,
             memory=memory,
             disk_space=disk_space,
-            docker_registry=docker_registry
+            preemptible=preemptible,
+            awsQueueArn = awsQueueArn,
+            backend = backend
     }
 }
 
@@ -56,26 +62,27 @@ task rsem_prepare_reference {
         String reference_name
         String aligner
         String smartseq2_version
+        String docker_registry
         String zones
-        Int preemptible
         Int cpu
         String memory
         Int disk_space
-        String docker_registry    
+        Int preemptible
+        String awsQueueArn
+        String backend
     }
 
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         mkdir ~{reference_name}_~{aligner}
         rsem-prepare-reference --gtf ~{gtf} --~{aligner} -p ~{cpu} ~{fasta} ~{reference_name}_~{aligner}/rsem_ref
         tar -czf ~{reference_name}_~{aligner}.tar.gz ~{reference_name}_~{aligner}
 
-        gsutil -m cp ~{reference_name}_~{aligner}.tar.gz ~{output_dir}
-        # mkdir -p ~{output_dir}
-        # cp ~{reference_name}_~{aligner}.tar.gz ~{output_dir}
+        strato cp --backend ~{backend} -m ~{reference_name}_~{aligner}.tar.gz "~{output_dir}"/
     }
 
     output {
@@ -84,11 +91,12 @@ task rsem_prepare_reference {
     }
 
     runtime {
-        disks: "local-disk " + disk_space + " HDD"
         docker: "~{docker_registry}/smartseq2:~{smartseq2_version}"
         zones: zones
-        preemptible: preemptible
         cpu: cpu
         memory: memory
+        disks: "local-disk " + disk_space + " HDD"
+        preemptible: preemptible
+        queueArn: awsQueueArn
     }
 }

@@ -2,23 +2,48 @@ version 1.0
 
 workflow souporcell {
     input {
+        # Sample ID
         String sample_id
+        # Output directory (gs url + path)
         String output_directory
+        # Link to a RNA count matrix
         String input_rna
+        # Link to a position-sorted BAM
         String input_bam
+        # Link to a reference genome
         String genome_url
+        # Link to reference genotype files
         String ref_genotypes_url
-        Boolean de_novo_mode
-        Int min_num_genes
+        # Number of expected clusters when doing clustering
         Int num_clusters
-        String donor_rename = ''
-        String souporcell_version = "2020.06"
-        String docker_registry = "cumulusprod"
-        Int num_cpu = 32
-        Int disk_space = 500
-        Int memory = 120
-        Int preemptible = 2
-        String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        # If true, run souporcell in de novo mode without reference genotypes
+        Boolean de_novo_mode
+        # Users can provide a common variants list in VCF format for Souporcell to use, instead of calling SNPs de novo
+        File? common_variants
+        # Skip remap step. Only recommended in non denovo mode or common variants are provided
+        Boolean skip_remap
+        # A comma-separated list of donor names for renaming clusters achieved by souporcell
+        String donor_rename
+        # Only demultiplex cells/nuclei with at least <min_num_genes> expressed genes
+        Int min_num_genes
+        # Souporcell version to use
+        String souporcell_version
+        # Which docker registry to use
+        String docker_registry
+        # Google cloud zones
+        String zones
+        # Number of CPUs to request for souporcell per pair
+        Int num_cpu
+        # Disk space (integer) in GB needed for souporcell per pair
+        Int disk_space
+        # Memory size string for souporcell per pair
+        String memory
+        # Number of preemptible tries
+        Int preemptible
+        # Arn string of AWS queue
+        String awsQueueArn
+        # Backend
+        String backend
     }
 
     if (ref_genotypes_url != 'null') {
@@ -33,17 +58,20 @@ workflow souporcell {
             input_bam = input_bam,
             genome = genome_url,
             ref_genotypes = ref_genotypes,
-            donor_rename = donor_rename,
+            common_variants = common_variants,
+            skip_remap = skip_remap,
             de_novo_mode = de_novo_mode,
             min_num_genes = min_num_genes,
             num_clusters = num_clusters,
             version = souporcell_version,
             docker_registry = docker_registry,
+            zones = zones,
             num_cpu = num_cpu,
             disk_space = disk_space,
             memory = memory,
             preemptible = preemptible,
-            zones = zones
+            awsQueueArn = awsQueueArn,
+            backend = backend
     }
 
     call match_donors {
@@ -60,7 +88,9 @@ workflow souporcell {
             zones = zones,
             memory = memory,
             disk_space = disk_space,
-            preemptible = preemptible
+            preemptible = preemptible,
+            awsQueueArn = awsQueueArn,
+            backend = backend
     }
 
     output {
@@ -79,23 +109,27 @@ task run_souporcell {
         File input_bam
         File genome
         File? ref_genotypes
-        String? donor_rename
+        File? common_variants
+        Boolean skip_remap
         Boolean de_novo_mode
         Int min_num_genes
         Int num_clusters
-        String version
 
+        String version
         String docker_registry
+        String zones
         Int num_cpu
         Int disk_space
-        Int memory
+        String memory
         Int preemptible
-        String zones
+        String awsQueueArn
+        String backend
     }
 
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         mkdir genome_ref
@@ -110,20 +144,33 @@ task run_souporcell {
 
         souporcell_call_args = ['souporcell_pipeline.py', '-i', '~{input_bam}', '-b', 'result/~{sample_id}.barcodes.tsv', '-f', 'genome_ref/fasta/genome.fa', '-t', '~{num_cpu}', '-o', 'result', '-k', '~{num_clusters}']
 
-        if '~{ref_genotypes}' is not '' and '~{de_novo_mode}' is 'false':
+        if '~{de_novo_mode}' == 'false':
+            assert '~{ref_genotypes}' != '', "Reference mode must have a reference genotype vcf file provided!"
             file_ext = '~{ref_genotypes}'.split('.')[-1]
-            if file_ext == '.gz':
+            if file_ext == 'gz':
                 with open('ref_genotypes.vcf', 'w') as fout:
                     check_call(['gunzip', '-k', '~{ref_genotypes}', '-c'], stdout = fout)
             else:
                 check_call(['mv', '~{ref_genotypes}', 'ref_genotypes.vcf'])
 
             souporcell_call_args.extend(['--known_genotypes', 'ref_genotypes.vcf'])
+        else:
+            assert '~{de_novo_mode}' == 'true'
+            if '~{common_variants}' != '':
+                file_ext = '~{common_variants}'.split('.')[-1]
+                if file_ext == 'gz':
+                    with open('common_variants.vcf', 'w') as fout:
+                        check_call(['gunzip', '~{common_variants}', '-c'], stdout = fout)
+                else:
+                    check_call(['mv', '~{common_variants}', 'common_variants.vcf'])
+                souporcell_call_args.extend(['--common_variants', 'common_variants.vcf'])
 
-            assert '~{donor_rename}' is not ''
-
-            name_list = '~{donor_rename}'.split(',')
-            souporcell_call_args.extend(['--known_genotypes_sample_names'] + name_list)
+        if '~{skip_remap}' == 'true':
+            if '~{de_novo_mode}' == 'true' and '~{common_variants}' == '':
+                print("Warning: if de novo mode is true and no common variants provided, skip remap is not recommended and thus is turned off!")
+            else:
+                check_call(['samtools', 'index', '-@', '~{num_cpu}', '~{input_bam}'])
+                souporcell_call_args.extend(['--skip_remap', 'True'])
 
         print(' '.join(souporcell_call_args))
         check_call(souporcell_call_args)
@@ -140,10 +187,11 @@ task run_souporcell {
     runtime {
         docker: "~{docker_registry}/souporcell:~{version}"
         zones: zones
-        memory: "~{memory}G"
+        memory: memory
         disks: "local-disk ~{disk_space} HDD"
-        cpu: "~{num_cpu}"
-        preemptible: "~{preemptible}"
+        cpu: num_cpu
+        preemptible: preemptible
+        queueArn: awsQueueArn
     }
 }
 
@@ -157,12 +205,14 @@ task match_donors {
         File? ref_genotypes
         String? donor_rename
 
-        String docker_registry
         String version
+        String docker_registry
         String zones
-        Int memory
+        String memory
         Int disk_space
         Int preemptible
+        String awsQueueArn
+        String backend
     }
 
     Float file_size = size([input_rna, souporcell_cluster_tsv, souporcell_genotypes_vcf], "GB")
@@ -170,6 +220,7 @@ task match_donors {
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         python <<CODE
@@ -177,10 +228,10 @@ task match_donors {
 
         call_args = ['python', '/opt/match_donors.py']
 
-        if '~{ref_genotypes}' is not '':
+        if '~{ref_genotypes}' != '':
             call_args.extend(['--ref-genotypes', '~{ref_genotypes}'])
 
-        if '~{donor_rename}' is not '':
+        if '~{donor_rename}' != '':
             call_args.extend(['--donor-names', '~{donor_rename}'])
 
         call_args.extend(['~{souporcell_genotypes_vcf}', '~{souporcell_cluster_tsv}', '~{input_rna}', '~{sample_id}_demux.zarr.zip'])
@@ -193,10 +244,8 @@ task match_donors {
         CODE
 
         mkdir result
-        mv match_donors.log ~{sample_id}_demux.zarr.zip ~{souporcell_cluster_tsv} ~{souporcell_genotypes_vcf} result/
-        gsutil -q -m rsync -r result ~{output_directory}/~{sample_id}
-        # mkdir -p ~{output_directory}/~{sample_id}
-        # cp -r result/* ~{output_directory}/~{sample_id}
+        mv match_donors.log "~{sample_id}"_demux.zarr.zip ~{souporcell_cluster_tsv} ~{souporcell_genotypes_vcf} result/
+        strato sync -m result "~{output_directory}/~{sample_id}"
     }
 
     output {
@@ -208,8 +257,9 @@ task match_donors {
     runtime {
         docker: "~{docker_registry}/souporcell:~{version}"
         zones: zones
-        memory: "~{memory}G"
+        memory: memory
         disks: "local-disk ~{disk_space} HDD"
-        preemptible: "~{preemptible}"
+        preemptible: preemptible
+        queueArn: awsQueueArn
     }
 }

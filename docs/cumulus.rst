@@ -22,7 +22,9 @@ Follow the steps below to run **cumulus** on Terra_.
   - csv format. If it is HCA DCP csv format, we expect the expression file has the name of ``expression.csv``. In addition, we expect that  ``cells.csv`` and ``genes.csv`` files are located under the same folder as the ``expression.csv``. For example, ``gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_3/``.
   - tsv or loom format.
 
-Additionally, an optional Reference column can be used to select samples generated from a same reference (e.g. ``mm10``). If the count matrix is in either DGE, mtx, csv, tsv, or loom format, the value in this column will be used as the reference since the count matrix file does not contain reference name information. The only exception is mtx format. If users do not provide a Reference column, we will use the basename of the folder containing the mtx file as its reference. In addition, the Reference column can be used to aggregate count matrices generated from different genome versions or gene annotations together under a unified reference. For example, if we have one matrix generated from ``mm9`` and the other one generated from ``mm10``, we can write ``mm9_10`` for these two matrices in their Reference column. Pegasus will change their references to ``mm9_10`` and use the union of gene symbols from the two matrices as the gene symbols of the aggregated matrix. For HDF5 files (e.g. 10x v2/v3), the reference name contained in the file does not need to match the value in this column. In fact, we use this column to rename references in HDF5 files. For example, if we have two HDF files, one generated from ``mm9`` and the other generated from ``mm10``. We can set these two files' Reference column value to ``mm9_10``, which will rename their reference names into ``mm9_10`` and the aggregated matrix will contain all genes from either ``mm9`` or ``mm10``. This renaming feature does not work if one HDF5 file contain multiple references (e.g. ``mm10`` and ``GRCh38``).
+An optional Reference column can be used to select samples generated from a same reference (e.g. ``mm10``). If the count matrix is in either DGE, mtx, csv, tsv, or loom format, the value in this column will be used as the reference since the count matrix file does not contain reference name information. The only exception is mtx format. If users do not provide a Reference column, we will use the basename of the folder containing the mtx file as its reference. In addition, the Reference column can be used to aggregate count matrices generated from different genome versions or gene annotations together under a unified reference. For example, if we have one matrix generated from ``mm9`` and the other one generated from ``mm10``, we can write ``mm9_10`` for these two matrices in their Reference column. Pegasus will change their references to ``mm9_10`` and use the union of gene symbols from the two matrices as the gene symbols of the aggregated matrix. For HDF5 files (e.g. 10x v2/v3), the reference name contained in the file does not need to match the value in this column. In fact, we use this column to rename references in HDF5 files. For example, if we have two HDF files, one generated from ``mm9`` and the other generated from ``mm10``. We can set these two files' Reference column value to ``mm9_10``, which will rename their reference names into ``mm9_10`` and the aggregated matrix will contain all genes from either ``mm9`` or ``mm10``. This renaming feature does not work if one HDF5 file contain multiple references (e.g. ``mm10`` and ``GRCh38``).
+
+The sample sheet can optionally contain two columns - nUMI and nGene. These two columns define minimum number of UMIs and genes for cell selection for each sample in the sample sheet. nGene column overwrites ``minimum_number_of_genes`` parameter.
 
 You are free to add any other columns and these columns will be used in selecting channels for futher analysis. In the example below, we have *Source*, which refers to the tissue of origin, *Platform*, which refers to the sequencing platform, *Donor*, which refers to the donor ID, and *Reference*, which refers to the reference genome.
 
@@ -34,7 +36,7 @@ You are free to add any other columns and these columns will be used in selectin
         sample_3,pbmc,NextSeq,1,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_3/raw_feature_bc_matrices.h5
         sample_4,pbmc,NextSeq,2,GRCh38,gs://fc-e0000000-0000-0000-0000-000000000000/my_dir/sample_4/raw_feature_bc_matrices.h5
 
-    If you ran **cellranger_workflow** ahead, you should already obtain a template **count_matrix.csv** file that you can modify from **generate_count_config**'s outputs.
+    If you ran **cellranger_workflow** previously, you should already have a template **count_matrix.csv** file that you can modify from **generate_count_config**'s outputs.
 
 #. Upload your sample sheet to the workspace.
 
@@ -46,7 +48,7 @@ You are free to add any other columns and these columns will be used in selectin
 
 #. Import *cumulus* workflow to your workspace.
 
-    See the Terra documentation for `adding a workflow`_. The *cumulus* workflow is under ``Broad Methods Repository`` with name "**cumulus/cumulus**".
+    Import by following instructions in `Import workflows to Terra`_. You should choose **github.com/lilab-bcb/cumulus/Cumulus** for import.
 
     Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cumulus* workflow in the drop-down menu.
 
@@ -121,17 +123,14 @@ Cumulus steps:
 #. **plot**. This step is optional. In this step, **Cumulus** can generate 6 types of figures based on the **cluster** step results:
 
     - **composition** plots which are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects.
-    - **tsne**, **fitsne**, and **net_tsne**: t-SNE like plots based on different algorithms, respectively. Users can specify cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
     - **umap** and **net_umap**: UMAP like plots based on different algorithms, respectively. Users can specify cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
+    - **tsne**: FIt-SNE plots. Users can specify cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
     - **fle** and **net_fle**: FLE (Force-directed Layout Embedding) like plots based on different algorithms, respectively. Users can specify cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
-    - **diffmap** plots which are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components.
-    - If input is CITE-Seq data, there will be **citeseq_fitsne** plots which are FIt-SNE plots based on epitope expression.
+    - If input is CITE-Seq data, there will be **citeseq_umap** plots which are UMAP plots based on epitope expression.
 
 #. **cirro_output**. This step is optional. Generate `Cirrocumulus`_ inputs for visualization using `Cirrocumulus`_ .
 
 #. **scp_output**. This step is optional. Generate analysis result in `Single Cell Portal`_ (SCP) compatible format.
-
-#. **organize_results**. Copy analysis results from execution environment to destination location on Google bucket. The output organization is as follows: one top-level output folder specified by ``output_directory`` in `global inputs`_; each sample has all it output files in a distinct subfolder, with name specified by ``output_name`` in `global inputs`_; within this subfolder, each file has a common filename prefix specified by ``output_name``.
 
 In the following sections, we will first introduce global inputs and then introduce the WDL inputs and outputs for each step separately. But please note that you need to set inputs from all steps simultaneously in the Terra WDL.
 
@@ -162,18 +161,22 @@ global inputs
       - This is the name of subdirectory for the current sample; and all output files within the subdirectory will have this string as the common filename prefix.
       - "my_sample"
       -
-    * - cumulus_version
-      - cumulus version to use. Versions available: 1.0.0, 0.16.0, 0.15.0, 0.13.0, 0.12.0, 0.11.0, 0.10.0.
-      - "1.0.0"
-      - "1.0.0"
+    * - default_reference
+      - If sample count matrix is in either DGE, mtx, csv, tsv or loom format and there is no Reference column in the csv_file, use default_reference as the reference string.
+      - "GRCh38"
+      -
+    * - pegasus_version
+      - Pegasus version to use for analysis. Versions available: ``1.4.3``, ``1.4.2``, ``1.4.0``, ``1.3.0``.
+      - "1.4.3"
+      - "1.4.3"
     * - docker_registry
       - Docker registry to use. Options:
 
-        - "cumulusprod" for Docker Hub images;
+        - "quay.io/cumulus" for images on Red Hat registry;
 
-        - "quay.io/cumulus" for backup images on Red Hat registry.
-      - "cumulusprod"
-      - "cumulusprod"
+        - "cumulusprod" for backup images on Docker Hub.
+      - "quay.io/cumulus"
+      - "quay.io/cumulus"
     * - zones
       - Google cloud zones to consider for execution.
       - "us-east1-d us-west1-a us-west1-b"
@@ -190,10 +193,22 @@ global inputs
       - Total disk space in GB
       - 100
       - 100
+    * - backend
+      - Cloud infrastructure backend to use. Available options:
+
+        - "gcp" for Google Cloud;
+        - "aws" for Amazon AWS;
+        - "local" for local machine.
+      - "gcp"
+      - "gcp"
     * - preemptible
-      - Number of preemptible tries
+      - Number of preemptible tries. This works only when *backend* is ``gcp``.
       - 2
       - 2
+    * - awsQueueArn
+      - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+      - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
+      - ""
 
 ---------------------------------
 
@@ -219,18 +234,31 @@ aggregate_matrices inputs
       - Specify a comma-separated list of outputted attributes. These attributes should be column names in the count_matrix.csv file
       - "Source,Platform,Donor"
       -
-    * - default_reference
-      - If sample count matrix is in either DGE, mtx, csv, tsv or loom format and there is no Reference column in the csv_file, use default_reference as the reference.
-      - "GRCh38"
-      -
     * - select_only_singlets
       - If we have demultiplexed data, turning on this option will make cumulus only include barcodes that are predicted as singlets.
       - true
       - false
+    * - remap_singlets
+      - | For demultiplexed data, user can remap singlet names using assignment in String in this input. This string assignment takes the format "new_name_i:old_name_1,old_name_2;new_name_ii:old_name_3;...".
+        | For example, if we hashed 5 libraries from 3 samples: sample1_lib1, sample1_lib2; sample2_lib1, sample2_lib2; sample3, we can remap them to 3 samples using this string: ``"sample1:sample1_lib1,sample1_lib2;sample2:sample2_lib1,sample2_lib2"``.
+        | In this way, the new singlet names will be in metadata field with key ``assignment``, while the old names are kept in metadata with key ``assignment.orig``.
+        | **Notice:** This input is enabled only when *select_only_singlets* input is ``true``.
+      - "Group1:CB1,CB2;Group2:CB3,CB4,CB5"
+      -
+    * - subset_singlets
+      - | For demultiplexed data, user can use this input to choose a subset of singlets based on their names. This string takes the format "name1,name2,...".
+        | Note that if *remap_singlets* input is specified, subsetting happens after remapping, i.e. you should use the new singlet names for choosing subset.
+        | **Notice:** This input is enabled only when *select_only_singlets* input is ``true``.
+      - "Group2,CB6,CB7"
+      -
     * - minimum_number_of_genes
       - Only keep barcodes with at least this number of expressed genes
       - 100
       - 100
+    * - is_dropseq
+      - If inputs are DropSeq data.
+      - false
+      - false
 
 aggregate_matrices output
 +++++++++++++++++++++++++
@@ -265,13 +293,13 @@ cluster inputs
     * - focus
       - | Focus analysis on Unimodal data with <keys>. <keys> is a comma-separated list of keys. If None, the ``self._selected`` will be the focused one.
         | Focus key consists of two parts: reference genome name, and data type, connected with a hyphen marker "``-``".
-        | Reference genome name depends on the reference you used when running Cellranger workflow. See `here <./cellranger.html#sample-sheet>`_ for reference list.
+        | Reference genome name depends on the reference you used when running Cellranger workflow. See details in `reference list`_.
       - "GRCh38-rna"
       -
     * - append
       - | Append Unimodal data <key> to any <keys> in *focus*.
         | Similarly as focus keys, append key also consists of two parts: reference genome name, and data type, connected with a hyphen marker "``-``".
-        | See `here <./cellranger.html#sample-sheet>`_ for reference genome list.
+        | See `reference list`_ for details.
       - "SARSCoV2-rna"
       -
     * - channel
@@ -283,7 +311,7 @@ cluster inputs
       - "attr1,attr2,attr3""
       -
     * - min_genes_before_filtration
-      - If raw data matrix is input, empty barcodes will dominate pre-filtration statistics. To avoid this, for raw data matrix, only consider barcodes with at lease <min_genes_before_filtration> genes for pre-filtration condition.
+      - If raw data matrix is input, empty barcodes will dominate pre-filtration statistics. To avoid this, for raw data matrix, only consider barcodes with at least <min_genes_before_filtration> genes for pre-filtration condition.
       - 100
       - 100
     * - select_only_singlets
@@ -294,11 +322,13 @@ cluster inputs
       - | For demultiplexed data, user can remap singlet names using assignment in String in this input. This string assignment takes the format "new_name_i:old_name_1,old_name_2;new_name_ii:old_name_3;...".
         | For example, if we hashed 5 libraries from 3 samples: sample1_lib1, sample1_lib2; sample2_lib1, sample2_lib2; sample3, we can remap them to 3 samples using this string: ``"sample1:sample1_lib1,sample1_lib2;sample2:sample2_lib1,sample2_lib2"``.
         | In this way, the new singlet names will be in metadata field with key ``assignment``, while the old names are kept in metadata with key ``assignment.orig``.
+        | **Notice:** This input is enabled only when *select_only_singlets* input is ``true``.
       - "Group1:CB1,CB2;Group2:CB3,CB4,CB5"
       -
     * - subset_singlets
       - | For demultiplexed data, user can use this input to choose a subset of singlets based on their names. This string takes the format "name1,name2,...".
-        | Note that if ``remap_singlets`` is specified, subsetting happens after remapping, i.e. you should use the new singlet names for choosing subset.
+        | Note that if *remap_singlets* is specified, subsetting happens after remapping, i.e. you should use the new singlet names for choosing subset.
+        | **Notice:** This input is enabled only when *select_only_singlets* input is ``true``.
       - "Group2,CB6,CB7"
       -
     * - output_filtration_results
@@ -314,7 +344,7 @@ cluster inputs
       - 6,4
       -
     * - output_h5ad
-      - Generate Seurat-compatible h5ad file.
+      - Generate Seurat-compatible h5ad file. Must set to ``true`` if performing DE analysis, cell type annotation, or plotting.
       - true
       - true
     * - output_loom
@@ -370,6 +400,10 @@ cluster inputs
       - Do not select highly variable features.
       - false
       - false
+    * - plot_hvf
+      - Plot highly variable feature selection. Will not work if ``no_select_hvf`` is ``true``.
+      - false
+      - false
     * - correct_batch_effect
       - If correct batch effects
       - false
@@ -402,8 +436,8 @@ cluster inputs
     * - calc_signature_scores
       - Gene set for calculating signature scores. It can be either of the following forms:
 
-        - String chosen from: "cell_cycle_human", "cell_cycle_mouse", "gender_human", "gender_mouse", "mitochondrial_genes_human", "mitochondrial_genes_mouse", "robosomal_genes_human", and "robosomal_genes_mouse".
-        - Google bucket URL of a GMT_ format file. For example: "gs://fc-e0000000-0000-0000-0000-000000000000/cell_cycle_sig.gmt".
+        - String chosen from: ``cell_cycle_human``, ``cell_cycle_mouse``, ``gender_human``, ``gender_mouse``, ``mitochondrial_genes_human``, ``mitochondrial_genes_mouse``, ``robosomal_genes_human``, ``robosomal_genes_mouse``, ``apoptosis_human``, and ``apoptosis_mouse``.
+        - Google bucket URL of a GMT_ format file. For example: ``gs://fc-e0000000-0000-0000-0000-000000000000/cell_cycle_sig.gmt``.
       - "cell_cycle_human"
       -
     * - nPC
@@ -491,17 +525,17 @@ cluster inputs
       - "spectral_leiden_labels"
       - "spectral_leiden_labels"
     * - run_tsne
-      - Run multi-core t-SNE for visualization
+      - Run FIt-SNE for visualization.
       - false
       - false
     * - tsne_perplexity
-      - t-SNE’s perplexity parameter, also used by FIt-SNE.
+      - t-SNE’s perplexity parameter.
       - 30
       - 30
-    * - run_fitsne
-      - Run FIt-SNE for visualization
-      - false
-      - false
+    * - tsne_initialization
+      - Initialization method for FIt-SNE. It can be either: 'random' refers to random initialization; 'pca' refers to PCA initialization as described in `[Kobak et al. 2019]`_.
+      - "pca"
+      - "pca"
     * - run_umap
       - Run UMAP for visualization
       - true
@@ -538,14 +572,6 @@ cluster inputs
       - Down sampling fraction for net-related visualization
       - 0.1
       - 0.1
-    * - run_net_tsne
-      - Run Net tSNE for visualization
-      - false
-      - false
-    * - net_tsne_out_basis
-      - Basis name for Net t-SNE coordinates in analysis result
-      - "net_tsne"
-      - "net_tsne"
     * - run_net_umap
       - Run Net UMAP for visualization
       - false
@@ -562,6 +588,32 @@ cluster inputs
       - Basis name for Net FLE coordinates in analysis result.
       - "net_fle"
       - "net_fle"
+    * - infer_doublets
+      - Infer doublets using the `Pegasus method <https://github.com/klarman-cell-observatory/pegasus/raw/master/doublet_detection.pdf>`_. When finished, Scrublet-like doublet scores are in cell attribute ``doublet_score``, and "doublet/singlet" assignment on cells are stored in cell attribute ``demux_type``.
+      - false
+      - false
+    * - expected_doublet_rate
+      - The expected doublet rate per sample. If not specified, calculate the expected rate based on number of cells from the 10x multiplet rate table.
+      - 0.05
+      -
+    * - doublet_cluster_attribute
+      - | Specify which cluster attribute (e.g. "louvain_labels") should be used for doublet inference. Then doublet clusters will be marked with the following criteria: passing the Fisher's exact test and having >= 50% of cells identified as doublets.
+      	| If not specified, the first computed cluster attribute in the list of "leiden", "louvain", "spectral_ledein" and "spectral_louvain" will be used.
+      - "louvain_labels"
+      -
+    * - citeseq
+      - | Perform CITE-Seq data analysis. Set to ``true`` if input data contain both RNA and CITE-Seq modalities.
+      	| This will set *focus* to be the RNA modality and *append* to be the CITE-Seq modality. In addition, ``"ADT-"`` will be added in front of each antibody name to avoid name conflict with genes in the RNA modality.
+      - false
+      - false
+    * - citeseq_umap
+      - For high quality cells kept in the RNA modality, calculate a distinct UMAP embedding based on their antibody expression.
+      - false
+      - false
+    * - citeseq_umap_exclude
+      - A comma-separated list of antibodies to be excluded from the CITE-Seq UMAP calculation (e.g. Mouse-IgG1,Mouse-IgG2a).
+      - "Mouse-IgG1,Mouse-IgG2a"
+      -
 
 cluster outputs
 +++++++++++++++
@@ -579,6 +631,7 @@ cluster outputs
         | To load this file in Python, you need to first install `PegasusIO`_ on your local machine. Then use ``import pegasusio as io; data = io.read_input('output_name.zarr.zip')`` in Python environment.
         | ``data`` is a *MultimodalData* object, and points to its default *UnimodalData* element. You can set its default *UnimodalData* to others by ``data.set_data(focus_key)`` where ``focus_key`` is the key string to the wanted *UnimodalData* element.
         | For its default *UnimodalData* element, the log-normalized expression matrix is stored in ``data.X`` as a Scipy CSR-format sparse matrix, with cell-by-gene shape.
+        | Alternatively, to get the raw count matrix, first run ``data.select_matrix('raw.X')``, then ``data.X`` will be switched to point to the raw matrix.
         | The ``obs`` field contains cell related attributes, including clustering results.
         | For example, ``data.obs_names`` records cell barcodes; ``data.obs['Channel']`` records the channel each cell comes from;
         | ``data.obs['n_genes']``, ``data.obs['n_counts']``, and ``data.obs['percent_mito']`` record the number of expressed genes, total UMI count, and mitochondrial rate for each cell respectively;
@@ -588,8 +641,7 @@ cluster outputs
         | The ``obsm`` field records embedding coordinates.
         | For example, ``data.obsm['X_pca']`` records PCA coordinates, ``data.obsm['X_tsne']`` records t-SNE coordinates,
         | ``data.obsm['X_umap']`` records UMAP coordinates, ``data.obsm['X_diffmap']`` records diffusion map coordinates,
-        | ``data.obsm['X_diffmap_pca']`` records the first 3 PCs by projecting the diffusion components using PCA,
-        | and ``data.obsm['X_fle']`` records the force-directed layout coordinates from the diffusion components.
+        | and ``data.obsm['X_fle']`` records the force-directed layout coordinates.
         | The ``uns`` field stores other related information, such as reference genome (``data.uns['genome']``), kNN on PCA coordinates (``data.uns['pca_knn_indices']`` and ``data.uns['pca_knn_distances']``), etc.
     * - **output_log**
       - File
@@ -599,8 +651,7 @@ cluster outputs
       - | List of output file(s) in Seurat-compatible h5ad format (output_name.focus_key.h5ad), in which each file is associated with a focus of the input data.
         | To load this file in Python, first install `PegasusIO`_ on your local machine. Then use ``import pegasusio as io; data = io.read_input('output_name.focus_key.h5ad')`` in Python environment.
         | After loading, ``data`` has the similar structure as *UnimodalData* object in Description of **output_zarr** in `cluster outputs <./cumulus.html#cluster-outputs>`_ section.
-        | In addition, ``data.raw.X`` records filtered raw count matrix as a Scipy CSR-format sparse matrix, with cell-by-gene shape.
-        | ``data.uns['scale.data']`` records variable-gene-selected and standardized expression matrix which are ready to perform PCA, and ``data.uns['scale.data.rownames']`` records indexes of the selected highly variable genes.
+        | In addition, ``data.uns['scale.data']`` records variable-gene-selected and standardized expression matrix which are ready to perform PCA, and ``data.uns['scale.data.rownames']`` records indexes of the selected highly variable genes.
         | This file is used for loading in R and converting into a Seurat object (see `here <./cumulus.html#load-h5ad-file-into-seurat>`_ for instructions)
     * - output_filt_xlsx
       - File
@@ -624,6 +675,12 @@ cluster outputs
         | output_name.filt.gene.pdf, which contains violin plots contrasting gene count distributions before and after filtration per channel.
         | output_name.filt.UMI.pdf, which contains violin plots contrasting UMI count distributions before and after filtration per channel.
         | output_name.filt.mito.pdf, which contains violin plots contrasting mitochondrial rate distributions before and after filtration per channel
+    * - output_hvf_plot
+      - Array[File]
+      - If not empty, this array contains PDF files showing scatter plots of genes upon highly variable feature selection.
+    * - output_dbl_plot
+      - Array[File]
+      - If **infer_doublets** input field is ``true``, this array will contain a number of ``png`` files, each corresponding to one sample/channel in the data. In each file, there are histograms showing the automated doublet rate selection of that sample/channel.
     * - output_loom_file
       - Array[File]
       - | List of output file in loom format (output_name.focus_key.loom), in which each file is associated with a focus of the input data.
@@ -634,8 +691,7 @@ cluster outputs
         | ``ds.ca['louvain_labels']``, ``ds.ca['leiden_labels']``, ``ds.ca['spectral_louvain_labels']``, and ``ds.ca['spectral_leiden_labels']`` record each cell's cluster labels using different clustering algorithms;
         | ``ds.ca['X_pca']`` records PCA coordinates, ``ds.ca['X_tsne']`` records t-SNE coordinates,
         | ``ds.ca['X_umap']`` records UMAP coordinates, ``ds.ca['X_diffmap']`` records diffusion map coordinates,
-        | ``ds.ca['X_diffmap_pca']`` records the first 3 PCs by projecting the diffusion components using PCA,
-        | and ``ds.ca['X_fle']`` records the force-directed layout coordinates from the diffusion components.
+        | and ``ds.ca['X_fle']`` records the force-directed layout coordinates.
         | The ``ra`` field contains gene related attributes as column attributes.
         | For example, ``ds.ra['var_names']`` records gene symbols, ``ds.ra['gene_ids']`` records Ensembl gene IDs, and ``ds.ra['highly_variable_features']`` records selected variable genes.
 
@@ -669,12 +725,12 @@ de_analysis inputs
       - 0.05
     * - fisher
       - Calculate Fisher’s exact test
-      - true
-      - true
+      - false
+      - false
     * - t_test
       - Calculate Welch's t-test.
-      - true
-      - true
+      - false
+      - false
     * - find_markers_lightgbm
       - If also detect markers using LightGBM
       - false
@@ -692,12 +748,15 @@ de_analysis inputs
       - false
       - false
     * - annotate_de_test
-      - Differential Expression test to use for inference on cell types. Options: "mwu", "t", or "fisher"
+      - Differential Expression test to use for inference on cell types. Options: ``mwu``, ``t``, or ``fisher``
       - "mwu"
       - "mwu"
     * - organism
-      - Organism, could either be "human_immune", "mouse_immune", "human_brain", "mouse_brain", "human_lung", or a Google bucket link to a JSON file describing the markers
-      - "mouse_brain"
+      - Organism, could either of the follow:
+
+        - Preset markers: ``human_immune``, ``mouse_immune``, ``human_brain``, ``mouse_brain``, ``human_lung``, or a combination of them as a string separated by comma.
+        - User-defined marker file: A Google bucket link to a user-specified JSON file describing the markers. For example: ``gs://fc-e0000000/my_markers.json``.
+      - "mouse_immune,mouse_brain"
       - "human_immune"
     * - minimum_report_score
       - Minimum cell type score to report a potential cell type
@@ -719,8 +778,8 @@ de_analysis outputs
       - | List of h5ad-formatted results with DE results updated (output_name.focus_key.h5ad), in which each file is associated with a focus of the input data.
         | To load this file in Python, you need to first install `PegasusIO`_ on your local machine. Then type ``import pegasusio as io; data = io.read_input('output_name.focus_key.h5ad')`` in Python environment.
         | After loading, ``data`` has the similar structure as *UnimodalData* object in Description of **output_zarr** in `cluster outputs <./cumulus.html#cluster-outputs>`_ section.
-        | Besides, there is one additional field ``varm`` which records DE analysis results in ``data.varm['de_res']``. You can use Pandas DataFrame to convert it into a reader-friendly structure: ``import pandas as pd; df = pd.DataFrame(data.varm['de_res'], index = data.var_names)``. Then in the resulting data frame, genes are rows, and those DE test statistics are columns.
-        | DE analysis in cumulus is performed on each cluster against cells in all the other clusters. For instance, in the data frame, column ``mean_logExpr:1`` refers to the mean expression of genes in log-scale for cells in Cluster 1. The number after colon refers to the cluster label to which this statistic belongs.
+        | Besides, there is one additional field ``varm`` which records DE analysis results in ``data.varm['de_res']``. You can use Pandas DataFrame to convert it into a reader-friendly structure: ``import pandas as pd; df = pd.DataFrame(data.varm['de_res'], index=data.var_names)``. Then in the resulting data frame, genes are rows, and those DE test statistics are columns.
+        | DE analysis in cumulus is performed on each cluster against cells in all the other clusters. For instance, in the data frame, column ``1:log2Mean`` refers to the mean expression of genes in log-scale for cells in Cluster 1. The number before colon refers to the cluster label to which this statistic belongs.
     * - output_de_xlsx
       - Array[File]
       - | List of spreadsheets reporting DE results (output_name.focus_key.de.xlsx), in which each file is associated with a focus of the input data.
@@ -862,15 +921,10 @@ plot inputs
         | "label" refers to cluster labels and "attr" refers to sample conditions
       - "louvain_labels:Donor"
       - None
-    * - plot_fitsne
+    * - plot_tsne
       - | Takes the format of "attr,attr,...,attr".
         | If non-empty, plot attr colored FIt-SNEs side by side
       - "louvain_labels,Donor"
-      - None
-    * - plot_tsne
-      - | Takes the format of "attr,attr,...,attr".
-        | If non-empty, plot attr colored t-SNEs side by side
-      - "louvain_labels,Channel"
       - None
     * - plot_umap
       - | Takes the format of "attr,attr,...,attr".
@@ -882,11 +936,6 @@ plot inputs
         | If non-empty, plot attr colored FLE (force-directed layout embedding) side by side
       - "louvain_labels,Donor"
       - None
-    * - plot_net_tsne
-      - | Takes the format of "attr,attr,...,attr".
-        | If non-empty, plot attr colored t-SNEs side by side based on net t-SNE result.
-      - "leiden_labels,Channel"
-      - None
     * - plot_net_umap
       - | Takes the format of "attr,attr,...,attr".
         | If non-empty, plot attr colored UMAP side by side based on net UMAP result.
@@ -897,6 +946,11 @@ plot inputs
         | If non-empty, plot attr colored FLE (force-directed layout embedding) side by side
         | based on net FLE result.
       - "leiden_labels,Donor"
+      - None
+    * - plot_citeseq_umap
+      - | Takes the format of "attr,attr,...,attr".
+        | If non-empty, plot attr colored UMAP side by side based on CITE-Seq UMAP result.
+      - "louvain_labels,Donor"
       - None
 
 plot outputs
@@ -1004,161 +1058,26 @@ scp_output outputs
 Run CITE-Seq analysis
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
-To run CITE-Seq analysis, add ``"citeseq"`` string to *focus* field in cluster inputs of cumulus workflow.
+Users now can use *cumulus/cumulus* workflow solely to run CITE-Seq analysis.
 
-An embedding of epitope expressions via FIt-SNE is available at basis ``X_citeseq_fitsne``.
+1. Prepare a sample sheet in the following format::
 
-To plot this epitope embedding, specify attributes to plot in ``plot_citeseq_fitsne`` field of cluster inputs.
+	Sample,Location,Modality
+	sample_1,gs://your-bucket/rna_raw_counts.h5,rna
+	sample_1,gs://your-bucket/citeseq_cell_barcodes.csv,citeseq
 
----------------------------------
+Each row stands for one modality:
 
-Run subcluster analysis
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+	* **Sample:** Sample name, which *must* be the same in the two rows to let Cumulus aggregate RNA and CITE-Seq matrices.
+	* **Location:** Google bucket URL of the corresponding count matrix file.
+	* **Modality:** Modality type. ``rna`` for RNA count matrix; ``citeseq`` for CITE-Seq antibody count matrix.
 
-Once we have **cumulus** outputs, we could further analyze a subset of cells by running **cumulus_subcluster**. To run **cumulus_subcluster**, follow the following steps:
+2. Run *cumulus/cumulus* workflow using this sample sheet as the input file, and specify the following input fields:
 
-#. Import **cumulus_subcluster** method.
-
-    See the Terra documentation for `adding a workflow`_. The cumulus workflow is under ``Broad Methods Repository`` with name "**cumulus/cumulus_subcluster**".
-
-    Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export cumulus workflow in the drop-down menu.
-
-#. In your workspace, open ``cumulus_subcluster`` in ``WORKFLOWS`` tab. Select ``Run workflow with inputs defined by file paths`` as below
-
-    .. image:: images/single_workflow.png
-
-   and click the ``SAVE`` button.
-
-cumulus_subcluster steps:
-^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-*cumulus_subcluster* processes the subset of single cells in the following steps:
-
-#. **subcluster**. In this step, **cumulus_subcluster** first select the subset of cells from **cumulus** outputs according to user-provided criteria. It then performs batch correction, dimension reduction, diffusion map calculation, graph-based clustering and 2D visualization calculation (e.g. t-SNE/UMAP/FLE).
-
-#. **de_analysis** (optional). In this step, **cumulus_subcluster** calculates potential markers for each cluster by performing a variety of differential expression (DE) analysis. The available DE tests include Welch's t test, Fisher's exact test, and Mann-Whitney U test. **cumulus_subcluster** can also calculate the area under ROC curve (AUROC) values for putative markers. If the samples are human or mouse immune cells, **cumulus_subcluster** can optionally annotate putative cell types for each cluster based on known markers.
-
-#. **plot** (optional). In this step, **cumulus_subcluster** can generate the following 5 types of figures based on the **subcluster** step results:
-
-    - **composition** plots which are bar plots showing the cell compositions (from different conditions) for each cluster. This type of plots is useful to fast assess library quality and batch effects.
-
-    - **tsne**, **fitsne**, and **net_tsne**: t-SNE like plots based on different algorithms, respectively. Users can specify different cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
-
-    - **umap** and **net_umap**: UMAP like plots based on different algorithms, respectively. Users can specify different cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
-
-    - **fle** and **net_fle**: FLE (Force-directed Layout Embedding) like plots based on different algorithms, respectively. Users can specify different cell attributes (e.g. cluster labels, conditions) for coloring side-by-side.
-
-    - **diffmap** plots which are 3D interactive plots showing the diffusion maps. The 3 coordinates are the first 3 PCs of all diffusion components.
-
-cumulus_subcluster's inputs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-**cumulus_subcluster** shares many inputs/outputs with **cumulus**, we will only cover inputs/outputs that are specific to **cumulus_subcluster** in this section.
-
-Note that we will make the required inputs/outputs bold and all other inputs/outputs are optional.
-
-.. list-table::
-    :widths: 5 20 10 5
-    :header-rows: 1
-
-    * - Name
-      - Description
-      - Example
-      - Default
-    * - **input_h5ad**
-      - Google bucket URL of input h5ad file containing *cumulus* results
-      - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir/my_results.h5ad"
-      -
-    * - **output_name**
-      - This is the prefix for all output files. It should contain the Google bucket URL, subdirectory name and output name prefix
-      - "gs://fc-e0000000-0000-0000-0000-000000000000/my_results_dir/my_results_sub"
-      -
-    * - **subset_selections**
-      - | Specify which cells will be included in the subcluster analysis.
-        | This field contains one or more <subset_selection> strings separated by ';'.
-        | Each <subset_selection> string takes the format of 'attr:value,…,value', which means select cells with attr in the values.
-        | If multiple <subset_selection> strings are specified, the subset of cells selected is the intersection of these strings
-      - "louvain_labels:3,6" or "louvain_labels:3,6;Donor:1,2"
-      -
-    * - calculate_pseudotime
-      - Calculate diffusion-based pseudotimes based on <roots>. <roots> should be a comma-separated list of cell barcodes
-      - "sample_1-ACCCGGGTTT-1,sample_1-TCCCGGGAAA-2"
-      - None
-    * - num_cpu
-      - Number of cpus per cumulus job
-      - 32
-      - 64
-    * - memory
-      - Memory size string
-      - "200G"
-      - "200G"
-    * - disk_space
-      - Total disk space in GB
-      - 100
-      - 100
-    * - preemptible
-      - Number of preemptible tries
-      - 2
-      - 2
-
-.. role:: red-bold
-
-For other **cumulus_subcluster** inputs, please refer to `cumulus cluster inputs list`_ for details. Notice that some inputs (as listed below) in **cumulus cluster** inputs list are :red-bold:`DISABLED` for **cumulus_subcluster**:
-
-    - cite_seq
-    - cite_seq_capping
-    - output_filtration_results
-    - plot_filtration_results
-    - plot_filtration_figsize
-    - output_seurat_compatible
-    - batch_group_by
-    - min_genes
-    - max_genes
-    - min_umis
-    - max_umis
-    - mito_prefix
-    - percent_mito
-    - gene_percent_cells
-    - min_genes_on_raw
-    - counts_per_cell_after
-
-.. _cumulus cluster inputs list: ./cumulus.html#cluster
-
-
-cumulus_subcluster's outputs
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. list-table::
-    :widths: 5 5 20
-    :header-rows: 1
-
-    * - Name
-      - Type
-      - Description
-    * - **output_h5ad**
-      - File
-      - | h5ad-formatted HDF5 file containing all results (output_name.h5ad).
-        | If ``perform_de_analysis`` is on, this file should be the same as *output_de_h5ad*.
-        | To load this file in Python, it's similar as in `cumulus cluster outputs <./cumulus.html#cluster-outputs>`_ section.
-        | Besides, for subcluster results, there is a new cell attributes in ``data.obs['pseudo_time']``, which records the inferred pseudotime for each cell.
-    * - **output_log**
-      - File
-      - This is a copy of the logging module output, containing important intermediate messages
-    * - output_loom_file
-      - File
-      - Generated loom file (output_name.loom)
-    * - output_de_h5ad
-      - File
-      - Generated h5ad-formatted results with DE results updated (output_name.h5ad)
-    * - output_de_xlsx
-      - File
-      - Generated Spreadsheet reporting DE results (output_name.de.xlsx)
-    * - output_pdfs
-      - Array[File]
-      - Generated pdf files
-    * - output_htmls
-      - Array[File]
-      - Generated html files
+	* **citeseq**: Set this to ``true`` to enable CITE-Seq analysis.
+	* **citeseq_umap**: Set this to ``true`` to calculate the CITE-Seq UMAP embedding on cells.
+	* **citeseq_umap_exclude**: A list of CITE-Seq antibodies to be excluded from UMAP calculation. This list should be written in a string format with each antobidy name separated by comma.
+	* **plot_citeseq_umap**: A list of cell barcode attributes to be plotted based on CITE-Seq UMAP embedding. This list should be written in a string format with each attribute separated by comma.
 
 ---------------------------------
 
@@ -1202,7 +1121,7 @@ Notice that Python, and Python package `anndata`_ with version at least ``0.6.22
 
 Execute the R code below to load the h5ad result into Seurat (working with both Seurat v2 and v3)::
 
-    source("https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cumulus/h5ad2seurat.R")
+    source("https://raw.githubusercontent.com/lilab-bcb/cumulus/master/workflows/cumulus/h5ad2seurat.R")
     ad <- import("anndata", convert = FALSE)
     test_ad <- ad$read_h5ad("output_name.focus_key.h5ad")
     result <- convert_h5ad_to_seurat(test_ad)
@@ -1226,7 +1145,7 @@ You also need to install *loomR* package in your R environment::
 
 Execute the R code below to load the loom file result into Seurat (working with Seurat v3 only)::
 
-    source("https://raw.githubusercontent.com/klarman-cell-observatory/cumulus/master/workflows/cumulus/loom2seurat.R")
+    source("https://raw.githubusercontent.com/lilab-bcb/cumulus/master/workflows/cumulus/loom2seurat.R")
     result <- convert_loom_to_seurat("output_name.focus_key.loom")
 
 In addition, if you want to set an active cluster label field for the resulting Seurat object, do the following::
@@ -1269,32 +1188,7 @@ Ensure you have `Pegasus`_ installed.
 
 Download your analysis result data, say ``output_name.zarr.zip``, from Google bucket to your local machine.
 
-Load the output::
-
-    import pegasusio as io
-    data = io.read_input("output_name.zarr.zip")
-
-Violin plot of the computed quality measures::
-
-    fig = pg.violin(data, keys = ['n_genes', 'n_counts', 'percent_mito'], by = 'passed_qc')
-    fig.savefig('output_file.qc.pdf', dpi = 500)
-
-t-SNE plot colored by louvain cluster labels and channel::
-
-    fig = pg.embedding(data, basis = 'tsne', keys = ['louvain_labels', 'Channel'])
-    fig.savefig('output_file.tsne.pdf', dpi = 500)
-
-t-SNE plot colored by genes of interes (also known as Feature Plot)::
-
-    fig = pg.embedding(data, basis = 'tsne', keys = ['CD4', 'CD8A'])
-    fig.savefig('output_file.genes.tsne.pdf', dpi = 500)
-
-For other embedding plots using FIt-SNE (``fitsne``), Net t-SNE (``net_tsne``), CITE-Seq FIt-SNE (``citeseq_fitsne``), UMAP (``umap``), Net UMAP (``net_umap``), FLE (``fle``), or Net FLE (``net_fle``) coordinates, simply substitute its basis name for ``tsne`` in the code above.
-
-Composition plot on louvain cluster labels colored by channel::
-
-    fig = pg.composition_plot(data, by = 'louvain_labels', condition = 'Channel')
-    fig.savefig('output_file.composition.pdf', dpi = 500)
+Follow `Pegasus plotting tutorial`_ for visualizing your data in Python.
 
 
 .. _PegasusIO: https://pegasusio.readthedocs.io
@@ -1304,9 +1198,12 @@ Composition plot on louvain cluster labels colored by channel::
 .. _anndata: https://anndata.readthedocs.io/en/latest/
 .. _Cirrocumulus: https://cirrocumulus.readthedocs.io/en/latest/
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
-.. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
+.. _Import workflows to Terra: ./cumulus_import.html
 .. _Terra: https://app.terra.bio/
 .. _Single Cell Portal: https://portals.broadinstitute.org/single_cell
 .. _global inputs: ./cumulus.html#global-inputs
 .. _create a data table: https://support.terra.bio/hc/en-us/articles/360025758392
 .. _GMT: https://software.broadinstitute.org/cancer/software/gsea/wiki/index.php/Data_formats#GMT:_Gene_Matrix_Transposed_file_format_.28.2A.gmt.29
+.. _[Kobak et al. 2019]: https://www.nature.com/articles/s41467-019-13056-x
+.. _Pegasus plotting tutorial: https://pegasus-tutorials.readthedocs.io/en/latest/_static/tutorials/plotting_tutorial.html
+.. _reference list: ./cellranger/index.html#sample-sheet

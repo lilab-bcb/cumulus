@@ -20,13 +20,13 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Cumulus'
-copyright = '2020 The Broad Institute, Inc. and The General Hospital Corporation. All rights reserved.'
+copyright = '2024 Genentech, Inc. All rights reserved.'
 author = 'Yiming Yang, Joshua Gould and Bo Li'
 
 # The short X.Y version
-version = ''
+version = '2.5'
 # The full version, including alpha/beta/rc tags
-release = ''
+release = '2.5.0'
 
 
 # -- General configuration ---------------------------------------------------
@@ -67,7 +67,7 @@ master_doc = 'index'
 #
 # This is also used if you do content translation via gettext catalogs.
 # Usually you set "language" from the command line for these cases.
-language = None
+language = 'en'
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
@@ -181,4 +181,4 @@ todo_include_todos = True
 # set up function
 
 def setup(app):
-    app.add_stylesheet('my_theme.css')
+    app.add_css_file('my_theme.css')

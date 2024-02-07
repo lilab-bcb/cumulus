@@ -1,28 +1,49 @@
 version 1.0
 
 workflow cellranger_create_reference {
-    # Output directory, gs URL
     input {
+        # Output directory, gs URL
         String output_directory
+
+        # A sample sheet in CSV format allows users to specify more than 1 genomes to build references (e.g. human and mouse). If a sample sheet is provided, input_fasta, input_gtf, and attributes will be ignored.
         File? input_sample_sheet
+        # Input gene annotation file in either GTF or GTF.gz format
         String? input_gtf
+        # Input genome reference in either FASTA or FASTA.gz format
         String? input_fasta
+        # Genome reference name. New reference will be stored in a folder named genome
         String? genome
+        # A list of key:value pairs separated by ;. If this option is not None, cellranger mkgtf will be called to filter the user-provided GTF file. See 10x filter with mkgtf for more details
         String? attributes
+        # If we want to build pre-mRNA references, in which we use full length transcripts as exons in the annotation file. We follow 10x build Cell Ranger compatible pre-mRNA Reference Package to build pre-mRNA references
         Boolean pre_mrna = false
+        # reference version string
         String? ref_version
 
-        String docker_registry = "cumulusprod"
-        String cellranger_version = '4.0.0'
+        # Which docker registry to use
+        String docker_registry = "quay.io/cumulus"
+        # 7.2.0, 7.1.0, 7.0.1, 7.0.0, 6.1.2, 6.1.1
+        String cellranger_version = "7.2.0"
+
+        # Disk space in GB
         Int disk_space = 100
-        Int preemptible = 2
+        # Google cloud zones
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        # Number of CPUs
         Int num_cpu = 32
-        Int memory = 32
+        # Memory string
+        String memory = "32G"
+
+        # Number of preemptible tries
+        Int preemptible = 2
+        # Backend
+        String backend = "gcp"
+        # Arn string of AWS queue
+        String awsQueueArn = ""
     }
 
     # Output directory, with trailing slashes stripped
-    String output_directory_stripped = sub(output_directory, "/+$", "")
+    String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
     call generate_create_reference_config {
         input:
@@ -33,8 +54,10 @@ workflow cellranger_create_reference {
             attributes = attributes,
             docker_registry = docker_registry,
             cellranger_version = cellranger_version,
+            zones = zones,
             preemptible = preemptible,
-            zones = zones
+            awsQueueArn = awsQueueArn,
+            backend = backend
     }
 
     scatter (filt_gtf_row in generate_create_reference_config.filt_gtf_input) {
@@ -48,7 +71,9 @@ workflow cellranger_create_reference {
                 disk_space = disk_space,
                 zones = zones,
                 memory = memory,
-                preemptible = preemptible
+                preemptible = preemptible,
+                awsQueueArn = awsQueueArn,
+                backend = backend
         }
     }
 
@@ -67,7 +92,13 @@ workflow cellranger_create_reference {
             memory = memory,
             num_cpu = num_cpu,
             zones = zones,
-            preemptible = preemptible
+            preemptible = preemptible,
+            awsQueueArn = awsQueueArn,
+            backend = backend
+    }
+
+    output {
+        File output_reference = run_cellranger_mkref.output_reference
     }
 }
 
@@ -82,8 +113,10 @@ task generate_create_reference_config {
         String? attributes
         String cellranger_version
         String docker_registry
-        Int preemptible
         String zones
+        Int preemptible
+        String awsQueueArn
+        String backend
     }
 
     command {
@@ -93,8 +126,9 @@ task generate_create_reference_config {
         python <<CODE
         import pandas as pd
 
-        if '~{input_sample_sheet}' is not '':
+        if '~{input_sample_sheet}' != '':
             df = pd.read_csv('~{input_sample_sheet}', header = 0, dtype = str, index_col = False, keep_default_na = False)
+            df.columns = df.columns.str.strip()
             for c in df.columns:
                 df[c] = df[c].str.strip()
             if 'Attributes' not in df.columns:
@@ -132,6 +166,7 @@ task generate_create_reference_config {
         docker: "~{docker_registry}/cellranger:~{cellranger_version}"
         zones: zones
         preemptible: preemptible
+        queueArn: awsQueueArn
     }
 }
 
@@ -145,13 +180,16 @@ task run_filter_gtf {
         String cellranger_version
         Int disk_space
         String zones
-        Int memory
+        String memory
         Int preemptible
+        String awsQueueArn
+        String backend
     }
 
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         python <<CODE
@@ -173,7 +211,7 @@ task run_filter_gtf {
 
         output_gtf_file = input_gtf_file # in case no filtering
 
-        if '~{attributes}' is not '':
+        if '~{attributes}' != '':
             file_name += '.filt'
             output_gtf_file = file_name + '.gtf'
             call_args = ['cellranger', 'mkgtf', input_gtf_file, output_gtf_file]
@@ -184,7 +222,7 @@ task run_filter_gtf {
             check_call(call_args)
             input_gtf_file = output_gtf_file
 
-        if '~{pre_mrna}' is 'true':
+        if '~{pre_mrna}' == 'true':
             file_name += '.pre_mrna'
             output_gtf_file = file_name + '.gtf'
             call_args = ['awk', 'BEGIN\\x7BFS="\\\\t"; OFS="\\\\t"\\x7D \\x243 == "transcript" \\x7B\\x243="exon"; print\\x7D', input_gtf_file]
@@ -205,10 +243,11 @@ task run_filter_gtf {
     runtime {
         docker: "~{docker_registry}/cellranger:~{cellranger_version}"
         zones: zones
-        memory: "~{memory}G"
+        memory: memory
         disks: "local-disk ~{disk_space} HDD"
         cpu: 1
         preemptible: preemptible
+        queueArn: awsQueueArn
     }
 }
 
@@ -224,15 +263,18 @@ task run_cellranger_mkref {
         String docker_registry
         String cellranger_version
         Int disk_space
-        Int preemptible
         String zones
         Int num_cpu
-        Int memory
+        String memory
+        Int preemptible
+        String awsQueueArn
+        String backend
     }
 
     command {
         set -e
         export TMPDIR=/tmp
+        export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
         python <<CODE
@@ -259,8 +301,15 @@ task run_cellranger_mkref {
         for genome, fasta, gtf in zip(genome_list, fasta_list, gtf_list):
             call_args.extend(['--genome=' + genome, '--fasta=' + fasta, '--genes=' + gtf])
 
-        call_args.extend(['--nthreads=~{num_cpu}', '--memgb=~{memory}'])
-        if '~{ref_version}' is not '':
+        mem_digit = ""
+        for c in "~{memory}":
+            if c.isdigit():
+                mem_digit += c
+            else:
+                break
+
+        call_args.extend(['--nthreads=~{num_cpu}', '--memgb=' + mem_digit])
+        if '~{ref_version}' != '':
             call_args.append('--ref-version=~{ref_version}')
 
         print(' '.join(call_args))
@@ -268,22 +317,21 @@ task run_cellranger_mkref {
         CODE
 
         tar -czf ~{output_genome}.tar.gz ~{output_genome}
-        gsutil cp ~{output_genome}.tar.gz ~{output_dir}/
-        # mkdir -p ~{output_dir}
-        # cp ~{output_genome}.tar.gz ~{output_dir}
+        strato cp ~{output_genome}.tar.gz "~{output_dir}"/
     }
 
     output {
-        String output_reference = "~{output_dir}/~{output_genome}.tar.gz"
+        File output_reference = "~{output_genome}.tar.gz"
         File monitoringLog = "monitoring.log"
     }
 
     runtime {
         docker: "~{docker_registry}/cellranger:~{cellranger_version}"
         zones: zones
-        memory: "~{memory}G"
+        memory: memory
         disks: "local-disk ~{disk_space} HDD"
         cpu: num_cpu
         preemptible: preemptible
+        queueArn: awsQueueArn
     }
 }
