@@ -11,7 +11,7 @@ workflow InferCNV {
         Boolean HMM = false
         String? ref_group_names
 
-        File acronym_file = "gs://cumulus-ref/resources/infercnv/index.tsv"
+        #File acronym_file = "gs://cumulus-ref/resources/infercnv/index.tsv"
         String docker_registry = "quay.io/cumulus"
         String inferCNV_version = "1.5.1"
         String backend = "gcp"
@@ -23,9 +23,10 @@ workflow InferCNV {
 
     String output_directory_stripped = sub(output_directory, "/+$", "")
 
-    Map[String, String] acronym2uri = read_map(acronym_file)
-    Boolean is_uri = sub(gene_ordering, "^.+\\.(csv|txt)$", "URI") == "URI"
-    File gene_ordering_csv = (if is_uri then gene_ordering else acronym2uri[gene_ordering])
+    #Map[String, String] acronym2uri = read_map(acronym_file)
+    #Boolean is_uri = sub(gene_ordering, "^.+\\.(csv|txt)$", "URI") == "URI"
+    #File gene_ordering_csv = (if is_uri then gene_ordering else acronym2uri[gene_ordering])
+    File gene_ordering_csv = gene_ordering
 
     call preprocess {
         input:
