@@ -162,7 +162,8 @@ task run_inferCNV {
         if '~{HMM}' is 'true':
             call_args.append('--HMM')
         if '~{ref_group_names}' is not '':
-            call_args.append("--ref-group-names=~{ref_group_names}")
+            ref_group_str = ','.join(map(lambda s: s.strip(), "~{ref_group_names}".split(',')))
+            call_args.append("--ref-group-names=" + ref_group_str)
 
         print(' '.join(call_args))
         check_call(call_args)
