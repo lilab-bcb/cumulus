@@ -7,7 +7,15 @@ zarr_file = sys.argv[1]
 out_name = sys.argv[2]
 
 data = pg.read_input(f"{zarr_file}")
-data.select_matrix('counts')
+
+mat_key = None
+if 'counts' in data._unidata.matrices:
+    mat_key = 'counts'
+elif 'raw.X' in data._unidata.matrices:
+    mat_key = 'raw.X'
+else:
+    raise Exception("Cannot find raw counts! Must be specified with key 'counts' or 'raw.X'!")
+data.select_matrix(mat_key)
 
 df_raw_count = pd.DataFrame(data=np.transpose(data.X.toarray()), index=data.var['featureid'], columns=data.obs_names)
 df_raw_count.to_csv(f"{out_name}.csv", sep='\t')

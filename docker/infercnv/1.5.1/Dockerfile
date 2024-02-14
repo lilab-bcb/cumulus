@@ -43,4 +43,5 @@ ADD run_inferCNV.R /software
 ADD calc_cnv_metrics.R /software
 ADD insert_cnv_scores.py /software
 
+RUN chmod a+rx /software/monitor_script.sh
 ENV PATH=${PATH}:/software
