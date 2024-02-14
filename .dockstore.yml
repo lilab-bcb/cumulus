@@ -224,3 +224,18 @@ workflows:
         - /.*/
       branches:
         - master
+  - name: InferCNV
+    subclass: WDL
+    publish: true
+    primaryDescriptorPath: /workflows/infercnv/infercnv.wdl
+    testParameterFiles:
+      - /test/dummy.json
+    authors:
+      - name: Cumulus Team
+        email: cumulus-support@googlegroups.com
+        affiliation: Genentech, Inc.
+    filters:
+      tags:
+        - /.*/
+      branches:
+        - infercnv
