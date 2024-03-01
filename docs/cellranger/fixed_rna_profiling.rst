@@ -51,6 +51,9 @@ Sample Sheet
 
     where the third column (i.e. ``Control`` and ``Treated`` above) is optional, which specifies the description of the samples.
 
+.. note::
+  In the case of Singleplex FRP with Antibody Capture, for ``citeseq`` sample, the *FeatureBarcodeFile* you prepare should be in 10x format (see `here <https://cf.10xgenomics.com/samples/cell-exp/7.0.0/10k_Human_PBMC_TotalSeqB_singleplex_Multiplex/10k_Human_PBMC_TotalSeqB_singleplex_Multiplex_count_feature_reference.csv>`_ for an example).
+
 #. *Link* column.
 
     Put a sample unique link name for all modalities that are linked.
