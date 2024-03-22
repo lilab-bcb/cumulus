@@ -33,7 +33,7 @@ workflow cellranger_multi {
         # If count reads mapping to intronic regions
         Boolean include_introns = true
         # If generate bam outputs
-        Boolean no_bam = false
+        Boolean create_bam = true
         # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
         Boolean secondary = false
 
@@ -81,7 +81,7 @@ workflow cellranger_multi {
             force_cells = force_cells,
             expect_cells = expect_cells,
             include_introns = include_introns,
-            no_bam = no_bam,
+            create_bam = create_bam,
             secondary = secondary,
             cellranger_version = cellranger_version,
             docker_registry = docker_registry,
@@ -113,7 +113,7 @@ task run_cellranger_multi {
         Int? force_cells
         Int? expect_cells
         Boolean include_introns
-        Boolean no_bam
+        Boolean create_bam
         Boolean secondary
         String cellranger_version
         String docker_registry
@@ -204,8 +204,14 @@ task run_cellranger_multi {
                 fout.write('expect-cells,~{expect_cells}\n')
             if '~{secondary}' == 'false':
                 fout.write('no-secondary,true\n')
-            if '~{no_bam}' == 'true':
-                fout.write('no-bam,true\n')
+            if version.parse('~{cellranger_version}') >= version.parse('8.0.0'):
+                if '~{create_bam}' == 'true':
+                    fout.write('create-bam,true\n')
+                else:
+                    fout.write('create-bam,false\n')
+            else:
+                if '~{create_bam}' == 'false':
+                    fout.write('no-bam,true\n')
 
             if feature_file != '':
                 fout.write('\n[feature]\nreference,' + feature_file + '\n')

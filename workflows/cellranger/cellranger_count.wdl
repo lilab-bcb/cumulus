@@ -32,7 +32,7 @@ workflow cellranger_count {
         # If count reads mapping to intronic regions
         Boolean include_introns = true
         # If generate bam outputs
-        Boolean no_bam = false
+        Boolean create_bam = true
         # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
         Boolean secondary = false
 
@@ -77,7 +77,7 @@ workflow cellranger_count {
             force_cells = force_cells,
             expect_cells = expect_cells,
             include_introns = include_introns,
-            no_bam = no_bam,
+            create_bam = create_bam,
             secondary = secondary,
             cellranger_version = cellranger_version,
             docker_registry = docker_registry,
@@ -112,7 +112,7 @@ task run_cellranger_count {
         Int? force_cells
         Int? expect_cells
         Boolean include_introns
-        Boolean no_bam
+        Boolean create_bam
         Boolean secondary
         String cellranger_version
         String docker_registry
@@ -248,9 +248,18 @@ task run_cellranger_count {
                 call_args.append('--include-introns')
         elif version.parse('~{cellranger_version}') >= version.parse('7.0.0'):
             call_args.extend(['--include-introns', '~{include_introns}'])
-        if '~{no_bam}' == 'true':
-            assert version.parse('~{cellranger_version}') >= version.parse('5.0.0')
-            call_args.append('--no-bam')
+
+        # For generating BAM output
+        if version.parse('~{cellranger_version}') >= version.parse('8.0.0'):
+            if '~{create_bam}' == 'true':
+                call_args.append('--create-bam=true')
+            else:
+                call_args.append('--create-bam=false')
+        else:
+            if '~{create_bam}' == 'false':
+                assert version.parse('~{cellranger_version}') >= version.parse('5.0.0')
+                call_args.append('--no-bam')
+
         if '~{secondary}' != 'true':
             call_args.append('--nosecondary')
         print(' '.join(call_args))
