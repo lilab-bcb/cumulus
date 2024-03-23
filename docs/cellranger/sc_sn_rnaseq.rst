@@ -172,18 +172,18 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes Illumina outputs as input a
 		  - Turn this option on to also count reads mapping to intronic regions. With this option, users do not need to use pre-mRNA references. Note that if this option is set, cellranger_version must be >= 5.0.0.
 		  - true
 		  - true
-		* - no_bam
-		  - Turn this option on to disable BAM file generation. This option is only available if cellranger_version >= 5.0.0.
-		  - false
-		  - false
+		* - create_bam
+		  - If generating BAM file or not. This option is only available if cellranger_version >= 5.0.0.
+		  - true
+		  - true
 		* - secondary
 		  - Perform Cell Ranger secondary analysis (dimensionality reduction, clustering, etc.)
 		  - false
 		  - false
 		* - cellranger_version
-		  - cellranger version, could be: 7.2.0, 7.1.0, 7.0.1, 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0
-		  - "7.2.0"
-		  - "7.2.0"
+		  - cellranger version, could be: 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0
+		  - "8.0.0"
+		  - "8.0.0"
 		* - config_version
 		  - config docker version used for processing sample sheets, could be 0.3, 0.2, 0.1
 		  - "0.3"
