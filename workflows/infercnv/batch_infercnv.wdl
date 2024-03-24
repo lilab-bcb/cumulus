@@ -7,6 +7,8 @@ workflow batch_infercnv {
         File input_csv_file
         String output_directory
         String gene_ordering
+
+        String acronym_file = "gs://cumulus-ref/resources/infercnv/index.tsv"
     }
 
     String zones = "us-west1-a us-west1-b us-west1-c"
@@ -27,6 +29,7 @@ workflow batch_infercnv {
                     sample_id = sample_id,
                     output_directory = output_directory,
                     gene_ordering = gene_ordering,
+                    acronym_file = acronym_file,
                     ref_group_names = generate_config.sample2ref[sample_id],
                     zones = zones,
                     preemptible = preemptible
