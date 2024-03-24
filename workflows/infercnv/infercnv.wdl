@@ -155,13 +155,13 @@ task run_inferCNV {
         from subprocess import check_call
 
         call_args = ['Rscript', '/software/run_inferCNV.R', '--out-dir=inferCNV_result', '--raw-counts-matrix=~{input_raw_count}', '--gene-order-file=~{gene_ordering_csv}', '--annotations-file=~{sample_annotation_csv}']
-        if '~{protocol}' is not '':
+        if '~{protocol}' != '':
             call_args.append('--protocol=~{protocol}')
-        if '~{cluster_by_groups}' is 'true':
+        if '~{cluster_by_groups}' == 'true':
             call_args.append('--cluster-by-groups')
-        if '~{HMM}' is 'true':
+        if '~{HMM}' == 'true':
             call_args.append('--HMM')
-        if '~{ref_group_names}' is not '':
+        if '~{ref_group_names}' != '':
             ref_group_str = ','.join(map(lambda s: s.strip(), "~{ref_group_names}".split(',')))
             call_args.append("--ref-group-names=" + ref_group_str)
 
