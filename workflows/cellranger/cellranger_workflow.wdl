@@ -47,7 +47,7 @@ workflow cellranger_workflow {
         # If count reads mapping to intronic regions
         Boolean include_introns = true
         # If generate bam outputs. This is also a spaceranger argument.
-        Boolean no_bam = false
+        Boolean create_bam = true
         # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false.
         Boolean secondary = false
 
@@ -291,7 +291,7 @@ workflow cellranger_workflow {
                         chemistry = generate_count_config.sample2chemistry[sample_id],
                         include_introns = include_introns,
                         acronym_file = acronym_file,
-                        no_bam = no_bam,
+                        create_bam = create_bam,
                         secondary = secondary,
                         force_cells = force_cells,
                         expect_cells = expect_cells,
@@ -434,7 +434,7 @@ workflow cellranger_workflow {
                         acronym_file = acronym_file,
                         genome = generate_count_config.sample2genome[link_id],
                         gex_exclude_introns = arc_gex_exclude_introns,
-                        no_bam = no_bam,
+                        no_bam = if create_bam then false else true,
                         min_atac_count = arc_min_atac_count,
                         min_gex_count = arc_min_gex_count,
                         peaks = peaks,
@@ -478,7 +478,7 @@ workflow cellranger_workflow {
                         probe_set = generate_count_config.sample2probeset[link_id],
                         cmo_set = cmo_set,
                         include_introns = include_introns,
-                        no_bam = no_bam,
+                        create_bam = create_bam,
                         secondary = secondary,
                         force_cells = force_cells,
                         expect_cells = expect_cells,
@@ -508,7 +508,7 @@ workflow cellranger_workflow {
                         acronym_file = acronym_file,
                         genome = generate_count_config.sample2genome[link_id],
                         include_introns = include_introns,
-                        no_bam = no_bam,
+                        create_bam = create_bam,
                         secondary = secondary,
                         force_cells = force_cells,
                         expect_cells = expect_cells,
