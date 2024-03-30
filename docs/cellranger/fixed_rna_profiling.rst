@@ -135,10 +135,10 @@ For FRP data, ``cellranger_workflow`` takes Illumina outputs as input and runs `
       - Turn this option on to also count reads mapping to intronic regions. With this option, users do not need to use pre-mRNA references. Note that if this option is set, cellranger_version must be >= 5.0.0. This option is used by ``cellranger multi``.
       - true
       - true
-    * - create_bam
-      - If generating BAM file or not. This option is only available if cellranger_version >= 5.0.0. This option is used by ``cellranger multi``.
-      - true
-      - true
+    * - no_bam
+      - Turn this option on to disable BAM file generation. This option is only available if cellranger_version >= 5.0.0. This option is used by ``cellranger multi``.
+      - false
+      - false
     * - secondary
       - Perform Cell Ranger secondary analysis (dimensionality reduction, clustering, etc.). This option is used by ``cellranger multi``.
       - false

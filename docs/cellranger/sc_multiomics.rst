@@ -123,10 +123,10 @@ For single-cell multiomics data, ``cellranger_workflow`` takes Illumina outputs 
 	    | **Note:** using this mode will reduce the UMI counts in the feature-barcode matrix.
 	  - false
 	  - false
-	* - create_bam
-	  - If generating BAM file or not. This option is only available if cellranger_version >= 5.0.0. This option is used by *cellranger-arc count*, *cellranger multi* and *cellranger count*.
-	  - true
-	  - true
+	* - no_bam
+	  - Turn this option on to disable BAM file generation. This option is only available if cellranger_version >= 5.0.0. This option is used by *cellranger-arc count*, *cellranger multi* and *cellranger count*.
+	  - false
+	  - false
 	* - arc_min_atac_count
 	  - | Cell caller override to define the minimum number of ATAC transposition events in peaks (ATAC counts) for a cell barcode.
 	    | **Note:** this input must be specified in conjunction with ``arc_min_gex_count`` input.
