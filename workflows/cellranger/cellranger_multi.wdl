@@ -204,8 +204,14 @@ task run_cellranger_multi {
                 fout.write('expect-cells,~{expect_cells}\n')
             if '~{secondary}' == 'false':
                 fout.write('no-secondary,true\n')
-            if '~{no_bam}' == 'true':
-                fout.write('no-bam,true\n')
+            if version.parse('~{cellranger_version}') >= version.parse('8.0.0'):
+                if '~{no_bam}' == 'false':
+                    fout.write('create-bam,true\n')
+                else:
+                    fout.write('create-bam,false\n')
+            else:
+                if '~{no_bam}' == 'true':
+                    fout.write('no-bam,true\n')
 
             if feature_file != '':
                 fout.write('\n[feature]\nreference,' + feature_file + '\n')

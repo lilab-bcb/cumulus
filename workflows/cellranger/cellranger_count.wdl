@@ -248,9 +248,18 @@ task run_cellranger_count {
                 call_args.append('--include-introns')
         elif version.parse('~{cellranger_version}') >= version.parse('7.0.0'):
             call_args.extend(['--include-introns', '~{include_introns}'])
-        if '~{no_bam}' == 'true':
-            assert version.parse('~{cellranger_version}') >= version.parse('5.0.0')
-            call_args.append('--no-bam')
+
+        # For generating BAM output
+        if version.parse('~{cellranger_version}') >= version.parse('8.0.0'):
+            if '~{no_bam}' == 'false':
+                call_args.append('--create-bam=true')
+            else:
+                call_args.append('--create-bam=false')
+        else:
+            if '~{no_bam}' == 'true':
+                assert version.parse('~{cellranger_version}') >= version.parse('5.0.0')
+                call_args.append('--no-bam')
+
         if '~{secondary}' != 'true':
             call_args.append('--nosecondary')
         print(' '.join(call_args))

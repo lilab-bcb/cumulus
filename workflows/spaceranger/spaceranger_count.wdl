@@ -298,11 +298,19 @@ task run_spaceranger_count {
             # see here: https://support.10xgenomics.com/spatial-gene-expression/software/pipelines/latest/using/image-recommendations
             print("Automatic fiducial alignment of fluorescene images is not supported. Please provide manual alignment JSON files via the LoupeAlignment column in the sample sheet!", file = sys.stderr)
             sys.exit(1)
-        if '~{no_bam}' == 'true':
-            call_args.append('--no-bam')
+
+        # For generating BAM output
+        if version.parse('~{spaceranger_version}') >= version.parse('3.0.0'):
+            if '~{no_bam}' == 'false':
+                call_args.append('--create-bam=true')
+            else:
+                call_args.append('--create-bam=false')
+        else:
+            if '~{no_bam}' == 'true':
+                call_args.append('--no-bam')
+
         if '~{secondary}' != 'true':
             call_args.append('--nosecondary')
-
         if '~{r1_length}' != '':
             call_args.append('--r1-length=~{r1_length}')
         r2_length = '~{r2_length}'
