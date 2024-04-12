@@ -5,7 +5,7 @@ workflow chromap_create_reference {
         # Which docker registry to use
         String docker_registry = "quay.io/cumulus"
         # chromap version
-        String chromap_version = "0.1.3"
+        String chromap_version = "0.2.6"
 
         # Disk space in GB
         Int disk_space = 100
@@ -89,7 +89,7 @@ task run_chromap_create_reference {
 
         mv ~{input_fasta} ~{genome}/ref.fa
         tar -czf ~{genome}.tar.gz ~{genome}
-        strato cp --backend ~{backend} -m ~{genome}.tar.gz "~{output_dir}"/
+        strato cp -m ~{genome}.tar.gz "~{output_dir}"/
     }
 
     output {
