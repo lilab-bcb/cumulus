@@ -19,7 +19,7 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install pandas==1.5.3 --no-cache-dir && \
     python -m pip install packaging==23.0 --no-cache-dir && \
-    python -m pip install stratocumulus==0.1.7 --no-cache-dir
+    python -m pip install stratocumulus==0.2.1 --no-cache-dir
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
