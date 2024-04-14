@@ -257,7 +257,7 @@ task run_chromap {
                     set_up_input_fastq_files(index_list, target, '~{barcode_fastq_pattern}')
 
         index_fq = ""
-        if '~{preset}' == 'atac':
+        if ('~{preset}' == 'atac') and ('~{barcode_fastq_pattern}' != ''):
             assert len(r1_list) == len(r2_list) ==  len(index_list)
             index_fq = ",".join(index_list)
         else:
