@@ -234,7 +234,7 @@ task run_chromap {
                 set_up_input_fastq_files(r1_list, target, '~{read1_fastq_pattern}')
                 set_up_input_fastq_files(r2_list, target, '~{read2_fastq_pattern}')
 
-                if '~{preset}' == 'atac':
+                if ('~{preset}' == 'atac') and ('~{barcode_fastq_pattern}' != ''):
                     set_up_input_fastq_files(index_list, target, '~{barcode_fastq_pattern}')
 
             except CalledProcessError:
@@ -250,12 +250,13 @@ task run_chromap {
                 check_call(call_args)
                 set_up_input_fastq_files(r2_list, target, '~{read2_fastq_pattern}')
 
-                if '~{preset}' == 'atac':
+                if ('~{preset}' == 'atac') and ('~{barcode_fastq_pattern}' != ''):
                     call_args = ['strato', 'cp', '-m', directory + '/~{sample_id}~{barcode_fastq_pattern}' , target + '/']
                     print(' '.join(call_args))
                     check_call(call_args)
                     set_up_input_fastq_files(index_list, target, '~{barcode_fastq_pattern}')
 
+        index_fq = ""
         if '~{preset}' == 'atac':
             assert len(r1_list) == len(r2_list) ==  len(index_list)
             index_fq = ",".join(index_list)
