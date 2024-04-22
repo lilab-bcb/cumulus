@@ -24,9 +24,9 @@ copyright = '2024 Genentech, Inc. All rights reserved.'
 author = 'Yiming Yang, Joshua Gould and Bo Li'
 
 # The short X.Y version
-version = '2.5'
+version = '2.6'
 # The full version, including alpha/beta/rc tags
-release = '2.5.0'
+release = '2.6.0'
 
 
 # -- General configuration ---------------------------------------------------
