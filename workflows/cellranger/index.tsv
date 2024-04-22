@@ -1,6 +1,6 @@
-GRCh38-2024-A	gs://cumulus-ref/resources/cellranger/refdata-gex-GRCh38-2024-A.tar.gz
-GRCm39-2024-A	gs://cumulus-ref/resources/cellranger/refdata-gex-GRCm39-2024-A.tar.gz
-GRCh38_and_GRCm39-2024-A	gs://cumulus-ref/resources/cellranger/refdata-gex-GRCh38_and_GRCm39-2024-A.tar.gz
+GRCh38-2024-A	gs://regev-lab/resources/cellranger/refdata-gex-GRCh38-2024-A.tar.gz
+GRCm39-2024-A	gs://regev-lab/resources/cellranger/refdata-gex-GRCm39-2024-A.tar.gz
+GRCh38_and_GRCm39-2024-A	gs://regev-lab/resources/cellranger/refdata-gex-GRCh38_and_GRCm39-2024-A.tar.gz
 GRCh38-2020-A	gs://regev-lab/resources/cellranger/refdata-gex-GRCh38-2020-A.tar.gz
 mm10-2020-A	gs://regev-lab/resources/cellranger/refdata-gex-mm10-2020-A.tar.gz
 GRCh38_and_mm10-2020-A	gs://regev-lab/resources/cellranger/refdata-gex-GRCh38-and-mm10-2020-A.tar.gz
@@ -60,7 +60,7 @@ GRCh38_premrna_and_SARSCoV2	gs://regev-lab/resources/cellranger/GRCh38premrna_an
 human_probe_v1	gs://regev-lab/resources/cellranger/Visium_Human_Transcriptome_Probe_Set_v1.0_GRCh38-2020-A.csv
 human_probe_v2	gs://regev-lab/resources/cellranger/Visium_Human_Transcriptome_Probe_Set_v2.0_GRCh38-2020-A.csv
 mouse_probe_v1	gs://regev-lab/resources/cellranger/Visium_Mouse_Transcriptome_Probe_Set_v1.0_mm10-2020-A.csv
-mouse_probe_v2	gs://cumulus-ref/resources/cellranger/Visium_Mouse_Transcriptome_Probe_Set_v2.0_mm10-2020-A.csv
+mouse_probe_v2	gs://regev-lab/resources/cellranger/Visium_Mouse_Transcriptome_Probe_Set_v2.0_mm10-2020-A.csv
 FRP_human_probe_v1	gs://regev-lab/resources/cellranger/Chromium_Human_Transcriptome_Probe_Set_v1.0_GRCh38-2020-A.csv
 FRP_human_probe_v1.0.1	gs://regev-lab/resources/cellranger/Chromium_Human_Transcriptome_Probe_Set_v1.0.1_GRCh38-2020-A.csv
 FRP_mouse_probe_v1	gs://regev-lab/resources/cellranger/Chromium_Mouse_Transcriptome_Probe_Set_v1.0_mm10-2020-A.csv
