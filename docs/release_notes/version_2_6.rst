@@ -1,3 +1,11 @@
+2.6.1 :small:`May 8, 2024`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* In Cellranger workflow: Add new genome references for single-cell/nucleus RNA-Seq: **GRCh38-2024-A** for human, **GRCm39-2024-A** for mouse, and **GRCh38_and_GRCm39-2024-A** for human and mouse.
+* In Spaceranger workflow: Add a new probe set **mouse_probe_v2** for mouse.
+* Some underlying workflow improvement.
+
+
 2.6.0 :small:`April 22, 2024`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
