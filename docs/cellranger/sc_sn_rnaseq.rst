@@ -13,6 +13,12 @@ Sample sheet
 
 		* - Keyword
 		  - Description
+		* - **GRCh38-2024-A**
+		  - Human GRCh38, comparable to cellranger reference 2024-A (GENCODE v44/Ensembl 110). *Notice: This reference only supports Cell Ranger v6.0.0+.*
+		* - **GRCm39-2024-A**
+		  - Mouse GRCm39, comparable to cellranger reference 2024-A (GENCODE vM33/Ensembl 110). *Notice: This reference only supports Cell Ranger v6.0.0+.*
+		* - **GRCh38_and_GRCm39-2024-A**
+		  - Human GRCh38 (v44/Ensembl 110) and mouse GRCm39 (GENCODE vM33/Ensembl 110). *Notice: This reference only supports Cell Ranger v6.0.0+.*
 		* - **GRCh38-2020-A**
 		  - Human GRCh38 (GENCODE v32/Ensembl 98)
 		* - **mm10-2020-A**

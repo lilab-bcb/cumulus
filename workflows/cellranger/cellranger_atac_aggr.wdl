@@ -127,7 +127,7 @@ task run_cellranger_atac_aggr {
                     raise Exception("Found duplicated library id " + library_id + "!")
                 libs_seen.add(library_id)
 
-                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory, current_dir]
+                call_args = ['strato', 'cp', '-m', '-r', directory, current_dir]
                 print(' '.join(call_args))
                 check_call(call_args)
                 counts.append(library_id)
@@ -145,7 +145,7 @@ task run_cellranger_atac_aggr {
         check_call(call_args)
         CODE
 
-        strato sync --backend ~{backend} -m results/outs "~{output_directory}/~{aggr_id}"
+        strato sync -m results/outs "~{output_directory}/~{aggr_id}"
     }
 
     output {

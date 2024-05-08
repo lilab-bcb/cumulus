@@ -111,7 +111,7 @@ task run_cellranger_atac_create_reference {
 
         cellranger-atac mkref --config=ref.config
         tar -czf ~{genome}.tar.gz ~{genome}
-        strato cp --backend ~{backend} -m ~{genome}.tar.gz "~{output_dir}"/
+        strato cp -m ~{genome}.tar.gz "~{output_dir}"/
     }
 
     output {

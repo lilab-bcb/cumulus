@@ -15,7 +15,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.7.11.zip" -o "a
 RUN pip3 install --upgrade pip && \
     pip3 install pandas==1.4.3 && \
     pip3 install packaging==21.3 && \
-    pip3 install stratocumulus==0.1.7
+    pip3 install stratocumulus==0.2.3
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software

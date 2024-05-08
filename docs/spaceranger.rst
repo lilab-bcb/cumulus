@@ -71,10 +71,11 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		* - **Sample**
 		  - Contains sample names. Each 10x channel should have a unique sample name.
 		* - **Reference**
-		  -
-		  	| Provides the reference genome used by Space Ranger for each 10x channel.
-		  	| The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as *GRCh38-2020-A*.
-		  	| A full list of available keywords is included in each of the following data type sections (e.g. sc/snRNA-seq) below.
+		  - Provides the reference genome used by Space Ranger for each 10x channel. The elements in the *reference* column can be either keywords of pre-built references or Google bucket URLs to reference tarballs. Below are available keywords of pre-built references:
+
+			- **GRCh38-2020-A**: Human GRCh38 (GENCODE v32/Ensembl 98)
+
+			- **mm10-2020-A**: Mouse mm10 (GENCODE vM23/Ensembl 98)
 		* - **Flowcell**
 		  -
 		    | Indicates the Google bucket URLs of uploaded BCL folders.
@@ -88,7 +89,17 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		* - **Index**
 		  - Sample index (e.g. SI-GA-A12).
 		* - ProbeSet
-		  - Probe set for FFPE samples. **Choosing** from ``human_probe_v1`` (10x human probe set, CytoAssist-incompatible), ``human_probe_v2`` (10x human probe set, CytoAssist-compatible) and ``mouse_probe_v1`` (10x mouse probe set). Alternatively, a CSV file describing the probe set can be directly used. Setting ProbeSet to ``""`` for a sample implies the sample is not FFPE.
+		  - Probe set for FFPE samples. Can be either a keyword or a cloud URI to a custom probe set. Below are keywords of available probe sets:
+
+		    - **human_probe_v2**: 10x human probe set version 2, CytAssist-compatible
+
+		    - **mouse_probe_v2**: 10x mouse probe set version 2, CytAssist-compatible
+
+		    - **human_probe_v1**: 10x human probe set version 1, CytAssist-compatible
+
+		    - **mouse_probe_v1**: 10x mouse probe set version 1, CytAssist-compatible
+
+		    **Notice:** Set ProbeSet to ``""`` for a sample implies the sample is not FFPE.
 		* - Image
 		  - Cloud bucket url for a brightfield tissue H&E image in .jpg or .tiff format. This column is mutually exclusive with DarkImage and ColorizedImage columns.
 		* - DarkImage

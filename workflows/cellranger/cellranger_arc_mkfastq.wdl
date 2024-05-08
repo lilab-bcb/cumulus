@@ -101,7 +101,7 @@ task run_cellranger_arc_mkfastq {
         export TMPDIR=/tmp
         export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
-        strato cp --backend ~{backend} -r -m ~{input_bcl_directory} .
+        strato cp -r -m ~{input_bcl_directory} .
 
         python <<CODE
         import os
@@ -141,16 +141,16 @@ task run_cellranger_arc_mkfastq {
 
         CODE
 
-        strato sync --backend ~{backend} -m results/outs "~{output_directory}/~{run_id}_arcfastqs"
+        strato sync -m results/outs "~{output_directory}/~{run_id}_arcfastqs"
 
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError
         if '~{delete_input_bcl_directory}' == 'true':
             try:
-                call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_arcfastqs/input_samplesheet.csv']
+                call_args = ['strato', 'exists', '~{output_directory}/~{run_id}_arcfastqs/input_samplesheet.csv']
                 print(' '.join(call_args))
                 check_output(call_args)
-                call_args = ['strato', 'rm', '--backend', '~{backend}', '-m' ,'-r', '~{input_bcl_directory}']
+                call_args = ['strato', 'rm', '-m' ,'-r', '~{input_bcl_directory}']
                 print(' '.join(call_args))
                 check_call(call_args)
                 print('~{input_bcl_directory} is deleted!')

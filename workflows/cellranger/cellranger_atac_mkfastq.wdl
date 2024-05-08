@@ -101,7 +101,7 @@ task run_cellranger_atac_mkfastq {
         export TMPDIR=/tmp
         export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
-        strato cp --backend '~{backend}' -m -r ~{input_bcl_directory} .
+        strato cp -m -r ~{input_bcl_directory} .
 
         python <<CODE
         import os
@@ -140,16 +140,16 @@ task run_cellranger_atac_mkfastq {
             fout.write('~{output_directory}/~{run_id}_atacfastqs/fastq_path/' + flowcell + '\n')
         CODE
 
-        strato sync --backend ~{backend} -m results/outs "~{output_directory}/~{run_id}_atacfastqs"
+        strato sync -m results/outs "~{output_directory}/~{run_id}_atacfastqs"
 
         python <<CODE
         from subprocess import check_call, check_output, CalledProcessError
         if '~{delete_input_bcl_directory}' == 'true':
             try:
-                call_args = ['strato', 'exists', '--backend', '~{backend}', '~{output_directory}/~{run_id}_atacfastqs/input_samplesheet.csv']
+                call_args = ['strato', 'exists', '~{output_directory}/~{run_id}_atacfastqs/input_samplesheet.csv']
                 print(' '.join(call_args))
                 check_output(call_args)
-                call_args = ['strato', 'rm', '--backend', '~{backend}', '-m', '-r', '~{output_directory}/~{run_id}_atacfastqs/input_samplesheet.csv']
+                call_args = ['strato', 'rm', '-m', '-r', '~{output_directory}/~{run_id}_atacfastqs/input_samplesheet.csv']
                 print(' '.join(call_args))
                 check_call(call_args)
                 print('~{input_bcl_directory} is deleted!')
