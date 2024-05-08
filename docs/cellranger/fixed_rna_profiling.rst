@@ -15,6 +15,8 @@ Sample Sheet
           - Description
         * - **GRCh38-2020-A**
           - Human GRCh38 (GENCODE v32/Ensembl 98)
+        * - **mm10-2020-A**
+          - Mouse mm10 (GENCODE vM23/Ensembl 98)
 
 #. *DataType* column.
 
