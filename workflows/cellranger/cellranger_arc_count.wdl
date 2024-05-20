@@ -168,7 +168,7 @@ task run_cellranger_arc_count {
         check_call(call_args)
         CODE
 
-        strato sync -m results/outs "~{output_directory}"/~{link_id}
+        strato sync -m results/outs "~{output_directory}/~{link_id}"
     }
 
     output {

@@ -266,7 +266,7 @@ task run_cellranger_count {
         check_call(call_args)
         CODE
 
-        strato sync -m results/outs "~{output_directory}"/~{sample_id}
+        strato sync -m results/outs "~{output_directory}/~{sample_id}"
     }
 
     output {

@@ -278,7 +278,7 @@ task run_cellranger_multi {
         check_call(call_args)
         CODE
 
-        strato sync -m --ionice results/outs "~{output_directory}"/~{link_id}
+        strato sync -m --ionice results/outs "~{output_directory}/~{link_id}"
     }
 
     output {
