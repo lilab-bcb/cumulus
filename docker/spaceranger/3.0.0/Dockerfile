@@ -19,7 +19,7 @@ ENV PATH=/software/python/bin:$PATH
 RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install pandas==2.2.1 --no-cache-dir && \
     python -m pip install packaging==24.0 --no-cache-dir && \
-    python -m pip install stratocumulus==0.2.3 --no-cache-dir
+    python -m pip install stratocumulus==0.2.4 --no-cache-dir
 
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
 ADD spaceranger-3.0.0.tar.gz /software
@@ -29,5 +29,5 @@ RUN apt-get -qq -y autoremove && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
 
 RUN chmod a+rx /software/monitor_script.sh
-ENV PATH=/software:/software/spaceranger-3.0.0:$PATH
+ENV PATH=/software:/software/spaceranger-3.0.0:/usr/local/aws-cli/v2/current/bin:$PATH
 ENV TMPDIR=/tmp

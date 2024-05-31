@@ -15,7 +15,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.7.11.zip" -o "a
 RUN pip3 install --upgrade pip && \
     pip3 install pandas==1.4.3 && \
     pip3 install packaging==21.3 && \
-    pip3 install stratocumulus==0.2.3
+    pip3 install stratocumulus==0.2.4
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
@@ -27,5 +27,5 @@ RUN apt-get -qq -y autoremove && \
     rm -f /usr/bin/python && ln -s /usr/bin/python3 /usr/bin/python
 
 RUN chmod a+rx /software/monitor_script.sh
-ENV PATH=/software:/software/cellranger-arc-2.0.2:$PATH
+ENV PATH=/software:/software/cellranger-arc-2.0.2:/usr/local/aws-cli/v2/current/bin:$PATH
 ENV TMPDIR=/tmp
