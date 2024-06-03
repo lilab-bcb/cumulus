@@ -65,10 +65,13 @@ FRP_human_probe_v1	gs://regev-lab/resources/cellranger/Chromium_Human_Transcript
 FRP_human_probe_v1.0.1	gs://regev-lab/resources/cellranger/Chromium_Human_Transcriptome_Probe_Set_v1.0.1_GRCh38-2020-A.csv
 FRP_mouse_probe_v1	gs://regev-lab/resources/cellranger/Chromium_Mouse_Transcriptome_Probe_Set_v1.0_mm10-2020-A.csv
 FRP_mouse_probe_v1.0.1	gs://regev-lab/resources/cellranger/Chromium_Mouse_Transcriptome_Probe_Set_v1.0.1_mm10-2020-A.csv
+SC3Pv4	gs://regev-lab/resources/cellranger/3M-3pgex-may-2023.txt.gz
 SC3Pv3	gs://regev-lab/resources/cellranger/3M-february-2018.txt.gz
 SC3Pv2	gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
 fiveprime	gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
+SC5P-PE-v3	gs://regev-lab/resources/cellranger/3M-5pgex-jan-2023.txt.gz
 SC5P-PE	gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
+SC5P-R2-v3	gs://regev-lab/resources/cellranger/3M-5pgex-jan-2023.txt.gz
 SC5P-R2	gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
 multiome	gs://regev-lab/resources/cellranger/737K-arc-v1.txt.gz
 null_file	gs://regev-lab/resources/cellranger/null
