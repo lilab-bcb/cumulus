@@ -34,7 +34,7 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install numpy==1.26.1 --no-cache-dir && \
     python -m pip install pandas==2.1.1 --no-cache-dir && \
     python -m pip install matplotlib==3.8.0 --no-cache-dir && \
-    python -m pip install stratocumulus==0.2.3 --no-cache-dir
+    python -m pip install stratocumulus==0.2.4 --no-cache-dir
 
 RUN tar -xzf /software/0.11.3.tar.gz -C /software && \
     cd /software/cumulus_feature_barcoding-0.11.3 && make clean && make all && cd ../.. && \
@@ -47,4 +47,4 @@ RUN apt-get -qq -y remove gnupg && \
 
 RUN chmod a+rx /software/*
 
-ENV PATH=/software:/software/cumulus_feature_barcoding-0.11.3:$PATH
+ENV PATH=/software:/software/cumulus_feature_barcoding-0.11.3:/usr/local/aws-cli/v2/current/bin:$PATH

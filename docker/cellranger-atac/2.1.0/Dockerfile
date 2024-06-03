@@ -17,7 +17,7 @@ RUN ln -s /usr/bin/python3 /usr/bin/python
 RUN python -m pip install --upgrade pip && \
     python -m pip install pandas==1.4.3 && \
     python -m pip install packaging==21.3 && \
-    python -m pip install stratocumulus==0.2.3
+    python -m pip install stratocumulus==0.2.4
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
@@ -28,5 +28,5 @@ RUN apt-get -qq -y autoremove && \
     rm -rf /var/lib/apt/lists/* /var/log/dpkg.log
 
 RUN chmod a+rx /software/monitor_script.sh
-ENV PATH=/software:/software/cellranger-atac-2.1.0:$PATH
+ENV PATH=/software:/software/cellranger-atac-2.1.0:/usr/local/aws-cli/v2/current/bin:$PATH
 ENV TMPDIR=/tmp
