@@ -104,8 +104,8 @@ workflow cellranger_workflow {
         String cumulus_feature_barcoding_version = "0.11.3"
         # 2.1.0, 2.0.0, 1.2.0, 1.1.0
         String cellranger_atac_version = "2.1.0"
-        # 2.0.2, 2.0.1, 2.0.0, 1.0.1, 1.0.0
-        String cellranger_arc_version = "2.0.2"
+        # 2.0.2.strato, 2.0.2.custom-max-cell, 2.0.2, 2.0.1, 2.0.0, 1.0.1, 1.0.0
+        String cellranger_arc_version = "2.0.2.strato"
         # config version
         String config_version = "0.3"
 
