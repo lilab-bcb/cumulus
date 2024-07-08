@@ -13,7 +13,6 @@ workflow geomxngs_fastq_to_dcc {
         String memory = "64GB"
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f"
-        String backend = "gcp"
         String aws_queue_arn = ""
         Boolean delete_fastq_directory = false
     }
@@ -30,7 +29,6 @@ workflow geomxngs_fastq_to_dcc {
         memory : "Memory string"
         preemptible :"Number of preemptible tries"
         zones : "Google cloud zones"
-        backend : "Backend for computation (aws, gcp, or local)"
         aws_queue_arn : "The arn URI of the AWS job queue to be used (e.g. arn:aws:batch:us-east-1:xxxxx). Only works when backend is aws"
         delete_fastq_directory:"Whether to delete the input fastqs upon successful completion"
     }
@@ -38,6 +36,7 @@ workflow geomxngs_fastq_to_dcc {
     output {
         String geomxngs_output = geomxngs_task.geomxngs_output
         String dcc_zip = geomxngs_task.dcc_zip
+        File local_dcc_zip = geomxngs_task.local_dcc_zip
     }
 
     call geomxngs_task {
@@ -54,7 +53,6 @@ workflow geomxngs_fastq_to_dcc {
             disk_space = disk_space,
             preemptible = preemptible,
             zones = zones,
-            backend = backend,
             aws_queue_arn = aws_queue_arn
     }
 
@@ -73,7 +71,6 @@ task geomxngs_task {
         String docker_registry
         String geomxngs_version
         String zones
-        String backend
         String aws_queue_arn
         Boolean delete_fastq_directory
     }
@@ -114,18 +111,17 @@ task geomxngs_task {
         # download and rename fastqs
         rename = '~{fastq_rename}'
         remote_fastq_dirs = '~{fastq_directory}'.split(',')
-        backend = '~{backend}'
         local_fastq_dirs = []
         if len(remote_fastq_dirs) == 1:
             local_fastq_dirs.append('fastqs')
-            check_call(['strato', 'sync', '--backend', backend, '-m', remote_fastq_dirs[0], 'fastqs/'])
+            check_call(['strato', 'sync', '-m', remote_fastq_dirs[0], 'fastqs/'])
         else:  # geomx pipeline only works with one directory of fastqs
             for i in range(len(remote_fastq_dirs)):
                 local_fastq_dir = 'fastqs-' + str(i + 1)
                 local_fastq_dirs.append(local_fastq_dir)
                 os.makedirs(local_fastq_dir, exist_ok=True)
                 check_call(
-                    ['strato', 'sync', '--backend', backend, '-m', remote_fastq_dirs[i], local_fastq_dir])
+                    ['strato', 'sync', '-m', remote_fastq_dirs[i], local_fastq_dir])
 
         if rename:
             df = pd.read_csv(rename, sep="\t", header=None, names=["original_name", "new_name"])
@@ -160,8 +156,9 @@ task geomxngs_task {
                     os.rename(os.path.join(local_fastq_dir, f), dest)
         CODE
 
+        export TMPDIR="/tmp"
         geomx_expect.exp
-        strato sync --backend ~{backend} -m results ~{output_directory_stripped}
+        strato sync -m results ~{output_directory_stripped}
 
         python <<CODE
         from subprocess import check_call
@@ -172,7 +169,7 @@ task geomxngs_task {
                 if not url.endswith("/"):
                     url += "/"
                 try:
-                    call_args = ["strato", "rm", "--backend", backend, "-m", "-r", url]
+                    call_args = ["strato", "rm", "-m", "-r", url]
                     check_call(call_args)
                     print("Deleted " + url)
                 except:
