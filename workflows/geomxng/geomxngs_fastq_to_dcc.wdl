@@ -38,6 +38,7 @@ workflow geomxngs_fastq_to_dcc {
     output {
         String geomxngs_output = geomxngs_task.geomxngs_output
         String dcc_zip = geomxngs_task.dcc_zip
+        File local_dcc_zip = geomxngs_task.local_dcc_zip
     }
 
     call geomxngs_task {
