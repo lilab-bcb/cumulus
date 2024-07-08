@@ -156,6 +156,7 @@ task geomxngs_task {
                     os.rename(os.path.join(local_fastq_dir, f), dest)
         CODE
 
+        export TMPDIR="/tmp"
         geomx_expect.exp
         strato sync -m results ~{output_directory_stripped}
 
