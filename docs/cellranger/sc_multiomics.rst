@@ -155,9 +155,9 @@ For single-cell multiomics data, ``cellranger_workflow`` takes Illumina outputs 
 	  - "8.0.1"
 	  - "8.0.1"
 	* - cellranger_arc_version
-	  - cellranger-arc version, could be 2.0.2, 2.0.1, 2.0.0, 1.0.1, 1.0.0
-	  - "2.0.2"
-	  - "2.0.2"
+	  - cellranger-arc version, could be: ``2.0.2.strato`` (compatible with workflow v2.6.1+), ``2.0.2.custom-max-cell`` (with max_cell threshold set to 80,000), ``2.0.2`` (compatible with workflow v2.6.0 or earlier), ``2.0.1``, ``2.0.0``, ``1.0.1``, ``1.0.0``
+	  - "2.0.2.strato"
+	  - "2.0.2.strato"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 

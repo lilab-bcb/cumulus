@@ -1,3 +1,8 @@
+2.6.2 :small:`June 19, 2024`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Solve the issue of Cellranger workflow with cellranger-arc. ``cellranger_arc_version`` default is now "2.0.2.strato" which is compatible with workflow v2.6.1 or later.
+
 2.6.1 :small:`May 8, 2024`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 

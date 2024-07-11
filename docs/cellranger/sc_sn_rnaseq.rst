@@ -91,10 +91,16 @@ Sample sheet
 		  - Single Cell 3′ v2
 		* - **SC3Pv3**
 		  - Single Cell 3′ v3. You should set cellranger version input parameter to >= 3.0.2
+		* - **SC3Pv4**
+		  - Single Cell 3' v4. **Notice:** This is GEM-X chemistry, and only works for Cell Ranger v8.0.0+
 		* - **SC5P-PE**
 		  - Single Cell 5′ paired-end (both R1 and R2 are used for alignment)
+		* - **SC5P-PE-v3**
+		  - Single Cell 5' paired-end v3 (both R1 and R2 are used for alignment). **Notice:** This is GEM-X chemistry, and only works for Cell Ranger v8.0.0+
 		* - **SC5P-R2**
 		  - Single Cell 5′ R2-only (where only R2 is used for alignment)
+		* - **SC5P-R2-v3**
+		  - Single Cell 5' R2-only v3 (where only R2 is used for alignment). **Notice:** This is GEM-X chemistry, and only works for Cell Rangrer v8.0.0+
 
 #. *DataType* column.
 
