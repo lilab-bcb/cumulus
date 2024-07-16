@@ -13,6 +13,7 @@ RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.9.4.zip" -o "aw
     rm awscliv2.zip
 
 RUN pip3 install --upgrade pip && \
+    pip3 install numpy==1.26.4 && \
     pip3 install pandas==1.5.2 && \
     pip3 install packaging==21.3 && \
     pip3 install stratocumulus==0.2.4
