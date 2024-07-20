@@ -7,13 +7,14 @@ from typing import Union, Optional
 
 def filter_included_genes(
     data: Union[MultimodalData, UnimodalData],
-    filt_features_tsv: pd.DataFrame,
     output_file: Optional[str] = None,
 ) -> None:
-    df_var = pd.read_csv(filt_features_tsv, sep='\t', header=None)
-    assert df_var[0].nunique() == 18082, "Filtered genes inconsistent!"
+    df_var = pd.read_csv("Chromium_Human_Transcriptome_Probe_Set_v1.0.1_GRCh38-2020-A.csv", comment="#")
+    df_var = df_var.loc[df_var["included"]].copy()
+    df_var["gene_name"] = df_var["probe_id"].apply(lambda s: s.split("|")[1])
+    assert df_var["gene_id"].nunique() == 18082, "Filtered genes inconsistent!"
 
-    data._inplace_subset_var(data.var['featureid'].isin(df_var[0].values))
+    data._inplace_subset_var(data.var['featureid'].isin(df_var["gene_id"].unique()))
     correct_gene_names(data)
     if output_file:
         io.write_output(data, output_file)
@@ -29,5 +30,5 @@ def correct_gene_names(data):
     }
     df_var = data.var.reset_index()
     for gene_id, gene_name in rename_dict.items():
-        df_var.loc[df_var['featureid']==gene_id, 'featurekey'] = gene_name    
+        df_var.loc[df_var['featureid']==gene_id, 'featurekey'] = gene_name
     data.var = df_var.set_index('featurekey')
