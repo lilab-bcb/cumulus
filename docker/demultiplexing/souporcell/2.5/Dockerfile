@@ -69,7 +69,9 @@ RUN cd /opt && \
 
 ENV PATH=/opt/souporcell:/opt/souporcell/troublet/target/release:$PATH
 
-RUN python -m pip install pysam==0.22.0 && \
+RUN python -m pip install numpy==1.26.4 && \
+    python -m pip install pandas==2.2.2 && \
+    python -m pip install pysam==0.22.0 && \
     python -m pip install git+https://github.com/stan-dev/pystan2.git@master && \
     python -m pip install pyfaidx==0.7.2.2 && \
     python -m pip install "setuptools<58" --upgrade && \
@@ -79,7 +81,7 @@ RUN python -m pip install pysam==0.22.0 && \
     python -m pip install zarr==2.16.1 && \
     python -m pip install networkx==3.2.1 && \
     python -m pip install pegasusio==0.8.1 && \
-    python -m pip install stratocumulus==0.2.1
+    python -m pip install stratocumulus==0.2.4
 
 RUN cd /opt && \
     wget -O htslib.tar.bz2 https://github.com/samtools/htslib/releases/download/1.9/htslib-1.9.tar.bz2 && \
@@ -132,5 +134,5 @@ ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/demultiple
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /opt
 RUN chmod a+rx /opt/monitor_script.sh
 
-ENV PATH=/opt/freebayes/build:/opt/vartrix:/opt:$PATH
+ENV PATH=/opt/freebayes/build:/opt/vartrix:/opt:/usr/local/aws-cli/v2/current/bin:$PATH
 ENV TMPDIR=/tmp
