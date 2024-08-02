@@ -135,7 +135,7 @@ task run_demuxEM {
 
         mkdir result
         cp "~{sample_id}_demux".zarr.zip "~{sample_id}".out.demuxEM.zarr.zip "~{sample_id}".*.pdf result
-        strato sync --backend ~{backend} -m result "~{output_directory}/~{sample_id}"
+        strato sync -m result "~{output_directory}/~{sample_id}"
     }
 
     output {
