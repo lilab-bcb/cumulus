@@ -1,3 +1,8 @@
+2.6.3 :small:`August 2, 2024`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Update Demultiplexing workflow to work with Stratocumulus v0.2.4.
+
 2.6.2 :small:`June 19, 2024`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
