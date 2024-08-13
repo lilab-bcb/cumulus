@@ -117,6 +117,9 @@ task run_generate_count_matrix_ADTs {
         export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
+        # Convert to ASCII encoding
+        iconv -t ascii//TRANSLIT --output="~{feature_barcodes}" "~{feature_barcodes}"
+
         python <<CODE
         import re
         from subprocess import check_call, CalledProcessError, STDOUT, DEVNULL
