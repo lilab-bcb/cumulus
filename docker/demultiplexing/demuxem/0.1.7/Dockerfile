@@ -6,6 +6,7 @@ RUN apt-get -qq update && \
         curl \
         unzip \
         gnupg \
+        rsync \
         python3 \
         build-essential \
         python3-dev \

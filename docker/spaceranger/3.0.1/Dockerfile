@@ -2,7 +2,7 @@ FROM debian:bookworm-slim
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y unzip build-essential dpkg-dev curl gnupg procps python3 python3-pip python3-venv
+    apt-get install --no-install-recommends -y unzip build-essential dpkg-dev curl rsync gnupg procps python3 python3-pip python3-venv
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - && \

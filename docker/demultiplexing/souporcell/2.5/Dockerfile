@@ -10,6 +10,7 @@ RUN apt-get update && \
         build-essential \
         bzip2 \
         wget \
+        rsync \
         git \
         default-jre \
         curl \

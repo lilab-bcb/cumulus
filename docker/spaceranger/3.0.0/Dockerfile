@@ -2,7 +2,7 @@ FROM debian:bookworm-slim
 SHELL ["/bin/bash", "-c"]
 
 RUN apt-get update && \
-    apt-get install --no-install-recommends -y unzip build-essential dpkg-dev curl gnupg procps python3 python3-pip python3-venv
+    apt-get install --no-install-recommends -y unzip build-essential dpkg-dev curl rsync gnupg procps python3 python3-pip python3-venv
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - && \
@@ -17,9 +17,10 @@ RUN python3 -m venv /software/python
 ENV PATH=/software/python/bin:$PATH
 
 RUN python -m pip install --upgrade pip --no-cache-dir && \
-    python -m pip install pandas==2.2.1 --no-cache-dir && \
-    python -m pip install packaging==24.0 --no-cache-dir && \
-    python -m pip install stratocumulus==0.2.4 --no-cache-dir
+    python -m pip install numpy==2.0.0 && \
+    python -m pip install pandas==2.2.1 && \
+    python -m pip install packaging==24.0 && \
+    python -m pip install stratocumulus==0.2.4
 
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
 ADD spaceranger-3.0.0.tar.gz /software
