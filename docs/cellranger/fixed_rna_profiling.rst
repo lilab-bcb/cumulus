@@ -146,9 +146,9 @@ For FRP data, ``cellranger_workflow`` takes Illumina outputs as input and runs `
       - false
       - false
     * - cellranger_version
-      - Cell Ranger version to use. Available versions working for FRP data: 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0.
-      - "8.0.0"
-      - "8.0.0"
+      - Cell Ranger version to use. Available versions working for FRP data: 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0.
+      - "8.0.1"
+      - "8.0.1"
     * - docker_registry
       - Docker registry to use for cellranger_workflow. Options:
 
