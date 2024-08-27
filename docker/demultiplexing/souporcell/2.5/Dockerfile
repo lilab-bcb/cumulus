@@ -134,6 +134,7 @@ RUN apt-get -qq -y autoremove && \
 
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/demultiplexing/souporcell/extract_barcodes_from_rna.py /opt
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/demultiplexing/souporcell/match_donors.py /opt
+RUN chmod a+rx /opt/*.py
 
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /opt
 RUN chmod a+rx /opt/monitor_script.sh
