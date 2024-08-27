@@ -32,3 +32,6 @@ RUN apt-get -qq -y autoremove && \
 RUN chmod a+rx /software/monitor_script.sh
 ENV PATH=/software:/software/cellranger-8.0.1:/usr/local/aws-cli/v2/current/bin:$PATH
 ENV TMPDIR=/tmp
+
+ENV CLOUDSDK_PYTHON=/usr/lib/google-cloud-sdk/platform/bundledpythonunix/bin/python
+ENV CLOUDSDK_GSUTIL_PYTHON=/usr/lib/google-cloud-sdk/platform/bundledpythonunix/bin/python
