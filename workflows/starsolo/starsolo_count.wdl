@@ -194,10 +194,10 @@ task run_starsolo {
             directory = re.sub('/+$', '', directory) # remove trailing slashes
             target = "~{sample_id}_" + str(i)
             try:
-                call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
+                call_args = ['strato', 'exists', directory + '/~{sample_id}/']
                 print(' '.join(call_args))
                 check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-                call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]
+                call_args = ['strato', 'sync', '-m', directory + '/~{sample_id}', target]
                 print(' '.join(call_args))
                 check_call(call_args)
 
@@ -207,12 +207,12 @@ task run_starsolo {
             except CalledProcessError:
                 if not os.path.exists(target):
                     os.mkdir(target)
-                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{read1_fastq_pattern}' , target + '/']
+                call_args = ['strato', 'cp', '-m', directory + '/~{sample_id}~{read1_fastq_pattern}' , target + '/']
                 print(' '.join(call_args))
                 check_call(call_args)
                 set_up_input_fastq_files(r1_list, target, '~{read1_fastq_pattern}')
 
-                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}~{read2_fastq_pattern}' , target + '/']
+                call_args = ['strato', 'cp', '-m', directory + '/~{sample_id}~{read2_fastq_pattern}' , target + '/']
                 print(' '.join(call_args))
                 check_call(call_args)
                 set_up_input_fastq_files(r2_list, target, '~{read2_fastq_pattern}')
@@ -377,7 +377,7 @@ task run_starsolo {
                 gen_10x_h5(prefix+'/filtered', prefix+'/filtered/'+feature, "~{genome_name}")
         CODE
 
-        strato sync --backend ~{backend} -m result "~{output_directory}/~{sample_id}"
+        strato sync -m result "~{output_directory}/~{sample_id}"
     }
 
     output {

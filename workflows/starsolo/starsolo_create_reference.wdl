@@ -84,7 +84,7 @@ task run_starsolo_create_reference {
         CODE
 
         tar -czf ~{genome}-starsolo.tar.gz starsolo-ref
-        strato cp --backend ~{backend} -m ~{genome}-starsolo.tar.gz "~{output_directory}"/
+        strato cp -m ~{genome}-starsolo.tar.gz "~{output_directory}"/
     }
 
     output {
