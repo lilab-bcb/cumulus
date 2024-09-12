@@ -223,7 +223,8 @@ task run_cellranger_count {
                     check_call(call_args)
                 fastqs_dirs.append(target)
 
-        call_args = ['cellranger', 'count', '--id=results', '--transcriptome=genome_dir', '--chemistry=~{chemistry}', '--jobmode=local']
+        mem_size = re.findall(r"\d+", "~{memory}")[0]
+        call_args = ['cellranger', 'count', '--id=results', '--transcriptome=genome_dir', '--chemistry=~{chemistry}', '--jobmode=local', '--localmem='+mem_size]
 
         if samples is None: # not Feature Barcode
             call_args.extend(['--sample=~{sample_id}', '--fastqs=' + ','.join(fastqs_dirs)])
