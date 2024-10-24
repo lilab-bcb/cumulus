@@ -211,6 +211,9 @@ task run_spaceranger_count {
 
         call_args = ['spaceranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local']
 
+        localmem = "".join(filter(str.isdigit, "~{memory}"))
+        call_args.append("--localmem=" + localmem)
+
         def not_null(input_file):
             return (input_file != '') and (os.path.basename(input_file) != 'null')
 
