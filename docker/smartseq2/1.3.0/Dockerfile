@@ -19,8 +19,14 @@ RUN apt-get -qq update && apt-get -qq -y install --no-install-recommends ca-cert
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list \
     && curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - \
-    && apt-get update -y && apt-get install -y google-cloud-cli=439.0.0-0 \
-    && unzip /software/bowtie2-2.4.2-linux-x86_64.zip -d /software/ \
+    && apt-get update -y && apt-get install -y google-cloud-cli=478.0.0-0
+
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.15.62.zip" -o "awscliv2.zip" && \
+    unzip awscliv2.zip && \
+    ./aws/install && \
+    rm awscliv2.zip
+
+RUN unzip /software/bowtie2-2.4.2-linux-x86_64.zip -d /software/ \
     && unzip /software/2.7.7a.zip -d /software/ \
     && unzip /software/v2.2.1.zip -d /software/ && cd /software/hisat2-2.2.1/ && make && cd / \
     && unzip /software/v1.3.3.zip -d /software/ && cd /software/RSEM-1.3.3/ && make && cd / \
@@ -33,3 +39,7 @@ RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.c
     && chmod a+rx /software/generate_matrix_ss2.py
 
 ENV PATH=/software:/software/bowtie2-2.4.2-linux-x86_64:/software/STAR-2.7.7a/bin/Linux_x86_64_static:/software/hisat2-2.2.1:/software/RSEM-1.3.3:$PATH
+ENV TMPDIR=/tmp
+
+ENV CLOUDSDK_PYTHON=/usr/lib/google-cloud-sdk/platform/bundledpythonunix/bin/python
+ENV CLOUDSDK_GSUTIL_PYTHON=/usr/lib/google-cloud-sdk/platform/bundledpythonunix/bin/python
