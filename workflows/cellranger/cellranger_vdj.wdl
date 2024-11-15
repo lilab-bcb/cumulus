@@ -130,7 +130,8 @@ task run_cellranger_vdj {
                 check_call(call_args)
             fastqs.append(target)
 
-        call_args = ['cellranger', 'vdj', '--chain=~{chain}', '--id=results', '--reference=ref_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local']
+        mem_size = re.findall(r"\d+", "~{memory}")[0]
+        call_args = ['cellranger', 'vdj', '--chain=~{chain}', '--id=results', '--reference=ref_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local', '--localmem='+mem_size]
         if '~{denovo}' != 'false':
             call_args.append('--denovo')
         print(' '.join(call_args))
