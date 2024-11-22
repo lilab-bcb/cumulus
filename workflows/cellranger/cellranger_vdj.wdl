@@ -127,7 +127,7 @@ task run_cellranger_vdj {
                     os.mkdir(target)
                 call_args = ['strato', 'cp', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
                 print(' '.join(call_args))
-                check_call(call_args)
+                check_call(' '.join(call_args),shell=True)
             fastqs.append(target)
 
         mem_size = re.findall(r"\d+", "~{memory}")[0]
