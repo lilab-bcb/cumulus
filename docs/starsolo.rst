@@ -319,9 +319,9 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
       - 50
       - 50
     * - star_version
-      - STAR version to use. Currently support: ``2.7.9a``, ``2.7.10a`` (`2.7.10a_alpha_220818 <https://github.com/alexdobin/STAR/releases/tag/2.7.10a_alpha_220818>`_), ``2.7.10b`` (`2.7.10b_alpha_230301 <https://github.com/alexdobin/STAR/releases/tag/STAR_2.7.10b_alpha_230301>`_).
-      - "2.7.10b"
-      - "2.7.10b"
+      - STAR version to use. Currently support: ``2.7.11b``, ``2.7.10b`` (`2.7.10b_alpha_230301 <https://github.com/alexdobin/STAR/releases/tag/STAR_2.7.10b_alpha_230301>`_, ``2.7.10a`` (`2.7.10a_alpha_220818 <https://github.com/alexdobin/STAR/releases/tag/2.7.10a_alpha_220818>`_), ``2.7.9a``).
+      - "2.7.11b"
+      - "2.7.11b"
     * - docker_registry
       - Docker registry to use:
 
@@ -464,9 +464,9 @@ Required inputs are highlighted **in bold**.
       - "quay.io/cumulus"
       - "quay.io/cumulus"
     * - star_version
-      - STAR version to use. Currently support: ``2.7.9a`` and ``2.7.10a`` (`2.7.10a_alpha_220601 <https://github.com/alexdobin/STAR/releases/tag/2.7.10a_alpha_220601>`_).
-      - "2.7.10a"
-      - "2.7.10a"
+      - STAR version to use. Currently support: ``2.7.11b``, ``2.7.10a`` (`2.7.10a_alpha_220601 <https://github.com/alexdobin/STAR/releases/tag/2.7.10a_alpha_220601>`_, and ``2.7.9a``).
+      - "2.7.11b"
+      - "2.7.11b"
     * - num_cpu
       - Number of CPUs to request for count per sample.
       - 32
