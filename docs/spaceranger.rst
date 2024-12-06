@@ -276,9 +276,9 @@ For spatial data, ``spaceranger_workflow`` takes Illumina outputs and related im
 		  - 50
 		  -
 		* - spaceranger_version
-		  - spaceranger version, could be: 3.0.1, 3.0.0, 2.1.1, 2.0.1, 2.0.0, 1.3.1, 1.3.0
-		  - "3.0.1"
-		  - "3.0.1"
+		  - spaceranger version, could be: 3.1.2, 3.0.1, 3.0.0, 2.1.1, 2.0.1, 2.0.0, 1.3.1, 1.3.0
+		  - "3.1.2"
+		  - "3.1.2"
 		* - config_version
 		  - config docker version used for processing sample sheets, could be 0.3.
 		  - "0.3"
