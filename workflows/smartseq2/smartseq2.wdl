@@ -12,6 +12,8 @@ workflow smartseq2 {
         String aligner = "hisat2-hca"
         # Convert transcript BAM file into genome BAM file
         Boolean output_genome_bam = false
+        # This option defines the strandedness of the RNA-Seq reads. It recognizes three values: 'none', 'forward', and 'reverse'.
+        String strandedness = "none"
 
         # smartseq2 version, default to "1.3.0"
         String smartseq2_version = "1.3.0"
@@ -67,6 +69,7 @@ workflow smartseq2 {
                     sample_name = data_table[pos][0] + "." + data_table[pos][1],
                     aligner = aligner,
                     output_genome_bam = output_genome_bam,
+                    strandedness = strandedness,
                     output_directory = output_directory,
                     smartseq2_version = smartseq2_version,
                     docker_registry = docker_registry,
@@ -90,6 +93,7 @@ workflow smartseq2 {
                     sample_name = data_table[pos][0] + "." + data_table[pos][1],
                     aligner = aligner,
                     output_genome_bam = output_genome_bam,
+                    strandedness = strandedness,
                     output_directory = output_directory,
                     smartseq2_version = smartseq2_version,
                     docker_registry = docker_registry,
@@ -140,6 +144,7 @@ task run_rsem {
         File read1
         File? read2
         Boolean output_genome_bam
+        String strandedness
         String sample_name
         String aligner
         String output_directory
@@ -167,7 +172,7 @@ task run_rsem {
         mkdir -p rsem_ref
         tar xf ~{reference} -C rsem_ref --strip-components 1
         REFERENCE_NAME="$(basename `ls rsem_ref/*.grp` .grp)"
-        rsem-calculate-expression --~{aligner} ~{true="--output-genome-bam" false="" output_genome_bam} ~{true="--star-gzipped-read-file" false="" star_gzipped_read_file} ~{true="--paired-end" false="" defined(read2)} -p ~{num_cpu} --append-names --time ~{read1} ~{default="" read2} rsem_ref/$REFERENCE_NAME ~{sample_name}
+        rsem-calculate-expression --~{aligner} --strandedness ~{strandedness} ~{true="--output-genome-bam" false="" output_genome_bam} ~{true="--star-gzipped-read-file" false="" star_gzipped_read_file} ~{true="--paired-end" false="" defined(read2)} -p ~{num_cpu} --append-names --time ~{read1} ~{default="" read2} rsem_ref/$REFERENCE_NAME ~{sample_name}
 
         strato cp --backend ~{backend} ~{sample_name}.transcript.bam "~{output_directory}"/
 
