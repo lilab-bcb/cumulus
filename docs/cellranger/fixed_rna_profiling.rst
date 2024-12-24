@@ -1,11 +1,11 @@
-Cellranger multi supports `Fixed RNA Profiling`_ since version 7.0.0.
+Cellranger multi supports `Flex`_ (previous "Fixed RNA Profiling") since version 7.0.0.
 
 Sample Sheet
 ++++++++++++++
 
 #. **Reference** column.
 
-    Prebuilt scRNA-seq references for FRP data processing are summarized below.
+    Prebuilt scRNA-seq references for Flex data processing are summarized below.
 
     .. list-table::
         :widths: 5 20
@@ -13,35 +13,49 @@ Sample Sheet
 
         * - Keyword
           - Description
+        * - **GRCh38-2024-A**
+          - Human GRCh38 (GENCODE v44/Ensembl 110)
         * - **GRCh38-2020-A**
           - Human GRCh38 (GENCODE v32/Ensembl 98)
+        * - **GRCm39-2024-A**
+          - Mouse GRCm39 (GENCODE vM33/Ensembl 110)
         * - **mm10-2020-A**
           - Mouse mm10 (GENCODE vM23/Ensembl 98)
 
 #. *DataType* column.
 
-    Set ``frp`` for RNA-Seq modalities of your FRP samples. For other modalities (e.g. citeseq or antibody), set to their corresponding data types.
+    Set ``frp`` for RNA-Seq modalities of your Flex samples. For other modalities (e.g. citeseq or antibody), set to their corresponding data types.
 
-#. *ProbeSet* column.
+#. **ProbeSet** column.
 
-    Preset probe set references for FRP samples:
+    Preset Flex probe set references have their own compatible scRNA-seq references and Cell Ranger versions, respectively. This is summarized as follows:
 
     .. list-table::
-        :widths: 5 20
+        :widths: 5 5 5
         :header-rows: 1
 
         * - Keyword
-          - Description
+          - Genome Reference
+          - Cell Ranger version
+        * - **FRP_human_probe_v1.1**
+          - GRCh38-2024-A
+          - v9.0+
         * - **FRP_human_probe_v1.0.1**
-          - FRP probe set v1.0.1 for human. *Only work with Cell Ranger v7.1+*.
-        * - **FRP_mouse_probe_v1.0.1**
-          - FRP probe set v1.0.1 for mouse. *Only work with Cell Ranger v7.1+*.
+          - GRCh38-2020-A
+          - v7.1+
         * - **FRP_human_probe_v1**
-          - FRP probe set v1.0 for human. Work with Cell Ranger v7.0+.
+          - GRCh38-2020-A
+          - v7.0+
+        * - **FRP_mouse_probe_v1.1**
+          - GRCm39-2024-A
+          - v9.0+
+        * - **FRP_mouse_probe_v1.0.1**
+          - mm10-2020-A
+          - v7.1+
         * - **FRP_mouse_probe_v1**
-          - FRP probe set v1.0 for mouse. Work with Cell Ranger v7.0+.
+          - mm10-2020-A
+          - v7.0+
 
-    If *ProbeSet* column is not set, use **FRP_human_probe_v1.0.1** by default.
     Custom probe set references are also accepted. Simply put the GS or S3 URI of the custom probe set CSV file for this column.
 
 #. *FeatureBarcodeFile* column.
@@ -54,7 +68,7 @@ Sample Sheet
     where the third column (i.e. ``Control`` and ``Treated`` above) is optional, which specifies the description of the samples.
 
 .. note::
-  In the case of Singleplex FRP with Antibody Capture, for ``citeseq`` sample, the *FeatureBarcodeFile* you prepare should be in 10x format (see `here <https://cf.10xgenomics.com/samples/cell-exp/7.0.0/10k_Human_PBMC_TotalSeqB_singleplex_Multiplex/10k_Human_PBMC_TotalSeqB_singleplex_Multiplex_count_feature_reference.csv>`_ for an example).
+  In the case of Singleplex Flex with Antibody Capture, for ``citeseq`` sample, the *FeatureBarcodeFile* you prepare should be in 10x format (see `here <https://cf.10xgenomics.com/samples/cell-exp/7.0.0/10k_Human_PBMC_TotalSeqB_singleplex_Multiplex/10k_Human_PBMC_TotalSeqB_singleplex_Multiplex_count_feature_reference.csv>`_ for an example).
 
 #. *Link* column.
 
@@ -65,8 +79,8 @@ Sample Sheet
 #. Example::
 
     Sample,Reference,ProbeSet,Flowcell,DataType,FeatureBarcodeFile,Link
-    sample1,GRCh38-2020-A,FRP_human_probe_v1,/path/to/sample1/fastq/folder,frp,/path/to/sample1/fbf/file,
-    sample2_rna,GRCh38-2020-A,FRP_human_probe_v1,/path/to/sample2/rna/fastq/folder,frp,/path/to/sample2/rna/fbf/file,sample2
+    sample1,GRCh38-2020-A,Flex_human_probe_v1.0.1,/path/to/sample1/fastq/folder,frp,/path/to/sample1/fbf/file,
+    sample2_rna,GRCh38-2020-A,Flex_human_probe_v1.0.1,/path/to/sample2/rna/fastq/folder,frp,/path/to/sample2/rna/fbf/file,sample2
     sample2_citeseq,GRCh38-2020-A,,/path/to/sample2/citeseq/fastq/folder,citeseq,/path/to/sample2/citeseq/fbf/file,sample2
 
 In the example above, two linked samples are provided.
@@ -75,7 +89,7 @@ In the example above, two linked samples are provided.
 Workflow Input
 ++++++++++++++++
 
-For FRP data, ``cellranger_workflow`` takes Illumina outputs as input and runs ``cellranger mkfastq`` and ``cellranger multi``. Revalant workflow inputs are described below, with required inputs highlighted in **bold**:
+For Flex data, ``cellranger_workflow`` takes Illumina outputs as input and runs ``cellranger mkfastq`` and ``cellranger multi``. Revalant workflow inputs are described below, with required inputs highlighted in **bold**:
 
 .. list-table::
     :widths: 5 30 30 20
@@ -146,9 +160,9 @@ For FRP data, ``cellranger_workflow`` takes Illumina outputs as input and runs `
       - false
       - false
     * - cellranger_version
-      - Cell Ranger version to use. Available versions working for FRP data: 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0.
-      - "8.0.1"
-      - "8.0.1"
+      - Cell Ranger version to use. Available versions working for Flex data: 9.0.0, 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0.
+      - "9.0.0"
+      - "9.0.0"
     * - docker_registry
       - Docker registry to use for cellranger_workflow. Options:
 
@@ -217,10 +231,10 @@ See the table below for important outputs:
       - Description
     * - fastq_outputs
       - Array[Array[String]]
-      - ``fastq_outputs[0]`` gives the list of cloud urls containing FASTQ files for RNA-Seq modalities of FRP data, one url per flowcell.
+      - ``fastq_outputs[0]`` gives the list of cloud urls containing FASTQ files for RNA-Seq modalities of Flex data, one url per flowcell.
     * - count_outputs
       - Map[String, Array[String]]
       - ``count_outputs["multi"]`` gives the list of cloud urls containing *cellranger multi* outputs, one url per sample.
 
 
-.. _Fixed RNA Profiling: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/multi-frp
+.. _Flex: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-flex-multi-frp

@@ -61,8 +61,10 @@ human_probe_v1	gs://regev-lab/resources/cellranger/Visium_Human_Transcriptome_Pr
 human_probe_v2	gs://regev-lab/resources/cellranger/Visium_Human_Transcriptome_Probe_Set_v2.0_GRCh38-2020-A.csv
 mouse_probe_v1	gs://regev-lab/resources/cellranger/Visium_Mouse_Transcriptome_Probe_Set_v1.0_mm10-2020-A.csv
 mouse_probe_v2	gs://regev-lab/resources/cellranger/Visium_Mouse_Transcriptome_Probe_Set_v2.0_mm10-2020-A.csv
+FRP_human_probe_v1.1	gs://regev-lab/resources/cellranger/Chromium_Human_Transcriptome_Probe_Set_v1.1.0_GRCh38-2024-A.csv
 FRP_human_probe_v1	gs://regev-lab/resources/cellranger/Chromium_Human_Transcriptome_Probe_Set_v1.0_GRCh38-2020-A.csv
 FRP_human_probe_v1.0.1	gs://regev-lab/resources/cellranger/Chromium_Human_Transcriptome_Probe_Set_v1.0.1_GRCh38-2020-A.csv
+FRP_mouse_probe_v1.1	gs://regev-lab/resources/cellranger/Chromium_Mouse_Transcriptome_Probe_Set_v1.1.1_GRCm39-2024-A.csv
 FRP_mouse_probe_v1	gs://regev-lab/resources/cellranger/Chromium_Mouse_Transcriptome_Probe_Set_v1.0_mm10-2020-A.csv
 FRP_mouse_probe_v1.0.1	gs://regev-lab/resources/cellranger/Chromium_Mouse_Transcriptome_Probe_Set_v1.0.1_mm10-2020-A.csv
 SC3Pv4	gs://regev-lab/resources/cellranger/3M-3pgex-may-2023.txt.gz
