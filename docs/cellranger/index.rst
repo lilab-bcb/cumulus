@@ -45,8 +45,8 @@ Single-cell multiomics
 
 --------------------------
 
-Fixed RNA Profiling
-^^^^^^^^^^^^^^^^^^^^
+Fixed RNA Profiling (Flex)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. include:: fixed_rna_profiling.rst
 
