@@ -37,22 +37,22 @@ Sample Sheet
         * - Keyword
           - Genome Reference
           - Cell Ranger version
-        * - **FRP_human_probe_v1.1**
+        * - **Flex_human_probe_v1.1**
           - GRCh38-2024-A
           - v9.0+
-        * - **FRP_human_probe_v1.0.1**
+        * - **Flex_human_probe_v1.0.1**
           - GRCh38-2020-A
           - v7.1+
-        * - **FRP_human_probe_v1**
+        * - **Flex_human_probe_v1**
           - GRCh38-2020-A
           - v7.0+
-        * - **FRP_mouse_probe_v1.1**
+        * - **Flex_mouse_probe_v1.1**
           - GRCm39-2024-A
           - v9.0+
-        * - **FRP_mouse_probe_v1.0.1**
+        * - **Flex_mouse_probe_v1.0.1**
           - mm10-2020-A
           - v7.1+
-        * - **FRP_mouse_probe_v1**
+        * - **Flex_mouse_probe_v1**
           - mm10-2020-A
           - v7.0+
 
