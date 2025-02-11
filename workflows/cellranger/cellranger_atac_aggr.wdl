@@ -133,7 +133,8 @@ task run_cellranger_atac_aggr {
                 counts.append(library_id)
                 fout.write(library_id + "," + current_dir + '/' + library_id + "/fragments.tsv.gz," + current_dir + '/' + library_id + "/singlecell.csv\n")
 
-        call_args = ['cellranger-atac', 'aggr', '--id=results', '--reference=genome_dir', '--csv=aggr.csv', '--normalize=~{normalize}', '--jobmode=local']
+        mem_size = re.findall(r"\d+", "~{memory}")[0]
+        call_args = ['cellranger-atac', 'aggr', '--id=results', '--reference=genome_dir', '--csv=aggr.csv', '--normalize=~{normalize}', '--jobmode=local', '--localcores=~{num_cpu}', '--localmem='+mem_size]
         if '~{secondary}' != 'true':
             call_args.append('--nosecondary')
         else:

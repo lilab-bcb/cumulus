@@ -153,7 +153,8 @@ task run_cellranger_arc_count {
                     check_call(call_args)
                 fout.write(os.path.abspath(target) + ',' + samples[i] + ',' + ('Gene Expression' if data_types[i] == 'rna' else 'Chromatin Accessibility') + '\n')
 
-        call_args = ['cellranger-arc', 'count', '--id=results', '--libraries=libraries.csv', '--reference=genome_dir', '--jobmode=local']
+        mem_size = re.findall(r"\d+", "~{memory}")[0]
+        call_args = ['cellranger-arc', 'count', '--id=results', '--libraries=libraries.csv', '--reference=genome_dir', '--jobmode=local', '--localcores=~{num_cpu}', '--localmem='+mem_size]
         if '~{gex_exclude_introns}' == 'true':
             call_args.append('--gex-exclude-introns')
         if '~{no_bam}' == 'true':

@@ -273,7 +273,7 @@ task run_cellranger_multi {
                 raise Exception("Cannot locate CMO or FRP sample file!")
 
         mem_size = re.findall(r"\d+", "~{memory}")[0]
-        call_args = ['cellranger', 'multi', '--id=results', '--csv=multi.csv', '--jobmode=local', '--localmem='+mem_size]
+        call_args = ['cellranger', 'multi', '--id=results', '--csv=multi.csv', '--jobmode=local', '--localcores=~{num_cpu}', '--localmem='+mem_size]
         print(' '.join(call_args))
         check_call(call_args)
         CODE

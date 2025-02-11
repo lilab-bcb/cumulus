@@ -137,7 +137,8 @@ task run_cellranger_atac_count {
                 check_call(call_args)
             fastqs.append(target)
 
-        call_args = ['cellranger-atac', 'count', '--id=results', '--reference=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local']
+        mem_size = re.findall(r"\d+", "~{memory}")[0]
+        call_args = ['cellranger-atac', 'count', '--id=results', '--reference=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local', '--localcores=~{num_cpu}', '--localmem='+mem_size]
         if '~{force_cells}' != '':
             call_args.append('--force-cells=~{force_cells}')
         if '~{dim_reduce}' != '':

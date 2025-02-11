@@ -22,8 +22,8 @@ workflow cellranger_create_reference {
 
         # Which docker registry to use
         String docker_registry = "quay.io/cumulus"
-        # 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0, 6.1.2, 6.1.1
-        String cellranger_version = "8.0.1"
+        # 9.0.0, 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0, 6.1.2, 6.1.1
+        String cellranger_version = "9.0.0"
 
         # Disk space in GB
         Int disk_space = 100
@@ -308,7 +308,7 @@ task run_cellranger_mkref {
             else:
                 break
 
-        call_args.extend(['--nthreads=~{num_cpu}', '--memgb=' + mem_digit])
+        call_args.extend(['--nthreads=~{num_cpu}', '--memgb=' + mem_digit, '--localcores=~{num_cpu}', '--localmem=' + mem_digit])
         if '~{ref_version}' != '':
             call_args.append('--ref-version=~{ref_version}')
 
