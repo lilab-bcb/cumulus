@@ -1,4 +1,4 @@
-name: Womtools check
+name: Womtools
 
 on:
   pull_request:
