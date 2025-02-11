@@ -209,7 +209,8 @@ task run_spaceranger_count {
                 check_call(call_args)
             fastqs.append('~{sample_id}_' + str(i))
 
-        call_args = ['spaceranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local']
+        mem_size = re.findall(r"\d+", "~{memory}")[0]
+        call_args = ['spaceranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local', '--localcores=~{num_cpu}', '--localmem='+mem_size]
 
         localmem = "".join(filter(str.isdigit, "~{memory}"))
         call_args.append("--localmem=" + localmem)

@@ -1,0 +1,38 @@
+name: Womtools check
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v2
+
+      - name: Set up Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+
+      - name: Fetch Womtool
+        run: |
+          curl -L -o womtool.jar https://github.com/broadinstitute/cromwell/releases/download/87/womtool-87.jar
+
+      - name: List modified files
+        id: diff
+        run: echo "::set-output name=files::$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }})"
+
+      - name: Validate WDL files using Womtool
+        run: |
+          for file in ${{ steps.diff.outputs.files }}
+          do
+            if [[ $file == *.wdl ]]; then  # Assuming you are validating WDL files
+              echo "Validating $file"
+              java -jar womtool.jar validate "$file"
+            fi
+          done
