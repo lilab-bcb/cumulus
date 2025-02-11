@@ -25,7 +25,7 @@ jobs:
 
       - name: List modified files
         id: diff
-        run: echo "::set-output name=files::$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.sha }})"
+        run: echo "name=files::$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_requst.head.sha }})" >> $GITHUB_OUTPUT
 
       - name: Validate WDL files using Womtool
         run: |
