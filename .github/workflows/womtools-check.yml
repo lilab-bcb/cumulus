@@ -12,6 +12,9 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          repository: ${{ github.repository }}
 
       - name: Set up Java
         uses: actions/setup-java@v3
@@ -25,7 +28,7 @@ jobs:
 
       - name: List modified files
         id: diff
-        run: echo "name=files::$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.workflow_run.head_sha }})" >> $GITHUB_OUTPUT
+        run: echo "name=files::$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})" >> $GITHUB_OUTPUT
 
       - name: Validate WDL files using Womtool
         run: |
