@@ -20,7 +20,7 @@
 # -- Project information -----------------------------------------------------
 
 project = 'Cumulus'
-copyright = '2024 Genentech, Inc. All rights reserved.'
+copyright = '2021 - 2025 Genentech, Inc. All rights reserved.'
 author = 'Yiming Yang, Joshua Gould and Bo Li'
 
 # The short X.Y version
@@ -169,7 +169,7 @@ texinfo_documents = [
 # -- Options for intersphinx extension ---------------------------------------
 
 # Example configuration for intersphinx: refer to the Python standard library.
-intersphinx_mapping = {'https://docs.python.org/': None}
+intersphinx_mapping = {'python': ('https://docs.python.org/', None)}
 
 # -- Options for todo extension ----------------------------------------------
 
