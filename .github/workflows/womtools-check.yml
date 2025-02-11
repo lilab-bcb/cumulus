@@ -29,13 +29,13 @@ jobs:
 
       - name: List modified files
         id: diff
-        run: echo "name=files::$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }})" >> $GITHUB_OUTPUT
+        run: echo "files=$(git diff --name-only ${{ github.event.pull_request.base.sha }} ${{ github.event.pull_request.head.sha }} | tr '\n' ' ')" >> $GITHUB_ENV
 
       - name: Validate WDL files using Womtool
         run: |
-          for file in ${{ steps.diff.outputs.files }}
+          for file in ${{ env.files }}
           do
-            if [[ $file == *.wdl ]]; then  # Assuming you are validating WDL files
+            if [[ $file == *.wdl ]]; then
               echo "Validating $file"
               java -jar womtool.jar validate "$file"
             fi
