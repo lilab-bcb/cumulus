@@ -250,7 +250,7 @@ task run_cellranger_count {
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
                 target = '~{sample_id}_' + str(i)
-                localize_fastqs(directory, target, '~{input_samples}')
+                localize_fastqs(directory, target, '~{sample_id}')
                 fastqs_dirs.append(target)
 
         mem_size = re.findall(r"\d+", "~{memory}")[0]
