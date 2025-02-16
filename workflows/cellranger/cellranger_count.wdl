@@ -144,7 +144,7 @@ task run_cellranger_count {
         def rename_fastq_file(path, sample_name):
             folder = os.path.dirname(path)
             filename = os.path.basename(path)
-            pattern = r"(_S\d+_L\d+_R\d+_001\.fastq\.gz)"
+            pattern = r"(_S\d+_L\d+_[RI]\d+_001\.fastq\.gz)"
             match = re.search(pattern, filename)
             if match:
                 idx = match.start()
