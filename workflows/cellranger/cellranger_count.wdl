@@ -137,6 +137,7 @@ task run_cellranger_count {
         import re
         import os
         import sys
+        import glob
         from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
         from packaging import version
 
