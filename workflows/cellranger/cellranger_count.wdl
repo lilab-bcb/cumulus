@@ -140,6 +140,22 @@ task run_cellranger_count {
         from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
         from packaging import version
 
+        def rename_fastq_file(path, sample_name):
+            folder = os.path.dirname(path)
+            filename = os.path.basename(path)
+            pattern = r"(_S\d+_L\d+_R\d+_001\.fastq\.gz)"
+            match = re.search(pattern, filename)
+            if match:
+                idx = match.start()
+                cur_name = filename[:idx]
+                suffix = filename[idx:]
+                if cur_name != sample_name:
+                    call_args = ["mv", path, folder+"/"+sample_name+suffix]
+                    print(' '.join(call_args))
+                    check_call(call_args)
+            else:
+                raise Exception(path + " does not follow Illumina naming convention!")
+
         samples = data_types = fbfs = None
         fastqs_dirs = []
 
@@ -188,9 +204,31 @@ task run_cellranger_count {
                     except CalledProcessError:
                         if not os.path.exists(target):
                             os.mkdir(target)
-                        call_args = ['strato', 'cp', '-m', directory + '/' + samples[i] + '_S*_L*_*_001.fastq.gz' , target]
-                        print(' '.join(call_args))
-                        check_call(call_args)
+                        try:
+                            call_args = ['strato', 'cp', '-m', directory + '/' + samples[i] + '_S*_L*_*_001.fastq.gz' , target]
+                            print(' '.join(call_args))
+                            check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
+                        except CalledProcessError:
+                            # Localize tar file
+                            call_args = ['strato', 'cp', '-m', directory + '/*.tar', target]
+                            print(' '.join(call_args))
+                            check_call(call_args)
+
+                            # Untar
+                            tar_file = glob.glob(target+"/*.tar")[0]
+                            call_args = ["tar", "--strip-components=1", "-xf", tar_file, "-C", target]
+                            print(' '.join(call_args))
+                            check_call(call_args)
+
+                            # Remove tar file
+                            call_args = ["rm", tar_file]
+                            print(' '.join(call_args))
+                            check_call(call_args)
+
+                            # Rename FASTQ files if needed
+                            fastq_files = glob.glob(target+"/*.fastq.gz")
+                            for fastq_f in fastq_files:
+                                rename_fastq_file(fastq_f, samples[i])
                     feature_type = ''
                     if data_types[i] == 'rna':
                         feature_type = 'Gene Expression'
