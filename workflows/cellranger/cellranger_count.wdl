@@ -141,19 +141,16 @@ task run_cellranger_count {
         from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
         from packaging import version
 
-        def rename_fastq_file(path, sample_name):
+        def check_fastq_file(path, sample_name):
             folder = os.path.dirname(path)
             filename = os.path.basename(path)
             pattern = r"(_S\d+_L\d+_[RI]\d+_001\.fastq\.gz)"
             match = re.search(pattern, filename)
             if match:
                 idx = match.start()
-                cur_name = filename[:idx]
-                suffix = filename[idx:]
+                cur_name = filename[:match.start()]
                 if cur_name != sample_name:
-                    call_args = ["mv", path, folder+"/"+sample_name+suffix]
-                    print(' '.join(call_args))
-                    check_call(call_args)
+                    raise Exception("FASTQ sample name prefix mismatch! Expect " + sample_name + ". Get " + cur_name + ".")
             else:
                 raise Exception(path + " does not follow Illumina naming convention!")
 
@@ -174,12 +171,12 @@ task run_cellranger_count {
                     check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
                 except CalledProcessError:
                     # Localize tar file
-                    call_args = ['strato', 'cp', '-m', directory + '/' + "*.tar", target]
+                    tar_file = sample_name + ".tar"
+                    call_args = ['strato', 'cp', '-m', directory + '/' + tar_file, target]
                     print(' '.join(call_args))
                     check_call(call_args)
 
                     # Untar
-                    tar_file = glob.glob(target+"/*.tar")[0]
                     call_args = ["tar", "--strip-components=1", "-xf", tar_file, "-C", target]
                     print(' '.join(call_args))
                     check_call(call_args)
@@ -192,7 +189,7 @@ task run_cellranger_count {
                     # Rename FASTQ files if needed
                     fastq_files = glob.glob(target+"/*.fastq.gz")
                     for fastq_f in fastq_files:
-                        rename_fastq_file(fastq_f, sample_name)
+                        check_fastq_file(fastq_f, sample_name)
 
         samples = data_types = fbfs = None
         fastqs_dirs = []
