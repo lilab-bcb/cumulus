@@ -137,8 +137,59 @@ task run_cellranger_count {
         import re
         import os
         import sys
+        import glob
         from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
         from packaging import version
+
+        def check_fastq_file(path, sample_name):
+            folder = os.path.dirname(path)
+            filename = os.path.basename(path)
+            pattern = r"(_S\d+_L\d+_[RI]\d+_001\.fastq\.gz)"
+            match = re.search(pattern, filename)
+            if match:
+                idx = match.start()
+                cur_name = filename[:match.start()]
+                if cur_name != sample_name:
+                    raise Exception("FASTQ sample name prefix mismatch! Expect " + sample_name + ". Get " + cur_name + ".")
+            else:
+                raise Exception(path + " does not follow Illumina naming convention!")
+
+        def localize_fastqs(directory, target, sample_name):
+            try:
+                call_args = ['strato', 'exists', directory + '/' + sample_name + '/']
+                print(' '.join(call_args))
+                check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
+                call_args = ['strato', 'sync', '-m', directory + '/' + sample_name, target]
+                print(' '.join(call_args))
+                check_call(call_args)
+            except CalledProcessError:
+                if not os.path.exists(target):
+                    os.mkdir(target)
+                try:
+                    call_args = ['strato', 'cp', '-m', directory + '/' + sample_name + '_S*_L*_*_001.fastq.gz' , target]
+                    print(' '.join(call_args))
+                    check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
+                except CalledProcessError:
+                    # Localize tar file
+                    tar_file = sample_name + ".tar"
+                    call_args = ['strato', 'cp', '-m', directory + '/' + tar_file, target]
+                    print(' '.join(call_args))
+                    check_call(call_args)
+
+                    # Untar
+                    call_args = ["tar", "--strip-components=1", "-xf", tar_file, "-C", target]
+                    print(' '.join(call_args))
+                    check_call(call_args)
+
+                    # Remove tar file
+                    call_args = ["rm", tar_file]
+                    print(' '.join(call_args))
+                    check_call(call_args)
+
+                    # Rename FASTQ files if needed
+                    fastq_files = glob.glob(target+"/*.fastq.gz")
+                    for fastq_f in fastq_files:
+                        check_fastq_file(fastq_f, sample_name)
 
         samples = data_types = fbfs = None
         fastqs_dirs = []
@@ -178,19 +229,8 @@ task run_cellranger_count {
                 for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                     directory = re.sub('/+$', '', directory) # remove trailing slashes
                     target = samples[i] + "_" + str(i)
-                    try:
-                        call_args = ['strato', 'exists', directory + '/' + samples[i] + '/']
-                        print(' '.join(call_args))
-                        check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-                        call_args = ['strato', 'sync', '-m', directory + '/' + samples[i], target]
-                        print(' '.join(call_args))
-                        check_call(call_args)
-                    except CalledProcessError:
-                        if not os.path.exists(target):
-                            os.mkdir(target)
-                        call_args = ['strato', 'cp', '-m', directory + '/' + samples[i] + '_S*_L*_*_001.fastq.gz' , target]
-                        print(' '.join(call_args))
-                        check_call(call_args)
+                    localize_fastqs(directory, target, samples[i])
+
                     feature_type = ''
                     if data_types[i] == 'rna':
                         feature_type = 'Gene Expression'
@@ -208,19 +248,7 @@ task run_cellranger_count {
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
                 target = '~{sample_id}_' + str(i)
-                try:
-                    call_args = ['strato', 'exists', directory + '/~{sample_id}/']
-                    print(' '.join(call_args))
-                    check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-                    call_args = ['strato', 'sync', '-m', directory + '/~{sample_id}', target]
-                    print(' '.join(call_args))
-                    check_call(call_args)
-                except CalledProcessError:
-                    if not os.path.exists(target):
-                        os.mkdir(target)
-                    call_args = ['strato', 'cp', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
-                    print(' '.join(call_args))
-                    check_call(call_args)
+                localize_fastqs(directory, target, '~{sample_id}')
                 fastqs_dirs.append(target)
 
         mem_size = re.findall(r"\d+", "~{memory}")[0]

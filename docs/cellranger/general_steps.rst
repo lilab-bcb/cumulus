@@ -66,12 +66,6 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		    | If starts with FASTQ files, this should be Google bucket URLs of uploaded FASTQ folders.
 		    | The FASTQ folders should contain one subfolder for each sample in the flowcell with the sample name as the subfolder name.
 		    | Each subfolder contains FASTQ files for that sample.
-		* - **Lane**
-		  -
-		    | Tells which lanes the sample was pooled into.
-		    | Can be either single lane (e.g. 8) or a range (e.g. 7-8) or all (e.g. \*).
-		* - **Index**
-		  - Sample index (e.g. SI-GA-A12).
 		* - Chemistry
 		  - Describes the 10x chemistry used for the sample. This column is optional.
 		* - DataType
@@ -108,15 +102,15 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 
 	Example::
 
-		Sample,Reference,Flowcell,Lane,Index,Chemistry,DataType
-		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,threeprime,rna
-		sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3-4,SI-GA-B8,SC3Pv3,rna
-		sample_3,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,5-6,SI-GA-C8,fiveprime,rna
-		sample_4,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,7-8,SI-GA-D8,fiveprime,rna
-		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,1-2,SI-GA-A8,threeprime,rna
-		sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,3-4,SI-GA-B8,SC3Pv3,rna
-		sample_3,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,5-6,SI-GA-C8,fiveprime,rna
-		sample_4,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,7-8,SI-GA-D8,fiveprime,rna
+		Sample,Reference,Flowcell,Chemistry,DataType
+		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,threeprime,rna
+		sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,SC3Pv3,rna
+		sample_3,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,fiveprime,rna
+		sample_4,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,fiveprime,rna
+		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,threeprime,rna
+		sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,SC3Pv3,rna
+		sample_3,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,fiveprime,rna
+		sample_4,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,fiveprime,rna
 
 	**3.2 Upload your sample sheet to the workspace bucket:**
 
@@ -183,9 +177,6 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		* - Name
 		  - Type
 		  - Description
-		* - fastq_outputs
-		  - Array[Array[String]?]
-		  - The top-level array contains results (as arrays) for different data modalities. The inner-level array contains cloud locations of FASTQ files, one url per flowcell.
 		* - count_outputs
 		  - Array[Array[String]?]
 		  - The top-level array contains results (as arrays) for different data modalities. The inner-level array contains cloud locations of count matrices, one url per sample.

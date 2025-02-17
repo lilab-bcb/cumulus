@@ -193,11 +193,11 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - 0.1
 		  - 0.1
 		* - cellranger_version
-		  - cellranger version, could be: 9.0.0, 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0
+		  - cellranger version, could be: 9.0.0, 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0
 		  - "9.0.0"
 		  - "9.0.0"
 		* - cumulus_feature_barcoding_version
-		  - Cumulus_feature_barcoding version for extracting feature barcode matrix. Version available: 0.11.4, 0.11.3, 0.11.2, 0.11.1, 0.11.0, 0.10.0, 0.9.0, 0.8.0, 0.7.0, 0.6.0, 0.5.0, 0.4.0, 0.3.0, 0.2.0.
+		  - Cumulus_feature_barcoding version for extracting feature barcode matrix.
 		  - "0.11.4"
 		  - "0.11.4"
 		* - docker_registry
@@ -208,12 +208,6 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  	- "cumulusprod" for backup images on Docker Hub.
 		  - "quay.io/cumulus"
 		  - "quay.io/cumulus"
-		* - mkfastq_docker_registry
-		  - Docker registry to use for ``cellranger mkfastq``.
-		    Default is the registry to which only Broad users have access.
-		    See :ref:`bcl2fastq-docker` for making your own registry.
-		  - "gcr.io/broad-cumulus"
-		  - "gcr.io/broad-cumulus"
 		* - acronym_file
 		  - | The link/path of an index file in TSV format for fetching preset genome references, chemistry whitelists, etc. by their names.
 		    | Set an GS URI if *backend* is ``gcp``; an S3 URI for ``aws`` backend; an absolute file path for ``local`` backend.
