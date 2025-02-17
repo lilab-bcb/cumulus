@@ -24,17 +24,17 @@ Feature barcoding assays (cell & nucleus hashing, CITE-seq and Perturb-seq)
 
 ---------------------------------
 
-Single-cell ATAC-seq
-^^^^^^^^^^^^^^^^^^^^
-
-.. include:: sc_atac.rst
-
----------------------------------
-
 Single-cell immune profiling
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. include:: sc_vdj.rst
+
+---------------------------------
+
+Single-cell ATAC-seq
+^^^^^^^^^^^^^^^^^^^^
+
+.. include:: sc_atac.rst
 
 ---------------------------------
 

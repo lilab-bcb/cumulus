@@ -19,22 +19,6 @@ Sample sheet
 		  - Human GRCh38 V(D)J sequences, cellranger reference 7.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
 		* - **GRCm38_vdj_v7.0.0**
 		  - Mouse GRCm38 V(D)J sequences, cellranger reference 7.0.0, annotation built from Ensembl *Mus_musculus.GRCm38.94.gtf*
-		* - **GRCh38_vdj_v5.0.0**
-		  - Human GRCh38 V(D)J sequences, cellranger reference 5.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
-		* - **GRCm38_vdj_v5.0.0**
-		  - Mouse GRCm38 V(D)J sequences, cellranger reference 5.0.0, annotation built from Ensembl *Mus_musculus.GRCm38.94.gtf*
-		* - **GRCh38_vdj_v4.0.0**
-		  - Human GRCh38 V(D)J sequences, cellranger reference 4.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
-		* - **GRCm38_vdj_v4.0.0**
-		  - Mouse GRCm38 V(D)J sequences, cellranger reference 4.0.0, annotation built from Ensembl *Mus_musculus.GRCm38.94.gtf*
-		* - **GRCh38_vdj_v3.1.0**
-		  - Human GRCh38 V(D)J sequences, cellranger reference 3.1.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
-		* - **GRCm38_vdj_v3.1.0**
-		  - Mouse GRCm38 V(D)J sequences, cellranger reference 3.1.0, annotation built from Ensembl *Mus_musculus.GRCm38.94.gtf*
-		* - **GRCh38_vdj_v2.0.0** or **GRCh38_vdj**
-		  - Human GRCh38 V(D)J sequences, cellranger reference 2.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.87.chr_patch_hapl_scaff.gtf* and *vdj_GRCh38_alts_ensembl_10x_genes-2.0.0.gtf*
-		* - **GRCm38_vdj_v2.2.0** or **GRCm38_vdj**
-		  - Mouse GRCm38 V(D)J sequences, cellranger reference 2.2.0, annotation built from Ensembl *Mus_musculus.GRCm38.90.chr_patch_hapl_scaff.gtf*
 
 #. **Index** column.
 
