@@ -172,7 +172,7 @@ task run_cellranger_count {
                 except CalledProcessError:
                     # Localize tar file
                     tar_file = sample_name + ".tar"
-                    call_args = ['strato', 'cp', '-m', directory + '/' + tar_file, target]
+                    call_args = ['strato', 'cp', '-m', directory + '/' + tar_file, '.']
                     print(' '.join(call_args))
                     check_call(call_args)
 
