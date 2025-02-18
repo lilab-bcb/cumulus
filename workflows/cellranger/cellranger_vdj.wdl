@@ -25,6 +25,10 @@ workflow cellranger_vdj {
         # Use this in rare cases when automatic chain detection fails.
         String chain = "auto"
 
+        # If inner enrichment primers other than those provided in the 10x kits are used, they need to be specified here as a textfile with one primer per line. Disable secondary analysis, e.g. clustering
+        # A cloud URI to the text file
+        String inner_enrichment_primers = ""
+
         # cellranger version
         String cellranger_version
         # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
@@ -60,6 +64,7 @@ workflow cellranger_vdj {
             genome_file = genome_file,
             denovo = denovo,
             chain = chain,
+            inner_enrichment_primers = inner_enrichment_primers,
             cellranger_version = cellranger_version,
             docker_registry = docker_registry,
             zones = zones,
@@ -87,6 +92,7 @@ task run_cellranger_vdj {
         File genome_file
         Boolean denovo
         String chain
+        String inner_enrichment_primers
         String cellranger_version
         String docker_registry
         String zones
@@ -134,6 +140,8 @@ task run_cellranger_vdj {
         call_args = ['cellranger', 'vdj', '--chain=~{chain}', '--id=results', '--reference=ref_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local', '--localcores=~{num_cpu}', '--localmem='+mem_size]
         if '~{denovo}' != 'false':
             call_args.append('--denovo')
+        if '~{inner_enrichment_primers}' != '':
+            call_args.extend(['--inner-enrichment-primers', '~{inner_enrichment_primers}'])
         print(' '.join(call_args))
         check_call(call_args)
         CODE

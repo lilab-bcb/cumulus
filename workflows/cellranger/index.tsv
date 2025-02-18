@@ -1,6 +1,7 @@
 GRCh38-2024-A	gs://cumulus-ref/resources/cellranger/refdata-gex-GRCh38-2024-A.tar.gz
 GRCm39-2024-A	gs://cumulus-ref/resources/cellranger/refdata-gex-GRCm39-2024-A.tar.gz
 GRCh38_and_GRCm39-2024-A	gs://cumulus-ref/resources/cellranger/refdata-gex-GRCh38_and_GRCm39-2024-A.tar.gz
+mRatBN7.2-2024-A	gs://cumulus-ref/resources/cellranger/refdata-gex-mRatBN7-2-2024-A.tar.gz
 GRCh38-2020-A	gs://cumulus-ref/resources/cellranger/refdata-gex-GRCh38-2020-A.tar.gz
 mm10-2020-A	gs://cumulus-ref/resources/cellranger/refdata-gex-mm10-2020-A.tar.gz
 GRCh38_and_mm10-2020-A	gs://cumulus-ref/resources/cellranger/refdata-gex-GRCh38-and-mm10-2020-A.tar.gz
