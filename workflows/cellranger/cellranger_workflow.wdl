@@ -435,9 +435,6 @@ task generate_count_config {
     input {
         File input_csv_file
         String output_dir
-        Array[String]? fastq_dirs
-        Array[String]? fastq_dirs_atac
-        Array[String]? fastq_dirs_arc
         String config_version
         String docker_registry
         String zones
