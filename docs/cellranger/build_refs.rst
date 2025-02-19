@@ -94,9 +94,9 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be: 8.0.0, 7.2.0 7.1.0, 7.0.1, 7.0.0, 6.1.2, 6.1.1
-		  - "8.0.0"
-		  - "8.0.0"
+		  - cellranger version, could be: 9.0.1, 9.0.0, 8.0.1, 8.0.0, 7.2.0 7.1.0, 7.0.1, 7.0.0
+		  - "9.0.1"
+		  - "9.0.1"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -106,7 +106,7 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - "quay.io/cumulus"
 		  - "quay.io/cumulus"
 		* - zones
-		  - Google cloud zones
+		  - Google cloud zones. For GCP Batch backend, the zones are automatically restricted by the Batch settings.
 		  - "us-central1-a us-west1-a"
 		  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		* - num_cpu
@@ -213,7 +213,7 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 		  - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_atac_reference"
 		  -
 		* - cellranger_atac_version
-		  - cellranger-atac version, could be: 2.1.0, 2.0.0, 1.2.0, 1.1.0
+		  - cellranger-atac version, could be: 2.1.0, 2.0.0
 		  - "2.1.0"
 		  - "2.1.0"
 		* - docker_registry
@@ -225,7 +225,7 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 		  - "quay.io/cumulus"
 		  - "quay.io/cumulus"
 		* - zones
-		  - Google cloud zones
+		  - Google cloud zones. For GCP Batch backend, the zones are automatically restricted by the Batch settings.
 		  - "us-central1-a us-west1-a"
 		  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		* - memory
@@ -320,9 +320,9 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be: 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0, 6.1.2, 6.1.1
-		  - "8.0.0"
-		  - "8.0.0"
+		  - cellranger version, could be: 9.0.1, 9.0.0, 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0
+		  - "9.0.1"
+		  - "9.0.1"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -332,7 +332,7 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - "quay.io/cumulus"
 		  - "quay.io/cumulus"
 		* - zones
-		  - Google cloud zones
+		  - Google cloud zones. For GCP Batch backend, the zones are automatically restricted by the Batch settings.
 		  - "us-central1-a us-west1-a"
 		  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		* - memory
