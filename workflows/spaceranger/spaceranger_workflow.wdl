@@ -63,7 +63,6 @@ workflow spaceranger_workflow {
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
     String docker_registry_stripped = sub(docker_registry, "/+$", "")
-    String mkfastq_docker_registry_stripped = sub(mkfastq_docker_registry, "/+$", "")
 
     Map[String, String] acronym2gsurl = read_map(acronym_file)
     String null_file = acronym2gsurl["null_file"]
