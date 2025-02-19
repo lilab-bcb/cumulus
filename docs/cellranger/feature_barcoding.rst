@@ -25,7 +25,7 @@ Prepare feature barcode files
 
 	Then upload it to your google bucket::
 
-		gsutil antibody_index.csv gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index.csv
+		gcloud storage cp antibody_index.csv gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index.csv
 
 
 Sample sheet
@@ -34,16 +34,6 @@ Sample sheet
 #. **Reference** column.
 
 	This column is not used for extracting feature-barcode count matrix. To be consistent, please put the reference for the associated scRNA-seq assay here.
-
-#. **Index** column.
-
-	The ADT/HTO index can be either Illumina index primer sequence (e.g. ``ATTACTCG``, also known as ``D701``), or `10x single cell RNA-seq sample index set names`_ (e.g. SI-GA-A12).
-
-	**Note 1**: All ADT/HTO index sequences (including 10x's) should have the same length (8 bases). If one index sequence is shorter (e.g. ATCACG), pad it with P7 sequence (e.g. ATCACGAT).
-
-	**Note 2**: It is users' responsibility to avoid index collision between 10x genomics' RNA indexes (e.g. SI-GA-A8) and Illumina index sequences for used here (e.g. ``ATTACTCG``).
-
-	**Note 3**: For NextSeq runs, please reverse complement the ADT/HTO index primer sequence (e.g. use reverse complement ``CGAGTAAT`` instead of ``ATTACTCG``).
 
 #. *Chemistry* column.
 
@@ -105,28 +95,31 @@ Sample sheet
 
 	Put Google Bucket URL of the feature barcode file here.
 
+#. *Link* column.
+
+	If not specified, the workflow will run `Cumulus Feature Barcoding`_ to process the sample. Otherwise, put a sample unique link name for all modalities that are linked here, so that the workflow will run `cellranger multi` instead.
+
 #. Example::
 
-	Sample,Reference,Flowcell,Lane,Index,Chemistry,DataType,FeatureBarcodeFile
-	sample_1_rna,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,threeprime,rna
-	sample_1_adt,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,ATTACTCG,SC3Pv3,adt,gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index.csv
-	sample_2_adt,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3-4,TCCGGAGA,SC3Pv3,adt,gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index.csv
-	sample_3_crispr,GRCh38_v3.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,5-6,CGCTCATT,SC3Pv3,crispr,gs://fc-e0000000-0000-0000-0000-000000000000/crispr_index.csv
+	Sample,Reference,Flowcell,Chemistry,DataType,FeatureBarcodeFile,Link
+	sample_1_rna,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,auto,rna,,sample_1
+	sample_1_adt,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,SC3Pv4,adt,gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index.csv,sample_1
+	sample_2_gex,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,auto,rna
+	sample_2_adt,GRCh38-2024-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,SC3Pv3,adt,gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index2.csv
+	sample_3_crispr,GRCh38-2024-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,SC3Pv3,crispr,gs://fc-e0000000-0000-0000-0000-000000000000/crispr_index.csv
 
 In the sample sheet above, despite the header row,
 
-	- First row describes the normal 3' RNA assay;
+	- Row 1 and 2 specify the GEX and antibody libraries of the same sample. By specifying ``sample_1`` in *Link* column, the workflow will run ``cellranger multi`` to process the two libraries together. The output will be one subfolder named ``sample_1``.
 
-	- Second row describes its associated antibody tag data, which can from either a CITE-seq, cell hashing, or nucleus hashing experiment.
+	- Row 3 and 4 also specify a sample which has GEX and antibody libraries. This time, without *Link* column values, the two modalities will be processed separately (i.e. run ``Cumulus Feature Barcoding`` for the antibody library), and the output will be 2 separate subfolders, respectively.
 
-	- Third row describes another tag data, which is in 10x genomics' V3 chemistry. For tag and crispr data, it is important to explicitly state the chemistry (e.g. ``SC3Pv3``).
-
-	- Last row describes one gRNA guide data for Perturb-seq (see ``crispr`` in *DataType* field).
+	- Row 5 describes one gRNA guide data for Perturb-seq (see ``crispr`` in *DataType* field).
 
 Workflow input
 ++++++++++++++
 
-For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as input and runs ``cellranger mkfastq`` and ``cumulus adt``. Revalant workflow inputs are described below, with required inputs highlighted in bold.
+For feature barcoding data, ``cellranger_workflow`` takes sequencing reads as input (FASTQ files, or TAR files containing FASTQ files), and runs ``cumulus adt``. Revalant workflow inputs are described below, with required inputs highlighted in bold.
 
 	.. list-table::
 		:widths: 5 30 30 20
@@ -137,45 +130,13 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - Example
 		  - Default
 		* - **input_csv_file**
-		  - Sample Sheet (contains Sample, Reference, Flowcell, Lane, Index as required and Chemistry, DataType, FeatureBarcodeFile as optional)
+		  - Sample Sheet (contains Sample, Reference, Flowcell as required and Chemistry, DataType, FeatureBarcodeFile, Link as optional)
 		  - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.csv"
 		  -
 		* - **output_directory**
 		  - Output directory
 		  - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_output"
 		  -
-		* - run_mkfastq
-		  - If you want to run ``cellranger mkfastq``
-		  - true
-		  - true
-		* - run_count
-		  - If you want to run ``cumulus adt``
-		  - true
-		  - true
-		* - delete_input_bcl_directory
-		  - If delete BCL directories after demux. If false, you should delete this folder yourself so as to not incur storage charges
-		  - false
-		  - false
-		* - mkfastq_barcode_mismatches
-		  - Number of mismatches allowed in matching barcode indices (bcl2fastq2 default is 1)
-		  - 0
-		  -
-		* - mkfastq_force_single_index
-		  - If 10x-supplied i7/i5 paired indices are specified, but the flowcell was run with only one sample index, allow the demultiplex to proceed using the i7 half of the sample index pair
-		  - false
-		  - false
-		* - mkfastq_filter_single_index
-		  - Only demultiplex samples identified by an i7-only sample index, ignoring dual-indexed samples. Dual-indexed samples will not be demultiplexed
-		  - false
-		  - false
-		* - mkfastq_use_bases_mask
-		  - Override the read lengths as specified in *RunInfo.xml*
-		  - "Y28n*,I8n*,N10,Y90n*"
-		  -
-		* - mkfastq_delete_undetermined
-		  - Delete undetermined FASTQ files generated by bcl2fastq2
-		  - true
-		  - false
 		* - crispr_barcode_pos
 		  - Barcode start position at Read 2 (0-based coordinate) for CRISPR
 		  - 19
@@ -193,9 +154,9 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - 0.1
 		  - 0.1
 		* - cellranger_version
-		  - cellranger version, could be: 9.0.0, 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0
-		  - "9.0.0"
-		  - "9.0.0"
+		  - cellranger version, could be: 9.0.1, 9.0.0, 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0
+		  - "9.0.1"
+		  - "9.0.1"
 		* - cumulus_feature_barcoding_version
 		  - Cumulus_feature_barcoding version for extracting feature barcode matrix.
 		  - "0.11.4"
@@ -209,20 +170,20 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - "quay.io/cumulus"
 		  - "quay.io/cumulus"
 		* - acronym_file
-		  - | The link/path of an index file in TSV format for fetching preset genome references, chemistry whitelists, etc. by their names.
+		  - | The link/path of an index file in TSV format for fetching preset genome references, chemistry barcode inclusion lists, etc. by their names.
 		    | Set an GS URI if *backend* is ``gcp``; an S3 URI for ``aws`` backend; an absolute file path for ``local`` backend.
 		  - "s3://xxxx/index.tsv"
-		  - "gs://regev-lab/resources/cellranger/index.tsv"
+		  - "gs://cumulus-ref/resources/cellranger/index.tsv"
 		* - zones
-		  - Google cloud zones
+		  - Google cloud zones. For GCP Batch backend, the zones are automatically restricted by the Batch settings.
 		  - "us-central1-a us-west1-a"
 		  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		* - num_cpu
-		  - Number of cpus to request for one node for cellranger mkfastq
+		  - Number of cpus to request for one node for ``cellranger multi`` if used
 		  - 32
 		  - 32
 		* - memory
-		  - Memory size string for cellranger mkfastq
+		  - Memory size string for ``cellranger multi`` if used
 		  - "120G"
 		  - "120G"
 		* - feature_num_cpu
@@ -233,10 +194,6 @@ For feature barcoding data, ``cellranger_workflow`` takes Illumina outputs as in
 		  - Optional memory string for extracting feature count matrix
 		  - "32G"
 		  - "32G"
-		* - mkfastq_disk_space
-		  - Optional disk space in GB for mkfastq
-		  - 1500
-		  - 1500
 		* - feature_disk_space
 		  - Disk space in GB needed for extracting feature count matrix
 		  - 100
@@ -282,12 +239,9 @@ See the table below for important outputs.
 	* - Name
 	  - Type
 	  - Description
-	* - cellranger_mkfastq.output_fastqs_directory
-	  - Array[String]?
-	  - Subworkflow output. A list of cloud urls containing FASTQ files, one url per flowcell.
 	* - cumulus_adt.output_count_directory
-	  - Array[String]?
-	  - Subworkflow output. A list of cloud urls containing feature-barcode count matrices, one url per sample.
+	  - Array[String]
+	  - Subworkflow output. A list of cloud URIs containing feature-barcode count matrices, one URI per sample.
 
 In addition, For each antibody tag or crispr tag sample, a folder with the sample ID is generated under ``output_directory``. In the folder, two files --- ``sample_id.csv`` and ``sample_id.stat.csv.gz`` --- are generated.
 
@@ -308,6 +262,6 @@ If data type is ``crispr``, three additional files, ``sample_id.umi_count.pdf``,
 ``sample_id.filt.stat.csv.gz`` is the filtered sufficient statistics. It has the same format as ``sample_id.stat.csv.gz``.
 
 
+.. _Cumulus Feature Barcoding: https://github.com/lilab-bcb/cumulus_feature_barcoding
 .. _10x genomics v2 cell barcode white list: gs://regev-lab/resources/cellranger/737K-august-2016.txt.gz
 .. _10x genomics v3 cell barcode white list: gs://regev-lab/resources/cellranger/3M-february-2018.txt.gz
-.. _10x single cell RNA-seq sample index set names: https://support.10xgenomics.com/single-cell-gene-expression/index/doc/specifications-sample-index-sets-for-single-cell-3

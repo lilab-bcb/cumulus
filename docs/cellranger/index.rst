@@ -45,10 +45,10 @@ Single-cell multiomics
 
 --------------------------
 
-Fixed RNA Profiling (Flex)
+Flex gene expression
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. include:: fixed_rna_profiling.rst
+.. include:: flex_gex.rst
 
 ---------------------------------
 

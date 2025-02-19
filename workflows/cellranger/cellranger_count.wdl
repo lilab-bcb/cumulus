@@ -25,6 +25,8 @@ workflow cellranger_count {
 
         # chemistry of the channel
         String chemistry = "auto"
+        # Cell annotation model to use. Valid model names: auto, human_pca_v1_beta, mouse_pca_v1_beta. Default: Do not run.
+        String cell_annotation_model = ""
         # Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells.
         Int? force_cells
         # Expected number of recovered cells. Mutually exclusive with force_cells
@@ -79,6 +81,7 @@ workflow cellranger_count {
             include_introns = include_introns,
             no_bam = no_bam,
             secondary = secondary,
+            cell_annotation_model = cell_annotation_model,
             cellranger_version = cellranger_version,
             docker_registry = docker_registry,
             zones = zones,
@@ -114,6 +117,7 @@ task run_cellranger_count {
         Boolean include_introns
         Boolean no_bam
         Boolean secondary
+        String cell_annotation_model
         String cellranger_version
         String docker_registry
         String zones
@@ -291,6 +295,9 @@ task run_cellranger_count {
 
         if '~{secondary}' != 'true':
             call_args.append('--nosecondary')
+        if '~{cell_annotation_model}' != '':
+            call_args.append('--cell-annotation-model=~{cell_annotation_model}')
+
         print(' '.join(call_args))
         check_call(call_args)
         CODE

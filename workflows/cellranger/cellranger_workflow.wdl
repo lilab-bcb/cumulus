@@ -26,6 +26,8 @@ workflow cellranger_workflow {
         Boolean no_bam = false
         # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false.
         Boolean secondary = false
+        # Cell annotation model to use. Valid model names: auto, human_pca_v1_beta, mouse_pca_v1_beta. Default: Do not run.
+        String cell_annotation_model = ""
 
         # For vdj
 
@@ -38,6 +40,9 @@ workflow cellranger_workflow {
         #   "IG" for B cell receptors,
         # Use this in rare cases when automatic chain detection fails.
         String vdj_chain = "auto"
+        # If inner enrichment primers other than those provided in the 10x kits are used, they need to be specified here as a textfile with one primer per line. Disable secondary analysis, e.g. clustering
+        # A cloud URI to the text file
+        String vdj_inner_enrichment_primers = ""
 
         # For extracting ADT count
 
@@ -72,10 +77,10 @@ workflow cellranger_workflow {
         File? cmo_set
 
         # Index TSV file
-        File acronym_file = "gs://regev-lab/resources/cellranger/index.tsv"
+        File acronym_file = "gs://cumulus-ref/resources/cellranger/index.tsv"
 
-        # 9.0.0, 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0
-        String cellranger_version = "9.0.0"
+        # 9.0.1, 9.0.0, 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0
+        String cellranger_version = "9.0.1"
         String cumulus_feature_barcoding_version = "0.11.4"
         # 2.1.0, 2.0.0
         String cellranger_atac_version = "2.1.0"
@@ -165,6 +170,7 @@ workflow cellranger_workflow {
                     acronym_file = acronym_file,
                     no_bam = no_bam,
                     secondary = secondary,
+                    cell_annotation_model = cell_annotation_model,
                     force_cells = force_cells,
                     expect_cells = expect_cells,
                     cellranger_version = cellranger_version,
@@ -203,6 +209,7 @@ workflow cellranger_workflow {
                     acronym_file = acronym_file,
                     denovo = vdj_denovo,
                     chain = vdj_chain,
+                    inner_enrichment_primers = vdj_inner_enrichment_primers,
                     cellranger_version = cellranger_version,
                     docker_registry = docker_registry_stripped,
                     zones = zones,
@@ -419,7 +426,7 @@ workflow cellranger_workflow {
             "multi": cellranger_multi.output_multi_directory,
             "fbc": cellranger_count_fbc.output_count_directory
         }
-        File? count_matrix = generate_count_config.count_matrix
+        File count_matrix = generate_count_config.count_matrix
     }
 }
 

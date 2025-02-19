@@ -9,7 +9,10 @@ Run Space Ranger tools using spaceranger_workflow
 A general step-by-step instruction
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-This section mainly considers jobs starting from BCL files. If your job starts with FASTQ files, and only need to run ``spaceranger count`` part, please refer to `this subsection <./spaceranger.html#run-spaceranger-count-only>`_.
+The workflow starts with FASTQ files.
+
+.. note::
+	Starting from v3.0.0, Cumulus spaceranger_workflow drops support for ``mkfastq``. If your data start from BCL files, please first run `BCL Convert`_ to demultiplex folwcells to generate FASTQ files.
 
 1. Import ``spaceranger_workflow``
 ++++++++++++++++++++++++++++++++++
@@ -21,32 +24,28 @@ This section mainly considers jobs starting from BCL files. If your job starts w
 2. Upload sequencing and image data to Google bucket
 ++++++++++++++++++++++++++++++++++++++++++++++++++++
 
-	Copy your sequencing output to your workspace bucket using gsutil_ (you already have it if you've installed Google cloud SDK) in your unix terminal.
+	Copy your FASTQ files to your workspace bucket using `gcloud storage`_ (you already have it if you've installed Google cloud SDK) in your unix terminal.
 
 	You can obtain your bucket URL in the dashboard tab of your Terra workspace under the information panel.
 
 	.. image:: images/google_bucket_link.png
 
-	Use ``gsutil cp [OPTION]... src_url dst_url`` to copy data to your workspace bucket. For example, the following command copies the directory at /foo/bar/nextseq/Data/VK18WBC6Z4 to a Google bucket::
+    There are two cases:
 
-		gsutil -m cp -r /foo/bar/nextseq/Data/VK18WBC6Z4 gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4
+	- **Case 1**: All the FASTQ files are in one top-level folder. Then you can simply upload this folder to Cloud, and in your sample sheet, make sure **Sample** names are consistent with the filename prefix of their corresponding FASTQ files.
+	- **Case 2**: In the top-level folder, each sample has a dedicated subfolder containing its FASTQ files. In this case, you need to upload the whole top-level folder, and in your sample sheet, make sure **Sample** names and their corresponding subfolder names are identical.
 
-	``-m`` means copy in parallel, ``-r`` means copy the directory recursively, and ``gs://fc-e0000000-0000-0000-0000-000000000000`` should be replaced by your own workspace Google bucket URL.
+	Notice that if your FASTQ files are downloaded from the Sequence Read Archive (SRA) from NCBI, you must rename your FASTQs to follow the Illumina `file naming conventions`_.
+
+	Example::
+
+		gcloud storage cp -r /foo/bar/fastq_path/K18WBC6Z4/Fastq gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq
+
+	where ``-r`` means copy the directory recursively, and ``fc-e0000000-0000-0000-0000-000000000000`` should be replaced by your own workspace Google bucket name.
 
 	Similarly, copy all images for spatial data to the same google bucket.
 
-.. note::
-	If input is a folder of BCL files, users do not need to upload the whole folder to the Google bucket. Instead, they only need to upload the following files::
-
-		RunInfo.xml
-		RTAComplete.txt
-		runParameters.xml
-		Data/Intensities/s.locs
-		Data/Intensities/BaseCalls
-
-	If data are generated using MiSeq or NextSeq, the location files are inside lane subfloders ``L001`` under ``Data/Intensities/``. In addition, if users' data only come from a subset of lanes (e.g. ``L001`` and ``L002``), users only need to upload lane subfolders from the subset (e.g. ``Data/Intensities/BaseCalls/L001, Data/Intensities/BaseCalls/L002`` and ``Data/Intensities/L001, Data/Intensities/L002`` if sequencer is MiSeq or NextSeq).
-
-Alternatively, users can submit jobs through command line interface (CLI) using `altocumulus <./command_line.html>`_, which will smartly upload BCL folders according to the above rules.
+Alternatively, users can submit jobs through command line interface (CLI) using `altocumulus <./command_line.html>`_, which will smartly uFASTQ files to cloud.
 
 
 3. Prepare a sample sheet
@@ -58,7 +57,7 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 
 	For **FFPE** data, **ProbeSet** column is mandatory.
 
-	The sample sheet describes how to demultiplex flowcells and generate channel-specific count matrices. Note that *Sample*, *Lane*, and *Index* columns are defined exactly the same as in 10x's simple CSV layout file.
+	The sample sheet describes how to generate gene-count matrices from sequencing reads.
 
 	A brief description of the sample sheet format is listed below **(required column headers are shown in bold)**.
 
@@ -82,12 +81,6 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		    | If starts with FASTQ files, this should be Google bucket URLs of uploaded FASTQ folders.
 		    | The FASTQ folders should contain one subfolder for each sample in the flowcell with the sample name as the subfolder name.
 		    | Each subfolder contains FASTQ files for that sample.
-		* - **Lane**
-		  -
-		    | Tells which lanes the sample was pooled into.
-		    | Can be either single lane (e.g. 8) or a range (e.g. 7-8) or all (e.g. \*).
-		* - **Index**
-		  - Sample index (e.g. SI-GA-A12).
 		* - ProbeSet
 		  - Probe set for FFPE samples. Can be either a keyword or a cloud URI to a custom probe set. Below are keywords of available probe sets:
 
@@ -99,7 +92,7 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 
 		    - **mouse_probe_v1**: 10x mouse probe set version 1, CytAssist-compatible
 
-		    **Notice:** Set ProbeSet to ``""`` for a sample implies the sample is not FFPE.
+		    **Notice:** Setting *ProbeSet* to ``""`` for a sample implies the sample is not FFPE.
 		* - Image
 		  - Cloud bucket url for a brightfield tissue H&E image in .jpg or .tiff format. This column is mutually exclusive with DarkImage and ColorizedImage columns.
 		* - DarkImage
@@ -123,17 +116,17 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 
 	Example::
 
-		Sample,Reference,Flowcell,Lane,Index,Image,Slide,Area
-		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,1-2,SI-GA-A8,gs://image/image1.tif,V19J25-123,A1
-		sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,3-4,SI-GA-B8,gs://image/image2.tif,V19J25-123,B1
-		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,1-2,SI-GA-A8,gs://image/image1.tif,V19J25-123,A1
-		sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,3-4,SI-GA-B8,gs://image/image2.tif,V19J25-123,B1
+		Sample,Reference,Flowcell,Image,Slide,Area
+		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,gs://image/image1.tif,V19J25-123,A1
+		sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,gs://image/image2.tif,V19J25-123,B1
+		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/Fastq,gs://image/image1.tif,V19J25-123,A1
+		sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/Fastq,gs://image/image2.tif,V19J25-123,B1
 
 	**3.2 Upload your sample sheet to the workspace bucket:**
 
 		Example::
 
-			gsutil cp /foo/bar/projects/sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/
+			gcloud storage cp /foo/bar/projects/sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/
 
 4. Launch analysis
 ++++++++++++++++++
@@ -146,40 +139,6 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 
 	Once INPUTS are appropriated filled, click ``RUN ANALYSIS`` and then click ``LAUNCH``.
 
-5. Notice: run ``spaceranger mkfastq`` if you are non Broad Institute users
-+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-	Non Broad Institute users that wish to run ``spaceranger mkfastq`` must create a custom docker image that contains ``bcl2fastq``.
-
-		See :ref:`bcl2fastq-docker` instructions.
-
-6. Run ``spaceranger count`` only
-++++++++++++++++++++++++++++++++++++
-
-Sometimes, users might want to perform demultiplexing locally and only run the count part on the cloud. This section describes how to only run the count part via ``spaceranger_workflow``.
-
-#. Copy your FASTQ files to the workspace using gsutil_ in your unix terminal. There are two cases:
-
-	- **Case 1**: All the FASTQ files are in one top-level folder. Then you can simply upload this folder to Cloud, and in your sample sheet, make sure **Sample** names are consistent with the filename prefix of their corresponding FASTQ files.
-	- **Case 2**: In the top-level folder, each sample has a dedicated subfolder containing its FASTQ files. In this case, you need to upload the whole top-level folder, and in your sample sheet, make sure **Sample** names and their corresponding subfolder names are identical.
-
-	Notice that if your FASTQ files are downloaded from the Sequence Read Archive (SRA) from NCBI, you must rename your FASTQs to follow the bcl2fastq `file naming conventions`_.
-
-	Example::
-
-		gsutil -m cp -r /foo/bar/fastq_path/K18WBC6Z4 gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq
-
-#. Create a sample sheet following the similar structure as `above <./spaceranger.html#prepare-a-sample-sheet>`_, except the following differences:
-
-	- **Flowcell** column should list Google bucket URLs of the FASTQ folders for flowcells.
-	- **Lane** and **Index** columns are NOT required in this case.
-
-	Example::
-
-		Sample,Reference,Flowcell,Image,Slide,Area
-		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq,gs://image/image1.tif,V19J25-123,A1
-
-#. Set optional input ``run_mkfastq`` to ``false``.
 
 ---------------------------------
 
@@ -209,7 +168,7 @@ Sample sheet
 Workflow input
 ++++++++++++++
 
-For spatial data, ``spaceranger_workflow`` takes Illumina outputs and related images as input and runs ``spaceranger mkfastq`` and ``spaceranger count``. Revalant workflow inputs are described below, with required inputs highlighted in bold.
+For spatial data, ``spaceranger_workflow`` takes sequencing reads as input (FASTQ files, or TAR files containing FASTQ files), and runs ``spaceranger count``. Revalant workflow inputs are described below, with required inputs highlighted in bold.
 
 	.. list-table::
 		:widths: 5 30 30 20
@@ -227,22 +186,6 @@ For spatial data, ``spaceranger_workflow`` takes Illumina outputs and related im
 		  - Output directory
 		  - "gs://fc-e0000000-0000-0000-0000-000000000000/spaceranger_output"
 		  - Results are written under directory *output_directory* and will overwrite any existing files at this location.
-		* - run_mkfastq
-		  - If you want to run ``spaceranger mkfastq``
-		  - true
-		  - true
-		* - run_count
-		  - If you want to run ``spaceranger count``
-		  - true
-		  - true
-		* - delete_input_bcl_directory
-		  - If delete BCL directories after demux. If false, you should delete this folder yourself so as to not incur storage charges
-		  - false
-		  - false
-		* - mkfastq_barcode_mismatches
-		  - Number of mismatches allowed in matching barcode indices (bcl2fastq2 default is 1)
-		  - 0
-		  -
 		* - reorient_images
 		  - For use with automatic fiducial alignment. This option will apply to all samples in the sample sheet. Spaceranger will attempt to find the best alignment of the fiducial markers by any rotation or mirroring of the image.
 		  - true
@@ -276,9 +219,9 @@ For spatial data, ``spaceranger_workflow`` takes Illumina outputs and related im
 		  - 50
 		  -
 		* - spaceranger_version
-		  - spaceranger version, could be: 3.1.2, 3.0.1, 3.0.0
-		  - "3.1.2"
-		  - "3.1.2"
+		  - spaceranger version, could be: 3.1.3, 3.1.2, 3.0.1, 3.0.0
+		  - "3.1.3"
+		  - "3.1.3"
 		* - config_version
 		  - config docker version used for processing sample sheets, could be 0.3.
 		  - "0.3"
@@ -291,28 +234,18 @@ For spatial data, ``spaceranger_workflow`` takes Illumina outputs and related im
 		  	- "cumulusprod" for backup images on Docker Hub.
 		  - "quay.io/cumulus"
 		  - "quay.io/cumulus"
-		* - spaceranger_mkfastq_docker_registry
-		  - Docker registry to use for ``spaceranger mkfastq``.
-		    Default is the registry to which only Broad users have access.
-		    See :ref:`bcl2fastq-docker` for making your own registry.
-		  - "gcr.io/broad-cumulus"
-		  - "gcr.io/broad-cumulus"
 		* - zones
-		  - Google cloud zones
+		  - Google cloud zones. For GCP Batch backend, the zones are automatically restricted by the Batch settings.
 		  - "us-central1-a us-west1-a"
 		  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		* - num_cpu
-		  - Number of cpus to request for one node for spaceranger mkfastq and spaceranger count
+		  - Number of cpus to request for one node for spaceranger count
 		  - 32
 		  - 32
 		* - memory
-		  - Memory size string for spaceranger mkfastq and spaceranger count
+		  - Memory size string for spaceranger count
 		  - "120G"
 		  - "120G"
-		* - mkfastq_disk_space
-		  - Optional disk space in GB for mkfastq
-		  - 1500
-		  - 1500
 		* - count_disk_space
 		  - Disk space in GB needed for spaceranger count
 		  - 500
@@ -346,17 +279,14 @@ See the table below for important sc/snRNA-seq outputs.
 	* - Name
 	  - Type
 	  - Description
-	* - fastq_outputs
-	  - Array[String]?
-	  - A list of cloud urls containing FASTQ files, one url per flowcell.
 	* - count_outputs
-	  - Array[String]?
+	  - Array[String]
 	  - A list of cloud urls containing spaceranger count outputs, one url per sample.
 	* - metrics_summaries
-	  - File?
+	  - File
 	  - A excel spreadsheet containing QCs for each sample.
 	* - spaceranger_count.output_web_summary
-	  - Array[File]?
+	  - Array[File]
 	  - A list of htmls visualizing QCs for each sample (spaceranger count output).
 
 ---------------------------------
@@ -367,6 +297,7 @@ Build Space Ranger References
 Reference built by Cell Ranger for sc/snRNA-seq should be compatible with Space Ranger. For more details on building references uing Cell Ranger, please refer to `here <./cellranger/index.html#build-references-for-sc-snrna-seq>`_.
 
 
-.. _gsutil: https://cloud.google.com/storage/docs/gsutil
+.. _BCL Convert: https://emea.support.illumina.com/sequencing/sequencing_software/bcl-convert.html
+.. _gcloud storage: https://cloud.google.com/sdk/gcloud/reference/storage#COMMAND
 .. _Import workflows to Terra: ./cumulus_import.html
-.. _`file naming conventions`: https://kb.10xgenomics.com/hc/en-us/articles/115003802691-How-do-I-prepare-Sequence-Read-Archive-SRA-data-from-NCBI-for-Cell-Ranger-
+.. _file naming conventions: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/inputs/cr-specifying-fastqs#file-naming-convention
