@@ -25,7 +25,7 @@ The workflow starts with FASTQ files.
 		- **Case 2**: In the top-level folder, each sample has a dedicated subfolder containing its FASTQ files. In this case, you need to upload the whole top-level folder, and in your sample sheet, make sure **Sample** names and their corresponding subfolder names are identical.
 		- **Case 3**: Each sample's FASTQ files are wrapped in a TAR file. In this case, upload the folder which contains this TAR file. Also, make sure **Sample** names are consistent with the filename prefix of their corresponding FASTQ files inside the TAR files.
 
-		Notice that if your FASTQ files are downloaded from the Sequence Read Archive (SRA) from NCBI, you must rename your FASTQs to follow the bcl2fastq `file naming conventions`_.
+		Notice that if your FASTQ files are downloaded from the Sequence Read Archive (SRA) from NCBI, you must rename your FASTQs to follow the Illumina `file naming conventions`_.
 
 		Example::
 

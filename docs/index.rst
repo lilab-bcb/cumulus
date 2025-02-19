@@ -58,7 +58,6 @@ Release Highlights in Current Stable
    :maxdepth: 1
    :hidden:
 
-   bcl2fastq
    count
    topic_modeling
 
