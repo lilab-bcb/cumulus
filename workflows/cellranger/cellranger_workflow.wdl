@@ -73,6 +73,8 @@ workflow cellranger_workflow {
 
         # CMO set CSV file, delaring CMO constructs and associated barcodes
         File? cmo_set
+        # CMO barcode sample assignment CSV file, manually specifying the barcodes for each sample
+        File? cmo_barcode_sample_csv
 
         # Index TSV file
         File acronym_file = "gs://cumulus-ref/resources/cellranger/index.tsv"
@@ -354,6 +356,7 @@ workflow cellranger_workflow {
                     genome = generate_count_config.sample2genome[link_id],
                     probe_set = generate_count_config.sample2probeset[link_id],
                     cmo_set = cmo_set,
+                    cmo_barcode_sample_csv = cmo_barcode_sample_csv,
                     include_introns = include_introns,
                     no_bam = no_bam,
                     secondary = secondary,

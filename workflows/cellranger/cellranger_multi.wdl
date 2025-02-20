@@ -6,7 +6,7 @@ workflow cellranger_multi {
         String link_id
         # A comma-separated list of input sample names
         String input_samples
-        # A comma-separated list of input FASTQs directories (gs urls)
+        # A comma-separated list of input FASTQs directories
         String input_fastqs_directories
         # A comma-separated list of input data types
         String input_data_types
@@ -22,6 +22,9 @@ workflow cellranger_multi {
 
         # CMO set CSV file, delaring CMO constructs and associated barcodes
         File? cmo_set
+        # CMO barcode sample assignment CSV file, manually specifying the barcodes for each sample.
+        #     It will override Cell Ranger's default cell calling and tag calling steps, and may be useful in cases where data with microfluidic failures can be partially rescued
+        File? cmo_barcode_sample_csv
 
         # Index TSV file
         File acronym_file
@@ -78,6 +81,7 @@ workflow cellranger_multi {
             genome_file = genome_file,
             probe_set_file = probe_set_file,
             cmo_set = cmo_set,
+            cmo_barcode_sample_csv = cmo_barcode_sample_csv,
             force_cells = force_cells,
             expect_cells = expect_cells,
             include_introns = include_introns,
@@ -110,6 +114,7 @@ task run_cellranger_multi {
         File genome_file
         File probe_set_file
         File? cmo_set
+        File? cmo_barcode_sample_csv
         Int? force_cells
         Int? expect_cells
         Boolean include_introns
@@ -145,19 +150,25 @@ task run_cellranger_multi {
         data_types = '~{input_data_types}'.split(',')
         fbfs = '~{input_fbf}'.split(',')
 
-        target_panel = set()
+        ocm_hto_file = set()  # barcode file for OCM and HTO assays, depending on if a hashing library is associated
         cmo_file = set()
         frp_file = set()
         feature_file = set()
+        vdj_file = set()
+        has_hto = False
         for dtype, fbf in zip(data_types, fbfs):
             if dtype == 'rna':
-                target_panel.add(fbf)
+                ocm_hto_file.add(fbf)
+            elif dtype == 'vdj':
+                vdj_file.add(fbf)
             elif dtype == 'cmo':
                 cmo_file.add(fbf)
             elif dtype == 'frp':
                 frp_file.add(fbf)
-            else:
+            else:  # hashing, citeseq, adt
                 feature_file.add(fbf)
+                if dtype in ['hashing', 'adt']:
+                    has_hto = True
 
         def _locate_file(file_set, keyword):
             if len(file_set) > 1:
@@ -174,15 +185,18 @@ task run_cellranger_multi {
         def is_null_file(filename):
             return filename == "" or os.path.basename(filename) == "null"
 
-        target_panel = _locate_file(target_panel, 'target panel')
+        ocm_hto_file = _locate_file(ocm_hto_file, 'OCM sample') if not has_hto else _locate_file(ocm_hto_file, 'HTO sample')
+        vdj_file = _locate_file(vdj_file, 'VDJ reference')
         cmo_file = _locate_file(cmo_file, 'CMO sample')
         feature_file = _locate_file(feature_file, 'feature reference')
         frp_file = _locate_file(frp_file, 'FRP sample')
 
         with open('multi.csv', 'w') as fout:
+            # Gene Expression section
             fout.write('[gene-expression]\n')
             fout.write('reference,' + os.path.abspath('genome_dir') + '\n')
 
+            # For Flex data
             if is_null_file('~{probe_set_file}'):
                 if '~{include_introns}' == 'true':
                     fout.write('include-introns,true\n')
@@ -194,10 +208,14 @@ task run_cellranger_multi {
                 else:
                     print("Fixed RNA Profiling only works in Cell Ranger v7.0.0+!", file=sys.stderr)
                     sys.exit(1)
+
+            # For CellPlex
             if '~{cmo_set}' != '':
                 fout.write('cmo-set,~{cmo_set}\n')
-            if target_panel != '':
-                fout.write('target-panel,' + target_panel + '\n')
+            if '~{cmo_barcode_sample_csv}' != '':
+                fout.write('barcode-sample-assignment',~{cmo_barcode_sample_csv}\n)
+
+            # Other options
             if '~{force_cells}' != '':
                 fout.write('force-cells,~{force_cells}\n')
             if '~{expect_cells}' != '':
@@ -213,9 +231,15 @@ task run_cellranger_multi {
                 if '~{no_bam}' == 'true':
                     fout.write('no-bam,true\n')
 
+            # VDJ section
+            if vdj_file != '':
+                fout.write('\n[vdj]\nreference,' + vdj_file + '\n')
+
+            # Feature section
             if feature_file != '':
                 fout.write('\n[feature]\nreference,' + feature_file + '\n')
 
+            # Library section
             fout.write('\n[libraries]\nfastq_id,fastqs,feature_types\n')
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
@@ -236,9 +260,11 @@ task run_cellranger_multi {
                 feature_type = ''
                 if data_types[i] in ['rna', 'frp']:
                     feature_type = 'Gene Expression'
+                elif data_types[i] == 'vdj':
+                    feature_type = 'VDJ'
                 elif data_types[i] == 'crispr':
                     feature_type = 'CRISPR Guide Capture'
-                elif data_types[i] == 'citeseq':
+                elif data_types[i] in ['citeseq', 'hashing', 'adt']:
                     feature_type = 'Antibody Capture'
                 elif data_types[i] == 'cmo':
                     feature_type = 'Multiplexing Capture'
@@ -247,12 +273,22 @@ task run_cellranger_multi {
                     sys.exit(1)
                 fout.write(samples[i] + ',' + os.path.abspath(target) + ',' +  feature_type + '\n')
 
+            # Samples section
             def write_csv_wise(full_columns, fin, fout):
                 lines = fin.readlines()
                 columns = full_columns[0:len(lines[0].split(','))]
                 fout.write("\n[samples]\n" + ",".join(columns) + "\n")
                 for l in lines:
                     fout.write(l)
+
+            has_ocm_hto = False
+            if ocm_hto_file != '':
+                with open(ocm_hto_file, 'r') as fin:
+                    if has_hto:
+                        write_csv_wise(['sample_id', 'hashtag_ids'], fin, fout)
+                    else:
+                        write_csv_wise(['sample_id', 'ocm_barcode_ids'], fin, fout)
+                has_ocm_hto = True
 
             has_cmo = False
             if cmo_file != '':
@@ -269,8 +305,8 @@ task run_cellranger_multi {
                         write_csv_wise(['sample_id', 'probe_barcode_ids', 'description', 'expect_cells', 'force_cells'], fin, fout)
                 has_frp = True
 
-            if (not has_cmo) and (not has_frp):
-                raise Exception("Cannot locate CMO or FRP sample file!")
+            if (not has_cmo) and (not has_frp) and (not has_ocm_hto):
+                raise Exception("Cannot locate CMO, FRP, OCM or HTO sample file!")
 
         mem_size = re.findall(r"\d+", "~{memory}")[0]
         call_args = ['cellranger', 'multi', '--id=results', '--csv=multi.csv', '--jobmode=local', '--localcores=~{num_cpu}', '--localmem='+mem_size]
