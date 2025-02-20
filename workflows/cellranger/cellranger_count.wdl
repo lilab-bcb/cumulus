@@ -25,8 +25,6 @@ workflow cellranger_count {
 
         # chemistry of the channel
         String chemistry = "auto"
-        # Cell annotation model to use. Valid model names: auto, human_pca_v1_beta, mouse_pca_v1_beta. Default: Do not run.
-        String cell_annotation_model = ""
         # Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells.
         Int? force_cells
         # Expected number of recovered cells. Mutually exclusive with force_cells
@@ -81,7 +79,6 @@ workflow cellranger_count {
             include_introns = include_introns,
             no_bam = no_bam,
             secondary = secondary,
-            cell_annotation_model = cell_annotation_model,
             cellranger_version = cellranger_version,
             docker_registry = docker_registry,
             zones = zones,
@@ -117,7 +114,6 @@ task run_cellranger_count {
         Boolean include_introns
         Boolean no_bam
         Boolean secondary
-        String cell_annotation_model
         String cellranger_version
         String docker_registry
         String zones
@@ -163,20 +159,20 @@ task run_cellranger_count {
                 call_args = ['strato', 'exists', directory + '/' + sample_name + '/']
                 print(' '.join(call_args))
                 check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-                call_args = ['strato', 'sync', '-m', directory + '/' + sample_name, target]
+                call_args = ['strato', 'sync', directory + '/' + sample_name, target]
                 print(' '.join(call_args))
                 check_call(call_args)
             except CalledProcessError:
                 if not os.path.exists(target):
                     os.mkdir(target)
                 try:
-                    call_args = ['strato', 'cp', '-m', directory + '/' + sample_name + '_S*_L*_*_001.fastq.gz' , target]
+                    call_args = ['strato', 'cp', directory + '/' + sample_name + '_S*_L*_*_001.fastq.gz' , target]
                     print(' '.join(call_args))
                     check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
                 except CalledProcessError:
                     # Localize tar file
                     tar_file = sample_name + ".tar"
-                    call_args = ['strato', 'cp', '-m', directory + '/' + tar_file, '.']
+                    call_args = ['strato', 'cp', directory + '/' + tar_file, '.']
                     print(' '.join(call_args))
                     check_call(call_args)
 
@@ -219,7 +215,7 @@ task run_cellranger_count {
                 if len(file_set) == 0 or list(file_set)[0] == 'null':
                     return ''
                 file_loc = list(file_set)[0]
-                call_args = ['strato', 'cp', '-m', file_loc, '.']
+                call_args = ['strato', 'cp', file_loc, '.']
                 print(' '.join(call_args))
                 check_call(call_args)
                 return os.path.abspath(os.path.basename(file_loc))
@@ -295,14 +291,12 @@ task run_cellranger_count {
 
         if '~{secondary}' != 'true':
             call_args.append('--nosecondary')
-        if '~{cell_annotation_model}' != '':
-            call_args.append('--cell-annotation-model=~{cell_annotation_model}')
 
         print(' '.join(call_args))
         check_call(call_args)
         CODE
 
-        strato sync -m results/outs "~{output_directory}/~{sample_id}"
+        strato sync results/outs "~{output_directory}/~{sample_id}"
     }
 
     output {

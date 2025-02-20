@@ -16,7 +16,7 @@ workflow cellranger_vdj_create_reference {
 
         # Which docker registry to use
         String docker_registry = "quay.io/cumulus"
-        # 9.0.1, 9.0.0, 8.0.0, 7.2.0 7.1.0, 7.0.1, 7.0.0
+        # 9.0.1, 8.0.1, 7.2.0
         String cellranger_version = "9.0.1"
 
         # Disk space in GB
@@ -116,7 +116,7 @@ task run_cellranger_vdj_create_reference {
         CODE
 
         tar -czf ~{genome}.tar.gz ~{genome}
-        strato cp -m ~{genome}.tar.gz "~{output_dir}"/
+        strato cp ~{genome}.tar.gz "~{output_dir}"/
     }
 
     output {

@@ -37,7 +37,7 @@ workflow cellranger_multi {
         # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
         Boolean secondary = false
 
-        # CellRanger version, must be >= 6.0.0
+        # CellRanger version
         String cellranger_version
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry
@@ -166,7 +166,7 @@ task run_cellranger_multi {
             if len(file_set) == 0 or list(file_set)[0] == 'null':
                 return ''
             file_loc = list(file_set)[0]
-            call_args = ['strato', 'cp', '-m', file_loc, '.']
+            call_args = ['strato', 'cp', file_loc, '.']
             print(' '.join(call_args))
             check_call(call_args)
             return os.path.abspath(os.path.basename(file_loc))
@@ -224,13 +224,13 @@ task run_cellranger_multi {
                     call_args = ['strato', 'exists', directory + '/' + samples[i] + '/']
                     print(' '.join(call_args))
                     check_call(call_args, stderr=STDOUT, stdout=DEVNULL)
-                    call_args = ['strato', 'cp', '-m', '-r', directory + '/' + samples[i], target]
+                    call_args = ['strato', 'cp', '-r', directory + '/' + samples[i], target]
                     print(' '.join(call_args))
                     check_call(call_args)
                 except CalledProcessError:
                     if not os.path.exists(target):
                         os.mkdir(target)
-                    call_args = ['strato', 'cp', '-m', directory + '/' + samples[i] + '_S*_L*_*_001.fastq.gz' , target]
+                    call_args = ['strato', 'cp', directory + '/' + samples[i] + '_S*_L*_*_001.fastq.gz' , target]
                     print(' '.join(call_args))
                     check_call(call_args)
                 feature_type = ''
@@ -278,7 +278,7 @@ task run_cellranger_multi {
         check_call(call_args)
         CODE
 
-        strato sync -m --ionice results/outs "~{output_directory}/~{link_id}"
+        strato sync --ionice results/outs "~{output_directory}/~{link_id}"
     }
 
     output {

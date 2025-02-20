@@ -26,8 +26,6 @@ workflow cellranger_workflow {
         Boolean no_bam = false
         # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false.
         Boolean secondary = false
-        # Cell annotation model to use. Valid model names: auto, human_pca_v1_beta, mouse_pca_v1_beta. Default: Do not run.
-        String cell_annotation_model = ""
 
         # For vdj
 
@@ -79,15 +77,13 @@ workflow cellranger_workflow {
         # Index TSV file
         File acronym_file = "gs://cumulus-ref/resources/cellranger/index.tsv"
 
-        # 9.0.1, 9.0.0, 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0
+        # 9.0.1, 8.0.1, 7.2.0
         String cellranger_version = "9.0.1"
         String cumulus_feature_barcoding_version = "0.11.4"
         # 2.1.0, 2.0.0
         String cellranger_atac_version = "2.1.0"
         # 2.0.2.strato, 2.0.2.custom-max-cell, 2.0.2, 2.0.1, 2.0.0
         String cellranger_arc_version = "2.0.2.strato"
-        # config version
-        String config_version = "0.3"
 
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
@@ -134,6 +130,9 @@ workflow cellranger_workflow {
         String awsQueueArn = ""
     }
 
+    # config version
+    String config_version = "0.3"
+
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
 
@@ -170,7 +169,6 @@ workflow cellranger_workflow {
                     acronym_file = acronym_file,
                     no_bam = no_bam,
                     secondary = secondary,
-                    cell_annotation_model = cell_annotation_model,
                     force_cells = force_cells,
                     expect_cells = expect_cells,
                     cellranger_version = cellranger_version,
@@ -640,8 +638,8 @@ task generate_count_config {
                     foo5.write(link_id + '\t' + ','.join(link2fbf[link_id]) + '\n')
                     n_fbf += 1
                 else:
-                    if not multiomics[link_id].issubset(set(['rna', 'crispr', 'citeseq', 'hashing'])):
-                        print("CellRanger count only works with RNA/CRISPR/CITESEQ/HASHING data! Link '" + link_id + "' contains " + ', '.join(list(multiomics[link_id])) + '.', file = sys.stderr)
+                    if not multiomics[link_id].issubset(set(['rna', 'crispr', 'citeseq'])):
+                        print("CellRanger count only works with RNA/CRISPR/CITESEQ data! Link '" + link_id + "' contains " + ', '.join(list(multiomics[link_id])) + '.', file = sys.stderr)
                         sys.exit(1)
                     fo7.write(link_id + '\n')
                     foo5.write(link_id + '\t' + ','.join(link2fbf[link_id]) + '\n')
