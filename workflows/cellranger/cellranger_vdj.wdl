@@ -10,7 +10,10 @@ workflow cellranger_vdj {
         String output_directory
 
         # GRCh38_vdj, GRCm38_vdj or a URL to a tar.gz file
-        String genome
+        String reference
+
+        # vdj, vdj_t, vdj_b, or vdj_tgd
+        String data_type
 
         # Index TSV file
         File acronym_file
@@ -23,7 +26,7 @@ workflow cellranger_vdj {
         #   "TR" for T cell receptors,
         #   "IG" for B cell receptors,
         # Use this in rare cases when automatic chain detection fails.
-        String chain = "auto"
+        ##String chain = "auto"
 
         # If inner enrichment primers other than those provided in the 10x kits are used, they need to be specified here as a textfile with one primer per line. Disable secondary analysis, e.g. clustering
         # A cloud URI to the text file
@@ -52,18 +55,18 @@ workflow cellranger_vdj {
 
     Map[String, String] acronym2gsurl = read_map(acronym_file)
     # If reference is a url
-    Boolean is_url = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
+    Boolean is_url = sub(reference, "^.+\\.(tgz|gz)$", "URL") == "URL"
 
-    File genome_file = (if is_url then genome else acronym2gsurl[genome])
+    File ref_file = (if is_url then reference else acronym2gsurl[reference])
 
     call run_cellranger_vdj {
         input:
             sample_id = sample_id,
             input_fastqs_directories = input_fastqs_directories,
             output_directory = sub(output_directory, "/+$", ""),
-            genome_file = genome_file,
+            ref_file = ref_file,
+            data_type = data_type,
             denovo = denovo,
-            chain = chain,
             inner_enrichment_primers = inner_enrichment_primers,
             cellranger_version = cellranger_version,
             docker_registry = docker_registry,
@@ -89,9 +92,9 @@ task run_cellranger_vdj {
         String sample_id
         String input_fastqs_directories
         String output_directory
-        File genome_file
+        File ref_file
         Boolean denovo
-        String chain
+        String data_type
         String inner_enrichment_primers
         String cellranger_version
         String docker_registry
@@ -110,7 +113,7 @@ task run_cellranger_vdj {
         export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
         mkdir -p ref_dir
-        tar xf ~{genome_file} -C ref_dir --strip-components 1
+        tar xf ~{ref_file} -C ref_dir --strip-components 1
 
         python <<CODE
         import re
@@ -137,7 +140,16 @@ task run_cellranger_vdj {
             fastqs.append(target)
 
         mem_size = re.findall(r"\d+", "~{memory}")[0]
-        call_args = ['cellranger', 'vdj', '--chain=~{chain}', '--id=results', '--reference=ref_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local', '--localcores=~{num_cpu}', '--localmem='+mem_size]
+        call_args = ['cellranger', 'vdj', '--id=results', '--reference=ref_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local', '--localcores=~{num_cpu}', '--localmem='+mem_size]
+        chain = 'auto'
+        if '~{data_type}' == 'vdj_t':
+            chain = 'TR'
+        elif '~{data_type}' == 'vdj_t_gd':
+            chain = 'TR'
+            assert '~{inner_enrichment_primers}' != '', "The vdj_t_gd library doesn't have associated inner_enrichment_primers!"
+        else:
+            chain = 'IG'
+        call_args.append('--chain='+chain)
         if '~{denovo}' != 'false':
             call_args.append('--denovo')
         if '~{inner_enrichment_primers}' != '':
