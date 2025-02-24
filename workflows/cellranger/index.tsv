@@ -31,3 +31,4 @@ SC5P-R2-v3	gs://cumulus-ref/resources/cellranger/3M-5pgex-jan-2023.txt.gz
 SC5P-R2	gs://cumulus-ref/resources/cellranger/737K-august-2016.txt.gz
 multiome	gs://cumulus-ref/resources/cellranger/737K-arc-v1.txt.gz
 null_file	gs://cumulus-ref/resources/cellranger/null
+Flex	gs://cumulus-ref/resources/cellranger/flex_probesets.tsv
