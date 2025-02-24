@@ -8,7 +8,7 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 1. Import ``cellranger_create_reference``
 ==============================================
 
-	Import *cellranger_create_reference* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/kalarman-cell-observatory/cumulus/Cellranger_create_reference** to import.
+	Import *cellranger_create_reference* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/lilab-bcb/cumulus/Cellranger_create_reference** to import.
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cellranger_create_reference* workflow in the drop-down menu.
 

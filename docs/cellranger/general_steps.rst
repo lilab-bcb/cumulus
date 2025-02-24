@@ -101,6 +101,8 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 			- For *cmo*: It's the CMO reference file (``cmo-set`` option) when using custom CMOs in CellPlex data.
 
 			- For *vdj_t_gd*: It's the inner enrichment primer file (``inner-enrichment-primers`` option) for VDJ-T-GD data.
+
+			**Notice:** This is the *FeatureBarcodeFile* column in previous versions of Cellranger workflow. This old name is still accepted for backward compatibility.
 		* - Link
 		  -
 			| Designed for Single Cell Multiome	ATAC + Gene Expression, Feature Barcoding, Sample Multiplexing, or Flex.
@@ -162,9 +164,6 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		* - count_outputs
 		  - Map[String, Array[String]?]
 		  - A modality-to-output map showing output URIs for all samples, organized by modality and one URI per sample.
-		* - count_matrix
-		  - String
-		  - Cloud URI for a template count_matrix.csv to run Cumulus. It only contains sc/snRNA-Seq samples (i.e. with ``rna`` value in **DataType** column).
 
 
 .. _BCL Convert: https://emea.support.illumina.com/sequencing/sequencing_software/bcl-convert.html

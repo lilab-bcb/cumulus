@@ -35,7 +35,8 @@ Sample sheet
 
 #. *AuxFile* column.
 
-	Only need for **vdj_t_gd** type samples which use primer sequences to enrich cDNA for V(D)J sequences. In that case, provide a ``.txt`` file containing such sequences, one per line.
+	Only need for **vdj_t_gd** type samples which use primer sequences to enrich cDNA for V(D)J sequences.
+	In this case, provide a ``.txt`` file containing such sequences, one per line. Then this file would be given to ``--inner-enrichment-primers`` option in *cellranger vdj*.
 
 .. note::
 	The ``--chain`` option in ``cellranger vdj`` is automatically decided based on the *DataType* value specified:
@@ -63,7 +64,7 @@ For scIR-seq data, ``cellranger_workflow`` takes sequencing reads as input (FAST
 	  - Example
 	  - Default
 	* - **input_csv_file**
-	  - Sample Sheet (contains Sample, Reference, Flowcell as required and Chemistry, DataType, FeatureBarcodeFile as optional)
+	  - Sample Sheet (contains Sample, Reference, Flowcell, DataType, Chemistry, and AuxFile)
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.csv"
 	  -
 	* - **output_directory**

@@ -1,8 +1,7 @@
 ``cellranger_workflow`` can extract feature-barcode count matrices in CSV format for feature barcoding assays such as *cell and nucleus hashing*, *CellPlex*, *CITE-seq*, and *Perturb-seq*.
 For cell and nucleus hashing as well as CITE-seq, the feature refers to antibody. For Perturb-seq, the feature refers to guide RNA. Please follow the instructions below to configure ``cellranger_workflow``.
 
-By default, the workflow uses `Cumulus Feature Barcoding`_ to process antibody and Perturb-Seq data.
-If you want to use Cell Ranger instead, follow steps in Section "Feature barcoding using Cell Ranger" (`here <./index.html#feature-barcoding-using-cell-ranger>`_).
+Tthe workflow uses `Cumulus Feature Barcoding`_ to process antibody and Perturb-Seq data.
 
 Prepare feature barcode files
 +++++++++++++++++++++++++++++
@@ -60,13 +59,16 @@ Sample sheet
 		* - **SC3Pv2**
 		  - Single Cell 3′ v2
 		* - **fiveprime**
-		  - Single Cell 5′
-		* - **SC5P-R2**
-		  - Single Cell 5′ R2-only (where only R2 is used for alignment)
-		* - **SC5P-R2-v3**
-		  - Single Cell 5' R2-only v3 (where only R2 is used for alignment). **Notice:** This is GEM-X chemistry, and only works for Cell Rangrer v8.0.0+
+		  - This an alias for Single Cell 5' v2 (SC5Pv2)
+		* - **SC5Pv2**
+		  - Single Cell 5′ v2
+		* - **SC5Pv3**
+		  - Single Cell 5' v3. **Notice:** This is GEM-X chemistry, and only works for Cell Rangrer v8.0.0+
 		* - **multiome**
 		  - 10x Multiome barcodes
+
+.. note::
+	The *Chemistry* names for feature barcoding here are not necessarily the same as 10x names, as the workflow uses *Cumulus Feature Barcoding* to process the data.
 
 #. *DataType* column.
 
@@ -93,7 +95,7 @@ Sample sheet
 
 #. *AuxFile* column.
 
-	Put Google Bucket URI of the feature barcode file here.
+	Put cloud URI of the feature barcode file here.
 
 Below is an example sample sheet::
 
@@ -112,66 +114,6 @@ In the sample sheet above, despite the header row,
 
 	- Row 5 describes one gRNA guide data for Perturb-seq (see ``crispr`` in *DataType* field).
 
-Feature Barcoding using Cell Ranger
-+++++++++++++++++++++++++++++++++++++
-
-To perform feature barcoding using Cell Ranger instead of Cumulus Feature Barcoding, prepare your sample sheet in this way:
-
-#. *Link* column.
-
-	A unique link name for all modalities of the same data, so that the workflow will run ``cellranger count`` by putting them together.
-
-#. *Chemistry* column.
-
-	The workflow supports all 10x assay configurations. The most widely used ones are listed below:
-
-	.. list-table::
-		:widths: 5 20
-		:header-rows: 1
-
-		* - Chemistry
-		  - Explanation
-		* - **auto**
-		  - autodetection (default). If the index read has extra bases besides cell barcode and UMI, autodetection might fail. In this case, please specify the chemistry
-		* - **threeprime**
-		  - Single Cell 3′
-		* - **fiveprime**
-		  - Single Cell 5′
-		* - **ARC-v1**
-		  - Gene Expression portion of 10x Multiome data
-
-	Please refer to the section of ``--chemistry`` option in `Cell Ranger Command Line Arguments`_ for all other valid chemistry keywords.
-
-#. *DataType* column.
-
-	The following keywords are accepted for *DataType* column:
-
-	.. list-table::
-		:widths: 5 20
-		:header-rows: 1
-
-		* - DataType
-		  - Explanation
-		* - **rna**
-		  - scRNA-seq
-		* - **citeseq**
-		  - CITE-seq
-		* - **crispr**
-		  - | Perturb-seq/CROP-seq
-		    | If neither *crispr_barcode_pos* nor *scaffold_sequence* (see Workflow input) is set, **crispr** refers to 10x CRISPR assays. If in addition *Chemistry* is set to be **SC3Pv3** or its aliases, Cumulus automatically complement the middle two bases to convert 10x feature barcoding cell barcodes back to 10x RNA cell barcodes.
-		    | Otherwise, **crispr** refers to non 10x CRISPR assays, such as CROP-Seq. In this case, we assume feature barcoding cell barcodes are the same as the RNA cell barcodes and no cell barcode convertion will be conducted.
-
-#. *AuxFile* column.
-
-	Prepare your feature barcode file in `10x Feature Reference`_ format.
-
-Below is an example sample sheet::
-
-	Link,Sample,Reference,DataType,Flowcell,Chemistry,AuxFile
-	sample_4,s4_gex,GRCh38-2020-A,rna,gs://my-bucket/s4_fastqs,auto,
-	sample_4,s4_citeseq,,citeseq,gs://my-bucket/s4_fastqs,SC3Pv4,gs://my-bucket/s4_fbc_ref.csv
-
-Here, by specifying ``sample_4`` in *Link* column, the workflow will run ``cellranger count`` to process the two samples together. The output will be one subfolder named ``sample_4``.
 
 Workflow input
 ++++++++++++++
@@ -187,7 +129,7 @@ For feature barcoding data, ``cellranger_workflow`` takes sequencing reads as in
 		  - Example
 		  - Default
 		* - **input_csv_file**
-		  - Sample Sheet (contains Sample, Reference, Flowcell, Chemistry, DataType, FeatureBarcodeFile, and Link)
+		  - Sample Sheet (contains Sample, Reference, Flowcell, Chemistry, DataType, and AuxFile)
 		  - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.csv"
 		  -
 		* - **output_directory**
@@ -210,10 +152,6 @@ For feature barcoding data, ``cellranger_workflow`` takes sequencing reads as in
 		  - Minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for the adt task and crispr data type
 		  - 0.1
 		  - 0.1
-		* - cellranger_version
-		  - cellranger version, could be: 9.0.1, 8.0.1, 7.2.0
-		  - "9.0.1"
-		  - "9.0.1"
 		* - cumulus_feature_barcoding_version
 		  - Cumulus_feature_barcoding version for extracting feature barcode matrix.
 		  - "0.11.4"
@@ -235,14 +173,6 @@ For feature barcoding data, ``cellranger_workflow`` takes sequencing reads as in
 		  - Google cloud zones. For GCP Batch backend, the zones are automatically restricted by the Batch settings.
 		  - "us-central1-a us-west1-a"
 		  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-		* - num_cpu
-		  - Number of cpus to request for one node for ``cellranger multi`` if used
-		  - 32
-		  - 32
-		* - memory
-		  - Memory size string for ``cellranger multi`` if used
-		  - "120G"
-		  - "120G"
 		* - feature_num_cpu
 		  - Number of cpus for extracting feature count matrix
 		  - 4
@@ -315,28 +245,6 @@ If data type is ``crispr``, three additional files, ``sample_id.umi_count.pdf``,
 
 ``sample_id.filt.stat.csv.gz`` is the filtered sufficient statistics. It has the same format as ``sample_id.stat.csv.gz``.
 
--------------
 
-For important feature barcoding output using Cell Ranger, see the table below:
-
-.. list-table::
-	:widths: 5 5 10
-	:header-rows: 1
-
-	* - Name
-	  - Type
-	  - Description
-	* - cellranger_count_fbc.output_count_directory
-	  - Array[String]
-	  - Subworkflow output. A list of cloud URIs containing ``cellranger count`` output, one URI per sample.
-	* - cellranger_count_fbc.output_web_summary
-	  - Array[File]
-	  - A list of htmls visualizing QCs for each sample.
-	* - collect_summaries_fbc.metrics_summaries
-	  - File
-	  - An excel spreadsheet containing QCs for each sample.
-
-
-.. _Cell Ranger Command Line Arguments: https://www.10xgenomics.com/support/software/cell-ranger/latest/resources/cr-command-line-arguments
 .. _Cumulus Feature Barcoding: https://github.com/lilab-bcb/cumulus_feature_barcoding
 .. _10x Feature Reference: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/inputs/cr-feature-ref-csv

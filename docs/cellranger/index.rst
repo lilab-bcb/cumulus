@@ -38,15 +38,15 @@ Single-cell ATAC-seq
 
 ---------------------------------
 
-Single-cell multiomics
-^^^^^^^^^^^^^^^^^^^^^^
+Single-cell Multiome (GEX + ATAC)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. include:: sc_multiomics.rst
+.. include:: sc_multiome.rst
 
 --------------------------
 
-Sample Multiplexing and Flex
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Flex, Sample Multiplexing and Multiomics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. include:: multi.rst
 

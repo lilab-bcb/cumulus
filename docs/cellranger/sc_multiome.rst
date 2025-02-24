@@ -1,11 +1,11 @@
-To utilize ``cellranger arc`` for single-cell multiomics, follow the specific instructions below. Note that cumulus_feature_barcoding/demuxEM would not be triggered for hashing/citeseq in this setting.
+To process `10x Multiome`_ (GEX + ATAC) data, follow the instructions below:
 
 Sample sheet
 ++++++++++++
 
 #. **Reference** column.
 
-	Pre-built Multiome ATAC + Gene Expression references are summarized below.
+	Pre-built single-cell Multiome ATAC + Gene Expression references are summarized below.
 
 	.. list-table::
 		:widths: 5 20
@@ -53,12 +53,12 @@ Sample sheet
 	sample1,s1_atac,GRCh38-2020-A_arc_v2.0.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZZ/Fastq,atac
 
 
-In the above example, the linked samples will be processed by *cellranger arc* altogether.
+In the above example, the linked samples will be processed altogether. And the output will be one subfolder named ``sample1``.
 
 Workflow input
 ++++++++++++++
 
-For single-cell multiomics data, ``cellranger_workflow`` takes sequencing reads as input (FASTQ files, or TAR files containing FASTQ files), and runs ``cellranger-arc ount``. Revalant workflow inputs are described below, with required inputs highlighted in bold.
+For single-cell multiomics data, ``cellranger_workflow`` takes sequencing reads as input (FASTQ files, or TAR files containing FASTQ files). Revalant workflow inputs are described below, with required inputs highlighted in bold.
 
 .. list-table::
 	:widths: 5 30 30 20
@@ -69,7 +69,7 @@ For single-cell multiomics data, ``cellranger_workflow`` takes sequencing reads 
 	  - Example
 	  - Default
 	* - **input_csv_file**
-	  - Sample Sheet (contains Sample, Reference, Flowcell as required and Chemistry, DataType, FeatureBarcodeFile, Link as optional)
+	  - Sample Sheet (contains Sample, Reference, Flowcell, Chemistry, DataType, and Link)
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.csv"
 	  -
 	* - **output_directory**
@@ -77,21 +77,13 @@ For single-cell multiomics data, ``cellranger_workflow`` takes sequencing reads 
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_output"
 	  -
 	* - include_introns
-	  - Turn this option on to also count reads mapping to intronic regions. With this option, users do not need to use pre-mRNA references. Note that if this option is set, cellranger_version must be >= 5.0.0. This option is used by *cellranger multi* and *cellranger count*.
+	  - Turn this option on to also count reads mapping to intronic regions. With this option, users do not need to use pre-mRNA references.
 	  - true
 	  - true
 	* - no_bam
-	  - Turn this option on to disable BAM file generation. This option is only available if cellranger_version >= 5.0.0. This option is used by *cellranger-arc count*, *cellranger multi* and *cellranger count*.
+	  - Turn this option on to disable BAM file generation.
 	  - false
 	  - false
-	* - expect_cells
-	  - Expected number of recovered cells. Mutually exclusive with force_cells. This option is used by *cellranger multi* and *cellranger count*.
-	  - 3000
-	  -
-	* - force_cells
-	  - Force pipeline to use this number of cells, bypassing the cell detection algorithm, mutually exclusive with expect_cells. This option is used by *cellranger multi* and *cellranger count*.
-	  - 6000
-	  -
 	* - arc_gex_exclude_introns
 	  - | Disable counting of intronic reads. In this mode, only reads that are exonic and compatible with annotated splice junctions in the reference are counted.
 	    | **Note:** using this mode will reduce the UMI counts in the feature-barcode matrix.
@@ -111,14 +103,6 @@ For single-cell multiomics data, ``cellranger_workflow`` takes sequencing reads 
 	* - peaks
 	  - A 3-column BED file of peaks to override cellranger arc peak caller. Peaks must be sorted by position and not contain overlapping peaks; comment lines beginning with ``#`` are allowed
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/common_peaks.bed"
-	  -
-	* - secondary
-	  - Perform Cell Ranger secondary analysis (dimensionality reduction, clustering, etc.). This option is used by *cellranger multi* and *cellranger count*.
-	  - false
-	  - false
-	* - cmo_set
-	  - CMO set CSV file, delaring CMO constructs and associated barcodes. See `CMO reference`_ for details. Used only for *cellranger multi*.
-	  - "gs://fc-e0000000-0000-0000-0000-000000000000/cmo_set.csv"
 	  -
 	* - cellranger_arc_version
 	  - cellranger-arc version, could be: ``2.0.2.strato`` (compatible with workflow v2.6.1+), ``2.0.2.custom-max-cell`` (with max_cell threshold set to 80,000), ``2.0.2`` (compatible with workflow v2.6.0 or earlier), ``2.0.1``, ``2.0.0``
@@ -141,28 +125,16 @@ For single-cell multiomics data, ``cellranger_workflow`` takes sequencing reads 
 	  - Google cloud zones. For GCP Batch backend, the zones are automatically restricted by the Batch settings.
 	  - "us-central1-a us-west1-a"
 	  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-	* - num_cpu
-	  - Number of cpus to request for one node for cellranger vdj
-	  - 32
-	  - 32
-	* - memory
-	  - Memory size string for cellranger and cellranger vdj
-	  - "120G"
-	  - "120G"
-	* - count_disk_space
-	  - Disk space in GB needed for cellranger count
-	  - 500
-	  - 500
 	* - arc_num_cpu
-	  - Number of cpus to request for one node for cellranger-arc count
+	  - Number of cpus to request for one link
 	  - 64
 	  - 64
 	* - arc_memory
-	  - Memory size string for cellranger-arc count
+	  - Memory size string for one link
 	  - "160G"
 	  - "160G"
 	* - arc_disk_space
-	  - Disk space in GB needed for cellranger-arc count
+	  - Disk space in GB needed for one link
 	  - 700
 	  - 700
 	* - preemptible
@@ -188,14 +160,13 @@ See the table below for important output:
 	  - Description
 	* - cellranger_arc_count.output_count_directory
 	  - Array[String]
-	  - Subworkflow output. A list of cloud URIs containing *cellranger-arc count* output, one URI per *Link* name.
+	  - A list of cloud URIs to output, one URI per link
 	* - cellranger_arc_count.output_web_summary
 	  - Array[File]
-	  - A list of htmls visualizing QCs for each *Link* name.
+	  - A list of htmls visualizing QCs for each link
 	* - collect_summaries_arc.metrics_summaries
 	  - File
-	  - An excel spreadsheet containing QCs for each *Link* name.
+	  - An excel spreadsheet containing QCs for each link
 
 
-.. _Feature Barcode Reference: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/feature-bc-analysis#feature-ref
-.. _CMO reference: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/using/multi#cmoreference
+.. _10x Multiome: https://www.10xgenomics.com/support/epi-multiome

@@ -22,8 +22,8 @@ Release Highlights in Current Stable
    :hidden:
 
    cellranger/index
-   starsolo
    demultiplexing
+   starsolo
    cellbender
    cumulus
    command_line

@@ -51,7 +51,7 @@ Workflow input
 	  - Example
 	  - Default
 	* - **input_csv_file**
-	  - Sample Sheet (contains Sample, Reference, Flowcell as required and Chemistry, DataType, FeatureBarcodeFile as optional)
+	  - Sample Sheet (contains Sample, Reference, Flowcell, DataType, and Chemistry)
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.csv"
 	  -
 	* - **output_directory**

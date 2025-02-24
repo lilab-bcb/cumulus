@@ -83,7 +83,7 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes sequencing reads as input (
 		  - Example
 		  - Default
 		* - **input_csv_file**
-		  - Sample Sheet (contains Sample, Reference, Flowcell as required and Chemistry, DataType, FeatureBarcodeFile, Link as optional) in CSV format
+		  - Sample Sheet (contains Sample, Reference, Flowcell, Chemistry, DataType) in CSV format
 		  - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.csv"
 		  -
 		* - **output_directory**
@@ -173,9 +173,6 @@ See the table below for important sc/snRNA-seq outputs.
 	* - collect_summaries.metrics_summaries
 	  - File
 	  - Task output. An excel spreadsheet containing QCs for each sample.
-	* - count_matrix
-	  - String
-	  - Workflow output. Cloud url for a template ``count_matrix.csv`` to run Cumulus.
 
 
 .. _Cell Ranger Command Line Arguments: https://www.10xgenomics.com/support/software/cell-ranger/latest/resources/cr-command-line-arguments
