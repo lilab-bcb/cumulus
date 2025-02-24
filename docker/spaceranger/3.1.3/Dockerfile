@@ -22,10 +22,12 @@ ENV PATH=/software/python/bin:$PATH
 RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install pandas==2.2.3 --no-cache-dir && \
     python -m pip install packaging==24.2 --no-cache-dir && \
-    python -m pip install stratocumulus==0.2.4 --no-cache-dir
+    python -m pip install stratocumulus==0.3.0 --no-cache-dir
 
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software
 ADD spaceranger-3.1.3.tar.gz /software
+
+ENV TENX_DISABLE_TELEMETRY=1
 
 RUN apt-get -qq -y autoremove && \
     apt-get clean && \
