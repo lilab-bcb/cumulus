@@ -506,7 +506,7 @@ task generate_count_config {
             df_flex = pd.read_csv('~{flex_probset_file}', header=None, sep='\t')
 
             for sample_id in df['Sample'].unique():
-                df_local = df.loc[df['Sample'] == sample_id]
+                df_local = df.loc[df['Sample'] == sample_id].dropna(axis=1, how='all')  # Drop columns with only NAs
                 if df_local['DataType'].unique().size > 1:
                     print('Detected multiple DataType values for sample ' + sample_id + '!', file = sys.stderr)
                     sys.exit(1)
@@ -557,7 +557,7 @@ task generate_count_config {
                     else:
                         link = sample_id
 
-                    if pd.notnull(link) and (link != ''):
+                    if pd.notna(link) and (link != ''):
                         multiomics[link].add(datatype)
                         size = dirs.size
                         link2sample[link].extend([sample_id] * size)
@@ -620,7 +620,7 @@ task generate_count_config {
                     sys.exit(1)
                 if len(probeset_set) == 1:
                     no_probeset = False
-                    fo_s2probeset.write(link_id + '\t' + list(probeset_set)[0] + '\n')
+                    fom_l2probeset.write(link_id + '\t' + list(probeset_set)[0] + '\n')
 
                 fom_s2dir.write(link_id + '\t' + ','.join(link2dir[link_id]) + '\n')
                 fom_s2type.write(link_id + '\t' + ','.join(link2dt[link_id]) + '\n')
@@ -668,7 +668,7 @@ task generate_count_config {
             if no_vdj_ref:
                 fom_l2vdj_ref.write('null\tnull\n')
             if no_probeset:
-                fo_s2probeset.write('null\tnull\n')
+                fom_l2probeset.write('null\tnull\n')
             if no_chem:
                 fom_s2chem.write('null\tnull\n')
             if no_aux:
