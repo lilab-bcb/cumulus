@@ -45,10 +45,10 @@ Single-cell multiomics
 
 --------------------------
 
-Flex gene expression
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Sample Multiplexing and Flex
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. include:: flex_gex.rst
+.. include:: multi.rst
 
 ---------------------------------
 

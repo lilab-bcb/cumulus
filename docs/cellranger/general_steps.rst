@@ -85,21 +85,31 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 			- **atac**: scATAC-Seq data
 
 			- **frp**: 10x Flex gene expression (old name is Fixed RNA Profiling) data
-		* - ProbeSet
-		  - Probe set reference for Flex samples. Only works for samples of *frp* data type. See Flex_ section for the list of all available probe set references.
-		* - FeatureBarcodeFile
-		  -
-		  	| The Cloud URI pointing to feature barcode files for *rna*, *citeseq*, *hashing*, *cmo* and *crispr* data.
-		  	| Features can be either targeted genes for targeted gene expression analysis, antibody for CITE-Seq, cell-hashing, nucleus-hashing or gRNA for Perburb-seq.
-		  	| If *cmo* data is analyzed separately using *cumulus_feature_barcoding*, file format should follow the guide in Feature barcoding assays section, otherwise follow the guide in Single-cell multiomics section.
-		  	| This column is only required for targeted gene expression analysis (*rna*), CITE-Seq (*citeseq*), cell-hashing or nucleus-hashing (*hashing*), CellPlex (*cmo*) and Perturb-seq (*crispr*).
+		* - AuxFile
+		  - The Cloud URI pointing to auxiliary files of the corresponding samples, with different usage depending on *DataType* values:
+
+		  	- For *rna*: It's used by Sample Multiplexing methods, which specifies the sample name to multiplexing barcode mapping.
+
+			- For *frp*: It's used by Flex data, which specifies the sample name to Flex probe barcode mapping.
+
+			- For *citeseq*, *hashing*, *adt*, and *crispr*: It's the feature barcode file, which contains the information of antibody for CITE-Seq, cell-hashing, nucleus-hashing, or gNRA for Perturb-Seq.
+
+				- If analyzing using *cumulus_feature_barcoding*, the feature barcode file should be in format specified in `Feature barcoding assays`_ section below;
+
+				- If analyzing as part of the Sample Multiplexing data using ``cellranger multi``, the feature barcode file should be in `10x Feature Reference`_ format.
+
+			- For *cmo*: It's the CMO reference file (``cmo-set`` option) when using custom CMOs in CellPlex data.
+
+			- For *vdj_t_gd*: It's the inner enrichment primer file (``inner-enrichment-primers`` option) for VDJ-T-GD data.
 		* - Link
 		  -
-			| Designed for Single Cell Multiome	ATAC + Gene Expression, Feature Barcoding, CellPlex, or Flex.
+			| Designed for Single Cell Multiome	ATAC + Gene Expression, Feature Barcoding, Sample Multiplexing, or Flex.
 			| Link multiple modalities together using a single link name.
 			| ``cellranger-arc count``, ``cellranger count``, or ``cellranger multi`` will be triggered automatically depending on the modalities.
 			| If empty string is provided, no link is assumed.
 			| Link name can only contain characters from ``[a-zA-Z0-9\_-]`` for Cell Ranger to recognize.
+			| **Notice:** The Link names must be unique to *Sample* values to avoid overwriting each other's settings.
+
 
 
 	The sample sheet supports sequencing the same 10x channels across multiple flowcells. If a sample is sequenced across multiple flowcells, simply list it in multiple rows, with one flowcell per row. In the following example, we have 4 samples sequenced in two flowcells.
@@ -137,7 +147,7 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 
 
 
-7. Workflow outputs
+5. Workflow outputs
 +++++++++++++++++++
 
 	See the table below for workflow level outputs.
@@ -161,4 +171,5 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 .. _gcloud storage: https://cloud.google.com/sdk/gcloud/reference/storage#COMMAND
 .. _Import workflows to Terra: ../cumulus_import.html
 .. _file naming conventions: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/inputs/cr-specifying-fastqs#file-naming-convention
-.. _Flex: ./index.html#flex-gene-expression
+.. _Feature barcoding assays: ./index.html#feature-barcoding-assays-cell-nucleus-hashing-cite-seq-and-perturb-
+.. _10x Feature Reference: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/inputs/cr-feature-ref-csv

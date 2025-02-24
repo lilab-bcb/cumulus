@@ -13,7 +13,7 @@ Sample sheet
 
 		* - Keyword
 		  - Description
-		* - **GRCH38_vdj_v7.1.0**
+		* - **GRCh38_vdj_v7.1.0**
 		  - Human GRCh38 V(D)J sequences, cellranger reference 7.1.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
 		* - **GRCh38_vdj_v7.0.0**
 		  - Human GRCh38 V(D)J sequences, cellranger reference 7.0.0, annotation built from Ensembl *Homo_sapiens.GRCh38.94.chr_patch_hapl_scaff.gtf*
@@ -26,16 +26,28 @@ Sample sheet
 
 #. *DataType* column.
 
-	Set it to **vdj**.
+	Choose one from the availabe types below:
 
-#. *FetureBarcodeFile* column.
+	* **vdj**: The VDJ library. Let the workflow auto-detect the chain type.
+	* **vdj_t**: The VDJ-T library for T-cell receptor sequences.
+	* **vdj_b**: The VDJ-B library for B-cell receptor sequences.
+	* **vdj_t_gd**: The VDJ-T-GD library for T-cell receptor enriched for gamma (TRG) and delta (TRD) chains.
 
-	Leave it blank for scIR-seq.
+#. *AuxFile* column.
 
-#. Example::
+	Only need for **vdj_t_gd** type samples which use primer sequences to enrich cDNA for V(D)J sequences. In that case, provide a ``.txt`` file containing such sequences, one per line.
 
-	Sample,Reference,Flowcell,Chemistry,DataType
-	sample_vdj,GRCh38_vdj_v7.1.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZZ/Fastq,fiveprime,vdj
+.. note::
+	The ``--chain`` option in ``cellranger vdj`` is automatically decided based on the *DataType* value specified:
+		* For **vdj**: set to ``--chain auto``
+		* For **vdj_t** and **vdj_t_gd**: set to ``--chain TR``
+		* For **vdj_b**: set to ``--chain IG``
+
+An example sample sheet is below::
+
+	Sample,Reference,Flowcell,Chemistry,DataType,AuxFile
+	sample1,GRCh38_vdj_v7.1.0,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9ZZ/Fastq,fiveprime,vdj,
+	sample2,GRCh38_vdj_v7.1.0,gs://my-bucket/s2_fastqs,,vdj_t_gd,gs://my-bucket/s2_enrich_primers.txt
 
 Workflow input
 ++++++++++++++
@@ -62,25 +74,10 @@ For scIR-seq data, ``cellranger_workflow`` takes sequencing reads as input (FAST
 	  - Do not align reads to reference V(D)J sequences before de novo assembly
 	  - false
 	  - false
-	* - vdj_chain
-	  - Force the analysis to be carried out for a particular chain type. The accepted values are:
-
-		- "auto" for auto detection based on TR vs IG representation;
-
-		- "TR" for T cell receptors;
-
-		- "IG" for B cell receptors.
-	  - "auto"
-	  - "auto"
-	* - vdj_inner_enrichment_primers
-	  - | Cloud URI to a text file with custom inner enrichment primers. By default, use those provided in the 10x kit.
-	    | If inner enrichment primers other than those provided in the 10x kits are used, they need to be specified here as a textfile with one primer per line. Disable secondary analysis, e.g. clustering
-	  - "gs://fc-e0000000-0000-0000-0000-000000000000/vdj_primers.txt"
-	  -
 	* - cellranger_version
-	  - cellranger version, could be: 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0, 6.1.2, 6.1.1, 6.0.2, 6.0.1, 6.0.0, 5.0.1, 5.0.0
-	  - "8.0.1"
-	  - "8.0.1"
+	  - cellranger version, could be: 9.0.1, 8.0.1, 7.2.0
+	  - "9.0.1"
+	  - "9.0.1"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
@@ -91,7 +88,7 @@ For scIR-seq data, ``cellranger_workflow`` takes sequencing reads as input (FAST
 	  - "quay.io/cumulus"
 	* - acronym_file
 	  - | The link/path of an index file in TSV format for fetching preset genome references, chemistry barcode inclusion lists, etc. by their names.
-	    | Set an GS URI if *backend* is ``gcp``; an S3 URI for ``aws`` backend; an absolute file path for ``local`` backend.
+	    | Set an GS URI if running on GCP; an S3 URI for AWS; an absolute file path for HPC or local machines.
 	  - "s3://xxxx/index.tsv"
 	  - "gs://cumulus-ref/resources/cellranger/index.tsv"
 	* - zones
@@ -110,20 +107,12 @@ For scIR-seq data, ``cellranger_workflow`` takes sequencing reads as input (FAST
 	  - Disk space in GB needed for cellranger vdj
 	  - 500
 	  - 500
-	* - backend
-	  - Cloud backend for file transfer. Available options:
-
-	  	- "gcp" for Google Cloud;
-	  	- "aws" for Amazon AWS;
-	  	- "local" for local machine.
-	  - "gcp"
-	  - "gcp"
 	* - preemptible
-	  - Number of preemptible tries
+	  - Number of preemptible tries. Only works for GCP
 	  - 2
 	  - 2
 	* - awsQueueArn
-	  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+	  - The AWS ARN string of the job queue to be used. Only works for AWS
 	  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
 	  - ""
 

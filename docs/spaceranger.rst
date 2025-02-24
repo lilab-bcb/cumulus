@@ -109,8 +109,6 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		  - Slide layout file indicating capture spot and fiducial spot positions. Only required if internet access is not available.
 		* - LoupeAlignment
 		  - Alignment file produced by the manual Loupe alignment step.
-		* - TargetPanel
-		  - Cloud bucket url for a target panel CSV for targeted gene expression analysis.
 
 	The sample sheet supports sequencing the same 10x channels across multiple flowcells. If a sample is sequenced across multiple flowcells, simply list it in multiple rows, with one flowcell per row. In the following example, we have 2 samples sequenced in two flowcells.
 
@@ -179,7 +177,7 @@ For spatial data, ``spaceranger_workflow`` takes sequencing reads as input (FAST
 		  - Example
 		  - Default
 		* - **input_csv_file**
-		  - Sample Sheet (contains Sample, Reference, Flowcell, Lane, Index as required and ProbeSet, Image, DarkImage, ColorizedImage, CytaImage, Slide, Area, SlideFile, LoupeAlignment, TargetPanel as optional)
+		  - Sample Sheet (contains Sample, Reference, Flowcell, Lane, Index as required and ProbeSet, Image, DarkImage, ColorizedImage, CytaImage, Slide, Area, SlideFile, LoupeAlignment as optional)
 		  - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.csv"
 		  -
 		* - **output_directory**
@@ -219,13 +217,9 @@ For spatial data, ``spaceranger_workflow`` takes sequencing reads as input (FAST
 		  - 50
 		  -
 		* - spaceranger_version
-		  - spaceranger version, could be: 3.1.3, 3.1.2, 3.0.1, 3.0.0
+		  - spaceranger version, could be: 3.1.3, 3.0.1
 		  - "3.1.3"
 		  - "3.1.3"
-		* - config_version
-		  - config docker version used for processing sample sheets, could be 0.3.
-		  - "0.3"
-		  - "0.3"
 		* - docker_registry
 		  - Docker registry to use for spaceranger_workflow. Options:
 
@@ -234,6 +228,11 @@ For spatial data, ``spaceranger_workflow`` takes sequencing reads as input (FAST
 		  	- "cumulusprod" for backup images on Docker Hub.
 		  - "quay.io/cumulus"
 		  - "quay.io/cumulus"
+		* - acronym_file
+		  - | The link/path of an index file in TSV format for fetching preset genome references, Visium probe sets, etc. by their names.
+		    | Set an GS URI if running on GCP; an S3 URI for AWS; an absolute file path for HPC or local machines.
+		  - "s3://xxxx/index.tsv"
+		  - "gs://cumulus-ref/resources/cellranger/index.tsv"
 		* - zones
 		  - Google cloud zones. For GCP Batch backend, the zones are automatically restricted by the Batch settings.
 		  - "us-central1-a us-west1-a"
@@ -250,20 +249,12 @@ For spatial data, ``spaceranger_workflow`` takes sequencing reads as input (FAST
 		  - Disk space in GB needed for spaceranger count
 		  - 500
 		  - 500
-		* - backend
-		  - Cloud infrastructure backend to use. Available options:
-
-		    - "gcp" for Google Cloud;
-		    - "aws" for Amazon AWS;
-		    - "local" for local machine.
-		  - "gcp"
-		  - "gcp"
 		* - preemptible
-		  - Number of preemptible tries. This works only when *backend* is ``gcp``.
+		  - Number of preemptible tries. Only works for GCP
 		  - 2
 		  - 2
 		* - awsQueueArn
-		  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+		  - The AWS ARN string of the job queue to be used. Only works for AWS
 		  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
 		  - ""
 

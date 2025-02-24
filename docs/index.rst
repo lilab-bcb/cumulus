@@ -46,22 +46,6 @@ Release Highlights in Current Stable
    bulk_rna_seq
 
 .. toctree::
-   :caption: Drop-Seq pipeline
-   :maxdepth: 1
-   :hidden:
-
-   drop_seq
-
-
-.. toctree::
-   :caption: Others
-   :maxdepth: 1
-   :hidden:
-
-   count
-   topic_modeling
-
-.. toctree::
    :caption: Contact
    :maxdepth: 1
    :hidden:

@@ -94,7 +94,7 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be: 9.0.1, 9.0.0, 8.0.1, 8.0.0, 7.2.0 7.1.0, 7.0.1, 7.0.0
+		  - cellranger version, could be: 9.0.1, 8.0.1, 7.2.0
 		  - "9.0.1"
 		  - "9.0.1"
 		* - docker_registry
@@ -121,20 +121,12 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - Optional disk space in GB
 		  - 100
 		  - 100
-		* - backend
-		  - Cloud backend for file transfer. Available options:
-
-		    - "gcp" for Google Cloud;
-		    - "aws" for Amazon AWS;
-		    - "local" for local machine.
-		  - "gcp"
-		  - "gcp"
 		* - preemptible
-		  - Number of preemptible tries
+		  - Number of preemptible tries. Only works for GCP
 		  - 2
 		  - 2
 		* - awsQueueArn
-		  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+		  - The AWS ARN string of the job queue to be used. Only works for AWS
 		  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
 		  - ""
 
@@ -236,20 +228,12 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 		  - Optional disk space in GB
 		  - 100
 		  - 100
-		* - backend
-		  - Cloud backend for file transfer. Available options:
-
-		    - "gcp" for Google Cloud;
-		    - "aws" for Amazon AWS;
-		    - "local" for local machine.
-		  - "gcp"
-		  - "gcp"
 		* - preemptible
-		  - Number of preemptible tries
+		  - Number of preemptible tries. Only works for GCP
 		  - 2
 		  - 2
 		* - awsQueueArn
-		  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+		  - The AWS ARN string of the job queue to be used. Only works for AWS
 		  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
 		  - ""
 
@@ -320,7 +304,7 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be: 9.0.1, 9.0.0, 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0
+		  - cellranger version, could be: 9.0.1, 8.0.1, 7.2.0
 		  - "9.0.1"
 		  - "9.0.1"
 		* - docker_registry
@@ -343,20 +327,12 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - Optional disk space in GB
 		  - 100
 		  - 100
-		* - backend
-		  - Cloud backend for file transfer. Available options:
-
-		    - "gcp" for Google Cloud;
-		    - "aws" for Amazon AWS;
-		    - "local" for local machine.
-		  - "gcp"
-		  - "gcp"
 		* - preemptible
-		  - Number of preemptible tries
+		  - Number of preemptible tries. Only works for GCP
 		  - 2
 		  - 2
 		* - awsQueueArn
-		  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+		  - The AWS ARN string of the job queue to be used. Only works for AWS
 		  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
 		  - ""
 

@@ -1,40 +1,285 @@
-Cellranger multi supports `10x Flex`_ (old name is "Fixed RNA Profiling") since version 7.0.0.
+To process libraries multiplexed, as well as 10x Flex data, using ``cellranger multi``, follow the corresponding sections below:
 
-Sample Sheet
-++++++++++++++
+On Chip Multiplexing
++++++++++++++++++++++
 
-#. **Reference** column.
+This section covers preparing the sample sheet for `On-Chip Multiplexing`_ (OCM) data.
 
-    Prebuilt scRNA-seq references for Flex data processing are summarized below.
+1. *Sample* and *Link* column.
 
-    .. list-table::
-        :widths: 5 20
-        :header-rows: 1
+  *Sample* column is for specifying the name of each sample in your data. They must be unique to each other in the sample sheet.
 
-        * - Keyword
-          - Description
-        * - **GRCh38-2024-A**
-          - Human GRCh38 (GENCODE v44/Ensembl 110)
-        * - **GRCh38-2020-A**
-          - Human GRCh38 (GENCODE v32/Ensembl 98)
-        * - **GRCm39-2024-A**
-          - Mouse GRCm39 (GENCODE vM33/Ensembl 110)
-        * - **mm10-2020-A**
-          - Mouse mm10 (GENCODE vM23/Ensembl 98)
+  *Link* column is for specifying the name of your whole data, so that the workflow knows which samples should be put together to run ``cellranger multi``.
+  **Notice:** You should use a unique *Link* name for all samples belonging to the same data/experiment. Moreover, the *Link* name must be different from all *Sample* names.
 
-#. *DataType* column.
+2. *DataType*, *Reference*, and *AuxFile* column.
 
-    Set ``frp`` for RNA-Seq modalities of your Flex samples. For other modalities (e.g. citeseq or antibody), set to their corresponding data types.
+  For each sample, choose a data type from the table below, and prepare its corresponding auxiliary file if needed:
 
-#. **ProbeSet** column.
+  .. list-table::
+    :widths: 5 5 5 10
+    :header-rows: 1
 
-    Preset Flex probe set references have their own compatible scRNA-seq references and Cell Ranger versions, respectively. This is summarized as follows:
+    * - DataType
+      - Reference
+      - AuxFile
+      - Description
+    * - **rna**
+      - Select one from prebuilt genome references in `scRNA-seq section`_, or provide a cloud URI of a custom reference in ``.tar.gz`` format.
+      - Path to a text file including the sample name to OCM barcode association (see an example below this table).
+      - For RNA-Seq samples
+    * - Choose one from: **vdj**, **vdj_t**, **vdj_b**, **vdj_t_gd**
+      - Select one from prebuilt VDJ references in `Single-cell immune profiling`_ section.
+      - *Optional*. For ``vdj_t_gd`` type samples only: path to a text file containing inner enrichment primers info. This is the ``inner-enrichment-primers`` option in `VDJ section`_ of Cell Ranger multi config CSV.
+      - For each VDJ sample, choose one from the 4 provided VDJ data types:
+
+        - ``vdj``: Leave the workflow to auto-detect.
+
+        - ``vdj_t``: VDJ-T library for T-cell receptor sequences.
+
+        - ``vdj_b``: VDJ-B library for B-cell receptor sequences.
+
+        - ``vdj_t_gd``: VDJ-T-GD library for T-cell receptor enriched for gamma (TRG) and delta (TRD) chains. **Notice:** For such sample, A text file containing inner enrichment primers info must provided in *AuxFile* column.
+    * - Choose one from: **citeseq**, **adt**
+      - No need to specify a reference
+      - Path to its feature reference file of `10x Feature Reference`_ format. **Notice:** If ``adt`` type, you need to combine feature barcodes of both CITE-Seq and Hashing modalities in one file.
+      - For antibody capture samples:
+
+        - ``citeseq``: For samples only containing CITE-Seq modality.
+
+        - ``adt``: For samples containing both CITE-Seq and Hashing modalities.
+
+  An example sample name to OCM barcode association file is the following::
+
+    sample_id,ocm_barcode_ids,description
+    sample1,OB1,Control
+    sample2,OB2,Treated
+
+  where *description* column is optional, which specifies the description of the samples.
+
+.. note::
+  In the sample name to OCM barcode file, the header line is optional. But if users don't specify this header line, the order of columns must be fixed as *sample_id*, *ocm_barcode_ids*, and *description* (optional).
+
+Below is an example sample sheet for OCM::
+
+  Sample,Reference,Flowcell,DataType,AuxFile,Link
+  s1_gex,GRCh38-2020-A,gs://my-bucket/s1_fastqs,rna,gs://my-bucket/s1_ocm.csv,s1
+  s1_vdj,GRCh38_vdj_v7.1.0,gs://my-bucket/s1_fastqs,vdj,,s1
+  s1_adt,,gs://my-bucket/s1_fastqs,citeseq,gs://my-bucket/s1_fbc.csv,s1
+
+In the case where there is only scRNA-Seq library in your data, the *Link* column is optional::
+
+  Sample,Reference,Flowcell,DataType,AuxFile
+  s2,GRCh38-2020-A,gs://my-bucket/s2_fastqs,rna,gs://my-bucket/s2_ocm.csv
+
+----------
+
+Hashing with Antibody Capture
++++++++++++++++++++++++++++++++
+
+This section covers preparing the sample sheet for `non-OCM hashtag oligo`_ (HTO) data.
+
+1. *Sample* and *Link* column.
+
+  *Sample* column is for specifying the name of each sample in your data. They must be unique to each other in the sample sheet.
+
+  *Link* column is for specifying the name of your whole data, so that the workflow knows which samples should be put together to run ``cellranger multi``.
+  **Notice:** You should use a unique *Link* name for all samples belonging to the same data/experiment. Moreover, the *Link* name must be different from all *Sample* names.
+
+2. *DataType*, *Reference*, and *AuxFile* column.
+
+  For each sample, choose a data type from the table below, and prepare its corresponding auxiliary file if needed:
+
+  .. list-table::
+    :widths: 5 5 5 10
+    :header-rows: 1
+
+    * - DataType
+      - Reference
+      - AuxFile
+      - Description
+    * - **rna**
+      - Select one from prebuilt genome references in `scRNA-seq section`_, or provide a cloud URI of a custom reference in ``.tar.gz`` format.
+      - Path to a text file including the sample name to HTO barcode association (see an example below this table).
+      - For RNA-Seq samples
+    * - Choose one from: **vdj**, **vdj_t**, **vdj_b**, **vdj_t_gd**
+      - Select one from prebuilt VDJ references in `Single-cell immune profiling`_ section.
+      - *Optional*. For ``vdj_t_gd`` type samples only: path to a text file containing inner enrichment primers info. This is the ``inner-enrichment-primers`` option in `VDJ section`_ of Cell Ranger multi config CSV.
+      - For each VDJ sample, choose one from the 4 provided VDJ data types:
+
+        - ``vdj``: Leave the workflow to auto-detect.
+
+        - ``vdj_t``: VDJ-T library for T-cell receptor sequences.
+
+        - ``vdj_b``: VDJ-B library for B-cell receptor sequences.
+
+        - ``vdj_t_gd``: VDJ-T-GD library for T-cell receptor enriched for gamma (TRG) and delta (TRD) chains. **Notice:** For such sample, A text file containing inner enrichment primers info must provided in *AuxFile* column.
+    * - **hashing**
+      - No need to specify a reference
+      - Path to its feature reference file of `10x Feature Reference`_ format, which specifies the oligonucleotide sequences used in the data.
+      - For antibody capture samples
+
+An example sample name to HTO barcode association file is the following::
+
+    sample_id,hashtag_ids,description
+    sample1,TotalSeqB_Hashtag_1,Control
+    sample2,CD3_TotalSeqB,Treated
+
+where names in *hashtag_ids* column must be consistent with ``id`` column in the feature reference file. The *description* column is optional, which specifies the description of the samples.
+
+.. note::
+  In the sample name to HTO barcode file, the header line is optional. But if users don't specify this header line, the order of columns must be fixed as *sample_id*, *hashtag_ids*, and *description* (optional).
+
+Below is an example sample sheet for HTO::
+
+  Link,Sample,Reference,Flowcell,DataType,AuxFile
+  s1,s1_gex,GRCh38-2020-A,gs://my-bucket/s1_fastqs,rna,gs://my-bucket/s1_hto.csv
+  s1,s1_vdj,GRCh38_vdj_v7.1.0,gs://my-bucket/s1_fastqs,vdj,
+  s1,s1_hto,,gs://my-bucket/s1_fastqs,hashing,gs://my-bucket/s1_fbc_ref.csv
+
+Or if your data contain only scRNA-Seq and antibody capture libraries::
+
+  Link,Sample,Reference,Flowcell,DataType,AuxFile
+  s2,s2_gex,GRCh38-2020-A,gs://my-bucket/s2_fastqs,rna,gs://my-bucket/s2_hto.csv
+  s2,s2_hto,,gs://my-bucket/s2_fastqs,hashing,gs://my-bucket/s2_fbc_ref.csv
+
+------------
+
+Cell Multiplexing with CMO (CellPlex)
++++++++++++++++++++++++++++++++++++++++
+
+This section covers preparing the sample sheet for CellPlex data using `Cell Multiplexing Oligos`_ (CMO).
+
+1. *Sample* and *Link* column.
+
+  *Sample* column is for specifying the name of each sample in your data. They must be unique to each other in the sample sheet.
+
+  *Link* column is for specifying the name of your whole data, so that the workflow knows which samples should be put together to run ``cellranger multi``.
+  **Notice:** You should use a unique *Link* name for all samples belonging to the same data/experiment. Moreover, the *Link* name must be different from all *Sample* names.
+
+2. *DataType*, *Reference*, and *AuxFile* column.
+
+  For each sample, choose a data type from the table below, and prepare its corresponding auxiliary file if needed:
+
+  .. list-table::
+    :widths: 5 5 5 10
+    :header-rows: 1
+
+    * - DataType
+      - Reference
+      - AuxFile
+      - Description
+    * - **rna**
+      - Select one from prebuilt genome references in `scRNA-seq section`_, or provide a cloud URI of a custom reference in ``.tar.gz`` format.
+      - Path to a text file including the sample name to CMO barcode association (see an example below this table).
+      - For RNA-Seq samples
+    * - **cmo**
+      - No need to specify a reference
+      - *Optional*. If using custom CMOs, provide the path to their ``cmo-set`` reference file of `10x Feature Reference`_ format. See `here <https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-3p-multi#cmo-ref>`_ for an example.
+      - For CMO samples.
+    * - **citeseq**
+      - No need to specify a reference
+      - Path to its feature reference file of `10x Feature Reference`_ format.
+      - For CITE-Seq samples.
+
+An example sample name to CMO barcode association file is the following::
+
+    sample_id,cmo_ids,description
+    sample1,CMO301,Control
+    sample2,CMO302,Treated
+
+If using a ``cmo-set`` reference file, the names in *cmo_ids* must be consistent with ``id`` column in the CMO reference file. The *description* column is optional, which specifies the description of the samples.
+
+.. note::
+  In the sample name to CMO barcode file, the header line is optional. But if users don't specify this header line, the order of columns must be fixed as *sample_id*, *cmo_ids*, and *description* (optional).
+
+Below is an example sample sheet for CellPlex::
+
+  Link,Sample,Reference,Flowcell,DataType,AuxFile
+  s1,s1_gex,GRCh38-2020-A,gs://my-bucket/s1_fastqs,rna,gs://my-bucket/s1_cmo.csv
+  s1,s1_cellplex,,gs://my-bucket/s1_fastqs,cmo,
+
+Or if a CITE-Seq sample/library is also included in the data::
+
+  Link,Sample,Reference,Flowcell,DataType,AuxFile
+  s2,s2_gex,GRCh38-2020-A,gs://my-bucket/s2_fastqs,rna,gs://my-bucket/s2_cmo.csv
+  s2,s2_cellplex,,gs://my-bucket/s2_fastqs,cmo,
+  s2,s2_citeseq,,gs://my-bucket/s2_fastqs,citeseq,gs://my-bucket/s2_fbc.csv
+
+--------------
+
+Flex Gene Expression
+++++++++++++++++++++++
+
+This section covers preparing the sample sheet for Flex_ (previously named *Fixed RNA Profiling*) data.
+
+1. *Sample* and *Link* column.
+
+  *Sample* column is for specifying the name of each sample in your data. They must be unique to each other in the sample sheet.
+
+  *Link* column is for specifying the name of your whole data, so that the workflow knows which samples should be put together to run ``cellranger multi``.
+  **Notice 1:** You should use a unique *Link* name for all samples belonging to the same data/experiment. Moreover, the *Link* name must be different from all *Sample* names.
+  **Notice 2:** If there is only a scRNA-Seq sample in the data, you don't need to specify *Link* name. Then the workflow would use its *Sample* name for the whole data.
+
+2. *DataType*, *Reference*, and *AuxFile* column.
+
+  For each sample, choose a data type from the table below, and prepare its corresponding auxiliary file if needed:
+
+  .. list-table::
+    :widths: 5 5 5 10
+    :header-rows: 1
+
+    * - DataType
+      - Reference
+      - AuxFile
+      - Description
+    * - **frp**
+      - Select one from prebuilt genome references in `scRNA-seq section`_, or provide a cloud URI of a custom reference in ``.tar.gz`` format.
+      - Path to a text file including the sample name to Flex probe barcode association (see an example below this table).
+      - For RNA-Seq samples
+    * - Choose one from: **citeseq**, **crispr**
+      - No need to specify a reference
+      - Path to its feature reference file of `10x Feature Reference`_ format. **Notice:** If multiple antibody capture samples, you need to combine feature barcodes used in all of them in one reference file.
+      - For antibody capture samples:
+
+        - ``citeseq``: For CITE-Seq samples.
+
+        - ``crispr``: For Perturb-Seq samples. **Notice:** This data type used in Flex is supported only in Cell Ranger v8.0+.
+
+  An example sample name to Flex probe barcode association file is the following (see `here <https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-flex-multi-frp#example-configs>`_ for examples of different Flex experiment settings)::
+
+    sample_id,probe_barcode_ids,description
+    sample1,BC001,Control
+    sample2,BC002,Treated
+
+  The *description* column is optional, which specifies the description of the samples.
+
+  .. note::
+    In the sample name to Flex probe barcode file, the header line is optional. But if users don't specify this header line, the order of columns must be fixed as *sample_id*, *probe_barcode_ids*, and *description* (optional).
+
+  Below is an example sample sheet for Flex data::
+
+    Sample,Reference,Flowcell,DataType,AuxFile
+    s1,GRCh38-2020-A,gs://my-bucket/s1_fastqs,frp,gs://my-bucket/s1_flex.csv
+
+  Notice that *Link* column is not required for this case.
+
+  An example sample sheet for a more complex Flex data::
+
+    Link,Sample,Reference,Flowcell,DataType,AuxFile
+    s2,s2_gex,GRCh38-2020-A,gs://my-bucket/s2_fastqs,frp,gs://my-bucket/s2_flex.csv
+    s2,s2_citeseq,,gs://my-bucket/s2_fastqs,citeseq,gs://my-bucket/s2_fbc.csv
+    s2,s2_crispr,,gs://my-bucket/s2_fastqs,crispr,gs://my-bucket/s2_fbc.csv
+
+3. Flex Probe Set.
+
+  Flex uses probes that target protein-coding genes in the human or mouse transcriptome. It's automatically determined by the genome reference specified by users for the scRNA-Seq sample by following the table below:
 
     .. list-table::
         :widths: 5 5 5
         :header-rows: 1
 
-        * - Keyword
+        * - Probe Set
           - Genome Reference
           - Cell Ranger version
         * - **Flex_human_probe_v1.1**
@@ -43,53 +288,19 @@ Sample Sheet
         * - **Flex_human_probe_v1.0.1**
           - GRCh38-2020-A
           - v7.1+
-        * - **Flex_human_probe_v1**
-          - GRCh38-2020-A
-          - v7.0+
         * - **Flex_mouse_probe_v1.1**
           - GRCm39-2024-A
           - v9.0+
         * - **Flex_mouse_probe_v1.0.1**
           - mm10-2020-A
           - v7.1+
-        * - **Flex_mouse_probe_v1**
-          - mm10-2020-A
-          - v7.0+
 
-    Custom probe set references are also accepted. Simply put the cloud URI of the custom probe set CSV file for this column.
-
-#. *FeatureBarcodeFile* column.
-
-    Provide sample name - Probe Barcode association as follows::
-
-        sample1,BC001|BC002,Control
-        sample2,BC003|BC004,Treated
-
-    where the third column (i.e. ``Control`` and ``Treated`` above) is optional, which specifies the description of the samples.
-
-.. note::
-  In the case of Singleplex Flex with Antibody Capture, for ``citeseq`` sample, the *FeatureBarcodeFile* you prepare should be in 10x format (see `here <https://cf.10xgenomics.com/samples/cell-exp/7.0.0/10k_Human_PBMC_TotalSeqB_singleplex_Multiplex/10k_Human_PBMC_TotalSeqB_singleplex_Multiplex_count_feature_reference.csv>`_ for an example).
-
-#. *Link* column.
-
-    Put a sample unique link name for all modalities that are linked.
-
-    If *Link* column is not set, only consider RNA-seq modalities (i.e. samples of *DataType* ``frp``) and use their *Sample* names as the *Link* names.
-
-#. Example::
-
-    Sample,Reference,ProbeSet,Flowcell,DataType,FeatureBarcodeFile,Link
-    sample1,GRCh38-2020-A,Flex_human_probe_v1.0.1,/path/to/sample1/fastq/folder,frp,/path/to/sample1/fbf/file,
-    sample2_rna,GRCh38-2020-A,Flex_human_probe_v1.0.1,/path/to/sample2/rna/fastq/folder,frp,/path/to/sample2/rna/fbf/file,sample2
-    sample2_citeseq,GRCh38-2020-A,,/path/to/sample2/citeseq/fastq/folder,citeseq,/path/to/sample2/citeseq/fbf/file,sample2
-
-In the example above, two linked samples are provided.
-
+  See `Flex probe sets overview`_ for details on these probe sets.
 
 Workflow Input
 ++++++++++++++++
 
-For Flex data, ``cellranger_workflow`` takes sequencing reads as input (FASTQ files, or TAR files containing FASTQ files), and runs ``cellranger multi``. Revalant workflow inputs are described below, with required inputs highlighted in **bold**:
+All the sample multiplexing assays share the same workflow input settings. ``cellranger_workflow`` takes sequencing reads as input (FASTQ files, or TAR files containing FASTQ files), and runs ``cellranger multi``. Revalant workflow inputs are described below, with required inputs highlighted in **bold**:
 
 .. list-table::
     :widths: 5 30 30 20
@@ -100,7 +311,7 @@ For Flex data, ``cellranger_workflow`` takes sequencing reads as input (FASTQ fi
       - Example
       - Default
     * - **input_csv_file**
-      - Sample Sheet (contains Sample, Reference, DataType, Flowcell as required; ProbeSet, FeatureBarcodeFile and Link are optional)
+      - Sample Sheet (contains Link, Sample, Reference, DataType, Flowcell, and AuxFile columns)
       - "gs://fc-e0000000-0000-0000-0000-000000000000/sample_sheet.csv"
       -
     * - **output_directory**
@@ -108,11 +319,11 @@ For Flex data, ``cellranger_workflow`` takes sequencing reads as input (FASTQ fi
       - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_output"
       -
     * - include_introns
-      - Turn this option on to also count reads mapping to intronic regions. With this option, users do not need to use pre-mRNA references. Note that if this option is set, cellranger_version must be >= 5.0.0. This option is used by ``cellranger multi``.
+      - Turn this option on to also count reads mapping to intronic regions. With this option, users do not need to use pre-mRNA references. This option is used by ``cellranger multi``.
       - true
       - true
     * - no_bam
-      - Turn this option on to disable BAM file generation. This option is only available if cellranger_version >= 5.0.0. This option is used by ``cellranger multi``.
+      - Turn this option on to disable BAM file generation. This option is used by ``cellranger multi``.
       - false
       - false
     * - force_cells
@@ -128,7 +339,7 @@ For Flex data, ``cellranger_workflow`` takes sequencing reads as input (FASTQ fi
       - false
       - false
     * - cellranger_version
-      - Cell Ranger version to use. Available versions working for Flex data: 9.0.1, 9.0.0, 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0.
+      - Cell Ranger version to use. Available versions working for Flex data: 9.0.1, 8.0.1, 7.2.0.
       - "9.0.1"
       - "9.0.1"
     * - docker_registry
@@ -141,7 +352,7 @@ For Flex data, ``cellranger_workflow`` takes sequencing reads as input (FASTQ fi
       - "quay.io/cumulus"
     * - acronym_file
       - | The link/path of an index file in TSV format for fetching preset genome references, probe set references, chemistry whitelists, etc. by their names.
-        | Set an GS URI if *backend* is ``gcp``; an S3 URI for ``aws`` backend; an absolute file path for ``local`` backend.
+        | Set an GS URI if running on GCP; an S3 URI if running on AWS; an absolute file path if running on HPC or local machines.
       - "s3://xxxx/index.tsv"
       - "gs://cumulus-ref/resources/cellranger/index.tsv"
     * - zones
@@ -160,27 +371,19 @@ For Flex data, ``cellranger_workflow`` takes sequencing reads as input (FASTQ fi
       - Disk space in GB needed for cellranger multi
       - 1500
       - 1500
-    * - backend
-      - Cloud backend for file transfer and computation. Available options:
-
-        - "gcp" for Google Cloud;
-        - "aws" for Amazon AWS;
-        - "local" for local machines.
-      - "gcp"
-      - "gcp"
     * - preemptible
-      - Number of preemptible tries
+      - Number of preemptible tries. This only works for GCP.
       - 2
       - 2
     * - awsQueueArn
-      - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+      - The AWS ARN string of the job queue to be used. This only works for AWS.
       - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
       - ""
 
 Workflow Output
 +++++++++++++++++
 
-See the table below for important outputs:
+All the sample multiplexing assays share the same workflow output structure. See the table below for important outputs:
 
 .. list-table::
     :widths: 5 5 10
@@ -191,7 +394,16 @@ See the table below for important outputs:
       - Description
     * - count_outputs
       - Map[String, Array[String]]
-      - ``count_outputs["multi"]`` gives the list of cloud urls containing *cellranger multi* outputs, one url per sample.
+      - ``count_outputs["multi"]`` gives the list of cloud urls containing *cellranger multi* outputs, one URI per *Link* name or sample (if *Link* is not used).
 
 
-.. _10x Flex: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-flex-multi-frp
+
+.. _scRNA-seq section: ./index.html#single-cell-and-single-nucleus-rna-seq
+.. _Single-cell immune profiling: ./index.html#single-cell-immune-profiling
+.. _VDJ section: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/inputs/cr-multi-config-csv-opts#vdj
+.. _On-Chip Multiplexing: https://www.10xgenomics.com/support/software/cell-ranger/latest/getting-started/cr-3p-what-is-cellplex#on-chip
+.. _non-OCM hashtag oligo: https://www.10xgenomics.com/support/software/cell-ranger/latest/getting-started/cr-3p-what-is-cellplex#antibody-capture
+.. _Cell Multiplexing Oligos: https://www.10xgenomics.com/support/software/cell-ranger/latest/getting-started/cr-3p-what-is-cellplex#antibody-capture
+.. _10x Feature Reference: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/inputs/cr-feature-ref-csv
+.. _Flex: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-flex-multi-frp
+.. _Flex probe sets overview: https://www.10xgenomics.com/support/flex-gene-expression/documentation/steps/probe-sets/chromium-frp-probe-sets-overview

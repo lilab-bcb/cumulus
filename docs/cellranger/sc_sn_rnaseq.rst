@@ -30,7 +30,7 @@ Sample sheet
 
 #. *Chemistry* column.
 
-	According to *cellranger count*'s documentation, chemistry can be
+	The cellranger workflow fully supports all 10x assay configurations. The most widely used ones are listed below:
 
 	.. list-table::
 		:widths: 5 20
@@ -60,18 +60,14 @@ Sample sheet
 
 	This column is optional with a default **rna**. If you want to put a value, put **rna** here.
 
-#. *FetureBarcodeFile* column.
-
-	Put target panel CSV file here for targeted expressiond data. Note that if a target panel CSV is present, cell ranger version must be >= 4.0.0.
-
 #. Example::
 
-	Sample,Reference,Flowcell,Chemistry,DataType,FeatureBarcodeFile
+	Sample,Reference,Flowcell,Chemistry,DataType
 	sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,threeprime,rna
 	sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/Fastq,threeprime,rna
 	sample_2,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,fiveprime,rna
 	sample_2,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/Fastq,fiveprime,rna
-	sample_3,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,auto,rna,gs://fc-e0000000-0000-0000-0000-000000000000/immunology_v1.0_GRCh38-2020-A.target_panel.csv
+	sample_3,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,auto,rna
 
 Workflow input
 ++++++++++++++
@@ -114,18 +110,10 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes sequencing reads as input (
 		  - Perform Cell Ranger secondary analysis (dimensionality reduction, clustering, etc.)
 		  - false
 		  - false
-		* - cell_annotation_model
-		  - Cell annotation model to use. By default do not run. Otherwise, specify valid model names from: ``auto`` (autodetect model), ``human_pca_v1_beta``, ``mouse_pca_v1_beta``.
-		  - "auto"
-		  - ""
 		* - cellranger_version
-		  - cellranger version, could be: 9.0.1, 9.0.0, 8.0.1, 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0
+		  - cellranger version, could be: 9.0.1, 8.0.1, 7.2.0
 		  - "9.0.1"
 		  - "9.0.1"
-		* - config_version
-		  - config docker version used for processing sample sheets, could be 0.3, 0.2, 0.1
-		  - "0.3"
-		  - "0.3"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -136,7 +124,7 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes sequencing reads as input (
 		  - "quay.io/cumulus"
 		* - acronym_file
 		  - | The link/path of an index file in TSV format for fetching preset genome references, chemistry barcode inclusion lists, etc. by their names.
-		    | Set an GS URI if *backend* is ``gcp``; an S3 URI for ``aws`` backend; an absolute file path for ``local`` backend.
+		    | Set an GS URI if running on GCP; an S3 URI for AWS; an absolute file path for HPC or local machines.
 		  - "s3://xxxx/index.tsv"
 		  - "gs://cumulus-ref/resources/cellranger/index.tsv"
 		* - zones
@@ -155,20 +143,12 @@ For sc/snRNA-seq data, ``cellranger_workflow`` takes sequencing reads as input (
 		  - Disk space in GB needed for cellranger count
 		  - 500
 		  - 500
-		* - backend
-		  - Cloud backend for file transfer. Available options:
-
-		    - "gcp" for Google Cloud;
-		    - "aws" for Amazon AWS;
-		    - "local" for local machine.
-		  - "gcp"
-		  - "gcp"
 		* - preemptible
-		  - Number of preemptible tries
+		  - Number of preemptible tries. Only works for GCP
 		  - 2
 		  - 2
 		* - awsQueueArn
-		  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+		  - The AWS ARN string of the job queue to be used. Only works for AWS
 		  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
 		  - ""
 
