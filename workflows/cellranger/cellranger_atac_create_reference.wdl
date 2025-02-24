@@ -16,8 +16,6 @@ workflow cellranger_atac_create_reference {
 
         # Number of preemptible tries
         Int preemptible = 2
-        # Backend
-        String backend = "gcp"
         # Arn string of AWS queue
         String awsQueueArn = ""
 
@@ -40,6 +38,11 @@ workflow cellranger_atac_create_reference {
 
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
+
+    # Backend: gcp, aws, local
+    Boolean use_gcp = sub(output_directory, "^gs://.+$", "gcp") == "gcp"
+    Boolean use_aws = sub(output_directory, "^s3://.+$", "aws") == "aws"
+    String backend = (if use_gcp then "gcp"  else (if use_aws then "aws" else "local"))
 
     call run_cellranger_atac_create_reference {
         input:

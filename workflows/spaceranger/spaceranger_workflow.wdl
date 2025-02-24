@@ -36,8 +36,6 @@ workflow spaceranger_workflow {
 
         # Space Ranger version: 3.1.3, 3.0.1
         String spaceranger_version = "3.1.3"
-        # Config version
-        String config_version = "0.3"
 
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
@@ -55,9 +53,9 @@ workflow spaceranger_workflow {
         Int preemptible = 2
         # Arn string of AWS queue
         String awsQueueArn = ""
-        # Backend
-        String backend = "gcp"
     }
+
+    String config_version = "0.3"
 
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
@@ -67,6 +65,10 @@ workflow spaceranger_workflow {
     Map[String, String] acronym2gsurl = read_map(acronym_file)
     String null_file = acronym2gsurl["null_file"]
 
+    # Backend: gcp, aws, local
+    Boolean use_gcp = sub(output_directory, "^gs://.+$", "gcp") == "gcp"
+    Boolean use_aws = sub(output_directory, "^s3://.+$", "aws") == "aws"
+    String backend = (if use_gcp then "gcp"  else (if use_aws then "aws" else "local"))
 
     call generate_count_config {
         input:

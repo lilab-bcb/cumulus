@@ -21,16 +21,9 @@ workflow cellranger_vdj {
         # Do not align reads to reference V(D)J sequences before de novo assembly. Default: false
         Boolean denovo = false
 
-        # Force the analysis to be carried out for a particular chain type. The accepted values are:
-        #   "auto" for autodetection based on TR vs IG representation (default),
-        #   "TR" for T cell receptors,
-        #   "IG" for B cell receptors,
-        # Use this in rare cases when automatic chain detection fails.
-        ##String chain = "auto"
-
         # If inner enrichment primers other than those provided in the 10x kits are used, they need to be specified here as a textfile with one primer per line. Disable secondary analysis, e.g. clustering
         # A cloud URI to the text file
-        String inner_enrichment_primers = ""
+        File inner_enrichment_primers
 
         # cellranger version
         String cellranger_version
@@ -95,7 +88,7 @@ task run_cellranger_vdj {
         File ref_file
         Boolean denovo
         String data_type
-        String inner_enrichment_primers
+        File inner_enrichment_primers
         String cellranger_version
         String docker_registry
         String zones
@@ -119,6 +112,9 @@ task run_cellranger_vdj {
         import re
         import os
         from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
+
+        def is_null_file(filename):
+            return filename == "" or os.path.basename(filename) == "null"
 
         fastqs = []
         for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
@@ -146,13 +142,13 @@ task run_cellranger_vdj {
             chain = 'TR'
         elif '~{data_type}' == 'vdj_t_gd':
             chain = 'TR'
-            assert '~{inner_enrichment_primers}' != '', "The vdj_t_gd library doesn't have associated inner_enrichment_primers!"
+            assert not is_null_file('~{inner_enrichment_primers}'), "Sample '~{sample_id}' of vdj_t_gd DataType doesn't have associated inner_enrichment_primers!"
         else:
             chain = 'IG'
-        call_args.append('--chain='+chain)
+        call_args.append('--chain=' + chain)
         if '~{denovo}' != 'false':
             call_args.append('--denovo')
-        if '~{inner_enrichment_primers}' != '':
+        if not is_null_file('~{inner_enrichment_primers}'):
             call_args.extend(['--inner-enrichment-primers', '~{inner_enrichment_primers}'])
         print(' '.join(call_args))
         check_call(call_args)

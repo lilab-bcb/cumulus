@@ -84,11 +84,14 @@ workflow starsolo_workflow {
         Int preemptible = 2
         # Arn string of AWS queue
         String awsQueueArn = ""
-        # backend choose from "gcp", "aws", "local"
-        String backend = "gcp"
-        # Config version
-        String config_version = "0.3"
     }
+
+    String config_version = "0.3"
+
+    # Backend: gcp, aws, local
+    Boolean use_gcp = sub(output_directory, "^gs://.+$", "gcp") == "gcp"
+    Boolean use_aws = sub(output_directory, "^s3://.+$", "aws") == "aws"
+    String backend = (if use_gcp then "gcp"  else (if use_aws then "aws" else "local"))
 
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")

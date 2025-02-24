@@ -335,20 +335,12 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
       - Disk space in GB needed for count per sample.
       - 500
       - 500
-    * - backend
-      - Cloud infrastructure backend to use. Available options:
-
-        - ``gcp`` for Google Cloud;
-        - ``aws`` for Amazon AWS;
-        - ``local`` for local machine.
-      - "gcp"
-      - "gcp"
     * - preemptible
-      - Number of maximum preemptible tries allowed. This works only when *backend* is ``gcp``.
+      - Number of maximum preemptible tries allowed. Only works for GCP
       - 2
       - 2
     * - awsQueueArn
-      - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+      - The AWS ARN string of the job queue to be used. Only works for AWS
       - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
       - ""
 

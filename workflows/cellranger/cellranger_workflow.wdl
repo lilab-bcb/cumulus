@@ -38,9 +38,6 @@ workflow cellranger_workflow {
         #   "IG" for B cell receptors,
         # Use this in rare cases when automatic chain detection fails.
         String vdj_chain = "auto"
-        # If inner enrichment primers other than those provided in the 10x kits are used, they need to be specified here as a textfile with one primer per line. Disable secondary analysis, e.g. clustering
-        # A cloud URI to the text file
-        String vdj_inner_enrichment_primers = ""
 
         # For extracting ADT count
 
@@ -69,13 +66,6 @@ workflow cellranger_workflow {
         # Cell caller override: define the minimum number of GEX UMI counts for a cell barcode.
         Int? arc_min_gex_count
 
-        # For multi
-
-        # CMO set CSV file, delaring CMO constructs and associated barcodes
-        File? cmo_set
-        # CMO barcode sample assignment CSV file, manually specifying the barcodes for each sample
-        File? cmo_barcode_sample_csv
-
         # Index TSV file
         File acronym_file = "gs://cumulus-ref/resources/cellranger/index.tsv"
 
@@ -91,8 +81,6 @@ workflow cellranger_workflow {
         String docker_registry = "quay.io/cumulus"
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-        # Backend
-        String backend = "gcp"
         # Number of cpus per cellranger and spaceranger job
         Int num_cpu = 32
         # Memory string
@@ -140,9 +128,14 @@ workflow cellranger_workflow {
 
     String docker_registry_stripped = sub(docker_registry, "/+$", "")
 
-    Map[String, String] acronym2gsurl = read_map(acronym_file)
-    String null_file = acronym2gsurl["null_file"]
+    Map[String, String] acronym2uri = read_map(acronym_file)
+    String null_file = acronym2uri["null_file"]
+    String flex_probset_file = acronym2uri["Flex"]
 
+    # Backend: gcp, aws, local
+    Boolean use_gcp = sub(output_directory, "^gs://.+$", "gcp") == "gcp"
+    Boolean use_aws = sub(output_directory, "^s3://.+$", "aws") == "aws"
+    String backend = (if use_gcp then "gcp"  else (if use_aws then "aws" else "local"))
 
     call generate_count_config {
         input:
@@ -154,18 +147,18 @@ workflow cellranger_workflow {
             preemptible = preemptible,
             awsQueueArn = awsQueueArn,
             backend = backend,
-            null_file = null_file
+            null_file = null_file,
+            flex_probset_file = flex_probset_file
     }
 
-    if (length(generate_count_config.sample_ids) > 0) {
-        scatter (sample_id in generate_count_config.sample_ids) {
+    if (length(generate_count_config.sample_gex_ids) > 0) {
+        scatter (sample_id in generate_count_config.sample_gex_ids) {
             call crc.cellranger_count as cellranger_count {
                 input:
                     sample_id = sample_id,
                     input_fastqs_directories = generate_count_config.sample2dir[sample_id],
                     output_directory = output_directory_stripped,
-                    genome = generate_count_config.sample2genome[sample_id],
-                    target_panel = generate_count_config.sample2fbf[sample_id],
+                    genome = generate_count_config.sample2ref[sample_id],
                     chemistry = generate_count_config.sample2chemistry[sample_id],
                     include_introns = include_introns,
                     acronym_file = acronym_file,
@@ -205,11 +198,11 @@ workflow cellranger_workflow {
                     sample_id = sample_id,
                     input_fastqs_directories = generate_count_config.sample2dir[sample_id],
                     output_directory = output_directory_stripped,
-                    genome = generate_count_config.sample2genome[sample_id],
+                    reference = generate_count_config.sample2ref[sample_id],
+                    data_type = generate_count_config.sample2datatype[sample_id],
                     acronym_file = acronym_file,
                     denovo = vdj_denovo,
-                    chain = vdj_chain,
-                    inner_enrichment_primers = vdj_inner_enrichment_primers,
+                    inner_enrichment_primers = generate_count_config.sample2aux[sample_id],
                     cellranger_version = cellranger_version,
                     docker_registry = docker_registry_stripped,
                     zones = zones,
@@ -244,7 +237,7 @@ workflow cellranger_workflow {
                     output_directory = output_directory_stripped,
                     chemistry = generate_count_config.sample2chemistry[sample_id],
                     data_type = generate_count_config.sample2datatype[sample_id],
-                    feature_barcode_file = generate_count_config.sample2fbf[sample_id],
+                    feature_barcode_file = generate_count_config.sample2aux[sample_id],
                     crispr_barcode_pos = crispr_barcode_pos,
                     scaffold_sequence = scaffold_sequence,
                     max_mismatch = max_mismatch,
@@ -270,7 +263,7 @@ workflow cellranger_workflow {
                     sample_id = sample_id,
                     input_fastqs_directories = generate_count_config.sample2dir[sample_id],
                     output_directory = output_directory_stripped,
-                    genome = generate_count_config.sample2genome[sample_id],
+                    genome = generate_count_config.sample2ref[sample_id],
                     acronym_file = acronym_file,
                     force_cells = force_cells,
                     dim_reduce = atac_dim_reduce,
@@ -311,7 +304,7 @@ workflow cellranger_workflow {
                     input_data_types = generate_count_config.sample2datatype[link_id],
                     output_directory = output_directory_stripped,
                     acronym_file = acronym_file,
-                    genome = generate_count_config.sample2genome[link_id],
+                    genome = generate_count_config.sample2ref[link_id],
                     gex_exclude_introns = arc_gex_exclude_introns,
                     no_bam = no_bam,
                     min_atac_count = arc_min_atac_count,
@@ -350,13 +343,12 @@ workflow cellranger_workflow {
                     input_samples = generate_count_config.link2sample[link_id],
                     input_fastqs_directories = generate_count_config.sample2dir[link_id],
                     input_data_types = generate_count_config.sample2datatype[link_id],
-                    input_fbf = generate_count_config.sample2fbf[link_id],
+                    input_aux = generate_count_config.sample2aux[link_id],
                     output_directory = output_directory_stripped,
                     acronym_file = acronym_file,
-                    genome = generate_count_config.sample2genome[link_id],
-                    probe_set = generate_count_config.sample2probeset[link_id],
-                    cmo_set = cmo_set,
-                    cmo_barcode_sample_csv = cmo_barcode_sample_csv,
+                    genome = generate_count_config.sample2ref[link_id],
+                    vdj_ref = generate_count_config.link2vdjref[link_id],
+                    probe_set_file = generate_count_config.sample2probeset[link_id],
                     include_introns = include_introns,
                     no_bam = no_bam,
                     secondary = secondary,
@@ -383,10 +375,10 @@ workflow cellranger_workflow {
                     input_samples = generate_count_config.link2sample[link_id],
                     input_fastqs_directories = generate_count_config.sample2dir[link_id],
                     input_data_types = generate_count_config.sample2datatype[link_id],
-                    input_fbf = generate_count_config.sample2fbf[link_id],
+                    input_aux = generate_count_config.sample2aux[link_id],
                     output_directory = output_directory_stripped,
                     acronym_file = acronym_file,
-                    genome = generate_count_config.sample2genome[link_id],
+                    genome = generate_count_config.sample2ref[link_id],
                     include_introns = include_introns,
                     no_bam = no_bam,
                     secondary = secondary,
@@ -427,7 +419,6 @@ workflow cellranger_workflow {
             "multi": cellranger_multi.output_multi_directory,
             "fbc": cellranger_count_fbc.output_count_directory
         }
-        File count_matrix = generate_count_config.count_matrix
     }
 }
 
@@ -443,6 +434,7 @@ task generate_count_config {
         String awsQueueArn
         String backend
         String null_file
+        File flex_probset_file
     }
 
     command {
@@ -476,7 +468,7 @@ task generate_count_config {
 
         for idx, row in df.iterrows():
             row['Flowcell'] = re.sub('/+$', '', row['Flowcell'])
-            if row['DataType'] not in ['rna', 'vdj', 'adt', 'citeseq', 'cmo', 'crispr', 'atac', 'hashing', 'frp']:
+            if row['DataType'] not in ['rna', 'vdj', 'vdj_t', 'vdj_b', 'vdj_t_gd', 'adt', 'citeseq', 'cmo', 'crispr', 'atac', 'hashing', 'frp']:
                 print("Unknown DataType " + row['DataType'] + " is detected!", file = sys.stderr)
                 sys.exit(1)
             if re.search('[^a-zA-Z0-9_-]', row['Sample']) is not None:
@@ -484,23 +476,34 @@ task generate_count_config {
                 print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &', file = sys.stderr)
                 sys.exit(1)
 
-        with open('sample_ids.txt', 'w') as fo1, open('sample_vdj_ids.txt', 'w') as fo2, open('sample_feature_ids.txt', 'w') as fo3, open('sample_atac_ids.txt', 'w') as fo4, \
-             open('sample2dir.txt', 'w') as foo1, open('sample2datatype.txt', 'w') as foo2, open('sample2genome.txt', 'w') as foo3, \
-             open('sample2chemistry.txt', 'w') as foo4, open('sample2fbf.txt', 'w') as foo5, open('count_matrix.csv', 'w') as foo6, \
-             open('link_arc_ids.txt', 'w') as fo5, open('link_multi_ids.txt', 'w') as fo6, open('link_fbc_ids.txt', 'w') as fo7, \
-             open('link2sample.txt', 'w') as foo7, open('sample2probeset.txt', 'w') as fo_s2probeset:
+        with open('sample_gex_ids.txt', 'w') as fol_gex, open('sample_vdj_ids.txt', 'w') as fol_vdj, open('sample_feature_ids.txt', 'w') as fol_fbc, open('sample_atac_ids.txt', 'w') as fol_atac, \
+             open('sample2dir.txt', 'w') as fom_s2dir, open('sample2datatype.txt', 'w') as fom_s2type, open('sample2ref.txt', 'w') as fom_s2ref, \
+             open('sample2chemistry.txt', 'w') as fom_s2chem, open('sample2aux.txt', 'w') as fom_s2aux, \
+             open('link_arc_ids.txt', 'w') as fol_arc, open('link_multi_ids.txt', 'w') as fol_multi, open('link_fbc_ids.txt', 'w') as fol_link_fbc, \
+             open('link2sample.txt', 'w') as fom_l2sample, open('sample2probeset.txt', 'w') as fom_l2probeset, open('link2vdjref.txt', 'w') as fom_l2vdj_ref:
 
-            n_ref = n_chem = n_fbf = n_link = n_probeset = 0 # this mappings can be empty
-            foo6.write('Sample,Location,Bam,BamIndex,Barcodes,Reference,Chemistry\n') # count_matrix.csv
-            datatype2fo = dict([('rna', fo1), ('vdj', fo2), ('adt', fo3), ('citeseq', fo3), ('hashing', fo3), ('cmo', fo3), ('crispr', fo3), ('atac', fo4)])
+            no_ref = no_chem = no_aux = no_link = no_probeset = no_vdj_ref = True   # Handle the case of empty values in sample sheet
+            datatype2fo = dict([('rna', fol_gex), ('vdj', fol_vdj), ('vdj_t', fol_vdj), ('vdj_b', fol_vdj), ('vdj_t_gd', fol_vdj), ('adt', fol_fbc), ('citeseq', fol_fbc), ('hashing', fol_fbc), ('cmo', fol_fbc), ('crispr', fol_fbc), ('atac', fol_atac)])
 
             multiomics = defaultdict(set)
             link2sample = defaultdict(list)
             link2dir = defaultdict(list)
             link2dt = defaultdict(list)
-            link2fbf = defaultdict(list)
+            link2aux = defaultdict(list)
             link2ref = defaultdict(set)
-            link2probset = defaultdict(set)
+            link2vdj_ref = defaultdict(set)
+            link2probeset = defaultdict(set)
+
+            if 'Link' in df.columns:
+                # Check if Link names are disjoint from Sample IDs
+                link_set = set(df['Link'].unique())
+                sample_set = set(df['Sample'].unique())
+                if not link_set.isdisjoint(sample_set):
+                    print('Link names are not disjoint from Sample names!')
+                    sys.exit(1)
+
+            # Load Reference to Flex Probe Set mapping
+            df_flex = pd.read_csv('~{flex_probset_file}', header=None, sep='\t')
 
             for sample_id in df['Sample'].unique():
                 df_local = df.loc[df['Sample'] == sample_id]
@@ -513,37 +516,39 @@ task generate_count_config {
                 dirs = df_local['Flowcell'].values
 
                 reference = 'null'
-                if datatype in ['rna', 'vdj', 'atac', 'frp']:
+                if datatype in ['rna', 'vdj', 'vdj_t', 'vdj_b', 'vdj_t_gd', 'atac', 'frp']:
                     if df_local['Reference'].unique().size > 1:
                         print("Detected multiple references for sample " + sample_id + "!", file = sys.stderr)
                         sys.exit(1)
                     reference = df_local['Reference'].iat[0]
 
-                probeset = 'null'
+                probe_set_file = '~{null_file}'
                 if datatype == 'frp':
-                    if 'ProbeSet' not in df_local.columns:
-                        probeset = 'FRP_human_probe_v1.0.1'
-                    else:
-                        if df_local['ProbeSet'].unique().size > 1:
-                            print("Detected multiple probe sets for sample " + sample_id + "!", file = sys.stderr)
-                            sys.exit(1)
-                        probeset = df_local['ProbeSet'].iat[0]
+                    if reference == 'null':
+                        print("A genome reference must be specified for Flex sample '" + sample_id + "'!")
+                        sys.exit(1)
+                    if reference not in df_flex[0].values:
+                        print("The given genome reference '" + reference + "' doesn't have an associated Flex probe set!")
+                        sys.exit(1)
+                    probe_set_file = df_flex.loc[df_flex[0]==reference, 1].iat[0]
 
-                feature_barcode_file = 'null'
-                if datatype in ['rna', 'adt', 'citeseq', 'hashing', 'cmo', 'crispr', 'frp']:
-                    has_fbf = ('FeatureBarcodeFile' in df_local.columns) and isinstance(df_local['FeatureBarcodeFile'].iat[0], str) and (df_local['FeatureBarcodeFile'].iat[0] != '')
-                    if has_fbf:
-                        if df_local['FeatureBarcodeFile'].unique().size > 1:
-                            print("Detected multiple feature barcode or target panel files for sample " + sample_id + "!", file = sys.stderr)
+                aux_file = '~{null_file}'
+                if datatype in ['rna', 'adt', 'citeseq', 'hashing', 'cmo', 'crispr', 'frp', 'vdj', 'vdj_t', 'vdj_b', 'vdj_t_gd']:
+                    aux_key = 'AuxFile'
+                    if ('AuxFile' not in df_local.columns) and ('FeatureBarcodeFile' in df_local.columns):
+                        aux_key = 'FeatureBarcodeFile'  # Backward compatibility
+                    has_aux = (aux_key in df_local.columns) and isinstance(df_local[aux_key].iat[0], str) and (df_local[aux_key].iat[0] != '')
+                    if has_aux:
+                        if df_local[aux_key].unique().size > 1:
+                            print("Detected multiple auxiliary files for sample " + sample_id + "!", file = sys.stderr)
                             sys.exit(1)
-                        feature_barcode_file = df_local['FeatureBarcodeFile'].iat[0]
+                        aux_file = df_local[aux_key].iat[0]
                     else:
-                        if datatype in ['adt', 'citeseq', 'hashing', 'cmo', 'crispr']:
-                            print("Please specify one feature barcode file for sample " + sample_id + "!", file = sys.stderr)
+                        if datatype in ['adt', 'citeseq', 'hashing', 'crispr', 'vdj_t_gd']:
+                            print("An auxiliary file (info on feature barcodes or inner enrichment primers) for sample " + sample_id + " must be provided!", file = sys.stderr)
                             sys.exit(1)
-                        feature_barcode_file = '~{null_file}'
 
-                if ('Link' in df_local) or (datatype == 'frp'): # if multiomics or FRP (Fixed RNA Profiling)
+                if ('Link' in df_local) or (datatype == 'frp') or (datatype == 'rna' and aux_file != '~{null_file}'): # if multiomics, OCM, or Flex
                     if 'Link' in df_local:
                         if df_local['Link'].unique().size > 1:
                             print("Detected multiple Link values for sample '" + sample_id + "'!", file = sys.stderr)
@@ -558,27 +563,27 @@ task generate_count_config {
                         link2sample[link].extend([sample_id] * size)
                         link2dir[link].extend(list(dirs))
                         link2dt[link].extend([datatype] * size)
-                        if feature_barcode_file == '~{null_file}':
-                            feature_barcode_file = 'null'
-                        link2fbf[link].extend([feature_barcode_file] * size)
+                        link2aux[link].extend([aux_file] * size)
                         if reference != 'null':
-                            link2ref[link].add(reference)
-                        if probeset != 'null':
-                            link2probset[link].add(probeset)
+                            if datatype in ['vdj', 'vdj_t', 'vdj_b', 'vdj_t_gd']:  # Keep VDJ ref separate in case of OCM/HTO with VDJ
+                                link2vdj_ref[link].add(reference)
+                            else:
+                                link2ref[link].add(reference)
+                        link2probeset[link].add(probe_set_file)
                         continue
 
                 datatype2fo[datatype].write(sample_id + '\n')
 
-                foo1.write(sample_id + '\t' + ','.join(dirs) + '\n')
-                foo2.write(sample_id + '\t' + datatype + '\n')
+                fom_s2dir.write(sample_id + '\t' + ','.join(dirs) + '\n')
+                fom_s2type.write(sample_id + '\t' + datatype + '\n')
 
                 if reference != 'null':
-                    foo3.write(sample_id + '\t' + reference + '\n')
-                    n_ref += 1
+                    fom_s2ref.write(sample_id + '\t' + reference + '\n')
+                    no_ref = False
 
-                if feature_barcode_file != 'null':
-                    foo5.write(sample_id + '\t' + feature_barcode_file + '\n')
-                    n_fbf += 1
+                if aux_file != '~{null_file}':
+                    fom_s2aux.write(sample_id + '\t' + aux_file + '\n')
+                    no_aux = False
 
                 if datatype in ['rna', 'adt', 'citeseq', 'hashing', 'cmo', 'crispr', 'atac']:
                     if df_local['Chemistry'].unique().size > 1:
@@ -587,45 +592,45 @@ task generate_count_config {
                     chemistry = df_local['Chemistry'].iat[0]
                     if (chemistry in ['auto', 'threeprime']) and (datatype in ['adt', 'citeseq', 'hashing', 'cmo', 'crispr']):
                         chemistry = 'SC3Pv3' # default is different
-                    foo4.write(sample_id + '\t' + chemistry + '\n')
-                    n_chem += 1
+                    fom_s2chem.write(sample_id + '\t' + chemistry + '\n')
+                    no_chem = False
 
-                if datatype == 'rna':
-                    prefix = '~{output_dir}/' + sample_id
-                    bam = prefix + '/possorted_genome_bam.bam'
-                    bai = prefix + '/possorted_genome_bam.bam.bai'
-                    count_matrix = prefix + '/filtered_feature_bc_matrix.h5' # assume cellranger version >= 3.0.0
-                    barcodes = prefix + '/filtered_feature_bc_matrix/barcodes.tsv.gz'
-                    foo6.write(sample_id + ',' + count_matrix + ',' + bam + ',' + bai + ',' + barcodes + ',' + reference + ',' + chemistry + '\n')
+            no_link = len(multiomics) == 0
 
             for link_id in multiomics.keys():
-                n_link += 1
-
                 ref_set = link2ref.get(link_id, set())
                 if len(ref_set) > 1:
                     print("Link '" + link_id + "' contains multiple references!", file = sys.stderr)
                     sys.exit(1)
                 if len(ref_set) == 1:
-                    n_ref += 1
-                    foo3.write(link_id + '\t' + list(ref_set)[0] + '\n')
+                    no_ref = False
+                    fom_s2ref.write(link_id + '\t' + list(ref_set)[0] + '\n')
 
-                probeset_set = link2probset.get(link_id, set())
+                vdj_ref_set = link2vdj_ref.get(link_id, set())
+                if len(vdj_ref_set) > 1:
+                    print("Link '" + link_id + "' contains multiple VDJ references!", file = sys.stderr)
+                    sys.exit(1)
+                if len(vdj_ref_set) == 1:
+                    no_vdj_ref = False
+                    fom_l2vdj_ref.write(link_id + '\t' + list(vdj_ref_set)[0] + '\n')
+
+                probeset_set = link2probeset.get(link_id, set())
                 if len(probeset_set) > 1:
                     print("Link '" + link_id + "' contains multiple probe sets!", file = sys.stderr)
                     sys.exit(1)
                 if len(probeset_set) == 1:
-                    n_probeset += 1
+                    no_probeset = False
                     fo_s2probeset.write(link_id + '\t' + list(probeset_set)[0] + '\n')
 
-                foo1.write(link_id + '\t' + ','.join(link2dir[link_id]) + '\n')
-                foo2.write(link_id + '\t' + ','.join(link2dt[link_id]) + '\n')
-                foo7.write(link_id + '\t' + ','.join(link2sample[link_id]) + '\n')
+                fom_s2dir.write(link_id + '\t' + ','.join(link2dir[link_id]) + '\n')
+                fom_s2type.write(link_id + '\t' + ','.join(link2dt[link_id]) + '\n')
+                fom_l2sample.write(link_id + '\t' + ','.join(link2sample[link_id]) + '\n')
 
                 if 'atac' in multiomics[link_id]:
                     if multiomics[link_id] != set(['atac', 'rna']):
                         print("CellRanger ARC only works with ATAC+RNA data! Link '" + link_id + "' contains " + ', '.join(list(multiomics[link_id])) + '.', file = sys.stderr)
                         sys.exit(1)
-                    fo5.write(link_id + '\n')
+                    fol_arc.write(link_id + '\n')
                 elif 'cmo' in multiomics[link_id]:
                     if 'rna' not in multiomics[link_id]:
                         print("CellRanger multi expect RNA modality!", file = sys.stderr)
@@ -633,36 +638,48 @@ task generate_count_config {
                     if not multiomics[link_id].issubset(set(['rna', 'cmo', 'crispr', 'citeseq'])):
                         print("CellRanger multi only works with RNA/CMO/CRISPR/CITESEQ data! Link '" + link_id + "' contains " + ', '.join(list(multiomics[link_id])) + '.', file = sys.stderr)
                         sys.exit(1)
-                    fo6.write(link_id + '\n')
-                    foo5.write(link_id + '\t' + ','.join(link2fbf[link_id]) + '\n')
-                    n_fbf += 1
+                    fol_multi.write(link_id + '\n')
+                    fom_s2aux.write(link_id + '\t' + ','.join(link2aux[link_id]) + '\n')
+                    no_aux = False
                 elif 'frp' in multiomics[link_id]:
-                    fo6.write(link_id + '\n')
-                    foo5.write(link_id + '\t' + ','.join(link2fbf[link_id]) + '\n')
-                    n_fbf += 1
+                    fol_multi.write(link_id + '\n')
+                    fom_s2aux.write(link_id + '\t' + ','.join(link2aux[link_id]) + '\n')
+                    no_aux = False
                 else:
+                    if 'rna' in multiomics[link_id]:
+                        idx_rna = link2dt[link_id].index('rna')
+                        if link2aux[link_id][idx_rna] != '~{null_file}':
+                            # OCM and HTO cases
+                            fol_multi.write(link_id + '\n')
+                            fom_s2aux.write(link_id + '\t' + ','.join(link2aux[link_id]) + '\n')
+                            no_aux = False
+                            continue
+
+                    # FBC case
                     if not multiomics[link_id].issubset(set(['rna', 'crispr', 'citeseq'])):
                         print("CellRanger count only works with RNA/CRISPR/CITESEQ data! Link '" + link_id + "' contains " + ', '.join(list(multiomics[link_id])) + '.', file = sys.stderr)
                         sys.exit(1)
-                    fo7.write(link_id + '\n')
-                    foo5.write(link_id + '\t' + ','.join(link2fbf[link_id]) + '\n')
-                    n_fbf += 1
+                    fol_link_fbc.write(link_id + '\n')
+                    fom_s2aux.write(link_id + '\t' + ','.join(link2aux[link_id]) + '\n')
+                    no_aux = False
 
-            if n_ref == 0:
-                foo3.write('null\tnull\n')
-            if n_probeset == 0:
+            if no_ref:
+                fom_s2ref.write('null\tnull\n')
+            if no_vdj_ref:
+                fom_l2vdj_ref.write('null\tnull\n')
+            if no_probeset:
                 fo_s2probeset.write('null\tnull\n')
-            if n_chem == 0:
-                foo4.write('null\tnull\n')
-            if n_fbf == 0:
-                foo5.write('null\tnull\n')
-            if n_link == 0:
-                foo7.write('null\tnull\n')
+            if no_chem:
+                fom_s2chem.write('null\tnull\n')
+            if no_aux:
+                fom_s2aux.write('null\tnull\n')
+            if no_link:
+                fom_l2sample.write('null\tnull\n')
         CODE
     }
 
     output {
-        Array[String] sample_ids = read_lines('sample_ids.txt')
+        Array[String] sample_gex_ids = read_lines('sample_gex_ids.txt')
         Array[String] sample_vdj_ids = read_lines('sample_vdj_ids.txt')
         Array[String] sample_feature_ids = read_lines('sample_feature_ids.txt')
         Array[String] sample_atac_ids = read_lines('sample_atac_ids.txt')
@@ -671,12 +688,12 @@ task generate_count_config {
         Array[String] link_fbc_ids = read_lines('link_fbc_ids.txt')
         Map[String, String] sample2dir = read_map('sample2dir.txt')
         Map[String, String] sample2datatype = read_map('sample2datatype.txt')
-        Map[String, String] sample2genome = read_map('sample2genome.txt')
+        Map[String, String] sample2ref = read_map('sample2ref.txt')
+        Map[String, String] link2vdjref = read_map('link2vdjref.txt')
         Map[String, String] sample2probeset = read_map('sample2probeset.txt')
         Map[String, String] sample2chemistry = read_map('sample2chemistry.txt')
-        Map[String, String] sample2fbf = read_map('sample2fbf.txt')
+        Map[String, String] sample2aux = read_map('sample2aux.txt')
         Map[String, String] link2sample = read_map('link2sample.txt')
-        File count_matrix = "count_matrix.csv"
     }
 
     runtime {

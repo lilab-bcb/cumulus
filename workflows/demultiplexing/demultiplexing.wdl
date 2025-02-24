@@ -25,8 +25,6 @@ workflow demultiplexing {
         String awsQueueArn = ""
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-        # Backend
-        String backend = "gcp"
         # Reference Index TSV
         File ref_index_file = "gs://regev-lab/resources/cellranger/index.tsv"
 
@@ -97,12 +95,16 @@ workflow demultiplexing {
         String popscle_memory = "120G"
         # Extra disk space (integer) in GB needed for popscle per pair
         Int popscle_extra_disk_space = 100
-
-        # Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: 0.3, 0.2, 0.1
-        String config_version = "0.3"
     }
 
+    String config_version = "0.3"
+
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
+
+    # Backend: gcp, aws, local
+    Boolean use_gcp = sub(output_directory, "^gs://.+$", "gcp") == "gcp"
+    Boolean use_aws = sub(output_directory, "^s3://.+$", "aws") == "aws"
+    String backend = (if use_gcp then "gcp"  else (if use_aws then "aws" else "local"))
 
     call generate_demux_config as Config {
         input:
