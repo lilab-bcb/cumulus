@@ -139,28 +139,16 @@ global inputs
 	  	- "cumulusprod" for backup images on Docker Hub.
 	  - "quay.io/cumulus"
 	  - "quay.io/cumulus"
-	* - config_version
-	  - Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: ``0.2``, ``0.1``.
-	  - "0.2"
-	  - "0.2"
-	* - backend
-	  - Cloud infrastructure backend to use. Available options:
-
-	  	- "gcp" for Google Cloud;
-	  	- "aws" for Amazon AWS;
-	  	- "local" for local machine.
-	  - "gcp"
-	  - "gcp"
 	* - ref_index_file
-	  - The link/path of an index file in TSV format for fetching preset genome references, chemistry whitelists, etc. by their names. Set an GS URI if backend is ``gcp``; an S3 URI for ``aws`` backend; an absolute file path for ``local`` backend.
+	  - The link/path of an index file in TSV format for fetching preset genome references, chemistry whitelists, etc. by their names. Set an GS URI if running on GCP; an S3 URI for AWS; an absolute file path for HPC or local machines.
 	  - "s3://xxxx/index.tsv"
-	  - "gs://regev-lab/resources/cellranger/index.tsv"
+	  - "gs://cumulus-ref/resources/cellranger/index.tsv"
 	* - preemptible
-	  - Number of maximum preemptible tries allowed. This works only when *backend* is ``gcp``.
+	  - Number of maximum preemptible tries allowed. Only works for GCP
 	  - 2
 	  - 2
 	* - awsQueueArn
-	  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+	  - The AWS ARN string of the job queue to be used. Only works for AWS
 	  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
 	  - ""
 
