@@ -4,7 +4,7 @@ import "spaceranger_count.wdl" as src
 
 workflow spaceranger_workflow {
     input {
-        # Columns: Sample, Reference, Flowcell, [ProbeSet, Image, DarkImage, ColorizedImage, CytaImage, Slide, Area, SlideFile, LoupeAlignment, TargetPanel])
+        # Columns: Sample, Reference, Flowcell, [ProbeSet, Image, DarkImage, ColorizedImage, CytaImage, Slide, Area, SlideFile, LoupeAlignment])
         File input_csv_file
         # Output directory, gs URL
         String output_directory
@@ -103,7 +103,6 @@ workflow spaceranger_workflow {
                 slidefile = sample_row[10],
                 reorient_images = reorient_images,
                 loupe_alignment = sample_row[11],
-                target_panel = sample_row[12],
                 no_bam = no_bam,
                 secondary = secondary,
                 r1_length = r1_length,
@@ -178,7 +177,7 @@ task generate_count_config {
                 print('Examples of common characters that are not allowed are the space character and the following: ?()[]/\=+<>:;"\',*^| &', file = sys.stderr)
                 sys.exit(1)
 
-        for c in ['Image', 'ColorizedImage', 'CytaImage', 'SlideFile', 'LoupeAlignment', 'TargetPanel']:
+        for c in ['Image', 'ColorizedImage', 'CytaImage', 'SlideFile', 'LoupeAlignment']:
             if c not in df.columns:
                 df[c] = '~{null_file}'
             else:
@@ -204,7 +203,7 @@ task generate_count_config {
             df_local = df.loc[df['Sample'] == sample_id]
             dirs = df_local['Flowcell'].values
             out_str = df_local['Sample'].iat[0] + '\t' + ','.join(dirs) + '\t' + df_local['Reference'].iat[0]
-            for c in ['ProbeSet', 'Image', 'DarkImage', 'ColorizedImage', 'CytaImage', 'Slide', 'Area', 'SlideFile', 'LoupeAlignment', 'TargetPanel']:
+            for c in ['ProbeSet', 'Image', 'DarkImage', 'ColorizedImage', 'CytaImage', 'Slide', 'Area', 'SlideFile', 'LoupeAlignment']:
                 out_str += '\t' + df_local[c].iat[0]
             print(out_str)
         CODE
