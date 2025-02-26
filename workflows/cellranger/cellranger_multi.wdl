@@ -144,6 +144,7 @@ task run_cellranger_multi {
         auxs = '~{input_aux}'.split(',')
 
         rna_file = set()
+        vdj_file = set()
         cmo_file = set()
         flex_file = set()
         feature_file = set()
