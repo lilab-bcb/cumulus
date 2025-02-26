@@ -160,6 +160,8 @@ task run_cellranger_multi {
             elif dtype == 'frp':
                 flex_file.add(aux)
                 has_flex = True
+            elif dtype in ['vdj', 'vdj_t_gd']:
+                vdj_file.add(aux)
             else:  # hashing, citeseq, adt
                 feature_file.add(aux)
                 if dtype in ['hashing', 'adt']:
