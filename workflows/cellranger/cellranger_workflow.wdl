@@ -610,9 +610,12 @@ task generate_count_config {
                 if len(vdj_ref_set) > 1:
                     print("Link '" + link_id + "' contains multiple VDJ references!", file = sys.stderr)
                     sys.exit(1)
-                if len(vdj_ref_set) == 1:
+                else:
                     no_vdj_ref = False
-                    fom_l2vdj_ref.write(link_id + '\t' + list(vdj_ref_set)[0] + '\n')
+                    if len(vdj_ref_set) == 1:
+                        fom_l2vdj_ref.write(link_id + '\t' + list(vdj_ref_set)[0] + '\n')
+                    else:
+                        fom_l2vdj_ref.write(link_id + '\tnull\n')
 
                 probeset_set = link2probeset.get(link_id, set())
                 if len(probeset_set) > 1:
