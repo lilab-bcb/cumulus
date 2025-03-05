@@ -71,7 +71,7 @@ workflow cellranger_workflow {
 
         # 9.0.1, 8.0.1, 7.2.0
         String cellranger_version = "9.0.1"
-        String cumulus_feature_barcoding_version = "0.11.4"
+        String cumulus_feature_barcoding_version = "1.0.0"
         # 2.1.0, 2.0.0
         String cellranger_atac_version = "2.1.0"
         # 2.0.2.strato, 2.0.2.custom-max-cell, 2.0.2, 2.0.1, 2.0.0
@@ -244,7 +244,6 @@ workflow cellranger_workflow {
                     min_read_ratio = min_read_ratio,
                     cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
                     docker_registry = docker_registry_stripped,
-                    acronym_file = acronym_file,
                     zones = zones,
                     num_cpu = feature_num_cpu,
                     memory = feature_memory,
@@ -590,8 +589,6 @@ task generate_count_config {
                         print("Detected multiple chemistry strings for sample " + sample_id + "!", file = sys.stderr)
                         sys.exit(1)
                     chemistry = df_local['Chemistry'].iat[0]
-                    if (chemistry in ['auto', 'threeprime']) and (datatype in ['adt', 'citeseq', 'hashing', 'cmo', 'crispr']):
-                        chemistry = 'SC3Pv3' # default is different
                     fom_s2chem.write(sample_id + '\t' + chemistry + '\n')
                     no_chem = False
 
