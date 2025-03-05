@@ -154,8 +154,8 @@ For feature barcoding data, ``cellranger_workflow`` takes sequencing reads as in
 		  - 0.1
 		* - cumulus_feature_barcoding_version
 		  - Cumulus_feature_barcoding version for extracting feature barcode matrix.
-		  - "0.11.4"
-		  - "0.11.4"
+		  - "1.0.0"
+		  - "1.0.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
