@@ -568,7 +568,8 @@ task generate_count_config {
                                 link2vdj_ref[link].add(reference)
                             else:
                                 link2ref[link].add(reference)
-                        link2probeset[link].add(probe_set_file)
+                        if probe_set_file != '~{null_file}':
+                            link2probeset[link].add(probe_set_file)
                         continue
 
                 datatype2fo[datatype].write(sample_id + '\n')
