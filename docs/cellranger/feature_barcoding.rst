@@ -49,26 +49,27 @@ Sample sheet
 		* - Chemistry
 		  - Explanation
 		* - **auto**
-		  - Default. This is an alias for Single Cell 3' v3 (SC3Pv3)
+		  - Default. Auto-detect the chemistry of your data from all possible 10x assay types.
 		* - **threeprime**
-		  - This is another alias for Single Cell 3' v3 (SC3Pv3)
+		  - Auto-detect the chemistry of your data from all 3' assay types.
+		* - **fiveprime**
+		  - Auto-detect the chemistry of your data from all 5' assay types.
 		* - **SC3Pv4**
-		  - Single Cell 3' v4. **Notice:** This is GEM-X chemistry, and only works for Cell Ranger v8.0.0+
+		  - | Single Cell 3' v4. The workflow will auto-detect if Poly-A or CS1 capture method was applied to your data.
+		    | **Notice:** This is a GEM-X chemistry, and only works for Cell Ranger v8.0.0+
 		* - **SC3Pv3**
-		  - Single Cell 3′ v3
+		  - Single Cell 3′ v3. This is a Next GEM chemistry. The workflow will auto-detect if Poly-A or CS1 capture method was applied to your data.
 		* - **SC3Pv2**
 		  - Single Cell 3′ v2
-		* - **fiveprime**
-		  - This an alias for Single Cell 5' v2 (SC5Pv2)
+		* - **SC5Pv3**
+		  - Single Cell 5' v3. **Notice:** This is a GEM-X chemistry, and only works for Cell Rangrer v8.0.0+
 		* - **SC5Pv2**
 		  - Single Cell 5′ v2
-		* - **SC5Pv3**
-		  - Single Cell 5' v3. **Notice:** This is GEM-X chemistry, and only works for Cell Rangrer v8.0.0+
 		* - **multiome**
 		  - 10x Multiome barcodes
 
 .. note::
-	The *Chemistry* names for feature barcoding here are not necessarily the same as 10x names, as the workflow uses *Cumulus Feature Barcoding* to process the data.
+	Not all 10x chemistry names are supported for feature barcoding, as the workflow uses *Cumulus Feature Barcoding* to process the data.
 
 #. *DataType* column.
 
@@ -101,10 +102,10 @@ Below is an example sample sheet::
 
 	Sample,Reference,Flowcell,Chemistry,DataType,AuxFile
 	sample_1_rna,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,auto,rna,
-	sample_1_adt,,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,SC3Pv4,hashing,gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index.csv
+	sample_1_adt,,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,threeprime,hashing,gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index.csv
 	sample_2_gex,GRCh38-2024-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,auto,rna
 	sample_2_adt,GRCh38-2024-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,SC3Pv3,adt,gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index2.csv
-	sample_3_crispr,,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,SC3Pv3,crispr,gs://fc-e0000000-0000-0000-0000-000000000000/crispr_index.csv
+	sample_3_crispr,,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,fiveprime,crispr,gs://fc-e0000000-0000-0000-0000-000000000000/crispr_index.csv
 
 In the sample sheet above, despite the header row,
 
@@ -164,11 +165,6 @@ For feature barcoding data, ``cellranger_workflow`` takes sequencing reads as in
 		  	- "cumulusprod" for backup images on Docker Hub.
 		  - "quay.io/cumulus"
 		  - "quay.io/cumulus"
-		* - acronym_file
-		  - | The link/path of an index file in TSV format for fetching preset genome references, chemistry barcode inclusion lists, etc. by their names.
-		    | Set an GS URI if running on GCP; an S3 URI for AWS; an absolute file path for HPC or local machines.
-		  - "s3://xxxx/index.tsv"
-		  - "gs://cumulus-ref/resources/cellranger/index.tsv"
 		* - zones
 		  - Google cloud zones. For GCP Batch backend, the zones are automatically restricted by the Batch settings.
 		  - "us-central1-a us-west1-a"
@@ -247,4 +243,3 @@ If data type is ``crispr``, three additional files, ``sample_id.umi_count.pdf``,
 
 
 .. _Cumulus Feature Barcoding: https://github.com/lilab-bcb/cumulus_feature_barcoding
-.. _10x Feature Reference: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/inputs/cr-feature-ref-csv
