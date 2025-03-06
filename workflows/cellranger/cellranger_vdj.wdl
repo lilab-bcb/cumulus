@@ -124,7 +124,7 @@ task run_cellranger_vdj {
                 call_args = ['strato', 'exists', directory + '/~{sample_id}/']
                 print(' '.join(call_args))
                 check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-                call_args = ['strato', 'cp', '-r', directory + '/~{sample_id}', target]
+                call_args = ['strato', 'sync', directory + '/~{sample_id}', target]
                 print(' '.join(call_args))
                 check_call(call_args)
             except CalledProcessError:

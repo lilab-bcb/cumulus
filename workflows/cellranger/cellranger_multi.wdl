@@ -251,7 +251,7 @@ task run_cellranger_multi {
                     call_args = ['strato', 'exists', directory + '/' + samples[i] + '/']
                     print(' '.join(call_args))
                     check_call(call_args, stderr=STDOUT, stdout=DEVNULL)
-                    call_args = ['strato', 'cp', '-r', directory + '/' + samples[i], target]
+                    call_args = ['strato', 'sync', directory + '/' + samples[i], target]
                     print(' '.join(call_args))
                     check_call(call_args)
                 except CalledProcessError:
