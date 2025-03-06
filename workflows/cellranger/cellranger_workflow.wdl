@@ -568,7 +568,7 @@ task generate_count_config {
                                 link2vdj_ref[link].add(reference)
                             else:
                                 link2ref[link].add(reference)
-                        if probe_set_file != '~{null_file}':
+                        if (probe_set_file != '~{null_file}') or (len(link2probeset[link]) == 0):
                             link2probeset[link].add(probe_set_file)
                         continue
 
