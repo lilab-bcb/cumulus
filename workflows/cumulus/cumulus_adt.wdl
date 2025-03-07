@@ -12,7 +12,7 @@ workflow cumulus_adt {
         # 10x genomics chemistry
         String chemistry
 
-        # data type, either adt or crispr
+        # data type, either hashing, cmo, crispr or adt
         String data_type
 
         # feature barcodes in csv format
@@ -147,6 +147,8 @@ task run_generate_count_matrix_ADTs {
             #    call_args.append('--convert-cell-barcode')
         else:
             call_args.extend(['--feature', 'antibody'])
+            if '~{data_type}' == 'cmo':
+                call_args.extend(['--barcode-pos', '0'])
         print(' '.join(call_args))
         check_call(call_args)
 
