@@ -1,7 +1,7 @@
 FROM debian:bookworm-slim
 SHELL ["/bin/bash", "-c"]
 
-ADD https://github.com/lilab-bcb/cumulus_feature_barcoding/archive/refs/tags/1.0.0rc1.tar.gz /software/
+ADD https://github.com/lilab-bcb/cumulus_feature_barcoding/archive/refs/tags/1.0.0.tar.gz /software/
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software/
 
 RUN apt-get -qq update && \
@@ -39,9 +39,9 @@ RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install matplotlib==3.10.1 --no-cache-dir && \
     python -m pip install stratocumulus==0.3.0 --no-cache-dir
 
-RUN tar -xzf /software/1.0.0rc1.tar.gz -C /software && \
-    cd /software/cumulus_feature_barcoding-1.0.0rc1 && make clean && make all && cd ../.. && \
-    rm -f /software/1.0.0rc1.tar.gz
+RUN tar -xzf /software/1.0.0.tar.gz -C /software && \
+    cd /software/cumulus_feature_barcoding-1.0.0 && make clean && make all && cd ../.. && \
+    rm -f /software/1.0.0.tar.gz
 
 ADD barcode_list /software/barcode_list
 
@@ -52,4 +52,4 @@ RUN apt-get -qq -y remove gnupg && \
 
 RUN chmod a+rx /software/*
 
-ENV PATH=/software:/software/cumulus_feature_barcoding-1.0.0rc1:/usr/local/aws-cli/v2/current/bin:$PATH
+ENV PATH=/software:/software/cumulus_feature_barcoding-1.0.0:/usr/local/aws-cli/v2/current/bin:$PATH
