@@ -19,7 +19,8 @@
     * Support all the 3 `Sample Multiplexing`_ methods provided since Cell Ranger v9.0. See `details <./cellranger/index.html#flex-sample-multiplexing-and-multiomics>`_
     * For single-cell and single-nucleus RNA-seq:
 
-        *  Add new genome reference ``mRatBN7.2-2024-A``
+        * Add new genome reference ``mRatBN7.2-2024-A``
+        * Remove Target Gene Expression-related inputs, as it's no longer supported since Cell Ranger v7.2.0.
     * For feature barcoding:
 
         * Upgrade *cumulus_feature_barcoding_version* to `1.0.0 <https://github.com/lilab-bcb/cumulus_feature_barcoding/releases/tag/1.0.0>`_.
