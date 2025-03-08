@@ -38,17 +38,17 @@ Single-cell ATAC-seq
 
 ---------------------------------
 
-Single-cell multiomics
-^^^^^^^^^^^^^^^^^^^^^^
+Single-cell Multiome (GEX + ATAC)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. include:: sc_multiomics.rst
+.. include:: sc_multiome.rst
 
 --------------------------
 
-Fixed RNA Profiling (Flex)
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Flex, Sample Multiplexing and Multiomics
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-.. include:: fixed_rna_profiling.rst
+.. include:: multi.rst
 
 ---------------------------------
 

@@ -1,33 +1,22 @@
 Run STARsolo to generate gene-count matrices from FASTQ files
 ----------------------------------------------------------------------
 
-This ``starsolo_workflow`` workflow generates gene-count matrices from FASTQ data using STARsolo.
+This ``starsolo_workflow`` workflow generates gene-count matrices from FASTQ data using STARsolo. If your data start from BCL files, please first run `BCL Convert`_ to demultiplex flowcells to generate FASTQ files.
 
 Prepare input data and import workflow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Run ``cellranger_workflow`` to generate FASTQ data
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-You can skip this step if your data are already in FASTQ format.
-
-Otherwise, for 10X data, you need to first run *cellranger_workflow* to generate FASTQ files from BCL raw data for each sample. Please follow `cellranger_workflow manual <./cellranger/index.html>`_.
-
-Notice that you should set **run_mkfastq** to ``true`` to get FASTQ output. You can also set **run_count** to ``false`` to skip Cell Ranger count step.
-
-For Non-Broad users, you'll need to build your own docker for *bcl2fastq* step. Instructions are `here <bcl2fastq.html>`_.
-
-2. Import ``starsolo_workflow``
+1. Import ``starsolo_workflow``
 ++++++++++++++++++++++++++++++++++
 
 Import *starsolo_workflow* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose workflow **github.com/lilab-bcb/cumulus/STARsolo** to import.
 
 Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *starsolo_workflow* in the drop-down menu.
 
-3. Prepare a sample sheet
+2. Prepare a sample sheet
 ++++++++++++++++++++++++++++
 
-**3.1 Sample sheet format:**
+**2.1 Sample sheet format:**
 
 Please note that the columns in the CSV can be in any order, but that the column names must match the recognized headings.
 
@@ -65,7 +54,7 @@ A brief description of the sample sheet format is listed below **(required colum
 
         If not specified, use the default ``tenX_v3``.
 
-**3.2 Assay-specific preset STARsolo options**
+**2.2 Assay-specific preset STARsolo options**
 
 If **tenX_v3**, The following STARsolo options would be applied (could be overwritten by user-specified options)::
 
@@ -106,7 +95,7 @@ Example::
     sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/sample_2_fastqs,tenX_v2
 
 
-**3.2 Upload your sample sheet to the workspace bucket:**
+**2.2 Upload your sample sheet to the workspace bucket:**
 
 Example::
 
@@ -346,20 +335,12 @@ Below are inputs for *count* workflow. Notice that required inputs are in bold.
       - Disk space in GB needed for count per sample.
       - 500
       - 500
-    * - backend
-      - Cloud infrastructure backend to use. Available options:
-
-        - ``gcp`` for Google Cloud;
-        - ``aws`` for Amazon AWS;
-        - ``local`` for local machine.
-      - "gcp"
-      - "gcp"
     * - preemptible
-      - Number of maximum preemptible tries allowed. This works only when *backend* is ``gcp``.
+      - Number of maximum preemptible tries allowed. Only works for GCP
       - 2
       - 2
     * - awsQueueArn
-      - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+      - The AWS ARN string of the job queue to be used. Only works for AWS
       - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
       - ""
 
@@ -514,6 +495,8 @@ Required inputs are highlighted **in bold**.
       - File
       - Gzipped reference folder with name **"<genome>-starsolo.tar.gz"**, where *<genome>* is specified by workflow input **genome** above. The workflow will save a copy of it under **output_directory** specified in workflow input above.
 
+
+.. _BCL Convert: https://emea.support.illumina.com/sequencing/sequencing_software/bcl-convert.html
 .. _Import workflows to Terra: ./cumulus_import.html
 .. _genome reference: ./starsolo.html#prebuilt-genome-references
 .. _10x HDF5 format: https://support.10xgenomics.com/single-cell-gene-expression/software/pipelines/latest/advanced/h5_matrices

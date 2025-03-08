@@ -1,4 +1,7 @@
-This section mainly considers jobs starting from BCL files. If your job starts with FASTQ files, and only need to run ``cellranger count`` part, please refer to `this subsection <./index.html#run-cellranger-count-only>`_.
+The workflow starts with FASTQ files.
+
+.. note::
+	Starting from v3.0.0, Cumulus cellranger_workflow drops support for ``mkfastq``. If your data start from BCL files, please first run `BCL Convert`_ to demultiplex flowcells to generate FASTQ files.
 
 1. Import ``cellranger_workflow``
 +++++++++++++++++++++++++++++++++
@@ -10,30 +13,28 @@ This section mainly considers jobs starting from BCL files. If your job starts w
 2. Upload sequencing data to Google bucket
 ++++++++++++++++++++++++++++++++++++++++++
 
-	Copy your sequencing output to your workspace bucket using gsutil_ (you already have it if you've installed Google cloud SDK) in your unix terminal.
+	Copy your FASTQ files to your workspace bucket using `gcloud storage`_ command (you already have it if you've installed Google cloud SDK) in your unix terminal.
 
 	You can obtain your bucket URL in the dashboard tab of your Terra workspace under the information panel.
 
 	.. image:: ../images/google_bucket_link.png
 
-	Use ``gsutil cp [OPTION]... src_url dst_url`` to copy data to your workspace bucket. For example, the following command copies the directory at /foo/bar/nextseq/Data/VK18WBC6Z4 to a Google bucket::
+	There are three cases:
 
-		gsutil -m cp -r /foo/bar/nextseq/Data/VK18WBC6Z4 gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4
+		- **Case 1**: All the FASTQ files are in one top-level folder. Then you can simply upload this folder to Cloud, and in your sample sheet, make sure **Sample** names are consistent with the filename prefix of their corresponding FASTQ files.
+		- **Case 2**: In the top-level folder, each sample has a dedicated subfolder containing its FASTQ files. In this case, you need to upload the whole top-level folder, and in your sample sheet, make sure **Sample** names and their corresponding subfolder names are identical.
+		- **Case 3**: Each sample's FASTQ files are wrapped in a TAR file. In this case, upload the folder which contains this TAR file. Also, make sure **Sample** names are consistent with the filename prefix of their corresponding FASTQ files inside the TAR files.
 
-	``-m`` means copy in parallel, ``-r`` means copy the directory recursively, and ``gs://fc-e0000000-0000-0000-0000-000000000000`` should be replaced by your own workspace Google bucket URL.
+		Notice that if your FASTQ files are downloaded from the Sequence Read Archive (SRA) from NCBI, you must rename your FASTQs to follow the Illumina `file naming conventions`_.
 
-.. note::
-	If input is a folder of BCL files, users do not need to upload the whole folder to the Google bucket. Instead, they only need to upload the following files::
+		Example::
 
-		RunInfo.xml
-		RTAComplete.txt
-		runParameters.xml
-		Data/Intensities/s.locs
-		Data/Intensities/BaseCalls
+			gcloud storage cp -r /foo/bar/K18WBC6Z4/Fastq gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq
 
-	If data are generated using MiSeq or NextSeq, the location files are inside lane subfloders ``L001`` under ``Data/Intensities/``. In addition, if users' data only come from a subset of lanes (e.g. ``L001`` and ``L002``), users only need to upload lane subfolders from the subset (e.g. ``Data/Intensities/BaseCalls/L001, Data/Intensities/BaseCalls/L002`` and ``Data/Intensities/L001, Data/Intensities/L002`` if sequencer is MiSeq or NextSeq).
+		where ``-r`` means copy the directory recursively, and ``fc-e0000000-0000-0000-0000-000000000000`` should be replaced by your own workspace Google bucket name.
 
-Alternatively, users can submit jobs through command line interface (CLI) using `altocumulus <../command_line.html>`_, which will smartly upload BCL folders according to the above rules.
+
+Alternatively, users can submit jobs through command line interface (CLI) using `altocumulus <../command_line.html>`_, which will smartly upload FASTQ files to cloud.
 
 
 3. Prepare a sample sheet
@@ -43,9 +44,7 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 
 	Please note that the columns in the CSV can be in any order, but that the column names must match the recognized headings.
 
-	The sample sheet describes how to demultiplex flowcells and generate channel-specific count matrices. Note that *Sample*, *Lane*, and *Index* columns are defined exactly the same as in 10x's simple CSV layout file.
-
-	A brief description of the sample sheet format is listed below **(required column headers are shown in bold)**.
+	The sample sheet describes how to generate count matrices from sequencing reads. A brief description of the sample sheet format is listed below **(required column headers are shown in bold)**.
 
 	.. list-table::
 		:widths: 5 30
@@ -54,48 +53,65 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		* - Column
 		  - Description
 		* - **Sample**
-		  - Contains sample names. Each 10x channel should have a unique sample name. Sample name can only contain characters from [a-zA-Z0-9\_-].
+		  -
+		  	| Sample name. This name must be consistent with its corresponding FASTQ filename prefix in the folder specified in **Flowcell** column. Sample names can only contain characters from ``[a-zA-Z0-9\_-]`` to be recognized by Cell Ranger.
+		  	| Notice that if a sample has multiple sequencing runs, each of which has FASTQ files stored in dedicated location, you can specify multiple entries in the sample sheet with the same name in **Sample** column, and each entry accounts for one FASTQ folder location.
 		* - **Reference**
 		  -
-		  	| Provides the reference genome used by Cell Ranger for each 10x channel.
-		  	| The elements in the *reference* column can be either Google bucket URLs to reference tarballs or keywords such as *GRCh38-2020-A*.
+		  	| Provides the reference genome used by Cell Ranger for processing the sample.
+		  	| The reference can be a keyword of prebuilt references (e.g. ``GRCh38-2020-A``) that stored in Cumulus bucket, or a user specified cloud URI to a custom reference (in tarball ``.tar.gz`` format).
 		  	| A full list of available keywords is included in each of the following data type sections (e.g. sc/snRNA-seq) below.
 		* - **Flowcell**
-		  -
-		    | Indicates the Google bucket URLs of uploaded BCL folders.
-		    | If starts with FASTQ files, this should be Google bucket URLs of uploaded FASTQ folders.
-		    | The FASTQ folders should contain one subfolder for each sample in the flowcell with the sample name as the subfolder name.
-		    | Each subfolder contains FASTQ files for that sample.
+		  - Indicates the cloud URI of the uploaded folder containing FASTQ files for each sample.
 		* - Chemistry
-		  - Describes the 10x chemistry used for the sample. This column is optional.
+		  - Keywords to describe the 10x chemistry used for the sample. This column is optional. Check data type sections (e.g. sc/snRNA-seq) below for the corresponding list of available keywords.
 		* - DataType
-		  -
-			| Describes the data type of the sample --- *rna*, *vdj*, *citeseq*, *hashing*, *cmo*, *crispr*, *atac*.
-			| **rna** refers to gene expression data (*cellranger count*),
-			| **vdj** refers to V(D)J data (*cellranger vdj*),
-			| **citeseq** refers to CITE-Seq tag data,
-			| **hashing** refers to cell-hashing or nucleus-hashing tag data,
-			| **adt**, which refers to the case where *hashing* and *citeseq* reads are in a sample library.
-			| **cmo** refers to cell multiplexing oligos used in 10x Genomics' CellPlex assay,
-			| **crispr** refers to Perturb-seq guide tag data,
-			| **atac** refers to scATAC-Seq data (*cellranger-atac count*),
-			| **frp** refers to Fixed RNA Profiling (FRP) gene expression data,
-			| This column is optional and the default data type is *rna*.
-		* - ProbeSet
-		  - Probe set reference for FRP samples. Currently ``FRP_human_probe_v1`` is the only available and thus the default reference. Only works for samples of *DataType* ``frp``.
-		* - FeatureBarcodeFile
-		  -
-		  	| Google bucket urls pointing to feature barcode files for *rna*, *citeseq*, *hashing*, *cmo* and *crispr* data.
-		  	| Features can be either targeted genes for targeted gene expression analysis, antibody for CITE-Seq, cell-hashing, nucleus-hashing or gRNA for Perburb-seq.
-		  	| If *cmo* data is analyzed separately using *cumulus_feature_barcoding*, file format should follow the guide in Feature barcoding assays section, otherwise follow the guide in Single-cell multiomics section.
-		  	| This column is only required for targeted gene expression analysis (*rna*), CITE-Seq (*citeseq*), cell-hashing or nucleus-hashing (*hashing*), CellPlex (*cmo*) and Perturb-seq (*crispr*).
+		  - Describes the data type of each sample, with keywords chosen from the list below. This column is optional, and the default is **rna**.
+
+		  	- **rna**: Gene expression (GEX) data
+
+		  	- **vdj**: V(D)J data
+
+			- **citeseq**: CITE-Seq tag data
+
+			- **hashing**: Cell-hashing or nucleus-hashing tag data
+
+			- **adt**: For the case where *hashing* and *citeseq* reads are in the same sample library
+
+			- **cmo**: Cell multiplexing oligos used in 10x Genomics' CellPlex assay
+
+			- **crispr**: Perturb-seq guide tag data
+
+			- **atac**: scATAC-Seq data
+
+			- **frp**: 10x Flex gene expression (old name is Fixed RNA Profiling) data
+		* - AuxFile
+		  - The Cloud URI pointing to auxiliary files of the corresponding samples, with different usage depending on *DataType* values:
+
+		  	- For *rna*: It's used by Sample Multiplexing methods, which specifies the sample name to multiplexing barcode mapping.
+
+			- For *frp*: It's used by Flex data, which specifies the sample name to Flex probe barcode mapping.
+
+			- For *citeseq*, *hashing*, *adt*, and *crispr*: It's the feature barcode file, which contains the information of antibody for CITE-Seq, cell-hashing, nucleus-hashing, or gNRA for Perturb-Seq.
+
+				- If analyzing using *cumulus_feature_barcoding*, the feature barcode file should be in format specified in `Feature barcoding assays`_ section below;
+
+				- If analyzing as part of the Sample Multiplexing data using ``cellranger multi``, the feature barcode file should be in `10x Feature Reference`_ format.
+
+			- For *cmo*: It's the CMO reference file (``cmo-set`` option) when using custom CMOs in CellPlex data.
+
+			- For *vdj_t_gd*: It's the inner enrichment primer file (``inner-enrichment-primers`` option) for VDJ-T-GD data.
+
+			**Notice:** This is the *FeatureBarcodeFile* column in previous versions of Cellranger workflow. This old name is still accepted for backward compatibility.
 		* - Link
 		  -
-			| Designed for Single Cell Multiome	ATAC + Gene Expression, Feature Barcoding, CellPlex, or FRP.
+			| Designed for Single Cell Multiome	ATAC + Gene Expression, Feature Barcoding, Sample Multiplexing, or Flex.
 			| Link multiple modalities together using a single link name.
-			| cellranger-arc count, cellranger count, or cellranger multi will be triggered automatically depending on the modalities.
+			| ``cellranger-arc count``, ``cellranger count``, or ``cellranger multi`` will be triggered automatically depending on the modalities.
 			| If empty string is provided, no link is assumed.
-			| Link name can only contain characters from [a-zA-Z0-9\_-].
+			| Link name can only contain characters from ``[a-zA-Z0-9\_-]`` for Cell Ranger to recognize.
+			| **Notice:** The Link names must be unique to *Sample* values to avoid overwriting each other's settings.
+
 
 
 	The sample sheet supports sequencing the same 10x channels across multiple flowcells. If a sample is sequenced across multiple flowcells, simply list it in multiple rows, with one flowcell per row. In the following example, we have 4 samples sequenced in two flowcells.
@@ -103,20 +119,22 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 	Example::
 
 		Sample,Reference,Flowcell,Chemistry,DataType
-		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,threeprime,rna
-		sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,SC3Pv3,rna
-		sample_3,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,fiveprime,rna
-		sample_4,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4,fiveprime,rna
-		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,threeprime,rna
-		sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,SC3Pv3,rna
-		sample_3,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,fiveprime,rna
-		sample_4,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2,fiveprime,rna
+		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,threeprime,rna
+		sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,SC3Pv3,rna
+		sample_3,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,fiveprime,rna
+		sample_4,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,fiveprime,rna
+		sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/Fastq,threeprime,rna
+		sample_2,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/Fastq,SC3Pv3,rna
+		sample_3,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/Fastq,fiveprime,rna
+		sample_4,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/Fastq,fiveprime,rna
 
 	**3.2 Upload your sample sheet to the workspace bucket:**
 
 		Example::
 
-			gsutil cp /foo/bar/projects/sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/
+			gcloud storage cp /foo/bar/projects/sample_sheet.csv gs://fc-e0000000-0000-0000-0000-000000000000/
+
+Alternatively, users can submit jobs through command line interface (CLI) using `altocumulus <../command_line.html>`_, which will smartly upload FASTQ files to cloud.
 
 4. Launch analysis
 ++++++++++++++++++
@@ -129,43 +147,9 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 
 	Once INPUTS are appropriated filled, click ``RUN ANALYSIS`` and then click ``LAUNCH``.
 
-5. Notice: run ``cellranger mkfastq`` if you are non Broad Institute users
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-	Non Broad Institute users that wish to run ``cellranger mkfastq`` must create a custom docker image that contains ``bcl2fastq``.
-
-		See :ref:`bcl2fastq-docker` instructions.
-
-6. Run ``cellranger count`` only
-++++++++++++++++++++++++++++++++++++
-
-	Sometimes, users might want to perform demultiplexing locally and only run the count part on the cloud. This section describes how to only run the count part via ``cellranger_workflow``.
-
-	#. Copy your FASTQ files to the workspace using gsutil_ in your unix terminal. There are two cases:
-
-		- **Case 1**: All the FASTQ files are in one top-level folder. Then you can simply upload this folder to Cloud, and in your sample sheet, make sure **Sample** names are consistent with the filename prefix of their corresponding FASTQ files.
-		- **Case 2**: In the top-level folder, each sample has a dedicated subfolder containing its FASTQ files. In this case, you need to upload the whole top-level folder, and in your sample sheet, make sure **Sample** names and their corresponding subfolder names are identical.
-
-		Notice that if your FASTQ files are downloaded from the Sequence Read Archive (SRA) from NCBI, you must rename your FASTQs to follow the bcl2fastq `file naming conventions`_.
-
-		Example::
-
-			gsutil -m cp -r /foo/bar/fastq_path/K18WBC6Z4 gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq
-
-	#. Create a sample sheet following the similar structure as `above <./index.html#prepare-a-sample-sheet>`_, except the following differences:
-
-		- **Flowcell** column should list Google bucket URLs of the FASTQ folders for flowcells.
-		- **Lane** and **Index** columns are NOT required in this case.
-
-		Example::
-
-			Sample,Reference,Flowcell
-			sample_1,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/K18WBC6Z4_fastq
-
-	#. Set optional input ``run_mkfastq`` to ``false``.
 
 
-7. Workflow outputs
+5. Workflow outputs
 +++++++++++++++++++
 
 	See the table below for workflow level outputs.
@@ -178,13 +162,13 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		  - Type
 		  - Description
 		* - count_outputs
-		  - Array[Array[String]?]
-		  - The top-level array contains results (as arrays) for different data modalities. The inner-level array contains cloud locations of count matrices, one url per sample.
-		* - count_matrix
-		  - String
-		  - Cloud url for a template count_matrix.csv to run Cumulus. It only contains sc/snRNA-Seq samples.
+		  - Map[String, Array[String]?]
+		  - A modality-to-output map showing output URIs for all samples, organized by modality and one URI per sample.
 
 
-.. _gsutil: https://cloud.google.com/storage/docs/gsutil
+.. _BCL Convert: https://emea.support.illumina.com/sequencing/sequencing_software/bcl-convert.html
+.. _gcloud storage: https://cloud.google.com/sdk/gcloud/reference/storage#COMMAND
 .. _Import workflows to Terra: ../cumulus_import.html
-.. _file naming conventions: https://kb.10xgenomics.com/hc/en-us/articles/115003802691-How-do-I-prepare-Sequence-Read-Archive-SRA-data-from-NCBI-for-Cell-Ranger-
+.. _file naming conventions: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/inputs/cr-specifying-fastqs#file-naming-convention
+.. _Feature barcoding assays: ./index.html#feature-barcoding-assays-cell-nucleus-hashing-cite-seq-and-perturb-
+.. _10x Feature Reference: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/inputs/cr-feature-ref-csv

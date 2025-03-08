@@ -5,7 +5,7 @@
 Release Highlights in Current Stable
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. include:: release_notes/version_2_6.rst
+.. include:: release_notes/version_3_0.rst
 
 .. toctree::
    :maxdepth: 1
@@ -22,8 +22,8 @@ Release Highlights in Current Stable
    :hidden:
 
    cellranger/index
-   starsolo
    demultiplexing
+   starsolo
    cellbender
    cumulus
    command_line
@@ -44,23 +44,6 @@ Release Highlights in Current Stable
 
    smart_seq_2
    bulk_rna_seq
-
-.. toctree::
-   :caption: Drop-Seq pipeline
-   :maxdepth: 1
-   :hidden:
-
-   drop_seq
-
-
-.. toctree::
-   :caption: Others
-   :maxdepth: 1
-   :hidden:
-
-   bcl2fastq
-   count
-   topic_modeling
 
 .. toctree::
    :caption: Contact

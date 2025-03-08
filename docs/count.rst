@@ -1,23 +1,12 @@
 Cell Ranger alternatives to generate gene-count matrices for 10X data
 ----------------------------------------------------------------------
 
-This ``count`` workflow generates gene-count matrices from 10X FASTQ data using alternative methods other than Cell Ranger.
+This ``count`` workflow generates gene-count matrices from 10X FASTQ data using alternative methods other than Cell Ranger. If your data start from BCL files, please first run `BCL Convert`_ to demultiplex flowcells to generate FASTQ files.
 
 Prepare input data and import workflow
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-1. Run ``cellranger_workflow`` to generate FASTQ data
-++++++++++++++++++++++++++++++++++++++++++++++++++++++++
-
-	You can skip this step if your data are already in FASTQ format.
-
-	Otherwise, you need to first run *cellranger_workflow* to generate FASTQ files from BCL raw data for each sample. Please follow `cellranger_workflow manual <./cellranger/index.html>`_.
-
-	Notice that you should set **run_mkfastq** to ``true`` to get FASTQ output. You can also set **run_count** to ``false`` if you want to skip Cell Ranger count, and only use the result from *count* workflow.
-
-	For Non-Broad users, you'll need to build your own docker for *bcl2fastq* step. Instructions are `here <bcl2fastq.html>`_.
-
-2. Import ``count``
+1. Import ``count``
 +++++++++++++++++++++++
 
 	Import *count* workflow to your workspace.
@@ -26,10 +15,10 @@ Prepare input data and import workflow
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *count* workflow in the drop-down menu.
 
-3. Prepare a sample sheet
+2. Prepare a sample sheet
 ++++++++++++++++++++++++++++
 
-	**3.1 Sample sheet format:**
+	**2.1 Sample sheet format:**
 
 	The sample sheet for *count* workflow should be in TSV format, i.e. columns are seperated by tabs not commas. Please note that the columns in the TSV can be in any order, but that the column names must match the recognized headings.
 
@@ -58,7 +47,7 @@ Prepare input data and import workflow
 
 	Moreover, if one flowcell of a sample contains multiple FASTQ files for each read, i.e. sequences from multiple lanes, you should keep your sample sheet as the same, and *count* workflow will automatically merge lanes altogether for the sample before performing counting.
 
-	**3.2 Upload your sample sheet to the workspace bucket:**
+	**2.2 Upload your sample sheet to the workspace bucket:**
 
 	Use gsutil_ (you already have it if you've installed Google cloud SDK) in your unix terminal to upload your sample sheet to workspace bucket.
 
@@ -66,7 +55,7 @@ Prepare input data and import workflow
 
 			gsutil cp /foo/bar/projects/sample_sheet.tsv gs://fc-e0000000-0000-0000-0000-000000000000/
 
-4. Launch analysis
+3. Launch analysis
 +++++++++++++++++++
 
 	In your workspace, open ``count`` in ``WORKFLOWS`` tab. Select the desired snapshot version (e.g. latest). Select ``Process single workflow from files`` as below
@@ -217,6 +206,8 @@ See the table below for *count* workflow outputs.
 	  - String
 	  - Google Bucket URL of output directory. Within it, each folder is for one sample in the input sample sheet.
 
+
+.. _BCL Convert: https://emea.support.illumina.com/sequencing/sequencing_software/bcl-convert.html
 .. _adding a workflow: https://support.terra.bio/hc/en-us/articles/360025674392-Finding-the-tool-method-you-need-in-the-Methods-Repository
 .. _gsutil: https://cloud.google.com/storage/docs/gsutil
 .. _STARsolo: https://github.com/alexdobin/STAR/blob/master/docs/STARsolo.md

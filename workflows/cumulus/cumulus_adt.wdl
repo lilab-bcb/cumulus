@@ -12,14 +12,11 @@ workflow cumulus_adt {
         # 10x genomics chemistry
         String chemistry
 
-        # data type, either adt or crispr
+        # data type, either hashing, cmo, crispr or adt
         String data_type
 
         # feature barcodes in csv format
         File feature_barcode_file
-
-        # Index TSV file
-        File acronym_file
 
         # Barcode start position at Read 2 (0-based coordinate) for CRISPR
         Int? crispr_barcode_pos
@@ -53,10 +50,6 @@ workflow cumulus_adt {
         String backend = "gcp"
     }
 
-    Map[String, String] acronym2gsurl = read_map(acronym_file)
-    File cell_barcode_file = acronym2gsurl[chemistry]
-
-
     call run_generate_count_matrix_ADTs {
         input:
             sample_id = sample_id,
@@ -64,7 +57,6 @@ workflow cumulus_adt {
             output_directory = output_directory,
             chemistry = chemistry,
             data_type = data_type,
-            cell_barcodes = cell_barcode_file,
             feature_barcodes = feature_barcode_file,
             crispr_barcode_pos = crispr_barcode_pos,
             scaffold_sequence = scaffold_sequence,
@@ -94,7 +86,6 @@ task run_generate_count_matrix_ADTs {
         String output_directory
         String chemistry
         String data_type
-        File cell_barcodes
         File feature_barcodes
         Int? crispr_barcode_pos
         String? scaffold_sequence
@@ -143,25 +134,21 @@ task run_generate_count_matrix_ADTs {
                 check_call(call_args)
             fastqs.append(target)
 
-        call_args = ['generate_count_matrix_ADTs', '~{cell_barcodes}', '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '-p', '~{num_cpu}', '--max-mismatch-feature', '~{max_mismatch}']
+        call_args = ['generate_count_matrix_ADTs', '/software/barcode_list', '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '-p', '~{num_cpu}', '--max-mismatch-feature', '~{max_mismatch}']
+        if '~{chemistry}' != '':
+            call_args.extend(['--chemistry', '~{chemistry}'])
         if '~{data_type}' == 'crispr':
             call_args.extend(['--feature', 'crispr'])
             if '~{scaffold_sequence}' != '':
                 call_args.extend(['--scaffold-sequence', '~{scaffold_sequence}'])
             if '~{crispr_barcode_pos}' != '':
                 call_args.extend(['--barcode-pos', '~{crispr_barcode_pos}'])
-            if '~{chemistry}' == 'SC3Pv3' and '~{crispr_barcode_pos}' == '' and '~{scaffold_sequence}' == '':
-                call_args.append('--convert-cell-barcode')
+            #if '~{chemistry}' == 'SC3Pv3' and '~{crispr_barcode_pos}' == '' and '~{scaffold_sequence}' == '':
+            #    call_args.append('--convert-cell-barcode')
         else:
             call_args.extend(['--feature', 'antibody'])
             if '~{data_type}' == 'cmo':
-                call_args.append('--convert-cell-barcode')
-        if '~{chemistry}' == 'SC3Pv3':
-            call_args.extend(['--max-mismatch-cell', '0', '--umi-length', '12'])
-        elif '~{chemistry}' == 'multiome':
-            call_args.extend(['--max-mismatch-cell', '1', '--umi-length', '12'])
-        else:
-            call_args.extend(['--max-mismatch-cell', '1', '--umi-length', '10'])
+                call_args.extend(['--barcode-pos', '0'])
         print(' '.join(call_args))
         check_call(call_args)
 

@@ -10,8 +10,8 @@ workflow cellranger_count {
         String input_fastqs_directories
         # A comma-separated list of input data types
         String? input_data_types
-        # A comma-separated list of input feature barcode files
-        String? input_fbf
+        # A comma-separated list of input auxiliary files
+        String? input_aux
         # CellRanger output directory, gs url
         String output_directory
 
@@ -19,9 +19,6 @@ workflow cellranger_count {
         String genome
         # Index TSV file
         File acronym_file
-
-        # Target panel CSV for targeted gene expression analysis
-        File? target_panel
 
         # chemistry of the channel
         String chemistry = "auto"
@@ -69,10 +66,9 @@ workflow cellranger_count {
             input_samples = input_samples,
             input_fastqs_directories = input_fastqs_directories,
             input_data_types = input_data_types,
-            input_fbf = input_fbf,
+            input_aux = input_aux,
             output_directory = output_directory,
             genome_file = genome_file,
-            target_panel = target_panel,
             chemistry = chemistry,
             force_cells = force_cells,
             expect_cells = expect_cells,
@@ -104,10 +100,9 @@ task run_cellranger_count {
         String? input_samples
         String input_fastqs_directories
         String? input_data_types
-        String? input_fbf
+        String? input_aux
         String output_directory
         File genome_file
-        File? target_panel
         String chemistry
         Int? force_cells
         Int? expect_cells
@@ -159,20 +154,20 @@ task run_cellranger_count {
                 call_args = ['strato', 'exists', directory + '/' + sample_name + '/']
                 print(' '.join(call_args))
                 check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-                call_args = ['strato', 'sync', '-m', directory + '/' + sample_name, target]
+                call_args = ['strato', 'sync', directory + '/' + sample_name, target]
                 print(' '.join(call_args))
                 check_call(call_args)
             except CalledProcessError:
                 if not os.path.exists(target):
                     os.mkdir(target)
                 try:
-                    call_args = ['strato', 'cp', '-m', directory + '/' + sample_name + '_S*_L*_*_001.fastq.gz' , target]
+                    call_args = ['strato', 'cp', directory + '/' + sample_name + '_S*_L*_*_001.fastq.gz' , target]
                     print(' '.join(call_args))
                     check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
                 except CalledProcessError:
                     # Localize tar file
                     tar_file = sample_name + ".tar"
-                    call_args = ['strato', 'cp', '-m', directory + '/' + tar_file, '.']
+                    call_args = ['strato', 'cp', directory + '/' + tar_file, '.']
                     print(' '.join(call_args))
                     check_call(call_args)
 
@@ -191,22 +186,17 @@ task run_cellranger_count {
                     for fastq_f in fastq_files:
                         check_fastq_file(fastq_f, sample_name)
 
-        samples = data_types = fbfs = None
+        samples = data_types = auxs = None
         fastqs_dirs = []
 
         if '~{input_samples}' != '':
-            assert version.parse('~{cellranger_version}') >= version.parse('3.0.2')
             samples = '~{input_samples}'.split(',')
             data_types = '~{input_data_types}'.split(',')
-            fbfs = '~{input_fbf}'.split(',')
+            auxs = '~{input_aux}'.split(',')
 
-            target_panel = set()
             feature_file = set()
-            for dtype, fbf in zip(data_types, fbfs):
-                if dtype == 'rna':
-                    target_panel.add(fbf)
-                else:
-                    feature_file.add(fbf)
+            for dtype, aux in zip(data_types, auxs):
+                feature_file.add(aux)
 
             def _locate_file(file_set, keyword):
                 if len(file_set) > 1:
@@ -215,12 +205,11 @@ task run_cellranger_count {
                 if len(file_set) == 0 or list(file_set)[0] == 'null':
                     return ''
                 file_loc = list(file_set)[0]
-                call_args = ['strato', 'cp', '-m', file_loc, '.']
+                call_args = ['strato', 'cp', file_loc, '.']
                 print(' '.join(call_args))
                 check_call(call_args)
                 return os.path.abspath(os.path.basename(file_loc))
 
-            target_panel = _locate_file(target_panel, 'target panel')
             feature_file = _locate_file(feature_file, 'feature reference')
             assert feature_file != ''
 
@@ -256,26 +245,14 @@ task run_cellranger_count {
 
         if samples is None: # not Feature Barcode
             call_args.extend(['--sample=~{sample_id}', '--fastqs=' + ','.join(fastqs_dirs)])
-            if ('~{target_panel}' != '') and (os.path.basename('~{target_panel}') != 'null'):
-                assert version.parse('~{cellranger_version}') >= version.parse('4.0.0')
-                call_args.append('--target-panel=~{target_panel}')
         else:
             call_args.extend(['--libraries=libraries.csv', '--feature-ref=' + feature_file])
-            if target_panel != '':
-                assert version.parse('~{cellranger_version}') >= version.parse('4.0.0')
-                call_args.append('--target-panel=' + target_panel)
 
         if '~{force_cells}' != '':
             call_args.append('--force-cells=~{force_cells}')
         if '~{expect_cells}' != '':
             call_args.append('--expect-cells=~{expect_cells}')
-        if '~{include_introns}' == 'true':
-            assert version.parse('~{cellranger_version}') >= version.parse('5.0.0')
-            if version.parse('~{cellranger_version}') >= version.parse('7.0.0'):
-                call_args.extend(['--include-introns', '~{include_introns}'])
-            else:
-                call_args.append('--include-introns')
-        elif version.parse('~{cellranger_version}') >= version.parse('7.0.0'):
+        if '~{include_introns}' == 'false':
             call_args.extend(['--include-introns', '~{include_introns}'])
 
         # For generating BAM output
@@ -286,16 +263,16 @@ task run_cellranger_count {
                 call_args.append('--create-bam=false')
         else:
             if '~{no_bam}' == 'true':
-                assert version.parse('~{cellranger_version}') >= version.parse('5.0.0')
                 call_args.append('--no-bam')
 
         if '~{secondary}' != 'true':
             call_args.append('--nosecondary')
+
         print(' '.join(call_args))
         check_call(call_args)
         CODE
 
-        strato sync -m results/outs "~{output_directory}/~{sample_id}"
+        strato sync results/outs "~{output_directory}/~{sample_id}"
     }
 
     output {

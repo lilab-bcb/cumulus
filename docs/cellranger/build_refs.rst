@@ -8,7 +8,7 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 1. Import ``cellranger_create_reference``
 ==============================================
 
-	Import *cellranger_create_reference* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/kalarman-cell-observatory/cumulus/Cellranger_create_reference** to import.
+	Import *cellranger_create_reference* workflow to your workspace by following instructions in `Import workflows to Terra`_. You should choose **github.com/lilab-bcb/cumulus/Cellranger_create_reference** to import.
 
 	Moreover, in the workflow page, click the ``Export to Workspace...`` button, and select the workspace to which you want to export *cellranger_create_reference* workflow in the drop-down menu.
 
@@ -94,9 +94,9 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be: 8.0.0, 7.2.0 7.1.0, 7.0.1, 7.0.0, 6.1.2, 6.1.1
-		  - "8.0.0"
-		  - "8.0.0"
+		  - cellranger version, could be: 9.0.1, 8.0.1, 7.2.0
+		  - "9.0.1"
+		  - "9.0.1"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -106,7 +106,7 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - "quay.io/cumulus"
 		  - "quay.io/cumulus"
 		* - zones
-		  - Google cloud zones
+		  - Google cloud zones. For GCP Batch backend, the zones are automatically restricted by the Batch settings.
 		  - "us-central1-a us-west1-a"
 		  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		* - num_cpu
@@ -121,20 +121,12 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - Optional disk space in GB
 		  - 100
 		  - 100
-		* - backend
-		  - Cloud backend for file transfer. Available options:
-
-		    - "gcp" for Google Cloud;
-		    - "aws" for Amazon AWS;
-		    - "local" for local machine.
-		  - "gcp"
-		  - "gcp"
 		* - preemptible
-		  - Number of preemptible tries
+		  - Number of preemptible tries. Only works for GCP
 		  - 2
 		  - 2
 		* - awsQueueArn
-		  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+		  - The AWS ARN string of the job queue to be used. Only works for AWS
 		  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
 		  - ""
 
@@ -213,7 +205,7 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 		  - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_atac_reference"
 		  -
 		* - cellranger_atac_version
-		  - cellranger-atac version, could be: 2.1.0, 2.0.0, 1.2.0, 1.1.0
+		  - cellranger-atac version, could be: 2.1.0, 2.0.0
 		  - "2.1.0"
 		  - "2.1.0"
 		* - docker_registry
@@ -225,7 +217,7 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 		  - "quay.io/cumulus"
 		  - "quay.io/cumulus"
 		* - zones
-		  - Google cloud zones
+		  - Google cloud zones. For GCP Batch backend, the zones are automatically restricted by the Batch settings.
 		  - "us-central1-a us-west1-a"
 		  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		* - memory
@@ -236,20 +228,12 @@ We provide a wrapper of ``cellranger-atac mkref`` to build scATAC-seq references
 		  - Optional disk space in GB
 		  - 100
 		  - 100
-		* - backend
-		  - Cloud backend for file transfer. Available options:
-
-		    - "gcp" for Google Cloud;
-		    - "aws" for Amazon AWS;
-		    - "local" for local machine.
-		  - "gcp"
-		  - "gcp"
 		* - preemptible
-		  - Number of preemptible tries
+		  - Number of preemptible tries. Only works for GCP
 		  - 2
 		  - 2
 		* - awsQueueArn
-		  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+		  - The AWS ARN string of the job queue to be used. Only works for AWS
 		  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
 		  - ""
 
@@ -320,9 +304,9 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be: 8.0.0, 7.2.0, 7.1.0, 7.0.1, 7.0.0, 6.1.2, 6.1.1
-		  - "8.0.0"
-		  - "8.0.0"
+		  - cellranger version, could be: 9.0.1, 8.0.1, 7.2.0
+		  - "9.0.1"
+		  - "9.0.1"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -332,7 +316,7 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - "quay.io/cumulus"
 		  - "quay.io/cumulus"
 		* - zones
-		  - Google cloud zones
+		  - Google cloud zones. For GCP Batch backend, the zones are automatically restricted by the Batch settings.
 		  - "us-central1-a us-west1-a"
 		  - "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
 		* - memory
@@ -343,20 +327,12 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - Optional disk space in GB
 		  - 100
 		  - 100
-		* - backend
-		  - Cloud backend for file transfer. Available options:
-
-		    - "gcp" for Google Cloud;
-		    - "aws" for Amazon AWS;
-		    - "local" for local machine.
-		  - "gcp"
-		  - "gcp"
 		* - preemptible
-		  - Number of preemptible tries
+		  - Number of preemptible tries. Only works for GCP
 		  - 2
 		  - 2
 		* - awsQueueArn
-		  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+		  - The AWS ARN string of the job queue to be used. Only works for AWS
 		  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
 		  - ""
 

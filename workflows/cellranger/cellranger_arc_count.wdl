@@ -142,13 +142,13 @@ task run_cellranger_arc_count {
                     call_args = ['strato', 'exists', directory + '/' + samples[i] + '/']
                     print(' '.join(call_args))
                     check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-                    call_args = ['strato', 'sync', '-m', directory + '/' + samples[i], target]
+                    call_args = ['strato', 'sync', directory + '/' + samples[i], target]
                     print(' '.join(call_args))
                     check_call(call_args)
                 except CalledProcessError:
                     if not os.path.exists(target):
                         os.mkdir(target)
-                    call_args = ['strato', 'cp', '-m', directory + '/' + samples[i] + '_S*_L*_*_001.fastq.gz' , target]
+                    call_args = ['strato', 'cp', directory + '/' + samples[i] + '_S*_L*_*_001.fastq.gz' , target]
                     print(' '.join(call_args))
                     check_call(call_args)
                 fout.write(os.path.abspath(target) + ',' + samples[i] + ',' + ('Gene Expression' if data_types[i] == 'rna' else 'Chromatin Accessibility') + '\n')
@@ -169,7 +169,7 @@ task run_cellranger_arc_count {
         check_call(call_args)
         CODE
 
-        strato sync -m results/outs "~{output_directory}/~{link_id}"
+        strato sync results/outs "~{output_directory}/~{link_id}"
     }
 
     output {
