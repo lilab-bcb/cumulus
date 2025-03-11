@@ -41,7 +41,7 @@
 
     * For Flex Gene Expression:
 
-        * Remove *ProbeSet* column. The probe set is not automatically decided based on user-specified *Reference* name.
+        * Remove *ProbeSet* column. The probe set is now automatically decided based on user-specified *Reference* name.
         * Support Flex probe sets v1.1 which are associated with 2024-A genome references.
 
     * For CellPlex using CMO:
