@@ -581,7 +581,7 @@ task generate_count_config {
                     fom_s2ref.write(sample_id + '\t' + reference + '\n')
                     no_ref = False
 
-                if aux_file != '~{null_file}':
+                if (aux_file != '~{null_file}') or (datatype in ['vdj', 'vdj_t', 'vdj_b', 'vdj_t_gd']):
                     fom_s2aux.write(sample_id + '\t' + aux_file + '\n')
                     no_aux = False
 
