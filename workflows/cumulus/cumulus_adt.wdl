@@ -9,10 +9,12 @@ workflow cumulus_adt {
         # Output directory, gs url
         String output_directory
 
+        # genome reference
+        String genome
         # 10x genomics chemistry
         String chemistry
 
-        # data type, either hashing, cmo, crispr or adt
+        # data type, either hashing, citeseq, cmo, crispr or adt
         String data_type
 
         # feature barcodes in csv format
@@ -25,8 +27,8 @@ workflow cumulus_adt {
 
         # maximum hamming distance in feature barcodes, change default to 2.
         Int max_mismatch = 2
-        # minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for crispr
-        Float min_read_ratio = 0.1
+        # PCR chimeric filitering: minimum read count ratio cutoff (non-inclusive) to justify a feature given a cell barcode and UMI combination, only used for crispr
+        Float read_ratio_cutoff = 0.5
 
         # cumulus_feature_barcoding version
         String cumulus_feature_barcoding_version
@@ -36,7 +38,7 @@ workflow cumulus_adt {
         # Google cloud zones, default to "us-central1-b", which is consistent with CromWell's genomics.default-zones attribute
         String zones = "us-central1-b"
         # Number of cpus per adt job
-        Int num_cpu = 4
+        Int num_cpu = 3
         # Memory string, e.g. 32G
         String memory = "32G"
         # Disk space in GB
@@ -55,13 +57,14 @@ workflow cumulus_adt {
             sample_id = sample_id,
             input_fastqs_directories = input_fastqs_directories,
             output_directory = output_directory,
+            genome = genome,
             chemistry = chemistry,
             data_type = data_type,
             feature_barcodes = feature_barcode_file,
             crispr_barcode_pos = crispr_barcode_pos,
             scaffold_sequence = scaffold_sequence,
             max_mismatch = max_mismatch,
-            min_read_ratio = min_read_ratio,
+            read_ratio_cutoff = read_ratio_cutoff,
             cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
             docker_registry = docker_registry,
             zones = zones,
@@ -84,13 +87,14 @@ task run_generate_count_matrix_ADTs {
         String sample_id
         String input_fastqs_directories
         String output_directory
+        String genome
         String chemistry
         String data_type
         File feature_barcodes
         Int? crispr_barcode_pos
         String? scaffold_sequence
         Int max_mismatch
-        Float min_read_ratio
+        Float read_ratio_cutoff
         String cumulus_feature_barcoding_version
         String docker_registry
         String zones
@@ -134,42 +138,23 @@ task run_generate_count_matrix_ADTs {
                 check_call(call_args)
             fastqs.append(target)
 
-        call_args = ['generate_count_matrix_ADTs', '/software/barcode_list', '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '-p', '~{num_cpu}', '--max-mismatch-feature', '~{max_mismatch}']
+        call_args = ['generate_feature_barcode_matrices', '/software/barcode_list', '~{data_type}', '~{feature_barcodes}', ','.join(fastqs), '~{sample_id}', '-p', '~{num_cpu}', '--max-mismatch-feature', '~{max_mismatch}']
+        if '~{genome}' != '':
+            call_args.extend(['--genome', '~{genome}'])
         if '~{chemistry}' != '':
             call_args.extend(['--chemistry', '~{chemistry}'])
         if '~{data_type}' == 'crispr':
-            call_args.extend(['--feature', 'crispr'])
+            call_args.extend(['--read-ratio-cutoff', '~{read_ratio_cutoff}'])
             if '~{scaffold_sequence}' != '':
                 call_args.extend(['--scaffold-sequence', '~{scaffold_sequence}'])
             if '~{crispr_barcode_pos}' != '':
                 call_args.extend(['--barcode-pos', '~{crispr_barcode_pos}'])
-            #if '~{chemistry}' == 'SC3Pv3' and '~{crispr_barcode_pos}' == '' and '~{scaffold_sequence}' == '':
-            #    call_args.append('--convert-cell-barcode')
-        else:
-            call_args.extend(['--feature', 'antibody'])
-            if '~{data_type}' == 'cmo':
-                call_args.extend(['--barcode-pos', '0'])
         print(' '.join(call_args))
         check_call(call_args)
 
         CODE
 
-        if [ -f "~{sample_id}".stat.csv.gz ]
-        then
-            filter_chimeric_reads ~{data_type} ~{feature_barcodes} "~{sample_id}.stat.csv.gz" ~{min_read_ratio} ~{sample_id}
-        fi
-
-        if [ -f "~{sample_id}".crispr.stat.csv.gz ]
-        then
-            filter_chimeric_reads ~{data_type} ~{feature_barcodes} "~{sample_id}.crispr.stat.csv.gz" ~{min_read_ratio} ~{sample_id}
-        fi
-
-        strato cp -m "~{sample_id}".*csv* "~{sample_id}".report.txt "~{output_directory}/~{sample_id}/"
-
-        if [ -f "~{sample_id}".umi_count.pdf ]
-        then
-            strato cp "~{sample_id}".umi_count.pdf "~{output_directory}/~{sample_id}/"
-        fi
+        strato cp -m "~{sample_id}".*h5 "~{sample_id}".report.txt "~{output_directory}/~{sample_id}/"
     }
 
     output {
