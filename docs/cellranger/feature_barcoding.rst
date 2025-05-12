@@ -36,7 +36,7 @@ Sample sheet
 
 #. *Reference* column.
 
-	This column is not used for extracting feature-barcode count matrix. To be consistent, you can put the reference for the associated scRNA-seq assay here.
+	Put the reference for the associated scRNA-seq assay here, so that the generated count matrix can convey this information.
 
 #. *Chemistry* column.
 
@@ -102,10 +102,10 @@ Below is an example sample sheet::
 
 	Sample,Reference,Flowcell,Chemistry,DataType,AuxFile
 	sample_1_rna,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,auto,rna,
-	sample_1_adt,,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,threeprime,hashing,gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index.csv
+	sample_1_adt,GRCh38-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,threeprime,hashing,gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index.csv
 	sample_2_gex,GRCh38-2024-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,auto,rna
 	sample_2_adt,GRCh38-2024-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,SC3Pv3,adt,gs://fc-e0000000-0000-0000-0000-000000000000/antibody_index2.csv
-	sample_3_crispr,,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,fiveprime,crispr,gs://fc-e0000000-0000-0000-0000-000000000000/crispr_index.csv
+	sample_3_crispr,mm10-2020-A,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,fiveprime,crispr,gs://fc-e0000000-0000-0000-0000-000000000000/crispr_index.csv
 
 In the sample sheet above, despite the header row,
 
@@ -149,14 +149,14 @@ For feature barcoding data, ``cellranger_workflow`` takes sequencing reads as in
 		  - Maximum hamming distance in feature barcodes for the adt task (changed to 2 as default)
 		  - 2
 		  - 2
-		* - min_read_ratio
-		  - Minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for the adt task and crispr data type
+		* - read_ratio_cutoff
+		  - Minimum read count ratio cutoff (non-inclusive) to justify a feature given a cell barcode and UMI combination, only used for samples of ``crispr`` data type
 		  - 0.1
 		  - 0.1
 		* - cumulus_feature_barcoding_version
 		  - Cumulus_feature_barcoding version for extracting feature barcode matrix.
-		  - "1.0.0"
-		  - "1.0.0"
+		  - "2.0.0"
+		  - "2.0.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -223,23 +223,76 @@ The table below lists important feature barcoding output when using Cumulus Feat
 	  - Array[String]
 	  - Subworkflow output. A list of cloud URIs containing feature-barcode count matrices, one URI per sample.
 
-In addition, For each antibody tag or crispr tag sample, a folder with the sample ID is generated under ``output_directory``. In the folder, two files --- ``sample_id.csv`` and ``sample_id.stat.csv.gz`` --- are generated.
+In addition, For each feature barcoding sample, a folder with the sample ID is generated under ``output_directory``. In the folder, there are output files:
 
-``sample_id.csv`` is the feature count matrix. It has the following format. The first line describes the column names: ``Antibody/CRISPR,cell_barcode_1,cell_barcode_2,...,cell_barcode_n``. The following lines describe UMI counts for each feature barcode, with the following format: ``feature_name,umi_count_1,umi_count_2,...,umi_count_n``.
+* **Modality:** Along with sample name specified in *Sample* column of the sample sheet, the modality name is also part of the name prefix of the output files:
 
-``sample_id.stat.csv.gz`` stores the gzipped sufficient statistics. It has the following format. The first line describes the column names: ``Barcode,UMI,Feature,Count``. The following lines describe the read counts for every barcode-umi-feature combination.
+	* If the feature barcode file provided in *AuxFile* column of sample sheet has only 2 columns, the sample's modality is the *DataType* column value in the sample sheet. So the name prefix is ``<sample_id>.<modality>.*``.
+	* If the feature barcode file has a 3rd column for **modality** names, then each modality will have its own sets of output files with name prefix ``<sample_id>.<modality>.*``.
 
-If the feature barcode file has a third column, there will be two files for each feature type in the third column. For example, if ``hashing`` presents, ``sample_id.hashing.csv`` and ``sample_id.hashing.stat.csv.gz`` will be generated.
+* If the sample has **crispr** type in *DataType*, there are 3 sets of count matrices and sufficient statistics tables with different name prefixes:
 
-``sample_id.report.txt`` is a summary report in TXT format. The first lines describe the total number of reads parsed, the number of reads with valid cell barcodes (and percentage over all parsed reads), the number of reads with valid feature barcodes (and percentage over all parsed reads) and the number of reads with both valid cell and feature barcodes (and percentage over all parsed reads). It is then followed by sections describing each feature type. In each section, 7 lines are shown: section title, number of valid cell barcodes (with matching cell barcode and feature barcode) in this section, number of reads for these cell barcodes, mean number of reads per cell barcode, number of UMIs for these cell barcodes, mean number of UMIs per cell barcode and sequencing saturation.
+	* ``<sample_id>.<modality>.raw.*`` for raw count matrix,
+	* ``<sample_id>.<modality>.umi_correct.*`` for count matrix after UMI correction,
+	* ``<sample_id>.<modality>.chimeric_filtered.*`` for count matrix after UMI correction and PCR chimeric filtering.
 
-If data type is ``crispr``, three additional files, ``sample_id.umi_count.pdf``, ``sample_id.filt.csv`` and ``sample_id.filt.stat.csv.gz``, are generated.
+* If the sample has other *DataType*, there are 2 sets of count matrices and sufficient statistics tables with different name prefixes:
 
-``sample_id.umi_count.pdf`` plots number of UMIs against UMI with certain number of reads and colors UMIs with high likelihood of being chimeric in blue and other UMIs in red. This plot is generated purely based on number of reads each UMI has. For better visualization, we do not show UMIs with > 50 read counts (rare in data).
+	* ``<sample_id>.<modality>.raw.*`` for raw count matrix,
+	* ``<sample_id>.<modality>.umi_correct.*`` for count matrix after UMI correction.
 
-``sample_id.filt.csv`` is the filtered feature count matrix. It has the same format as ``sample_id.csv``.
+* **Count Matrix:** ``<sample_id>.<modality>.raw.h5``, ``<sample_id>.<modality>.umi_correct.h5`` and ``<sample_id>.<modality>.chimeric_filtered.h5``. The feature count matrix is in sparse matrix format, and in `10x HDF5`_ format. It can be loaded by Pegasus via the following example code::
 
-``sample_id.filt.stat.csv.gz`` is the filtered sufficient statistics. It has the same format as ``sample_id.stat.csv.gz``.
+	import pegasus as pg
+	mdata = pg.read_input("<sample_id>.<modality>.umi_correct.h5")
 
+or by SCANPY via the following example code::
+
+	import scanpy as sc
+	adata = sc.read_10x_h5("<sample_id>.<modality>.umi_correct.h5", gex_only=False)
+
+* **Sufficient Statistics:** ``<sample_id>.<modality>.raw.molecule_info.h5``, ``<sample_id>.<modality>.umi_correct.molecule_info.h5`` and ``<sample_id>.<modality>.chimeric_filtered.molecule_info.h5``. In the table, each entry is a molecule as a Barcode + Feature + UMI combination. This table is in a smplified HDF5 format from 10x molecule_info file, which contains the following HDF5 DataSets:
+
+	* ``/barcode_idx``: Integer array of length ``n_mol`` (number of molecules). Each entry is the index of the molecule's cell barcode, which can be found in ``/barcodes``;
+	* ``/barcodes``: String array of length ``n_cell`` (number of cell barcodes). Each entry is a cell barcode;
+	* ``/feature_idx``: Integer array of length ``n_mol``. Each entry is the index of the molecule's feature name, which can be found in ``/features``;
+	* ``/features``: String array of length ``n_feature`` (number of features). Each entry is a feature name;
+	* ``/umi``: String array of length ``n_mol``. Each entry is the molecule's UMI barcode;
+	* ``/count``: Integer array of length ``n_mol``. Each entry is the molecule's count of reads.
+
+This sufficient statistics table can be loaded by PegasusIO_ (v0.10.0 or above) via the following example code::
+
+	import pegasusio as pio
+	df_mol = pio.read_molecule_info("<sample_id>.<modality>.umi_correct.molecule_info.h5")
+
+The resulting ``df_mol`` is a Pandas data frame of ``n_mol`` rows, with 4 columns:
+
+	* ``Barcode``: The molecule's cell barcode.
+	* ``Feature``: The molecule's feature name.
+	* ``UMI``: The molecule's UMI barcode.
+	* ``Count``: The molecule's count of reads.
+
+Otherwise, you can use ``h5py`` package to load this ``*.molecule_info.h5`` file of your own.
+
+* **Report:** ``<sample_id>.report.txt`` is a summary report in TXT format.
+
+	* The first lines describe
+
+		* Total number of reads parsed
+		* Number of reads with valid cell barcodes (and percentage over all parsed reads)
+		* Number of reads with valid feature barcodes (and percentage over all parsed reads)
+		* Number of reads with both valid cell and feature barcodes (and percentage over all parsed reads)
+		* Number of reads with valid cell, feature and UMI barcodes (and percentage over all parsed reads). **Notice:** A valid UMI should not contain ``N`` in its barcode.
+	* Then each modality has its own section:
+
+		* Number of valid cell barcodes
+		* Number of valid reads (with matching cell and feature barcodes)
+		* Mean number of valid reads per cell barcode
+		* Number of valid UMIs (with matching cell and feature barcodes)
+		* Mean number of valid UMIs per cell barcode
+		* Sequencing saturation
+	* For each section, if UMI correction and/or PCR chimeric filtering is performed, the stats above will be shown again after each of such steps.
 
 .. _Cumulus Feature Barcoding: https://github.com/lilab-bcb/cumulus_feature_barcoding
+.. _10x HDF5: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/outputs/cr-outputs-h5-matrices
+.. _PegasusIO: https://pegasusio.readthedocs.io/en/stable/
