@@ -1,3 +1,13 @@
+3.1.0 :small:`May 12, 2025`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Cellranger workflow:
+
+    * Upgrade *cumulus_feature_barcoding_version* default to ``2.0.0``.
+        * Apply UMI correction to raw count matrices; for ``crispr`` type samples, further apply PCR chimeric filtering.
+    * Rename ``min_read_ratio`` to ``read_ratio_cutoff``, and default is changed from ``0.1`` to ``0.5``. Still only applied to ``crispr`` type samples.
+    * Samples of ``crispr``, ``hashing``, ``citeseq``, ``adt`` and ``cmo`` types now accept *Reference* column values.
+
 3.0.0 :small:`March 7, 2025`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
