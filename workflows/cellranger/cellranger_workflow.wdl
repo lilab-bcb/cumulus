@@ -48,7 +48,7 @@ workflow cellranger_workflow {
         # maximum hamming distance in feature barcodes (change default to 2)
         Int max_mismatch = 2
         # minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for data type crispr
-        Float min_read_ratio = 0.1
+        Float read_ratio_cutoff = 0.1
 
         # For atac
 
@@ -71,7 +71,7 @@ workflow cellranger_workflow {
 
         # 9.0.1, 8.0.1, 7.2.0
         String cellranger_version = "9.0.1"
-        String cumulus_feature_barcoding_version = "1.0.0"
+        String cumulus_feature_barcoding_version = "2.0.0"
         # 2.1.0, 2.0.0
         String cellranger_atac_version = "2.1.0"
         # 2.0.2.strato, 2.0.2.custom-max-cell, 2.0.2, 2.0.1, 2.0.0
@@ -236,12 +236,13 @@ workflow cellranger_workflow {
                     input_fastqs_directories = generate_count_config.sample2dir[sample_id],
                     output_directory = output_directory_stripped,
                     chemistry = generate_count_config.sample2chemistry[sample_id],
+                    genome = generate_count_config.sample2ref[sample_id],
                     data_type = generate_count_config.sample2datatype[sample_id],
                     feature_barcode_file = generate_count_config.sample2aux[sample_id],
                     crispr_barcode_pos = crispr_barcode_pos,
                     scaffold_sequence = scaffold_sequence,
                     max_mismatch = max_mismatch,
-                    min_read_ratio = min_read_ratio,
+                    read_ratio_cutoff = read_ratio_cutoff,
                     cumulus_feature_barcoding_version = cumulus_feature_barcoding_version,
                     docker_registry = docker_registry_stripped,
                     zones = zones,
@@ -515,11 +516,10 @@ task generate_count_config {
                 dirs = df_local['Flowcell'].values
 
                 reference = 'null'
-                if datatype in ['rna', 'vdj', 'vdj_t', 'vdj_b', 'vdj_t_gd', 'atac', 'frp']:
-                    if df_local['Reference'].unique().size > 1:
-                        print("Detected multiple references for sample " + sample_id + "!", file = sys.stderr)
-                        sys.exit(1)
-                    reference = df_local['Reference'].iat[0]
+                if df_local['Reference'].unique().size > 1:
+                    print("Detected multiple references for sample " + sample_id + "!", file = sys.stderr)
+                    sys.exit(1)
+                reference = df_local['Reference'].iat[0]
 
                 probe_set_file = '~{null_file}'
                 if datatype == 'frp':
