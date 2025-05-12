@@ -516,11 +516,10 @@ task generate_count_config {
                 dirs = df_local['Flowcell'].values
 
                 reference = 'null'
-                if datatype in ['rna', 'vdj', 'vdj_t', 'vdj_b', 'vdj_t_gd', 'atac', 'frp']:
-                    if df_local['Reference'].unique().size > 1:
-                        print("Detected multiple references for sample " + sample_id + "!", file = sys.stderr)
-                        sys.exit(1)
-                    reference = df_local['Reference'].iat[0]
+                if df_local['Reference'].unique().size > 1:
+                    print("Detected multiple references for sample " + sample_id + "!", file = sys.stderr)
+                    sys.exit(1)
+                reference = df_local['Reference'].iat[0]
 
                 probe_set_file = '~{null_file}'
                 if datatype == 'frp':
