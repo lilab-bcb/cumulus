@@ -5,7 +5,7 @@
 Release Highlights in Current Stable
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. include:: release_notes/version_3_0.rst
+.. include:: release_notes/version_3.rst
 
 .. toctree::
    :maxdepth: 1
