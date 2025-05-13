@@ -48,7 +48,7 @@ workflow cellranger_workflow {
         # maximum hamming distance in feature barcodes (change default to 2)
         Int max_mismatch = 2
         # minimum read count ratio (non-inclusive) to justify a feature given a cell barcode and feature combination, only used for data type crispr
-        Float read_ratio_cutoff = 0.1
+        Float read_ratio_cutoff = 0.5
 
         # For atac
 

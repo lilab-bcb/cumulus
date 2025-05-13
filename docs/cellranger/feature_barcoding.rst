@@ -150,9 +150,10 @@ For feature barcoding data, ``cellranger_workflow`` takes sequencing reads as in
 		  - 2
 		  - 2
 		* - read_ratio_cutoff
-		  - Minimum read count ratio cutoff (non-inclusive) to justify a feature given a cell barcode and UMI combination, only used for samples of ``crispr`` data type
-		  - 0.1
-		  - 0.1
+		  - | PCR chimeric filtering parameter. Minimum read count ratio cutoff (non-inclusive) to justify a feature per cell barcode and UMI combination.
+		    | **Notice:** Only enabled for ``crispr`` samples.
+		  - 0.5
+		  - 0.5
 		* - cumulus_feature_barcoding_version
 		  - Cumulus_feature_barcoding version for extracting feature barcode matrix.
 		  - "2.0.0"
