@@ -108,6 +108,10 @@ task run_demuxEM {
         set -e
         export TMPDIR=/tmp
         export BACKEND=~{backend}
+        export OMP_NUM_THREADS=~{num_cpu}
+        export MKL_NUM_THREADS=~{num_cpu}
+        export OPENBLAS_NUM_THREADS=~{num_cpu}
+
         monitor_script.sh > monitoring.log &
 
         python <<CODE
