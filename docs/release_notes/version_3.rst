@@ -1,3 +1,10 @@
+3.1.1 :small:`May 22, 2025`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Demultiplexing workflow:
+    * Upgrade *demuxEM_version* default to ``0.1.8``, which supports HTO and CRISPR count matrices in 10x hdf5 format.
+    * Resolve ``numpy`` out-of-memory-map issue when running on large AWS EC2 instances. (PR `439 <https://github.com/lilab-bcb/cumulus/pull/439>`_ thanks to `Dantistnfs <https://github.com/Dantistnfs>`_)
+
 3.1.0 :small:`May 12, 2025`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
