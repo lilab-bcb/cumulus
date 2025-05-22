@@ -42,7 +42,7 @@ workflow demultiplexing {
         # Generate violin plots using gender-specific genes (e.g. Xist). <demuxEM_generate_gender_plot> is a comma-separated list of gene names
         String? demuxEM_generate_gender_plot
         # DemuxEM version
-        String demuxEM_version = "0.1.7"
+        String demuxEM_version = "0.1.8"
         # Number of CPUs used
         Int demuxEM_num_cpu = 8
         # Disk space in GB
@@ -125,7 +125,7 @@ workflow demultiplexing {
                     sample_id = hashing_id,
                     output_directory = output_directory_stripped,
                     input_rna_h5 = Config.id2rna[hashing_id],
-                    input_hto_csv = Config.id2tag[hashing_id],
+                    input_hto_file = Config.id2tag[hashing_id],
                     genome = genome,
                     alpha_on_samples = demuxEM_alpha_on_samples,
                     min_num_genes = min_num_genes,
