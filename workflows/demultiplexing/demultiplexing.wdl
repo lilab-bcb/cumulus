@@ -125,7 +125,7 @@ workflow demultiplexing {
                     sample_id = hashing_id,
                     output_directory = output_directory_stripped,
                     input_rna_h5 = Config.id2rna[hashing_id],
-                    input_hto_csv = Config.id2tag[hashing_id],
+                    input_hto_file = Config.id2tag[hashing_id],
                     genome = genome,
                     alpha_on_samples = demuxEM_alpha_on_samples,
                     min_num_genes = min_num_genes,
