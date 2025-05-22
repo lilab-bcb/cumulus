@@ -15,7 +15,7 @@ Prepare input data and import workflow
 
 	Please refer to the `cellranger_workflow tutorial`_ for details.
 
-	When finished, you should be able to find the raw gene count matrix (e.g. ``raw_gene_bc_matrices_h5.h5``), hashtag matrix (e.g. ``sample_1_ADT.csv``) / genome BAM file (e.g. ``possorted_genome_bam.bam``) for each sample.
+	When finished, you should be able to find the raw gene count matrix (e.g. ``raw_gene_bc_matrices_h5.h5``), hashtag matrix (e.g. ``sample_1_ADT.umi_correct.h5``) / genome BAM file (e.g. ``possorted_genome_bam.bam``) for each sample.
 
 2. Import ``demultiplexing``
 ++++++++++++++++++++++++++++++
@@ -65,8 +65,8 @@ Prepare input data and import workflow
 	Example::
 
 		OUTNAME,RNA,TagFile,TYPE,Genotype
-		sample_1,gs://exp/data_1/raw_gene_bc_matrices_h5.h5,gs://exp/data_1/sample_1_ADT.csv,cell-hashing
-		sample_2,gs://exp/data_2/raw_gene_bc_matrices_h5.h5,gs://exp/data_2/sample_2_ADT.csv,nucleus-hashing
+		sample_1,gs://exp/data_1/raw_gene_bc_matrices_h5.h5,gs://exp/data_1/sample_1_ADT.umi_correct.h5,cell-hashing
+		sample_2,gs://exp/data_2/raw_gene_bc_matrices_h5.h5,gs://exp/data_2/sample_2_ADT.umi_correct.h5,nucleus-hashing
 		sample_3,gs://exp/data_3/raw_gene_bc_matrices_h5.h5,gs://exp/data_3/possorted_genome_bam.bam,genetic-pooling
 		sample_4,gs://exp/data_4/raw_gene_bc_matrices_h5.h5,gs://exp/data_4/possorted_genome_bam.bam,genetic-pooling,gs://exp/variants/ref_genotypes.vcf.gz
 
@@ -189,9 +189,9 @@ demuxEM inputs
 	  - "XIST"
 	  -
 	* - demuxEM_version
-	  - demuxEM version to use. Choose from "0.1.7", "0.1.6" and "0.1.5".
-	  - "0.1.7"
-	  - "0.1.7"
+	  - demuxEM version to use. Choose from "0.1.8", "0.1.7", "0.1.6" and "0.1.5".
+	  - "0.1.8"
+	  - "0.1.8"
 	* - demuxEM_num_cpu
 	  - demuxEM parameter. Number of CPUs to request for demuxEM per pair.
 	  - 8
