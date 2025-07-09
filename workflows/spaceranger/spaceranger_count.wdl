@@ -212,9 +212,6 @@ task run_spaceranger_count {
         mem_size = re.findall(r"\d+", "~{memory}")[0]
         call_args = ['spaceranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local', '--localcores=~{num_cpu}', '--localmem='+mem_size]
 
-        localmem = "".join(filter(str.isdigit, "~{memory}"))
-        call_args.append("--localmem=" + localmem)
-
         def not_null(input_file):
             return (input_file != '') and (os.path.basename(input_file) != 'null')
 
