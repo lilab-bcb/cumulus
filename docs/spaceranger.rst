@@ -217,9 +217,9 @@ For spatial data, ``spaceranger_workflow`` takes sequencing reads as input (FAST
 		  - 50
 		  -
 		* - spaceranger_version
-		  - spaceranger version, could be: 3.1.3, 3.0.1
-		  - "3.1.3"
-		  - "3.1.3"
+		  - spaceranger version, could be: 4.0.1, 3.1.3, 3.0.1
+		  - "4.0.1"
+		  - "4.0.1"
 		* - docker_registry
 		  - Docker registry to use for spaceranger_workflow. Options:
 
