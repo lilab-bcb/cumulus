@@ -570,6 +570,8 @@ task generate_count_config {
                                 link2ref[link].add(reference)
                         if (probe_set_file != '~{null_file}') or (len(link2probeset[link]) == 0):
                             link2probeset[link].add(probe_set_file)
+                            if len(link2probeset[link]) > 1:
+                                link2probeset[link] = [f for f in link2probeset[link] if f != '~{null_file}']    # Clear the null placeholder if exists.
                         continue
 
                 datatype2fo[datatype].write(sample_id + '\n')
