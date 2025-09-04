@@ -115,7 +115,9 @@ task run_demuxEM {
         monitor_script.sh > monitoring.log &
 
         python <<CODE
+        import sys
         from subprocess import check_call
+
         call_args = ['demuxEM', '~{input_rna_h5}', '~{input_hto_file}', '~{sample_id}', '-p', '~{num_cpu}']
         if '~{genome}' != '':
             call_args.extend(['--genome', '~{genome}'])
@@ -134,7 +136,12 @@ task run_demuxEM {
         if '~{generate_gender_plot}' != '':
             call_args.extend(['--generate-gender-plot', '~{generate_gender_plot}'])
         print(' '.join(call_args))
-        check_call(call_args)
+
+        try:
+            check_call(call_args)
+        except Exception as e:
+            print(f"Error: {e}")
+            sys.exit(1)
         CODE
 
         mkdir result
