@@ -140,7 +140,7 @@ task run_demuxEM {
         try:
             check_call(call_args)
         except Exception as e:
-            print(f"Error: {e}")
+            print(e)
             sys.exit(1)
         CODE
 
