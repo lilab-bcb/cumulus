@@ -490,6 +490,7 @@ task generate_count_config {
             link2sample = defaultdict(list)
             link2dir = defaultdict(list)
             link2dt = defaultdict(list)
+            link2chem = defaultdict(list)
             link2aux = defaultdict(list)
             link2ref = defaultdict(set)
             link2vdj_ref = defaultdict(set)
@@ -558,11 +559,15 @@ task generate_count_config {
                         link = sample_id
 
                     if pd.notna(link) and (link != ''):
+                        chemistry = df_local['Chemistry'].iat[0]
+                        no_chem = False
+
                         multiomics[link].add(datatype)
                         size = dirs.size
                         link2sample[link].extend([sample_id] * size)
                         link2dir[link].extend(list(dirs))
                         link2dt[link].extend([datatype] * size)
+                        link2chem[link].extend([chemistry] * size)
                         link2aux[link].extend([aux_file] * size)
                         if reference != 'null':
                             if datatype in ['vdj', 'vdj_t', 'vdj_b', 'vdj_t_gd']:  # Keep VDJ ref separate in case of OCM/HTO with VDJ
@@ -628,6 +633,7 @@ task generate_count_config {
 
                 fom_s2dir.write(link_id + '\t' + ','.join(link2dir[link_id]) + '\n')
                 fom_s2type.write(link_id + '\t' + ','.join(link2dt[link_id]) + '\n')
+                fom_s2chem.write(link_id + '\t' + ','.join(link2chem[link_id]) + '\n')
                 fom_l2sample.write(link_id + '\t' + ','.join(link2sample[link_id]) + '\n')
 
                 if 'atac' in multiomics[link_id]:
