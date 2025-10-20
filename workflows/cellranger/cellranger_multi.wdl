@@ -10,6 +10,8 @@ workflow cellranger_multi {
         String input_fastqs_directories
         # A comma-separated list of input data types
         String input_data_types
+        # A comma-separated list of input data chemistries
+        String input_data_chemistries
         # A comma-separated list of input auxiliary files
         String input_aux
         # CellRanger multi output directory
@@ -71,6 +73,7 @@ workflow cellranger_multi {
             input_samples = input_samples,
             input_fastqs_directories = input_fastqs_directories,
             input_data_types = input_data_types,
+            input_chemistries = input_data_chemistries,
             input_aux = input_aux,
             output_directory = output_directory,
             genome_file = genome_file,
@@ -103,6 +106,7 @@ task run_cellranger_multi {
         String input_samples
         String input_fastqs_directories
         String input_data_types
+        String input_chemistries
         String input_aux
         String output_directory
         File genome_file
@@ -141,6 +145,7 @@ task run_cellranger_multi {
 
         samples = '~{input_samples}'.split(',')
         data_types = '~{input_data_types}'.split(',')
+        chemistries = '~{input_chemistries}'.split(',')
         auxs = '~{input_aux}'.split(',')
 
         rna_file = set()
@@ -243,7 +248,13 @@ task run_cellranger_multi {
             #######################
             # [libraries] section #
             #######################
-            fout.write('\n[libraries]\nfastq_id,fastqs,feature_types\n')
+            singleton_set = set()
+            singleton_set.add("auto")
+            has_chemistry = set(chemistries) != singleton_set
+            if not has_chemistry:
+                fout.write('\n[libraries]\nfastq_id,fastqs,feature_types\n')
+            else:
+                fout.write('\n[libraries]\nfastq_id,fastqs,feature_types,chemistry\n')
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
                 target = samples[i] + "_" + str(i)
@@ -280,7 +291,10 @@ task run_cellranger_multi {
                 if feature_type == '':
                     print("Do not expect " + data_types[i] + " in a cellranger multi run!", file = sys.stderr)
                     sys.exit(1)
-                fout.write(samples[i] + ',' + os.path.abspath(target) + ',' +  feature_type + '\n')
+                if not has_chemistry:
+                    fout.write(samples[i] + ',' + os.path.abspath(target) + ',' +  feature_type + '\n')
+                else:
+                    fout.write(samples[i] + ',' + os.path.abspath(target) + ',' +  feature_type + chemistries[i] + '\n')
 
             #####################
             # [samples] section #

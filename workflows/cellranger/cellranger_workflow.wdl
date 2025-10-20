@@ -343,6 +343,7 @@ workflow cellranger_workflow {
                     input_samples = generate_count_config.link2sample[link_id],
                     input_fastqs_directories = generate_count_config.sample2dir[link_id],
                     input_data_types = generate_count_config.sample2datatype[link_id],
+                    input_data_chemistries = generate_count_config.sample2chemistry[link_id],
                     input_aux = generate_count_config.sample2aux[link_id],
                     output_directory = output_directory_stripped,
                     acronym_file = acronym_file,
