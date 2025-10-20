@@ -294,7 +294,7 @@ task run_cellranger_multi {
                 if not has_chemistry:
                     fout.write(samples[i] + ',' + os.path.abspath(target) + ',' +  feature_type + '\n')
                 else:
-                    fout.write(samples[i] + ',' + os.path.abspath(target) + ',' +  feature_type + chemistries[i] + '\n')
+                    fout.write(samples[i] + ',' + os.path.abspath(target) + ',' +  feature_type + ',' + chemistries[i] + '\n')
 
             #####################
             # [samples] section #
