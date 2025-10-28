@@ -16,7 +16,7 @@ workflows:
         - /.*/
       branches:
         - master
-        - yiming
+        - test
   - name: Spaceranger
     subclass: WDL
     publish: true
