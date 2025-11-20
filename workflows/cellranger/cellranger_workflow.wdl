@@ -72,10 +72,10 @@ workflow cellranger_workflow {
         # 9.0.1, 8.0.1, 7.2.0
         String cellranger_version = "9.0.1"
         String cumulus_feature_barcoding_version = "2.0.0"
-        # 2.1.0, 2.0.0
-        String cellranger_atac_version = "2.1.0"
-        # 2.0.2.strato, 2.0.2.custom-max-cell, 2.0.2, 2.0.1, 2.0.0
-        String cellranger_arc_version = "2.0.2.strato"
+        # 2.2.0, 2.1.0, 2.0.0
+        String cellranger_atac_version = "2.2.0"
+        # 2.1.0, 2.0.2.strato, 2.0.2.custom-max-cell, 2.0.2, 2.0.1, 2.0.0
+        String cellranger_arc_version = "2.1.0"
 
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
@@ -265,6 +265,7 @@ workflow cellranger_workflow {
                     output_directory = output_directory_stripped,
                     genome = generate_count_config.sample2ref[sample_id],
                     acronym_file = acronym_file,
+                    secondary = secondary,
                     force_cells = force_cells,
                     dim_reduce = atac_dim_reduce,
                     peaks = peaks,
@@ -307,6 +308,7 @@ workflow cellranger_workflow {
                     genome = generate_count_config.sample2ref[link_id],
                     gex_exclude_introns = arc_gex_exclude_introns,
                     no_bam = no_bam,
+                    secondary = secondary,
                     min_atac_count = arc_min_atac_count,
                     min_gex_count = arc_min_gex_count,
                     peaks = peaks,
