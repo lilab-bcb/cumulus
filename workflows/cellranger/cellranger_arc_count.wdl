@@ -174,7 +174,8 @@ task run_cellranger_arc_count {
                 call-args.append('--no-bam')
 
         if '~{secondary}' != 'true':
-            call_args.append('--nosecondary')
+            if version.parse('~{cellranger_arc_version}') >= version.parse('2.1.0'):
+                call_args.append('--nosecondary')
 
         if '~{min_atac_count}' != '':
             call_args.extend(['--min-atac-count', '~{min_atac_count}'])
