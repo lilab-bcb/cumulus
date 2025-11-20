@@ -1,3 +1,9 @@
+.. note::
+  Cell Ranger will send anonymized telemetry data to 10x Genomics starting from v9.0. Here is the details on `Cell Ranger Pipeline Telemetry`_.
+
+  This option has been turned off in this *cellranger_workflow*, thus **no data will be sent to 10x Genomics**.
+
+
 The cellranger workflow supports processing data of 10x Flex and Sample Multiplexing type, as well as multiomics data.
 Follow the corresponding sections below based on your data type:
 
@@ -403,9 +409,9 @@ All the sample multiplexing assays share the same workflow input settings. ``cel
       - false
       - false
     * - cellranger_version
-      - Cell Ranger version to use. Available versions: 9.0.1, 8.0.1, 7.2.0.
-      - "9.0.1"
-      - "9.0.1"
+      - Cell Ranger version to use. Available versions: 10.0.0, 9.0.1, 8.0.1, 7.2.0.
+      - "10.0.0"
+      - "10.0.0"
     * - docker_registry
       - Docker registry to use for cellranger_workflow. Options:
 

@@ -1,3 +1,9 @@
+.. note::
+	Cell Ranger will send anonymized telemetry data to 10x Genomics starting from v9.0. Here is the details on `Cell Ranger Pipeline Telemetry`_.
+
+	This option has been turned off in this *cellranger_workflow*, thus **no data will be sent to 10x Genomics**.
+
+
 To process single-cell immune profiling (scIR-seq) data, follow the specific instructions below.
 
 Sample sheet
@@ -76,9 +82,9 @@ For scIR-seq data, ``cellranger_workflow`` takes sequencing reads as input (FAST
 	  - false
 	  - false
 	* - cellranger_version
-	  - cellranger version, could be: 9.0.1, 8.0.1, 7.2.0
-	  - "9.0.1"
-	  - "9.0.1"
+	  - cellranger version, could be: 10.0.0, 9.0.1, 8.0.1, 7.2.0
+	  - "10.0.0"
+	  - "10.0.0"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
