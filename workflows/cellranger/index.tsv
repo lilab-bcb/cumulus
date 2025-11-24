@@ -15,8 +15,10 @@ GRCh38_vdj_v7.0.0	gs://cumulus-ref/resources/cellranger/refdata-cellranger-vdj-G
 GRCm38_vdj_v7.0.0	gs://cumulus-ref/resources/cellranger/refdata-cellranger-vdj-GRCm38-alts-ensembl-7.0.0.tar.gz
 human_probe_v1	gs://cumulus-ref/resources/cellranger/Visium_Human_Transcriptome_Probe_Set_v1.0_GRCh38-2020-A.csv
 human_probe_v2	gs://cumulus-ref/resources/cellranger/Visium_Human_Transcriptome_Probe_Set_v2.0_GRCh38-2020-A.csv
+human_probe_v2.1	gs://cumulus-ref/resources/cellranger/Visium_Human_Transcriptome_Probe_Set_v2.1.0_GRCh38-2024-A.csv
 mouse_probe_v1	gs://cumulus-ref/resources/cellranger/Visium_Mouse_Transcriptome_Probe_Set_v1.0_mm10-2020-A.csv
 mouse_probe_v2	gs://cumulus-ref/resources/cellranger/Visium_Mouse_Transcriptome_Probe_Set_v2.0_mm10-2020-A.csv
+mouse_probe_v2.1	gs://cumulus-ref/resources/cellranger/Visium_Mouse_Transcriptome_Probe_Set_v2.1.0_GRCm39-2024-A.csv
 Flex_human_probe_v1.1	gs://cumulus-ref/resources/cellranger/Chromium_Human_Transcriptome_Probe_Set_v1.1.0_GRCh38-2024-A.csv
 Flex_human_probe_v1	gs://cumulus-ref/resources/cellranger/Chromium_Human_Transcriptome_Probe_Set_v1.0_GRCh38-2020-A.csv
 Flex_human_probe_v1.0.1	gs://cumulus-ref/resources/cellranger/Chromium_Human_Transcriptome_Probe_Set_v1.0.1_GRCh38-2020-A.csv

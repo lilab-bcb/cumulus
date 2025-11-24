@@ -18,6 +18,10 @@ Sample sheet
 
 		* - Keyword
 		  - Description
+		* - **GRCh38-2024-A_arc**
+		  - Human GRCh38 (GENCODE v44/Ensembl 110) for cellranger arc
+		* - **GRCm39-2024-A_arc**
+		  - Mouse GRCm39 (GENCODE vM33/Ensembl 110) for cellranger arc
 		* - **GRCh38-2020-A_arc_v2.0.0**
 		  - Human GRCh38 sequences (GENCODE v32/Ensembl 98), cellranger arc reference 2.0.0
 		* - **mm10-2020-A_arc_v2.0.0**
