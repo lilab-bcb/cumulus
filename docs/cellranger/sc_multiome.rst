@@ -1,3 +1,8 @@
+.. note::
+	Cell Ranger ARC will send anonymized telemetry data to 10x Genomics starting from v2.1. Here is the details on `Cell Ranger ARC Pipeline Telemetry`_.
+
+	This option has been turned off in this *cellranger_workflow*, thus **no data will be sent to 10x Genomics**.
+
 To process `10x Multiome`_ (GEX + ATAC) data, follow the instructions below:
 
 Sample sheet
@@ -80,6 +85,11 @@ For single-cell multiomics data, ``cellranger_workflow`` takes sequencing reads 
 	  - Turn this option on to also count reads mapping to intronic regions. With this option, users do not need to use pre-mRNA references.
 	  - true
 	  - true
+	* - secondary
+	  - | Perform Cell Ranger ARC secondary analysis (e.g. clustering).
+	    | **Note:** This parameter works only for *cellranger_arc_version* ``2.1.0`` or later.
+	  - false
+	  - false
 	* - no_bam
 	  - Turn this option on to disable BAM file generation.
 	  - false
@@ -105,9 +115,10 @@ For single-cell multiomics data, ``cellranger_workflow`` takes sequencing reads 
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/common_peaks.bed"
 	  -
 	* - cellranger_arc_version
-	  - cellranger-arc version, could be: ``2.0.2.strato`` (compatible with workflow v2.6.1+), ``2.0.2.custom-max-cell`` (with max_cell threshold set to 80,000), ``2.0.2`` (compatible with workflow v2.6.0 or earlier), ``2.0.1``, ``2.0.0``
-	  - "2.0.2.strato"
-	  - "2.0.2.strato"
+	  - | cellranger-arc version, could be: ``2.1.0``, ``2.0.2.strato`` (compatible with workflow v2.6.1+), ``2.0.2.custom-max-cell`` (with max_cell threshold set to 80,000), ``2.0.2`` (compatible with workflow v2.6.0 or earlier), ``2.0.1``, ``2.0.0``
+	  	| **Note:** The 20,000 total cell limit has been removed since version ``2.1.0``.
+	  - "2.1.0"
+	  - "2.1.0"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 
@@ -170,3 +181,4 @@ See the table below for important output:
 
 
 .. _10x Multiome: https://www.10xgenomics.com/support/epi-multiome
+.. _Cell Ranger ARC Pipeline Telemetry: https://www.10xgenomics.com/support/software/cell-ranger-arc/latest/tutorials/cr-arc-pipeline-telemetry
