@@ -97,6 +97,13 @@ This section covers preparing the sample sheet for Flex_ (previously named *Fixe
 
   See `Flex probe sets overview`_ for details on these probe sets.
 
+4. *Chemistry* column
+
+  By default, the chemistry is detected automatically which is officially recommended, so this column is usually omitted.
+
+  However, for the cases in which auto-detection fails (e.g. ``MFRP-RNA`` + ``MFRP-Ab-R1`` for Flex Multiplex with Antibody design, because probe barcodes are on different read pairs), users can specify this *Chemistry* column, and give the sample-level chemistry values.
+  **Notice:** This sample-level chemistry feature requires *cellranger_version* ``8.0.1`` or later.
+
 On Chip Multiplexing
 +++++++++++++++++++++
 
