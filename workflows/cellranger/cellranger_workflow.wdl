@@ -72,10 +72,10 @@ workflow cellranger_workflow {
         # 9.0.1, 8.0.1, 7.2.0
         String cellranger_version = "9.0.1"
         String cumulus_feature_barcoding_version = "2.0.0"
-        # 2.1.0, 2.0.0
-        String cellranger_atac_version = "2.1.0"
-        # 2.0.2.strato, 2.0.2.custom-max-cell, 2.0.2, 2.0.1, 2.0.0
-        String cellranger_arc_version = "2.0.2.strato"
+        # 2.2.0, 2.1.0, 2.0.0
+        String cellranger_atac_version = "2.2.0"
+        # 2.1.0, 2.0.2.strato, 2.0.2.custom-max-cell, 2.0.2, 2.0.1, 2.0.0
+        String cellranger_arc_version = "2.1.0"
 
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
@@ -265,6 +265,7 @@ workflow cellranger_workflow {
                     output_directory = output_directory_stripped,
                     genome = generate_count_config.sample2ref[sample_id],
                     acronym_file = acronym_file,
+                    secondary = secondary,
                     force_cells = force_cells,
                     dim_reduce = atac_dim_reduce,
                     peaks = peaks,
@@ -307,6 +308,7 @@ workflow cellranger_workflow {
                     genome = generate_count_config.sample2ref[link_id],
                     gex_exclude_introns = arc_gex_exclude_introns,
                     no_bam = no_bam,
+                    secondary = secondary,
                     min_atac_count = arc_min_atac_count,
                     min_gex_count = arc_min_gex_count,
                     peaks = peaks,
@@ -343,6 +345,7 @@ workflow cellranger_workflow {
                     input_samples = generate_count_config.link2sample[link_id],
                     input_fastqs_directories = generate_count_config.sample2dir[link_id],
                     input_data_types = generate_count_config.sample2datatype[link_id],
+                    input_data_chemistries = generate_count_config.sample2chemistry[link_id],
                     input_aux = generate_count_config.sample2aux[link_id],
                     output_directory = output_directory_stripped,
                     acronym_file = acronym_file,
@@ -489,6 +492,7 @@ task generate_count_config {
             link2sample = defaultdict(list)
             link2dir = defaultdict(list)
             link2dt = defaultdict(list)
+            link2chem = defaultdict(list)
             link2aux = defaultdict(list)
             link2ref = defaultdict(set)
             link2vdj_ref = defaultdict(set)
@@ -557,11 +561,15 @@ task generate_count_config {
                         link = sample_id
 
                     if pd.notna(link) and (link != ''):
+                        chemistry = df_local['Chemistry'].iat[0]
+                        no_chem = False
+
                         multiomics[link].add(datatype)
                         size = dirs.size
                         link2sample[link].extend([sample_id] * size)
                         link2dir[link].extend(list(dirs))
                         link2dt[link].extend([datatype] * size)
+                        link2chem[link].extend([chemistry] * size)
                         link2aux[link].extend([aux_file] * size)
                         if reference != 'null':
                             if datatype in ['vdj', 'vdj_t', 'vdj_b', 'vdj_t_gd']:  # Keep VDJ ref separate in case of OCM/HTO with VDJ
@@ -570,6 +578,8 @@ task generate_count_config {
                                 link2ref[link].add(reference)
                         if (probe_set_file != '~{null_file}') or (len(link2probeset[link]) == 0):
                             link2probeset[link].add(probe_set_file)
+                            if len(link2probeset[link]) > 1:
+                                link2probeset[link] = [f for f in link2probeset[link] if f != '~{null_file}']    # Clear the null placeholder if exists.
                         continue
 
                 datatype2fo[datatype].write(sample_id + '\n')
@@ -625,6 +635,7 @@ task generate_count_config {
 
                 fom_s2dir.write(link_id + '\t' + ','.join(link2dir[link_id]) + '\n')
                 fom_s2type.write(link_id + '\t' + ','.join(link2dt[link_id]) + '\n')
+                fom_s2chem.write(link_id + '\t' + ','.join(link2chem[link_id]) + '\n')
                 fom_l2sample.write(link_id + '\t' + ','.join(link2sample[link_id]) + '\n')
 
                 if 'atac' in multiomics[link_id]:

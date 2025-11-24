@@ -103,6 +103,7 @@ workflow spaceranger_workflow {
                 slidefile = sample_row[10],
                 reorient_images = reorient_images,
                 loupe_alignment = sample_row[11],
+                unknown_slide = unknown_slide,
                 no_bam = no_bam,
                 secondary = secondary,
                 r1_length = r1_length,
