@@ -82,17 +82,8 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		    | The FASTQ folders should contain one subfolder for each sample in the flowcell with the sample name as the subfolder name.
 		    | Each subfolder contains FASTQ files for that sample.
 		* - ProbeSet
-		  - Probe set for FFPE samples. Can be either a keyword or a cloud URI to a custom probe set. Below are keywords of available probe sets:
-
-		    - **human_probe_v2**: 10x human probe set version 2, CytAssist-compatible
-
-		    - **mouse_probe_v2**: 10x mouse probe set version 2, CytAssist-compatible
-
-		    - **human_probe_v1**: 10x human probe set version 1, CytAssist-compatible
-
-		    - **mouse_probe_v1**: 10x mouse probe set version 1, CytAssist-compatible
-
-		    **Notice:** Setting *ProbeSet* to ``""`` for a sample implies the sample is not FFPE.
+		  - | Probeset for FFPE samples. This can be a 10x official probeset selected from the table in this section below, or a URI to a custom probeset.
+		    | **Notice:** Setting *ProbeSet* to ``""`` for a sample implies the sample is not FFPE.
 		* - Image
 		  - Cloud bucket url for a brightfield tissue H&E image in .jpg or .tiff format. This column is mutually exclusive with DarkImage and ColorizedImage columns.
 		* - DarkImage
@@ -111,6 +102,41 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		  - Alignment file produced by the manual Loupe alignment step.
 
 	The sample sheet supports sequencing the same 10x channels across multiple flowcells. If a sample is sequenced across multiple flowcells, simply list it in multiple rows, with one flowcell per row. In the following example, we have 2 samples sequenced in two flowcells.
+
+	The list of available Visium probe sets is below:
+
+		.. list-table::
+			:widths: 5 5 5 5
+			:header-rows: 1
+
+			* - Probe Set
+			  - Genome Reference
+			  - Compatible Assay
+			  - Space Ranger version
+			* - **human_probe_v2.1**
+			  - GRCh38-2024-A
+			  - Visium HD, Visium CytAssist
+			  - v4.0+
+			* - **human_probe_v2**
+			  - GRCh38-2020-A
+			  - Visium HD, Visium CytAssist
+			  - v3.0+
+			* - **human_probe_v1**
+			  - GRCh38-2020-A
+			  - Visium CytAssist
+			  - v2.0+
+			* - **mouse_probe_v2.1**
+			  - GRCm39-2024-A
+			  - Visium HD, Visium CytAssist
+			  - v4.0+
+			* - **mouse_probe_v2**
+			  - mm10-2020-A
+			  - Visium HD, Visium CytAssist
+			  - v3.0+
+			* - **mouse_probe_v1**
+			  - mm10-2020-A
+			  - Visium CytAssist
+			  - v2.0+
 
 	Example::
 
@@ -158,6 +184,10 @@ Sample sheet
 
 		* - Keyword
 		  - Description
+		* - **GRCh38-2024-A**
+		  - Human GRCh38 (GENCODE v44/Ensembl 110). *Notice: This reference is only supported by Space Ranger v4.0.1+.*
+		* - **GRCm39-2024-A**
+		  - Mouse GRCm39 (GENCODE vM33/Ensembl 110). *Notice: This reference is only supported by Space Ranger v4.0.1+.*
 		* - **GRCh38-2020-A**
 		  - Human GRCh38 (GENCODE v32/Ensembl 98)
 		* - **mm10-2020-A**
