@@ -69,8 +69,8 @@ workflow cellranger_workflow {
         # Index TSV file
         File acronym_file = "gs://cumulus-ref/resources/cellranger/index.tsv"
 
-        # 9.0.1, 8.0.1, 7.2.0
-        String cellranger_version = "9.0.1"
+        # 10.0.0, 9.0.1, 8.0.1, 7.2.0
+        String cellranger_version = "10.0.0"
         String cumulus_feature_barcoding_version = "2.0.0"
         # 2.2.0, 2.1.0, 2.0.0
         String cellranger_atac_version = "2.2.0"
