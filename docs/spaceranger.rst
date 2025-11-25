@@ -6,6 +6,11 @@ Run Space Ranger tools using spaceranger_workflow
 
 ``spaceranger_workflow`` wraps Space Ranger to process 10x Visium data.
 
+.. note::
+	Space Ranger will send anonymized telemetry data to 10x Genomics starting from v4.0. Here is the details on `Space Ranger Pipeline Telemetry`_.
+
+	This option has been turned off in this *spaceranger_workflow*, thus **no data will be sent to 10x Genomics**.
+
 A general step-by-step instruction
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -318,6 +323,7 @@ Build Space Ranger References
 Reference built by Cell Ranger for sc/snRNA-seq should be compatible with Space Ranger. For more details on building references uing Cell Ranger, please refer to `here <./cellranger/index.html#build-references-for-sc-snrna-seq>`_.
 
 
+.. _Space Ranger Pipeline Telemetry: https://www.10xgenomics.com/support/software/space-ranger/latest/tutorials/sr-pipeline-telemetry
 .. _BCL Convert: https://emea.support.illumina.com/sequencing/sequencing_software/bcl-convert.html
 .. _gcloud storage: https://cloud.google.com/sdk/gcloud/reference/storage#COMMAND
 .. _Import workflows to Terra: ./cumulus_import.html
