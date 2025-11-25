@@ -145,7 +145,7 @@ task run_cellranger_atac_count {
         call_args = ['cellranger-atac', 'count', '--id=results', '--reference=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local', '--localcores=~{num_cpu}', '--localmem='+mem_size]
 
         # Run secondary analysis or not
-        if version.parse('cellranger_atac_version') >= version.parse('2.2.0'):
+        if version.parse('~{cellranger_atac_version}') >= version.parse('2.2.0'):
             if '~{secondary}' != 'true':
                 call_args.append('--nosecondary')
             else:
