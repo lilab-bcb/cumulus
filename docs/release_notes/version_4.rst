@@ -1,4 +1,4 @@
-4.0.0 :small:`Nov 24, 2025`
+4.0.0 :small:`Nov 26, 2025`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 * Cellranger workflow:
@@ -15,7 +15,7 @@
         * Add *secondary* input for running secondary analysis or not, with default ``false``.
     * Add 2024-A transcriptome references for Cell Ranger ARC and ATAC: ``GRCh38-2024-A_arc`` and ``GRCm39-2024-A_arc``.
 * Spaceranger workflow:
-    * Upgrade *sspaceranger_version* default to ``4.0.1``, with associated important feature changes:
+    * Upgrade *spaceranger_version* default to ``4.0.1``, with associated important feature changes:
 
         * Support Visium HD 3'. To enable it, in the sample sheet, leave the *ProbeSet* column blank for such samples, or skip this column if all samples are Visium HD 3'.
         * Add Visium probesets v2.1 which are bundled with 2024-A transcriptome references: ``human_probe_v2.1`` and ``mouse_probe_v2.1``.
