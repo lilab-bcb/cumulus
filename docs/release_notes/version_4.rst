@@ -8,7 +8,7 @@
 
         * The ``20,000`` total cell limit is removed.
         * Add *secondary* input for running secondary analysis or not, with default ``false``.
-    * Upgrade *cellranger_atatc_version* default to ``2.2.0``, with associated imporant feature changes:
+    * Upgrade *cellranger_atatc_version* default to ``2.2.0``, with associated important feature changes:
 
         * The ``20,000`` total cell limit is removed.
         * The *force_cells* input can be any positive integer, which is no longer restricted to be smaller than ``20,000``.

@@ -69,7 +69,7 @@ Workflow input
 	  - false
 	* - force_cells
 	  - | Force pipeline to use this number of cells, bypassing the cell detection algorithm
-	  	| **Note:** Users can specify any integer since *cellranger_atac_version* ``2.2.0``. For older versions, it has to be less than 20,000.
+	  	| **Note:** Users can specify any positive integer since *cellranger_atac_version* ``2.2.0``. For older versions, it has to be less than 20,000.
 	  - 6000
 	  - Estimation from data
 	* - atac_dim_reduce
