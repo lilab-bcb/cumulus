@@ -61,7 +61,7 @@ workflow cellranger_multi {
     Map[String, String] acronym2uri = read_map(acronym_file)
     # If reference is a URI
     Boolean is_genome_uri = sub(genome, "^.+\\.(tgz|gz)$", "URI") == "URI"
-    File genome_file = (if is_genome_uri then genome else acronym2uri[genome])
+    File genome_file = (if no_bam then acronym2uri["null_file"] else (if is_genome_uri then genome else acronym2uri[genome]))
 
     # If vdj reference is a URI
     Boolean is_vdj_ref_uri = sub(vdj_ref, "^.+\\.(tgz|gz)$", "URI") == "URI"
@@ -133,8 +133,11 @@ task run_cellranger_multi {
         export TMPDIR=/tmp
         export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
-        mkdir -p genome_dir
-        tar xf ~{genome_file} -C genome_dir --strip-components 1
+
+        if [ "~{no_bam}" = "false" ]; then
+            mkdir -p genome_dir
+            tar xf ~{genome_file} -C genome_dir --strip-components 1
+        fi
 
         python <<CODE
         import re
@@ -203,7 +206,9 @@ task run_cellranger_multi {
             # [gene-expression] section #
             #############################
             fout.write('[gene-expression]\n')
-            fout.write('reference,' + os.path.abspath('genome_dir') + '\n')
+
+            if '~{no_bam}' == 'false':
+                fout.write('reference,' + os.path.abspath('genome_dir') + '\n')
 
             if is_null_file('~{probe_set_file}'):  # GEX case
                 if '~{include_introns}' == 'false':
