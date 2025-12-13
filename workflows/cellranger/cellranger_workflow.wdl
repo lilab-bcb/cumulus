@@ -142,7 +142,6 @@ workflow cellranger_workflow {
             input_csv_file = input_csv_file,
             output_dir = output_directory_stripped,
             config_version = config_version,
-            docker_registry = docker_registry_stripped,
             zones = zones,
             preemptible = preemptible,
             awsQueueArn = awsQueueArn,
@@ -183,7 +182,6 @@ workflow cellranger_workflow {
                 summaries = cellranger_count.output_metrics_summary,
                 sample_ids = cellranger_count.output_count_directory,
                 config_version = config_version,
-                docker_registry = docker_registry_stripped,
                 zones = zones,
                 preemptible = preemptible,
                 awsQueueArn = awsQueueArn,
@@ -220,7 +218,6 @@ workflow cellranger_workflow {
                 summaries = cellranger_vdj.output_metrics_summary,
                 sample_ids = cellranger_vdj.output_vdj_directory,
                 config_version = config_version,
-                docker_registry = docker_registry_stripped,
                 zones = zones,
                 preemptible = preemptible,
                 awsQueueArn = awsQueueArn,
@@ -287,7 +284,6 @@ workflow cellranger_workflow {
                 summaries = cellranger_atac_count.output_metrics_summary,
                 sample_ids = cellranger_atac_count.output_count_directory,
                 config_version = config_version,
-                docker_registry = docker_registry_stripped,
                 zones = zones,
                 preemptible = preemptible,
                 awsQueueArn = awsQueueArn,
@@ -329,7 +325,6 @@ workflow cellranger_workflow {
                 summaries = cellranger_arc_count.output_metrics_summary,
                 sample_ids = cellranger_arc_count.output_count_directory,
                 config_version = config_version,
-                docker_registry = docker_registry_stripped,
                 zones = zones,
                 preemptible = preemptible,
                 awsQueueArn = awsQueueArn,
@@ -404,7 +399,6 @@ workflow cellranger_workflow {
                 summaries = cellranger_count_fbc.output_metrics_summary,
                 sample_ids = cellranger_count_fbc.output_count_directory,
                 config_version = config_version,
-                docker_registry = docker_registry_stripped,
                 zones = zones,
                 preemptible = preemptible,
                 awsQueueArn = awsQueueArn,
@@ -431,7 +425,6 @@ task generate_count_config {
         File input_csv_file
         String output_dir
         String config_version
-        String docker_registry
         String zones
         Int preemptible
         String awsQueueArn
@@ -709,7 +702,7 @@ task generate_count_config {
     }
 
     runtime {
-        docker: "~{docker_registry}/config:~{config_version}"
+        docker: "cumulusprod/config:~{config_version}"
         zones: zones
         preemptible: preemptible
         queueArn: awsQueueArn
@@ -721,7 +714,6 @@ task collect_summaries {
         Array[File] summaries
         Array[String] sample_ids
         String config_version
-        String docker_registry
         String zones
         Int preemptible
         String awsQueueArn
@@ -755,7 +747,7 @@ task collect_summaries {
     }
 
     runtime {
-        docker: "~{docker_registry}/config:~{config_version}"
+        docker: "cumulusprod/config:~{config_version}"
         zones: zones
         preemptible: preemptible
         queueArn: awsQueueArn
