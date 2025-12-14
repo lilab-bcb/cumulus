@@ -400,7 +400,8 @@ All the sample multiplexing assays share the same workflow input settings. ``cel
       - true
       - true
     * - no_bam
-      - Turn this option on to disable BAM file generation
+      - | Turn this option on to disable BAM file generation
+        | **Notice:** For Flex data, if this option is turned on, the genome reference will not be used in the process. (requires ``cellranger_version >= "8.0.0"``)
       - false
       - false
     * - force_cells

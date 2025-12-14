@@ -1,3 +1,10 @@
+4.0.1 :small:`Dec 14, 2025`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Cellranger workflow:
+    * For Flex data, avoid using genome reference when ``no_bam = true`` and ``cellranger_version >= "8.0.0"``.
+
+
 4.0.0 :small:`Nov 26, 2025`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
