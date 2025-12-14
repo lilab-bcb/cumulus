@@ -58,10 +58,12 @@ workflow cellranger_multi {
         String backend = "gcp"
     }
 
+    Boolean is_flex = sub(input_data_types, ".*frp.*", "Flex") == "Flex"
+
     Map[String, String] acronym2uri = read_map(acronym_file)
     # If reference is a URI
     Boolean is_genome_uri = sub(genome, "^.+\\.(tgz|gz)$", "URI") == "URI"
-    File genome_file = (if is_genome_uri then genome else acronym2uri[genome])
+    File genome_file = (if no_bam && is_flex then acronym2uri["null_file"] else (if is_genome_uri then genome else acronym2uri[genome]))
 
     # If vdj reference is a URI
     Boolean is_vdj_ref_uri = sub(vdj_ref, "^.+\\.(tgz|gz)$", "URI") == "URI"
@@ -70,6 +72,7 @@ workflow cellranger_multi {
     call run_cellranger_multi {
         input:
             link_id = link_id,
+            is_flex = is_flex,
             input_samples = input_samples,
             input_fastqs_directories = input_fastqs_directories,
             input_data_types = input_data_types,
@@ -103,6 +106,7 @@ workflow cellranger_multi {
 task run_cellranger_multi {
     input {
         String link_id
+        Boolean is_flex
         String input_samples
         String input_fastqs_directories
         String input_data_types
@@ -133,15 +137,20 @@ task run_cellranger_multi {
         export TMPDIR=/tmp
         export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
-        mkdir -p genome_dir
-        tar xf ~{genome_file} -C genome_dir --strip-components 1
+
+        if [ "~{no_bam}" = "false" ] && [ "~{is_flex}" = "true" ]; then
+            mkdir -p genome_dir
+            tar xf ~{genome_file} -C genome_dir --strip-components 1
+        fi
 
         python <<CODE
         import re
         import os
         import sys
-        from subprocess import check_call, CalledProcessError, STDOUT, DEVNULL
+        from subprocess import check_call, check_output, CalledProcessError, STDOUT, DEVNULL
         from packaging import version
+
+        cr_version = check_output(['cellranger', '--version'], text=True).strip().split('-')[-1]
 
         samples = '~{input_samples}'.split(',')
         data_types = '~{input_data_types}'.split(',')
@@ -203,7 +212,9 @@ task run_cellranger_multi {
             # [gene-expression] section #
             #############################
             fout.write('[gene-expression]\n')
-            fout.write('reference,' + os.path.abspath('genome_dir') + '\n')
+
+            if ('~{no_bam}' == 'false' and '~{is_flex}' == 'true') or (version.parse(cr_version) < version.parse('8.0.0')):
+                fout.write('reference,' + os.path.abspath('genome_dir') + '\n')
 
             if is_null_file('~{probe_set_file}'):  # GEX case
                 if '~{include_introns}' == 'false':
@@ -222,7 +233,7 @@ task run_cellranger_multi {
                 fout.write('expect-cells,~{expect_cells}\n')
             if '~{secondary}' == 'false':
                 fout.write('no-secondary,true\n')
-            if version.parse('~{cellranger_version}') >= version.parse('8.0.0'):
+            if version.parse(cr_version) >= version.parse('8.0.0'):
                 if '~{no_bam}' == 'false':
                     fout.write('create-bam,true\n')
                 else:
