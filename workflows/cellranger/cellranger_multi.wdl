@@ -147,8 +147,10 @@ task run_cellranger_multi {
         import re
         import os
         import sys
-        from subprocess import check_call, CalledProcessError, STDOUT, DEVNULL
+        from subprocess import check_call, check_output, CalledProcessError, STDOUT, DEVNULL
         from packaging import version
+
+        cr_version = check_output(['cellranger', '--version'], text=True).strip().split('-')[-1]
 
         samples = '~{input_samples}'.split(',')
         data_types = '~{input_data_types}'.split(',')
@@ -211,7 +213,7 @@ task run_cellranger_multi {
             #############################
             fout.write('[gene-expression]\n')
 
-            if '~{no_bam}' == 'false' and '~{is_flex}' == 'true':
+            if ('~{no_bam}' == 'false' and '~{is_flex}' == 'true') or (version.parse(cr_version) < version.parse('8.0.0')):
                 fout.write('reference,' + os.path.abspath('genome_dir') + '\n')
 
             if is_null_file('~{probe_set_file}'):  # GEX case
@@ -231,7 +233,7 @@ task run_cellranger_multi {
                 fout.write('expect-cells,~{expect_cells}\n')
             if '~{secondary}' == 'false':
                 fout.write('no-secondary,true\n')
-            if version.parse('~{cellranger_version}') >= version.parse('8.0.0'):
+            if version.parse(cr_version) >= version.parse('8.0.0'):
                 if '~{no_bam}' == 'false':
                     fout.write('create-bam,true\n')
                 else:
