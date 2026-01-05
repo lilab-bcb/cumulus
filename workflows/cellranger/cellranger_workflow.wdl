@@ -702,7 +702,7 @@ task generate_count_config {
     }
 
     runtime {
-        docker: "quay.io/config:~{config_version}"
+        docker: "quay.io/cumulus/config:~{config_version}"
         zones: zones
         preemptible: preemptible
         queueArn: awsQueueArn
@@ -747,7 +747,7 @@ task collect_summaries {
     }
 
     runtime {
-        docker: "quay.io/config:~{config_version}"
+        docker: "quay.io/cumulus/config:~{config_version}"
         zones: zones
         preemptible: preemptible
         queueArn: awsQueueArn
