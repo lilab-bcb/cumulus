@@ -1,3 +1,9 @@
+4.0.2 :small:`Jan 6, 2026`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Cellranger workflow:
+    * Bug fix on processing VDJ data.
+
 4.0.1 :small:`Dec 14, 2025`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
