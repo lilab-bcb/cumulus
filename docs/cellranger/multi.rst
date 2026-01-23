@@ -32,11 +32,15 @@ This section covers preparing the sample sheet for Flex_ (previously named *Fixe
       - Reference
       - AuxFile
       - Description
-    * - **frp**
+    * - Choose one from: **frp**, **flex-v1**, **flex-v2**
       - | Select one from prebuilt genome references in `scRNA-seq section`_,
         | or provide a cloud URI of a custom reference in ``.tar.gz`` format.
       - Path to a text file including the sample name to Flex probe barcode association (see an example below this table).
-      - For RNA-Seq samples
+      - For Flex RNA-Seq samples:
+
+        - ``flex-v1`` or ``frp``: For Flex v1 data.
+
+        - ``flex-v2``: For Flex v2 data. **Notice:** This data type is supported only in Cell Ranger v10.0+.
     * - Choose one from: **citeseq**, **crispr**
       - No need to specify a reference
       - Path to its feature reference file of `10x Feature Reference`_ format. **Notice:** If multiple antibody capture samples, you need to combine feature barcodes used in all of them in one reference file.
@@ -67,31 +71,44 @@ This section covers preparing the sample sheet for Flex_ (previously named *Fixe
   An example sample sheet for a more complex Flex data::
 
     Link,Sample,Reference,Flowcell,DataType,AuxFile
-    s2,s2_gex,GRCh38-2020-A,gs://my-bucket/s2_fastqs,frp,gs://my-bucket/s2_flex.csv
+    s2,s2_gex,GRCh38-2020-A,gs://my-bucket/s2_fastqs,flex-v2,gs://my-bucket/s2_flex.csv
     s2,s2_citeseq,,gs://my-bucket/s2_fastqs,citeseq,gs://my-bucket/s2_fbc.csv
     s2,s2_crispr,,gs://my-bucket/s2_fastqs,crispr,gs://my-bucket/s2_fbc.csv
 
 3. Flex Probe Set.
 
-  Flex uses probes that target protein-coding genes in the human or mouse transcriptome. It's automatically determined by the genome reference specified by users for the scRNA-Seq sample by following the table below:
+  Flex uses probes that target protein-coding genes in the human or mouse transcriptome. It's automatically determined by the genome reference and Flex chemistry version specified by users for the scRNA-Seq sample by following the table below:
 
     .. list-table::
-        :widths: 5 5 5
+        :widths: 5 5 5 5
         :header-rows: 1
 
         * - Genome Reference
+          - Flex chemistry version
           - Probe Set
           - Cell Ranger version
         * - GRCh38-2024-A
+          - v2
+          - `Flex_human_probe_v2.0`_
+          - v10.0+
+        * - GRCh38-2024-A
+          - v1
           - `Flex_human_probe_v1.1`_
           - v9.0+
         * - GRCh38-2020-A
+          - v1
           - `Flex_human_probe_v1.0.1`_
           - v7.1+
         * - GRCm39-2024-A
+          - v2
+          - `Flex_mouse_probe_v2.0`_
+          - v10.0+
+        * - GRCm39-2024-A
+          - v1
           - `Flex_mouse_probe_v1.1`_
           - v9.0+
         * - mm10-2020-A
+          - v1
           - `Flex_mouse_probe_v1.0.1`_
           - v7.1+
 
@@ -493,7 +510,9 @@ All the sample multiplexing assays share the same workflow output structure. See
 .. _Flex: https://www.10xgenomics.com/support/software/cell-ranger/latest/analysis/running-pipelines/cr-flex-multi-frp
 .. _Flex probe sets overview: https://www.10xgenomics.com/support/flex-gene-expression/documentation/steps/probe-sets/chromium-frp-probe-sets-overview
 .. _Cell Ranger Command Line Arguments: https://www.10xgenomics.com/support/software/cell-ranger/latest/resources/cr-command-line-arguments
+.. _Flex_human_probe_v2.0: https://www.10xgenomics.com/support/flex-gene-expression/documentation/steps/probe-sets/chromium-frp-human-transcriptome-probe-set-2-0
 .. _Flex_human_probe_v1.1: https://www.10xgenomics.com/support/flex-gene-expression/documentation/steps/probe-sets/chromium-frp-human-transcriptome-probe-set-1-1
 .. _Flex_human_probe_v1.0.1: https://www.10xgenomics.com/support/flex-gene-expression/documentation/steps/probe-sets/chromium-frp-human-transcriptome-probe-set
+.. _Flex_mouse_probe_v2.0: https://www.10xgenomics.com/support/flex-gene-expression/documentation/steps/probe-sets/chromium-frp-mouse-transcriptome-probe-set-2-0
 .. _Flex_mouse_probe_v1.1: https://www.10xgenomics.com/support/flex-gene-expression/documentation/steps/probe-sets/chromium-frp-mouse-transcriptome-probe-set-1-1
 .. _Flex_mouse_probe_v1.0.1: https://www.10xgenomics.com/support/flex-gene-expression/documentation/steps/probe-sets/chromium-frp-mouse-transcriptome-probe-set

@@ -150,7 +150,12 @@ task run_cellranger_multi {
         from subprocess import check_call, check_output, CalledProcessError, STDOUT, DEVNULL
         from packaging import version
 
-        cr_version = check_output(['cellranger', '--version'], text=True).strip().split('-')[-1]
+        raw_version_str = check_output(['cellranger', '--version'], text=True).strip()
+        match = re.search(r"(\d+\.\d+\.\d+)", raw_version_str)
+        if match:
+            cr_version = match.group(1)
+        else:
+            raise Exception("Invalid cellranger version: " + raw_version_str)
 
         samples = '~{input_samples}'.split(',')
         data_types = '~{input_data_types}'.split(',')
