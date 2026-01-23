@@ -464,7 +464,7 @@ task generate_count_config {
 
         for idx, row in df.iterrows():
             row['Flowcell'] = re.sub('/+$', '', row['Flowcell'])
-            if row['DataType'] not in ['rna', 'vdj', 'vdj_t', 'vdj_b', 'vdj_t_gd', 'adt', 'citeseq', 'cmo', 'crispr', 'atac', 'hashing', 'frp']:
+            if row['DataType'] not in ['rna', 'vdj', 'vdj_t', 'vdj_b', 'vdj_t_gd', 'adt', 'citeseq', 'cmo', 'crispr', 'atac', 'hashing', 'frp', 'flex-v1', 'flex-v2']:
                 print("Unknown DataType " + row['DataType'] + " is detected!", file = sys.stderr)
                 sys.exit(1)
             if re.search('[^a-zA-Z0-9_-]', row['Sample']) is not None:
@@ -501,6 +501,8 @@ task generate_count_config {
 
             # Load Reference to Flex Probe Set mapping
             df_flex = pd.read_csv('~{flex_probset_file}', header=None, sep='\t')
+            df_flex["version"] = df_flex[0].apply(lambda s: s.split('_')[1] if '_' in s else "v1")
+            df_flex["reference"] = df_flex[0].apply(lambda s: s.split('_')[0])
 
             for sample_id in df['Sample'].unique():
                 df_local = df.loc[df['Sample'] == sample_id].dropna(axis=1, how='all')  # Drop columns with only NAs
@@ -519,14 +521,18 @@ task generate_count_config {
                 reference = df_local['Reference'].iat[0]
 
                 probe_set_file = '~{null_file}'
-                if datatype == 'frp':
+                if datatype in ['frp', 'flex-v1', 'flex-v2']:
+                    flex_version = datatype.split('-')[1] if '-' in datatype else "v1"
                     if reference == 'null':
                         print("A genome reference must be specified for Flex sample '" + sample_id + "'!")
                         sys.exit(1)
-                    if reference not in df_flex[0].values:
-                        print("The given genome reference '" + reference + "' doesn't have an associated Flex probe set!")
+                    if (reference not in df_flex["reference"].values) or (flex_version not in df_flex["version"].values):
+                        print("The given genome reference '" + reference + "' with Flex '" + flex_version + "' doesn't have an associated Probeset!")
                         sys.exit(1)
-                    probe_set_file = df_flex.loc[df_flex[0]==reference, 1].iat[0]
+                    probe_set_file = df_flex.loc[(df_flex["reference"]==reference)&(df_flex["version"]==flex_version), 1].iat[0]
+
+                    # Unify the Flex DataType key for simplicity
+                    datatype = 'frp'
 
                 aux_file = '~{null_file}'
                 if datatype in ['rna', 'adt', 'citeseq', 'hashing', 'cmo', 'crispr', 'frp', 'vdj', 'vdj_t', 'vdj_b', 'vdj_t_gd']:
