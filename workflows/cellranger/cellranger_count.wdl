@@ -161,30 +161,35 @@ task run_cellranger_count {
                 if not os.path.exists(target):
                     os.mkdir(target)
                 try:
-                    call_args = ['strato', 'cp', directory + '/' + sample_name + '_S*_L*_*_001.fastq.gz', directory + '/' + sample_name + '_S*_L*_*_001.fastq', target]
+                    call_args = ['strato', 'cp', directory + '/' + sample_name + '_S*_L*_*_001.fastq.gz', target]
                     print(' '.join(call_args))
                     check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
                 except CalledProcessError:
-                    # Localize tar file
-                    tar_file = sample_name + ".tar"
-                    call_args = ['strato', 'cp', directory + '/' + tar_file, '.']
-                    print(' '.join(call_args))
-                    check_call(call_args)
+                    try:
+                        call_args = ['strato', 'cp', directory + '/' + sample_name + '_S*_L*_*_001.fastq', target]
+                        print(' '.join(call_args))
+                        check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
+                    except CalledProcessError:
+                        # Localize tar file
+                        tar_file = sample_name + ".tar"
+                        call_args = ['strato', 'cp', directory + '/' + tar_file, '.']
+                        print(' '.join(call_args))
+                        check_call(call_args)
 
-                    # Untar
-                    call_args = ["tar", "--strip-components=1", "-xf", tar_file, "-C", target]
-                    print(' '.join(call_args))
-                    check_call(call_args)
+                        # Untar
+                        call_args = ["tar", "--strip-components=1", "-xf", tar_file, "-C", target]
+                        print(' '.join(call_args))
+                        check_call(call_args)
 
-                    # Remove tar file
-                    call_args = ["rm", tar_file]
-                    print(' '.join(call_args))
-                    check_call(call_args)
+                        # Remove tar file
+                        call_args = ["rm", tar_file]
+                        print(' '.join(call_args))
+                        check_call(call_args)
 
-                    # Rename FASTQ files if needed
-                    fastq_files = glob.glob(target+"/*.fastq.gz")
-                    for fastq_f in fastq_files:
-                        check_fastq_file(fastq_f, sample_name)
+                        # Rename FASTQ files if needed
+                        fastq_files = glob.glob(target+"/*.fastq.gz")
+                        for fastq_f in fastq_files:
+                            check_fastq_file(fastq_f, sample_name)
 
         samples = data_types = auxs = None
         fastqs_dirs = []
