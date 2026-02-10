@@ -161,7 +161,7 @@ task run_cellranger_count {
                 if not os.path.exists(target):
                     os.mkdir(target)
                 try:
-                    call_args = ['strato', 'cp', directory + '/' + sample_name + '_S*_L*_*_001.fastq.gz' , target]
+                    call_args = ['strato', 'cp', directory + '/' + sample_name + '_S*_L*_*_001.fastq.gz', directory + '/' + sample_name + '_S*_L*_*_001.fastq', target]
                     print(' '.join(call_args))
                     check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
                 except CalledProcessError:
