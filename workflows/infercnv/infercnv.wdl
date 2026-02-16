@@ -13,14 +13,15 @@ workflow InferCNV {
 
         File acronym_file = "gs://cumulus-ref/resources/infercnv/index.tsv"
         String docker_registry = "quay.io/cumulus"
-        String inferCNV_version = "1.5.1"
-        String backend = "gcp"
+        String inferCNV_version = "1.20.0"
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         Int memory = 20
         Int disk_space = 50
+        String awsQueueArn = ""
     }
 
+    String backend = if sub(output_directory, "^s3://.+$", "aws") == "aws" then "aws" else "gcp"
     String output_directory_stripped = sub(output_directory, "/+$", "")
 
     Map[String, String] acronym2uri = read_map(acronym_file)
@@ -37,7 +38,8 @@ workflow InferCNV {
             zones = zones,
             preemptible = preemptible,
             memory = memory,
-            disk_space = disk_space
+            disk_space = disk_space,
+            awsQueueArn = awsQueueArn
     }
 
     call run_inferCNV {
@@ -57,7 +59,8 @@ workflow InferCNV {
             zones = zones,
             memory = memory,
             disk_space = disk_space,
-            preemptible = preemptible
+            preemptible = preemptible,
+            awsQueueArn = awsQueueArn
     }
 
     call gen_CNV_metrics {
@@ -73,7 +76,8 @@ workflow InferCNV {
             zones = zones,
             memory = memory,
             disk_space = disk_space,
-            preemptible = preemptible
+            preemptible = preemptible,
+            awsQueueArn = awsQueueArn
     }
 
 
@@ -96,6 +100,7 @@ task preprocess {
         Int preemptible
         Int memory
         Int disk_space
+        String awsQueueArn
     }
 
     command {
@@ -121,6 +126,7 @@ task preprocess {
         preemptible: preemptible
         memory: "~{memory}G"
         disks: "local-disk ~{disk_space} HDD"
+        queueArn: awsQueueArn
     }
 }
 
@@ -143,6 +149,7 @@ task run_inferCNV {
         Int memory
         Int disk_space
         Int preemptible
+        String awsQueueArn
     }
 
     command {
@@ -185,6 +192,7 @@ task run_inferCNV {
         memory: "~{memory}G"
         disks: "local-disk ~{disk_space} HDD"
         preemptible: preemptible
+        queueArn: awsQueueArn
     }
 }
 
@@ -202,6 +210,7 @@ task gen_CNV_metrics {
         Int memory
         Int disk_space
         Int preemptible
+        String awsQueueArn
     }
 
     command {
@@ -250,5 +259,6 @@ task gen_CNV_metrics {
         memory: "~{memory}G"
         disks: "local-disk ~{disk_space} HDD"
         preemptible: preemptible
+        queueArn: awsQueueArn
     }
 }
