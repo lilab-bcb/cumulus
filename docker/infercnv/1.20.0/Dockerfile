@@ -21,8 +21,10 @@ RUN python3 -m venv /software/python
 ENV PATH=/software/python/bin:$PATH
 
 RUN python -m pip install --upgrade pip && \
+    python -m pip install Cython && \
     python -m pip install pandas==2.3.3 && \
     python -m pip install pegasusio==0.10.0 && \
+    python -m pip install pegasuspy==1.11.0rc2 && \
     python -m pip install stratocumulus==0.3.0
 
 RUN apt-get -qq -y autoremove && \
