@@ -9,6 +9,7 @@ workflow batch_infercnv {
         String gene_ordering
 
         String acronym_file = "gs://cumulus-ref/resources/infercnv/index.tsv"
+        String docker_registry = "quay.io/cumulus"
         String awsQueueArn = ""
     }
 
@@ -32,6 +33,7 @@ workflow batch_infercnv {
                     gene_ordering = gene_ordering,
                     acronym_file = acronym_file,
                     ref_group_names = generate_config.sample2ref[sample_id],
+                    docker_registry = docker_registry,
                     zones = zones,
                     preemptible = preemptible,
                     awsQueueArn = awsQueueArn
