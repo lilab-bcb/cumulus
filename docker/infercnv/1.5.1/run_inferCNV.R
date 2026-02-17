@@ -101,6 +101,7 @@ cnv_obj <- CreateInfercnvObject(raw_counts_matrix = args$raw_counts_matrix,
                                 annotations_file = args$annotations_file,
                                 delim = '\t',
                                 gene_order_file = args$gene_order_file,
-                                ref_group_names = args$ref_group_names)
+                                ref_group_names = args$ref_group_names,
+                                min_max_counts_per_cell = c(-Inf, +Inf))
 
 cnv_obj <- infercnv::run(cnv_obj, cutoff = cutoff, out_dir = args$out_dir, cluster_by_groups = args$cluster_by_groups, HMM = args$HMM)
