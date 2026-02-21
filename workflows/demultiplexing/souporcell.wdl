@@ -176,7 +176,7 @@ task run_souporcell {
                 check_call(['samtools', 'index', '-@', '~{num_cpu}', '~{input_bam}'])
                 souporcell_call_args.extend(['--skip_remap', 'True'])
 
-        if '~{umi_tag}' != "UB" or '~{umi_tag}' != "":
+        if '~{umi_tag}' not in ["UB", ""]:
             souporcell_call_args.extend(["--umi_tag", "~{umi_tag}"])
 
         print(' '.join(souporcell_call_args))
