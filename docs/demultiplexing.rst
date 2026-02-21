@@ -262,6 +262,10 @@ souporcell inputs
 	  - souporcell parameter. Skip remap step. Only recommended in non denovo mode or common variants are provided.
 	  - true
 	  - false
+	* - souporcell_umi_tag
+	  - souporcell parameter. If the UMI tag in your data is not ``UB``, then set your UMI tag here to overwrite the default.
+	  - "UM"
+	  - "UB"
 	* - souporcell_rename_donors
 	  - souporcell parameter. A comma-separated list of donor names for matching clusters achieved by souporcell. Must be consistent with *souporcell_num_clusters* input.
 
