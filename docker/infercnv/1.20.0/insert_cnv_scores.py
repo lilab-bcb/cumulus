@@ -1,11 +1,21 @@
 import sys
 import pandas as pd
 import numpy as np
-import pegasusio as io
+import pegasus as pg
 
 def generate_CNV_scored_zarr(result_zarr, cnv_metrics_csv, sample_anno_csv, out_name):
 
-    data = io.read_input(result_zarr)
+    data = pg.read_input(result_zarr)
+    if "X_umap" not in data.obsm:
+        mat_key = "counts" if "counts" in data._unidata.matrices else "raw.X"
+        data.select_matrix(mat_key)
+        pg.log_norm(data)
+        pg.highly_variable_features(data)
+        pg.pca(data)
+        pg.elbowplot(data)
+        pg.neighbors(data, n_comps=data.uns["pca_ncomps"])
+        pg.umap(data, rep_ncomps=data.uns["pca_ncomps"])
+
     barcodes = data.obs_names.values
 
     df_scores = pd.read_csv(cnv_metrics_csv, index_col = 0)
@@ -32,7 +42,7 @@ def generate_CNV_scored_zarr(result_zarr, cnv_metrics_csv, sample_anno_csv, out_
 
     data.obs['infercnv_cell_types'] = df_anno[1].astype('str').values
 
-    io.write_output(data, f"{out_name}.cnv.zarr.zip")
+    pg.write_output(data, f"{out_name}.cnv.zarr.zip")
 
 if __name__ == '__main__':
     result_zarr = sys.argv[1]
