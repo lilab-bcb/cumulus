@@ -34,6 +34,7 @@ workflow batch_infercnv {
                     gene_ordering = gene_ordering,
                     acronym_file = acronym_file,
                     ref_group_names = generate_config.sample2ref[sample_id],
+                    cutoff = generate_config.sample2cutoff[sample_id],
                     docker_registry = docker_registry,
                     inferCNV_version = inferCNV_version,
                     zones = zones,
@@ -70,11 +71,13 @@ task generate_config {
         for c in df.columns:
             df[c] = df[c].str.strip()
 
-        with open("sample_ids.txt", 'w') as fout_id, open("sample2zarr.txt", 'w') as fout_zarr, open("sample2ref.txt", 'w') as fout_ref:
+        with open("sample_ids.txt", 'w') as fout_id, open("sample2zarr.txt", 'w') as fout_zarr, open("sample2ref.txt", 'w') as fout_ref, open("sample2cutoff.txt", 'w') as fout_cutoff:
             for idx, row in df.iterrows():
                 fout_id.write(row['Sample']+'\n')
                 fout_zarr.write(row['Sample']+'\t'+row['Zarr']+'\n')
                 fout_ref.write(row['Sample']+'\t'+row['RefGroups']+'\n')
+                cutoff = row['Cutoff'] if ~pd.isna(row['Cutoff']) else "NA"
+                fout_cutoff.write(row['Sample']+'\t'+cutoff+'\n')
         CODE
     >>>
 
@@ -82,6 +85,7 @@ task generate_config {
         Array[String] sample_ids = read_lines("sample_ids.txt")
         Map[String, String] sample2zarr = read_map("sample2zarr.txt")
         Map[String, String] sample2ref = read_map("sample2ref.txt")
+        Map[String, String] sample2cutoff = read_map("sample2cutoff.txt")
     }
 
     runtime {

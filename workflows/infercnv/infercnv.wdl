@@ -7,6 +7,7 @@ workflow InferCNV {
         String output_directory
         String gene_ordering
         String protocol = "tenX"
+        String cutoff = "NA"
         Boolean cluster_by_groups = true
         Boolean HMM = false
         String? ref_group_names
@@ -50,6 +51,7 @@ workflow InferCNV {
             gene_ordering_csv = gene_ordering_csv,
             sample_annotation_csv = preprocess.sample_annotation,
             protocol = protocol,
+            cutoff = cutoff,
             cluster_by_groups = cluster_by_groups,
             HMM = HMM,
             ref_group_names = ref_group_names,
@@ -138,6 +140,7 @@ task run_inferCNV {
         File gene_ordering_csv
         File sample_annotation_csv
         String protocol
+        String cutoff
         Boolean cluster_by_groups
         Boolean HMM
         String? ref_group_names
@@ -164,6 +167,8 @@ task run_inferCNV {
         call_args = ['Rscript', '/software/run_inferCNV.R', '--out-dir=inferCNV_result', '--raw-counts-matrix=~{input_raw_count}', '--gene-order-file=~{gene_ordering_csv}', '--annotations-file=~{sample_annotation_csv}']
         if '~{protocol}' != '':
             call_args.append('--protocol=~{protocol}')
+        if '~{cutoff}' != 'NA':
+            call_args.append('--cutoff=~{cutoff}')
         if '~{cluster_by_groups}' == 'true':
             call_args.append('--cluster-by-groups')
         if '~{HMM}' == 'true':
