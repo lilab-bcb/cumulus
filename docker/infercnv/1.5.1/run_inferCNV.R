@@ -43,9 +43,16 @@ option.list <- list(
                 default = "tenX",
                 dest = "protocol",
                 metavar = "Protocol",
-                help = paste("Cutoff is chosen depending on Protocols.",
+                help = paste("Cutoff is chosen depending on Protocols if --cutoff is not specified.",
                              "Available options are 'tenX' and 'SMART-Seq2'",
                              "[Default %default]")),
+    make_option("--cutoff",
+                type = "numeric",
+                action = "store",
+                default = NULL,
+                dest = "cutoff",
+                metavar = "numeric",
+                help = paste("A custom cutoff on min_expr_per_gene.")),
     make_option("--ref-group-names",
                 action = "store",
                 type = "character",
@@ -85,11 +92,17 @@ option.list <- list(
 
 args <- parse_args(OptionParser(option_list = option.list))
 
-if (args$protocol == "tenX") {
-    cutoff <- 0.1
+if (is.null(args$cutoff)) {
+    if (args$protocol == "tenX") {
+        cutoff <- 0.1
+    } else {
+        cutoff <- 1
+    }
 } else {
-    cutoff <- 1
+    cutoff <- args$cutoff
 }
+
+print(paste0("Set cutoff to ", cutoff, "."))
 
 if (!is.null(args$ref_group_names)) {
     args$ref_group_names <- strsplit(args$ref_group_names, ",")[[1]]
