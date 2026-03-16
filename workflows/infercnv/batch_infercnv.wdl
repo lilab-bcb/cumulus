@@ -10,6 +10,7 @@ workflow batch_infercnv {
 
         String acronym_file = "gs://cumulus-ref/resources/infercnv/index.tsv"
         String docker_registry = "quay.io/cumulus"
+        Int memory = 20
         String inferCNV_version = "1.20.0"
         String awsQueueArn = ""
     }
@@ -38,6 +39,7 @@ workflow batch_infercnv {
                     docker_registry = docker_registry,
                     inferCNV_version = inferCNV_version,
                     zones = zones,
+                    memory = memory,
                     preemptible = preemptible,
                     awsQueueArn = awsQueueArn
             }
