@@ -76,7 +76,7 @@ task generate_config {
                 fout_id.write(row['Sample']+'\n')
                 fout_zarr.write(row['Sample']+'\t'+row['Zarr']+'\n')
                 fout_ref.write(row['Sample']+'\t'+row['RefGroups']+'\n')
-                cutoff = row['Cutoff'] if ~pd.isna(row['Cutoff']) else "NA"
+                cutoff = row['Cutoff'] if ('Cutoff' in row) and (~pd.isna(row['Cutoff'])) else "NA"
                 fout_cutoff.write(row['Sample']+'\t'+cutoff+'\n')
         CODE
     >>>
