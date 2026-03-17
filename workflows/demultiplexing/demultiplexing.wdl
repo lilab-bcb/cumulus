@@ -59,6 +59,8 @@ workflow demultiplexing {
         File? souporcell_common_variants
         # Skip remap step. Only recommended in non denovo mode or common variants are provided
         Boolean souporcell_skip_remap = false
+        # Set if your UMI tag is not UB
+        String souporcell_umi_tag = "UB"
         # A comma-separated list of donor names for renaming clusters achieved by souporcell
         String souporcell_rename_donors = ""
         # Souporcell version to use. Available versions: "2.5"
@@ -163,6 +165,7 @@ workflow demultiplexing {
                         ref_genotypes_url = Config.id2genotype[pooling_id],
                         common_variants = souporcell_common_variants,
                         skip_remap = souporcell_skip_remap,
+                        umi_tag = souporcell_umi_tag,
                         de_novo_mode = souporcell_de_novo_mode,
                         min_num_genes = min_num_genes,
                         num_clusters = souporcell_num_clusters,
