@@ -39,7 +39,7 @@ workflow batch_infercnv {
                     docker_registry = docker_registry,
                     inferCNV_version = inferCNV_version,
                     zones = zones,
-                    memory = memory,
+                    infercnv_memory = memory,
                     preemptible = preemptible,
                     awsQueueArn = awsQueueArn
             }

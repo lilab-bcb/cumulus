@@ -17,6 +17,7 @@ workflow InferCNV {
         String inferCNV_version = "1.20.0"
         Int preemptible = 2
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
+        Int infercnv_memory = 20
         Int memory = 20
         Int disk_space = 50
         String awsQueueArn = ""
@@ -59,7 +60,7 @@ workflow InferCNV {
             version = inferCNV_version,
             backend = backend,
             zones = zones,
-            memory = memory,
+            memory = infercnv_memory,
             disk_space = disk_space,
             preemptible = preemptible,
             awsQueueArn = awsQueueArn
