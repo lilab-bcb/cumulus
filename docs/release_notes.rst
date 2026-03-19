@@ -3,6 +3,21 @@ Release notes
 
 .. role:: small
 
+Version 4
+~~~~~~~~~~~~~~
+
+.. include:: release_notes/version_4.rst
+
+Version 3
+~~~~~~~~~~~~~~
+
+.. include:: release_notes/version_3.rst
+
+Version 2.6
+~~~~~~~~~~~~~~
+
+.. include:: release_notes/version_2_6.rst
+
 Version 2.5
 ~~~~~~~~~~~~~~
 

@@ -589,7 +589,7 @@ cluster inputs
       - "net_fle"
       - "net_fle"
     * - infer_doublets
-      - Infer doublets using the `Pegasus method <https://github.com/klarman-cell-observatory/pegasus/raw/master/doublet_detection.pdf>`_. When finished, Scrublet-like doublet scores are in cell attribute ``doublet_score``, and "doublet/singlet" assignment on cells are stored in cell attribute ``demux_type``.
+      - Infer doublets using the `Pegasus method <https://github.com/lilab-bcb/pegasus/raw/master/doublet_detection.pdf>`_. When finished, Scrublet-like doublet scores are in cell attribute ``doublet_score``, and "doublet/singlet" assignment on cells are stored in cell attribute ``demux_type``.
       - false
       - false
     * - expected_doublet_rate

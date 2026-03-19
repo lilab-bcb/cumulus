@@ -17,11 +17,14 @@ RUN pip3 install --upgrade pip --no-cache-dir && \
     pip3 install pandas==2.0.0 --no-cache-dir && \
     pip3 install h5py==3.8.0 --no-cache-dir && \
     pip3 install pegasusio==0.8.0 --no-cache-dir && \
-    pip3 install stratocumulus==0.1.7 --no-cache-dir
+    pip3 install stratocumulus==0.2.4 --no-cache-dir
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - && \
-    apt-get update -y && apt-get install -y google-cloud-cli=426.0.0-0
+    apt-get update -y && apt-get install -y google-cloud-cli=483.0.0-0
+
+ENV CLOUDSDK_PYTHON=/usr/lib/google-cloud-sdk/platform/bundledpythonunix/bin/python
+ENV CLOUDSDK_GSUTIL_PYTHON=/usr/lib/google-cloud-sdk/platform/bundledpythonunix/bin/python
 
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.11.13.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \

@@ -199,17 +199,18 @@ task run_spaceranger_count {
                 call_args = ['strato', 'exists', directory + '/~{sample_id}/']
                 print(' '.join(call_args))
                 check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-                call_args = ['strato', 'sync', '-m', directory + '/~{sample_id}', target]
+                call_args = ['strato', 'sync', directory + '/~{sample_id}', target]
                 print(' '.join(call_args))
                 check_call(call_args)
             except CalledProcessError:
                 if not os.path.exists(target):
                     os.mkdir(target)
-                call_args = ['strato', 'cp', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
+                call_args = ['strato', 'cp', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
                 check_call(call_args)
             fastqs.append('~{sample_id}_' + str(i))
 
-        call_args = ['spaceranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local']
+        mem_size = re.findall(r"\d+", "~{memory}")[0]
+        call_args = ['spaceranger', 'count', '--id=results', '--transcriptome=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local', '--localcores=~{num_cpu}', '--localmem='+mem_size]
 
         def not_null(input_file):
             return (input_file != '') and (os.path.basename(input_file) != 'null')
@@ -298,11 +299,19 @@ task run_spaceranger_count {
             # see here: https://support.10xgenomics.com/spatial-gene-expression/software/pipelines/latest/using/image-recommendations
             print("Automatic fiducial alignment of fluorescene images is not supported. Please provide manual alignment JSON files via the LoupeAlignment column in the sample sheet!", file = sys.stderr)
             sys.exit(1)
-        if '~{no_bam}' == 'true':
-            call_args.append('--no-bam')
+
+        # For generating BAM output
+        if version.parse('~{spaceranger_version}') >= version.parse('3.0.0'):
+            if '~{no_bam}' == 'false':
+                call_args.append('--create-bam=true')
+            else:
+                call_args.append('--create-bam=false')
+        else:
+            if '~{no_bam}' == 'true':
+                call_args.append('--no-bam')
+
         if '~{secondary}' != 'true':
             call_args.append('--nosecondary')
-
         if '~{r1_length}' != '':
             call_args.append('--r1-length=~{r1_length}')
         r2_length = '~{r2_length}'
@@ -315,7 +324,7 @@ task run_spaceranger_count {
         check_call(call_args)
         CODE
 
-        strato sync -m results/outs "~{output_directory}/~{sample_id}"
+        strato sync results/outs "~{output_directory}/~{sample_id}"
     }
 
     output {

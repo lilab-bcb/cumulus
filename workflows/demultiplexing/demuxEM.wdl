@@ -8,8 +8,8 @@ workflow demuxEM {
         String output_directory
         # Input raw RNA expression matrix in 10x hdf5 format
         String input_rna_h5
-        # Input HTO (antibody tag) count matrix in CSV format
-        String input_hto_csv
+        # Input HTO (antibody tag) count matrix in 10x hdf5 or CSV format
+        String input_hto_file
         # Reference genome name. If not provided, we will infer it from the expression matrix file
         String genome
         # Only demultiplex cells/nuclei with at least <number> of expressed genes
@@ -51,7 +51,7 @@ workflow demuxEM {
             sample_id = sample_id,
             output_directory = output_directory,
             input_rna_h5 = input_rna_h5,
-            input_hto_csv = input_hto_csv,
+            input_hto_file = input_hto_file,
             genome = genome,
             alpha_on_samples = alpha_on_samples,
             min_num_genes = min_num_genes,
@@ -83,7 +83,7 @@ task run_demuxEM {
         String sample_id
         String output_directory
         File input_rna_h5
-        File input_hto_csv
+        File input_hto_file
         String genome
         Int min_num_genes
         Float? alpha_on_samples
@@ -108,11 +108,17 @@ task run_demuxEM {
         set -e
         export TMPDIR=/tmp
         export BACKEND=~{backend}
+        export OMP_NUM_THREADS=~{num_cpu}
+        export MKL_NUM_THREADS=~{num_cpu}
+        export OPENBLAS_NUM_THREADS=~{num_cpu}
+
         monitor_script.sh > monitoring.log &
 
         python <<CODE
+        import sys
         from subprocess import check_call
-        call_args = ['demuxEM', '~{input_rna_h5}', '~{input_hto_csv}', '~{sample_id}', '-p', '~{num_cpu}']
+
+        call_args = ['demuxEM', '~{input_rna_h5}', '~{input_hto_file}', '~{sample_id}', '-p', '~{num_cpu}']
         if '~{genome}' != '':
             call_args.extend(['--genome', '~{genome}'])
         if '~{alpha_on_samples}' != '':
@@ -130,12 +136,17 @@ task run_demuxEM {
         if '~{generate_gender_plot}' != '':
             call_args.extend(['--generate-gender-plot', '~{generate_gender_plot}'])
         print(' '.join(call_args))
-        check_call(call_args)
+
+        try:
+            check_call(call_args)
+        except Exception as e:
+            print(e)
+            sys.exit(1)
         CODE
 
         mkdir result
         cp "~{sample_id}_demux".zarr.zip "~{sample_id}".out.demuxEM.zarr.zip "~{sample_id}".*.pdf result
-        strato sync --backend ~{backend} -m result "~{output_directory}/~{sample_id}"
+        strato sync result "~{output_directory}/~{sample_id}"
     }
 
     output {

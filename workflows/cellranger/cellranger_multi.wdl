@@ -6,22 +6,22 @@ workflow cellranger_multi {
         String link_id
         # A comma-separated list of input sample names
         String input_samples
-        # A comma-separated list of input FASTQs directories (gs urls)
+        # A comma-separated list of input FASTQs directories
         String input_fastqs_directories
         # A comma-separated list of input data types
         String input_data_types
-        # A comma-separated list of input feature barcode files
-        String input_fbf
+        # A comma-separated list of input data chemistries
+        String input_data_chemistries
+        # A comma-separated list of input auxiliary files
+        String input_aux
         # CellRanger multi output directory
         String output_directory
 
         # Keywords or a URL to a tar.gz file
         String genome
-        # Keyword to a preset probe set CSV file
-        String probe_set = "null"
-
-        # CMO set CSV file, delaring CMO constructs and associated barcodes
-        File? cmo_set
+        String vdj_ref = "null"
+        # Flex probe set CSV file
+        File probe_set_file
 
         # Index TSV file
         File acronym_file
@@ -37,7 +37,7 @@ workflow cellranger_multi {
         # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
         Boolean secondary = false
 
-        # CellRanger version, must be >= 6.0.0
+        # CellRanger version
         String cellranger_version
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry
@@ -58,26 +58,30 @@ workflow cellranger_multi {
         String backend = "gcp"
     }
 
+    Boolean is_flex = sub(input_data_types, ".*frp.*", "Flex") == "Flex"
+
     Map[String, String] acronym2uri = read_map(acronym_file)
     # If reference is a URI
-    Boolean is_genome_uri = sub(genome, "^.+\\.(tgz|gz)$", "URL") == "URL"
-    File genome_file = (if is_genome_uri then genome else acronym2uri[genome])
+    Boolean is_genome_uri = sub(genome, "^.+\\.(tgz|gz)$", "URI") == "URI"
+    File genome_file = (if no_bam && is_flex then acronym2uri["null_file"] else (if is_genome_uri then genome else acronym2uri[genome]))
 
-    # If probe set is specified
-    Boolean is_probeset_uri = sub(probe_set, "^.+\\.csv$", "URL") == "URL"
-    File probe_set_file = (if probe_set != "null" then (if is_probeset_uri then probe_set else acronym2uri[probe_set]) else acronym2uri["null_file"])
+    # If vdj reference is a URI
+    Boolean is_vdj_ref_uri = sub(vdj_ref, "^.+\\.(tgz|gz)$", "URI") == "URI"
+    File vdj_ref_file = (if vdj_ref != "null" then (if is_vdj_ref_uri then vdj_ref else acronym2uri[vdj_ref]) else acronym2uri["null_file"])
 
     call run_cellranger_multi {
         input:
             link_id = link_id,
+            is_flex = is_flex,
             input_samples = input_samples,
             input_fastqs_directories = input_fastqs_directories,
             input_data_types = input_data_types,
-            input_fbf = input_fbf,
+            input_chemistries = input_data_chemistries,
+            input_aux = input_aux,
             output_directory = output_directory,
             genome_file = genome_file,
+            vdj_ref_file = vdj_ref_file,
             probe_set_file = probe_set_file,
-            cmo_set = cmo_set,
             force_cells = force_cells,
             expect_cells = expect_cells,
             include_introns = include_introns,
@@ -102,14 +106,16 @@ workflow cellranger_multi {
 task run_cellranger_multi {
     input {
         String link_id
+        Boolean is_flex
         String input_samples
         String input_fastqs_directories
         String input_data_types
-        String input_fbf
+        String input_chemistries
+        String input_aux
         String output_directory
         File genome_file
+        File vdj_ref_file
         File probe_set_file
-        File? cmo_set
         Int? force_cells
         Int? expect_cells
         Boolean include_introns
@@ -131,86 +137,140 @@ task run_cellranger_multi {
         export TMPDIR=/tmp
         export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
-        mkdir -p genome_dir
-        tar xf ~{genome_file} -C genome_dir --strip-components 1
+
+        if [ "~{no_bam}" = "false" ] && [ "~{is_flex}" = "true" ]; then
+            mkdir -p genome_dir
+            tar xf ~{genome_file} -C genome_dir --strip-components 1
+        fi
 
         python <<CODE
         import re
         import os
         import sys
-        from subprocess import check_call, CalledProcessError, STDOUT, DEVNULL
+        from subprocess import check_call, check_output, CalledProcessError, STDOUT, DEVNULL
         from packaging import version
+
+        raw_version_str = check_output(['cellranger', '--version'], text=True).strip()
+        match = re.search(r"(\d+\.\d+\.\d+)", raw_version_str)
+        if match:
+            cr_version = match.group(1)
+        else:
+            raise Exception("Invalid cellranger version: " + raw_version_str)
 
         samples = '~{input_samples}'.split(',')
         data_types = '~{input_data_types}'.split(',')
-        fbfs = '~{input_fbf}'.split(',')
+        chemistries = '~{input_chemistries}'.split(',')
+        auxs = '~{input_aux}'.split(',')
 
-        target_panel = set()
+        rna_file = set()
+        vdj_file = set()
         cmo_file = set()
-        frp_file = set()
+        flex_file = set()
         feature_file = set()
-        for dtype, fbf in zip(data_types, fbfs):
-            if dtype == 'rna':
-                target_panel.add(fbf)
+        has_hto = False
+        has_cmo = False
+        has_flex = False
+        for dtype, aux in zip(data_types, auxs):
+            if dtype == 'rna':  # OCM, HTO, and CMO cases
+                rna_file.add(aux)
             elif dtype == 'cmo':
-                cmo_file.add(fbf)
+                cmo_file.add(aux)
+                has_cmo = True
             elif dtype == 'frp':
-                frp_file.add(fbf)
-            else:
-                feature_file.add(fbf)
+                flex_file.add(aux)
+                has_flex = True
+            elif dtype in ['vdj', 'vdj_t_gd']:
+                vdj_file.add(aux)
+            else:  # hashing, citeseq, adt
+                feature_file.add(aux)
+                if dtype in ['hashing', 'adt']:
+                    has_hto = True
+
+        def is_null_file(filename):
+            return filename == "" or os.path.basename(filename) == "null"
 
         def _locate_file(file_set, keyword):
             if len(file_set) > 1:
                 print("Detected multiple " + keyword + " files!", file = sys.stderr)
                 sys.exit(1)
-            if len(file_set) == 0 or list(file_set)[0] == 'null':
+            if len(file_set) == 0 or is_null_file(list(file_set)[0]) or list(file_set)[0] == 'null':
                 return ''
             file_loc = list(file_set)[0]
-            call_args = ['strato', 'cp', '-m', file_loc, '.']
+            call_args = ['strato', 'cp', file_loc, '.']
             print(' '.join(call_args))
             check_call(call_args)
             return os.path.abspath(os.path.basename(file_loc))
 
-        def is_null_file(filename):
-            return filename == "" or os.path.basename(filename) == "null"
-
-        target_panel = _locate_file(target_panel, 'target panel')
-        cmo_file = _locate_file(cmo_file, 'CMO sample')
+        if has_cmo:
+            rna_file = _locate_file(rna_file, 'CMO sample')
+        elif has_hto:
+            rna_file = _locate_file(rna_file, 'HTO sample')
+        else:
+            rna_file = _locate_file(rna_file, 'OCM sample')
+        vdj_file = _locate_file(vdj_file, 'VDJ inner-enrichment-primers')
+        cmo_file = _locate_file(cmo_file, 'CMO cmo-set')
         feature_file = _locate_file(feature_file, 'feature reference')
-        frp_file = _locate_file(frp_file, 'FRP sample')
+        flex_file = _locate_file(flex_file, 'Flex sample')
 
         with open('multi.csv', 'w') as fout:
+            #############################
+            # [gene-expression] section #
+            #############################
             fout.write('[gene-expression]\n')
-            fout.write('reference,' + os.path.abspath('genome_dir') + '\n')
 
-            if is_null_file('~{probe_set_file}'):
-                if '~{include_introns}' == 'true':
-                    fout.write('include-introns,true\n')
-                elif version.parse('~{cellranger_version}') >= version.parse('7.0.0'):
+            if ('~{no_bam}' == 'false' and '~{is_flex}' == 'true') or (version.parse(cr_version) < version.parse('8.0.0')):
+                fout.write('reference,' + os.path.abspath('genome_dir') + '\n')
+
+            if is_null_file('~{probe_set_file}'):  # GEX case
+                if '~{include_introns}' == 'false':
                     fout.write('include-introns,false\n')
-            else:
-                if version.parse('~{cellranger_version}') >= version.parse('7.0.0'):
-                    fout.write('probe-set,~{probe_set_file}\n')
-                else:
-                    print("Fixed RNA Profiling only works in Cell Ranger v7.0.0+!", file=sys.stderr)
-                    sys.exit(1)
-            if '~{cmo_set}' != '':
-                fout.write('cmo-set,~{cmo_set}\n')
-            if target_panel != '':
-                fout.write('target-panel,' + target_panel + '\n')
+            else:   # Flex case
+                fout.write('probe-set,~{probe_set_file}\n')
+
+            # For CellPlex
+            if not is_null_file(cmo_file):
+                fout.write('cmo-set,' + cmo_file + '\n')
+
+            # Other options
             if '~{force_cells}' != '':
                 fout.write('force-cells,~{force_cells}\n')
             if '~{expect_cells}' != '':
                 fout.write('expect-cells,~{expect_cells}\n')
             if '~{secondary}' == 'false':
                 fout.write('no-secondary,true\n')
-            if '~{no_bam}' == 'true':
-                fout.write('no-bam,true\n')
+            if version.parse(cr_version) >= version.parse('8.0.0'):
+                if '~{no_bam}' == 'false':
+                    fout.write('create-bam,true\n')
+                else:
+                    fout.write('create-bam,false\n')
+            else:
+                if '~{no_bam}' == 'true':
+                    fout.write('no-bam,true\n')
 
+            #################
+            # [vdj] section #
+            #################
+            if not is_null_file('~{vdj_ref_file}'):
+                fout.write('\n[vdj]\nreference,~{vdj_ref_file}\n')
+                if not is_null_file(vdj_file):
+                    fout.write('inner-enrichment-primers,' + vdj_file + '\n')
+
+            #####################
+            # [feature] section #
+            #####################
             if feature_file != '':
                 fout.write('\n[feature]\nreference,' + feature_file + '\n')
 
-            fout.write('\n[libraries]\nfastq_id,fastqs,feature_types\n')
+            #######################
+            # [libraries] section #
+            #######################
+            singleton_set = set()
+            singleton_set.add("auto")
+            has_chemistry = set(chemistries) != singleton_set
+            if not has_chemistry:
+                fout.write('\n[libraries]\nfastq_id,fastqs,feature_types\n')
+            else:
+                fout.write('\n[libraries]\nfastq_id,fastqs,feature_types,chemistry\n')
             for i, directory in enumerate('~{input_fastqs_directories}'.split(',')):
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
                 target = samples[i] + "_" + str(i)
@@ -218,61 +278,79 @@ task run_cellranger_multi {
                     call_args = ['strato', 'exists', directory + '/' + samples[i] + '/']
                     print(' '.join(call_args))
                     check_call(call_args, stderr=STDOUT, stdout=DEVNULL)
-                    call_args = ['strato', 'cp', '-m', '-r', directory + '/' + samples[i], target]
+                    call_args = ['strato', 'sync', directory + '/' + samples[i], target]
                     print(' '.join(call_args))
                     check_call(call_args)
                 except CalledProcessError:
                     if not os.path.exists(target):
                         os.mkdir(target)
-                    call_args = ['strato', 'cp', '-m', directory + '/' + samples[i] + '_S*_L*_*_001.fastq.gz' , target]
+                    call_args = ['strato', 'cp', directory + '/' + samples[i] + '_S*_L*_*_001.fastq.gz' , target]
                     print(' '.join(call_args))
                     check_call(call_args)
                 feature_type = ''
                 if data_types[i] in ['rna', 'frp']:
                     feature_type = 'Gene Expression'
+                elif data_types[i] == 'vdj':
+                    feature_type = 'VDJ'
+                elif data_types[i] == 'vdj_t':
+                    feature_type = 'VDJ-T'
+                elif data_types[i] == 'vdj_b':
+                    feature_type = 'VDJ-B'
+                elif data_types[i] == 'vdj_t_gd':
+                    feature_type = 'VDJ-T-GD'
                 elif data_types[i] == 'crispr':
                     feature_type = 'CRISPR Guide Capture'
-                elif data_types[i] == 'citeseq':
+                elif data_types[i] in ['citeseq', 'hashing', 'adt']:
                     feature_type = 'Antibody Capture'
                 elif data_types[i] == 'cmo':
                     feature_type = 'Multiplexing Capture'
                 if feature_type == '':
                     print("Do not expect " + data_types[i] + " in a cellranger multi run!", file = sys.stderr)
                     sys.exit(1)
-                fout.write(samples[i] + ',' + os.path.abspath(target) + ',' +  feature_type + '\n')
+                if not has_chemistry:
+                    fout.write(samples[i] + ',' + os.path.abspath(target) + ',' +  feature_type + '\n')
+                else:
+                    fout.write(samples[i] + ',' + os.path.abspath(target) + ',' +  feature_type + ',' + chemistries[i] + '\n')
 
+            #####################
+            # [samples] section #
+            #####################
             def write_csv_wise(full_columns, fin, fout):
                 lines = fin.readlines()
-                columns = full_columns[0:len(lines[0].split(','))]
-                fout.write("\n[samples]\n" + ",".join(columns) + "\n")
+                fout.write("\n[samples]\n")
+                if 'sample_id' not in lines[0].strip().split(','):
+                    # Add header
+                    columns = full_columns[0:len(lines[0].split(','))]
+                    fout.write(",".join(columns) + "\n")
                 for l in lines:
                     fout.write(l)
 
-            has_cmo = False
-            if cmo_file != '':
-                with open(cmo_file, 'r') as fin:
-                    write_csv_wise(['sample_id', 'cmo_ids', 'description'], fin, fout)
-                has_cmo = True
+            has_ocm = False
+            if rna_file != '':
+                with open(rna_file, 'r') as fin:
+                    if has_hto:  # HTO
+                        write_csv_wise(['sample_id', 'hashtag_ids', 'description'], fin, fout)
+                    elif has_cmo:  # CMO
+                        write_csv_wise(['sample_id', 'cmo_ids', 'description'], fin, fout)
+                    else:  # OCM
+                        write_csv_wise(['sample_id', 'ocm_barcode_ids', 'description'], fin, fout)
+                        has_ocm = True
 
-            has_frp = False
-            if 'frp' in data_types:
-                if frp_file != '':
-                    if has_cmo:
-                        raise Exception("Cannot have both CMO and FRP sample files!")
-                    with open(frp_file, 'r') as fin:
-                        write_csv_wise(['sample_id', 'probe_barcode_ids', 'description', 'expect_cells', 'force_cells'], fin, fout)
-                has_frp = True
+            if has_flex:
+                if flex_file != '':  # Multiplex Flex case
+                    with open(flex_file, 'r') as fin:
+                        write_csv_wise(['sample_id', 'probe_barcode_ids', 'description'], fin, fout)
 
-            if (not has_cmo) and (not has_frp):
-                raise Exception("Cannot locate CMO or FRP sample file!")
+            if (not has_ocm) and (not has_hto) and (not has_cmo) and (not has_flex):
+                raise Exception("Cannot locate OCM, HTO, CMO, or Flex sample file!")
 
-
-        call_args = ['cellranger', 'multi', '--id=results', '--csv=multi.csv', '--jobmode=local']
+        mem_size = re.findall(r"\d+", "~{memory}")[0]
+        call_args = ['cellranger', 'multi', '--id=results', '--csv=multi.csv', '--jobmode=local', '--localcores=~{num_cpu}', '--localmem='+mem_size]
         print(' '.join(call_args))
         check_call(call_args)
         CODE
 
-        strato sync -m --ionice results/outs "~{output_directory}"/~{link_id}
+        strato sync --ionice results/outs "~{output_directory}/~{link_id}"
     }
 
     output {

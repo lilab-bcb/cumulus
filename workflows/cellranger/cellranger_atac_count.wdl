@@ -21,6 +21,8 @@ workflow cellranger_atac_count {
 
         # Force pipeline to use this number of cells, bypassing the cell detection algorithm
         Int? force_cells
+        # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
+        Boolean secondary
         # Choose the algorithm for dimensionality reduction prior to clustering and tsne: 'lsa' (default), 'plsa', or 'pca'.
         String? dim_reduce
         # A BED file to override peak caller
@@ -59,6 +61,7 @@ workflow cellranger_atac_count {
             input_fastqs_directories = input_fastqs_directories,
             output_directory = sub(output_directory, "/+$", ""),
             genome_file = genome_file,
+            secondary = secondary,
             force_cells = force_cells,
             dim_reduce = dim_reduce,
             peaks = peaks,
@@ -89,6 +92,7 @@ task run_cellranger_atac_count {
         String input_fastqs_directories
         String output_directory
         File genome_file
+        Boolean secondary
         Int? force_cells
         String? dim_reduce
         File? peaks
@@ -123,25 +127,35 @@ task run_cellranger_atac_count {
             directory = re.sub('/+$', '', directory) # remove trailing slashes
             target = '~{sample_id}_' + str(i)
             try:
-                call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/~{sample_id}/']
+                call_args = ['strato', 'exists', directory + '/~{sample_id}/']
                 print(' '.join(call_args))
                 check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-                call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/~{sample_id}', target]
+                call_args = ['strato', 'sync', directory + '/~{sample_id}', target]
                 print(' '.join(call_args))
                 check_call(call_args)
             except CalledProcessError:
                 if not os.path.exists(target):
                     os.mkdir(target)
-                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
+                call_args = ['strato', 'cp', directory + '/~{sample_id}' + '_S*_L*_*_001.fastq.gz' , target]
                 print(' '.join(call_args))
                 check_call(call_args)
             fastqs.append(target)
 
-        call_args = ['cellranger-atac', 'count', '--id=results', '--reference=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local']
+        mem_size = re.findall(r"\d+", "~{memory}")[0]
+        call_args = ['cellranger-atac', 'count', '--id=results', '--reference=genome_dir', '--fastqs=' + ','.join(fastqs), '--sample=~{sample_id}', '--jobmode=local', '--localcores=~{num_cpu}', '--localmem='+mem_size]
+
+        # Run secondary analysis or not
+        if version.parse('~{cellranger_atac_version}') >= version.parse('2.2.0'):
+            if '~{secondary}' != 'true':
+                call_args.append('--nosecondary')
+            else:
+                call_args.append('--dim-reduce=~{dim_reduce}')
+        else:
+            if '~{secondary}' == 'true':
+                call_args.append('--dim-reduce=~{dim_reduce}')
+
         if '~{force_cells}' != '':
             call_args.append('--force-cells=~{force_cells}')
-        if '~{dim_reduce}' != '':
-            call_args.append('--dim-reduce=~{dim_reduce}')
         if '~{peaks}' != '':
             assert version.parse('~{cellranger_atac_version}') >= version.parse('2.0.0')
             call_args.append('--peaks=~{peaks}')
@@ -151,7 +165,7 @@ task run_cellranger_atac_count {
         check_call(call_args)
         CODE
 
-        strato sync --backend ~{backend} -m results/outs "~{output_directory}/~{sample_id}"
+        strato sync results/outs "~{output_directory}/~{sample_id}"
     }
 
     output {

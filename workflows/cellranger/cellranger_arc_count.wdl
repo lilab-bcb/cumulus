@@ -24,6 +24,8 @@ workflow cellranger_arc_count {
         Boolean gex_exclude_introns = false
         # Do not generate bam files
         Boolean no_bam = false
+        # Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization). Default: false
+        Boolean secondary = false
         # Cell caller override: define the minimum number of ATAC transposition events in peaks (ATAC counts) for a cell barcode.
         # Note: this option must be specified in conjunction with `min-gex-count`.
         # With `--min-atac-count=X` and `--min-gex-count=Y` a barcode is defined as a cell if it contains at least X ATAC counts AND at least Y GEX UMI counts
@@ -73,6 +75,7 @@ workflow cellranger_arc_count {
             genome_file = genome_file,
             gex_exclude_introns = gex_exclude_introns,
             no_bam = no_bam,
+            secondary = secondary,
             min_atac_count = min_atac_count,
             min_gex_count = min_gex_count,
             peaks = peaks,
@@ -104,6 +107,7 @@ task run_cellranger_arc_count {
         File genome_file
         Boolean gex_exclude_introns
         Boolean no_bam
+        Boolean secondary
         Int? min_atac_count
         Int? min_gex_count
         File? peaks
@@ -130,6 +134,7 @@ task run_cellranger_arc_count {
         import re
         import os
         from subprocess import check_call, CalledProcessError, DEVNULL, STDOUT
+        from packaging import version
 
         samples = '~{input_samples}'.split(',')
         data_types = '~{input_data_types}'.split(',')
@@ -139,25 +144,39 @@ task run_cellranger_arc_count {
                 directory = re.sub('/+$', '', directory) # remove trailing slashes
                 target = samples[i] + '_' + str(i)
                 try:
-                    call_args = ['strato', 'exists', '--backend', '~{backend}', directory + '/' + samples[i] + '/']
+                    call_args = ['strato', 'exists', directory + '/' + samples[i] + '/']
                     print(' '.join(call_args))
                     check_call(call_args, stdout=DEVNULL, stderr=STDOUT)
-                    call_args = ['strato', 'sync', '--backend', '~{backend}', '-m', directory + '/' + samples[i], target]
+                    call_args = ['strato', 'sync', directory + '/' + samples[i], target]
                     print(' '.join(call_args))
                     check_call(call_args)
                 except CalledProcessError:
                     if not os.path.exists(target):
                         os.mkdir(target)
-                    call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', directory + '/' + samples[i] + '_S*_L*_*_001.fastq.gz' , target]
+                    call_args = ['strato', 'cp', directory + '/' + samples[i] + '_S*_L*_*_001.fastq.gz' , target]
                     print(' '.join(call_args))
                     check_call(call_args)
                 fout.write(os.path.abspath(target) + ',' + samples[i] + ',' + ('Gene Expression' if data_types[i] == 'rna' else 'Chromatin Accessibility') + '\n')
 
-        call_args = ['cellranger-arc', 'count', '--id=results', '--libraries=libraries.csv', '--reference=genome_dir', '--jobmode=local']
+        mem_size = re.findall(r"\d+", "~{memory}")[0]
+        call_args = ['cellranger-arc', 'count', '--id=results', '--libraries=libraries.csv', '--reference=genome_dir', '--jobmode=local', '--localcores=~{num_cpu}', '--localmem='+mem_size]
         if '~{gex_exclude_introns}' == 'true':
             call_args.append('--gex-exclude-introns')
-        if '~{no_bam}' == 'true':
-            call_args.append('--no-bam')
+
+        # For generating BAM output
+        if version.parse("~{cellranger_arc_version}") >= version.parse("2.1.0"):
+            if '~{no_bam}' == 'false':
+                call_args.append('--create-bam=true')
+            else:
+                call_args.append('--create-bam=false')
+        else:
+            if '~{no_bam}' == 'true':
+                call-args.append('--no-bam')
+
+        if '~{secondary}' != 'true':
+            if version.parse('~{cellranger_arc_version}') >= version.parse('2.1.0'):
+                call_args.append('--nosecondary')
+
         if '~{min_atac_count}' != '':
             call_args.extend(['--min-atac-count', '~{min_atac_count}'])
         if '~{min_gex_count}' != '':
@@ -168,7 +187,7 @@ task run_cellranger_arc_count {
         check_call(call_args)
         CODE
 
-        strato sync --backend ~{backend} -m results/outs "~{output_directory}"/~{link_id}
+        strato sync results/outs "~{output_directory}/~{link_id}"
     }
 
     output {

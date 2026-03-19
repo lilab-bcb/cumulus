@@ -23,8 +23,8 @@ workflow cellranger_atac_aggr {
         # A BED file to override peak caller
         File? peaks
 
-        # 2.1.0, 2.0.0, 1.2.0, 1.1.0
-        String cellranger_atac_version = "2.1.0"
+        # 2.2.0, 2.1.0, 2.0.0
+        String cellranger_atac_version = "2.2.0"
         # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
         String docker_registry = "quay.io/cumulus"
 
@@ -127,13 +127,14 @@ task run_cellranger_atac_aggr {
                     raise Exception("Found duplicated library id " + library_id + "!")
                 libs_seen.add(library_id)
 
-                call_args = ['strato', 'cp', '--backend', '~{backend}', '-m', '-r', directory, current_dir]
+                call_args = ['strato', 'cp', '-m', '-r', directory, current_dir]
                 print(' '.join(call_args))
                 check_call(call_args)
                 counts.append(library_id)
                 fout.write(library_id + "," + current_dir + '/' + library_id + "/fragments.tsv.gz," + current_dir + '/' + library_id + "/singlecell.csv\n")
 
-        call_args = ['cellranger-atac', 'aggr', '--id=results', '--reference=genome_dir', '--csv=aggr.csv', '--normalize=~{normalize}', '--jobmode=local']
+        mem_size = re.findall(r"\d+", "~{memory}")[0]
+        call_args = ['cellranger-atac', 'aggr', '--id=results', '--reference=genome_dir', '--csv=aggr.csv', '--normalize=~{normalize}', '--jobmode=local', '--localcores=~{num_cpu}', '--localmem='+mem_size]
         if '~{secondary}' != 'true':
             call_args.append('--nosecondary')
         else:
@@ -145,7 +146,7 @@ task run_cellranger_atac_aggr {
         check_call(call_args)
         CODE
 
-        strato sync --backend ~{backend} -m results/outs "~{output_directory}/~{aggr_id}"
+        strato sync -m results/outs "~{output_directory}/~{aggr_id}"
     }
 
     output {

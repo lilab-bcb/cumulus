@@ -23,8 +23,6 @@ Follow the steps below to extract gene-count matrices from SMART-Seq2 data on Te
 
 #. Create a sample sheet.
 
-    Please note that the columns in the TSV can be in any order, but that the column names must match the recognized headings.
-
     The sample sheet provides metadata for each cell:
 
     .. list-table::

@@ -64,8 +64,8 @@ workflow starsolo_workflow {
         String? soloOutFormatFeaturesGeneField3
         # Number of CPUs to request per sample
         Int num_cpu = 32
-        # STAR version to use. Currently support: 2.7.10b
-        String star_version = "2.7.10b"
+        # STAR version to use. Currently support: 2.7.11b
+        String star_version = "2.7.11b"
         # Docker registry, default to quay.io/cumulus
         String docker_registry = "quay.io/cumulus"
         # Reference Index TSV
@@ -84,11 +84,14 @@ workflow starsolo_workflow {
         Int preemptible = 2
         # Arn string of AWS queue
         String awsQueueArn = ""
-        # backend choose from "gcp", "aws", "local"
-        String backend = "gcp"
-        # Config version
-        String config_version = "0.3"
     }
+
+    String config_version = "0.3"
+
+    # Backend: gcp, aws, local
+    Boolean use_gcp = sub(output_directory, "^gs://.+$", "gcp") == "gcp"
+    Boolean use_aws = sub(output_directory, "^s3://.+$", "aws") == "aws"
+    String backend = (if use_gcp then "gcp"  else (if use_aws then "aws" else "local"))
 
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")

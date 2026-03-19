@@ -22,8 +22,8 @@ workflow cellranger_create_reference {
 
         # Which docker registry to use
         String docker_registry = "quay.io/cumulus"
-        # 7.2.0, 7.1.0, 7.0.1, 7.0.0, 6.1.2, 6.1.1
-        String cellranger_version = "7.2.0"
+        # 10.0.0, 9.0.1, 8.0.1, 7.2.0
+        String cellranger_version = "10.0.0"
 
         # Disk space in GB
         Int disk_space = 100
@@ -36,14 +36,17 @@ workflow cellranger_create_reference {
 
         # Number of preemptible tries
         Int preemptible = 2
-        # Backend
-        String backend = "gcp"
         # Arn string of AWS queue
         String awsQueueArn = ""
     }
 
     # Output directory, with trailing slashes stripped
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
+
+    # Backend: gcp, aws, local
+    Boolean use_gcp = sub(output_directory, "^gs://.+$", "gcp") == "gcp"
+    Boolean use_aws = sub(output_directory, "^s3://.+$", "aws") == "aws"
+    String backend = (if use_gcp then "gcp"  else (if use_aws then "aws" else "local"))
 
     call generate_create_reference_config {
         input:
@@ -308,7 +311,7 @@ task run_cellranger_mkref {
             else:
                 break
 
-        call_args.extend(['--nthreads=~{num_cpu}', '--memgb=' + mem_digit])
+        call_args.extend(['--nthreads=~{num_cpu}', '--memgb=' + mem_digit, '--localcores=~{num_cpu}', '--localmem=' + mem_digit])
         if '~{ref_version}' != '':
             call_args.append('--ref-version=~{ref_version}')
 

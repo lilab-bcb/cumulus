@@ -17,3 +17,4 @@ RUN apt-get -qq update && \
 
 RUN mkdir /software
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/yiming/docker/config/check_uri.py /software
+RUN chmod a+rx /software/*

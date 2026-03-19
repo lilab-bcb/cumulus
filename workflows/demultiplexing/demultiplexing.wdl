@@ -25,8 +25,6 @@ workflow demultiplexing {
         String awsQueueArn = ""
         # Google cloud zones, default to "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
         String zones = "us-central1-a us-central1-b us-central1-c us-central1-f us-east1-b us-east1-c us-east1-d us-west1-a us-west1-b us-west1-c"
-        # Backend
-        String backend = "gcp"
         # Reference Index TSV
         File ref_index_file = "gs://regev-lab/resources/cellranger/index.tsv"
 
@@ -44,7 +42,7 @@ workflow demultiplexing {
         # Generate violin plots using gender-specific genes (e.g. Xist). <demuxEM_generate_gender_plot> is a comma-separated list of gene names
         String? demuxEM_generate_gender_plot
         # DemuxEM version
-        String demuxEM_version = "0.1.7"
+        String demuxEM_version = "0.1.8"
         # Number of CPUs used
         Int demuxEM_num_cpu = 8
         # Disk space in GB
@@ -61,6 +59,8 @@ workflow demultiplexing {
         File? souporcell_common_variants
         # Skip remap step. Only recommended in non denovo mode or common variants are provided
         Boolean souporcell_skip_remap = false
+        # Set if your UMI tag is not UB
+        String souporcell_umi_tag = "UB"
         # A comma-separated list of donor names for renaming clusters achieved by souporcell
         String souporcell_rename_donors = ""
         # Souporcell version to use. Available versions: "2.5"
@@ -97,12 +97,16 @@ workflow demultiplexing {
         String popscle_memory = "120G"
         # Extra disk space (integer) in GB needed for popscle per pair
         Int popscle_extra_disk_space = 100
-
-        # Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: 0.3, 0.2, 0.1
-        String config_version = "0.3"
     }
 
+    String config_version = "0.3"
+
     String output_directory_stripped = sub(output_directory, "[/\\s]+$", "")
+
+    # Backend: gcp, aws, local
+    Boolean use_gcp = sub(output_directory, "^gs://.+$", "gcp") == "gcp"
+    Boolean use_aws = sub(output_directory, "^s3://.+$", "aws") == "aws"
+    String backend = (if use_gcp then "gcp"  else (if use_aws then "aws" else "local"))
 
     call generate_demux_config as Config {
         input:
@@ -123,7 +127,7 @@ workflow demultiplexing {
                     sample_id = hashing_id,
                     output_directory = output_directory_stripped,
                     input_rna_h5 = Config.id2rna[hashing_id],
-                    input_hto_csv = Config.id2tag[hashing_id],
+                    input_hto_file = Config.id2tag[hashing_id],
                     genome = genome,
                     alpha_on_samples = demuxEM_alpha_on_samples,
                     min_num_genes = min_num_genes,
@@ -161,6 +165,7 @@ workflow demultiplexing {
                         ref_genotypes_url = Config.id2genotype[pooling_id],
                         common_variants = souporcell_common_variants,
                         skip_remap = souporcell_skip_remap,
+                        umi_tag = souporcell_umi_tag,
                         de_novo_mode = souporcell_de_novo_mode,
                         min_num_genes = min_num_genes,
                         num_clusters = souporcell_num_clusters,

@@ -15,7 +15,7 @@ Prepare input data and import workflow
 
 	Please refer to the `cellranger_workflow tutorial`_ for details.
 
-	When finished, you should be able to find the raw gene count matrix (e.g. ``raw_gene_bc_matrices_h5.h5``), hashtag matrix (e.g. ``sample_1_ADT.csv``) / genome BAM file (e.g. ``possorted_genome_bam.bam``) for each sample.
+	When finished, you should be able to find the raw gene count matrix (e.g. ``raw_gene_bc_matrices_h5.h5``), hashtag matrix (e.g. ``sample_1_ADT.umi_correct.h5``) / genome BAM file (e.g. ``possorted_genome_bam.bam``) for each sample.
 
 2. Import ``demultiplexing``
 ++++++++++++++++++++++++++++++
@@ -65,8 +65,8 @@ Prepare input data and import workflow
 	Example::
 
 		OUTNAME,RNA,TagFile,TYPE,Genotype
-		sample_1,gs://exp/data_1/raw_gene_bc_matrices_h5.h5,gs://exp/data_1/sample_1_ADT.csv,cell-hashing
-		sample_2,gs://exp/data_2/raw_gene_bc_matrices_h5.h5,gs://exp/data_2/sample_2_ADT.csv,nucleus-hashing
+		sample_1,gs://exp/data_1/raw_gene_bc_matrices_h5.h5,gs://exp/data_1/sample_1_ADT.umi_correct.h5,cell-hashing
+		sample_2,gs://exp/data_2/raw_gene_bc_matrices_h5.h5,gs://exp/data_2/sample_2_ADT.umi_correct.h5,nucleus-hashing
 		sample_3,gs://exp/data_3/raw_gene_bc_matrices_h5.h5,gs://exp/data_3/possorted_genome_bam.bam,genetic-pooling
 		sample_4,gs://exp/data_4/raw_gene_bc_matrices_h5.h5,gs://exp/data_4/possorted_genome_bam.bam,genetic-pooling,gs://exp/variants/ref_genotypes.vcf.gz
 
@@ -139,28 +139,16 @@ global inputs
 	  	- "cumulusprod" for backup images on Docker Hub.
 	  - "quay.io/cumulus"
 	  - "quay.io/cumulus"
-	* - config_version
-	  - Version of config docker image to use. This docker is used for parsing the input sample sheet for downstream execution. Available options: ``0.2``, ``0.1``.
-	  - "0.2"
-	  - "0.2"
-	* - backend
-	  - Cloud infrastructure backend to use. Available options:
-
-	  	- "gcp" for Google Cloud;
-	  	- "aws" for Amazon AWS;
-	  	- "local" for local machine.
-	  - "gcp"
-	  - "gcp"
 	* - ref_index_file
-	  - The link/path of an index file in TSV format for fetching preset genome references, chemistry whitelists, etc. by their names. Set an GS URI if backend is ``gcp``; an S3 URI for ``aws`` backend; an absolute file path for ``local`` backend.
+	  - The link/path of an index file in TSV format for fetching preset genome references, chemistry whitelists, etc. by their names. Set an GS URI if running on GCP; an S3 URI for AWS; an absolute file path for HPC or local machines.
 	  - "s3://xxxx/index.tsv"
-	  - "gs://regev-lab/resources/cellranger/index.tsv"
+	  - "gs://cumulus-ref/resources/cellranger/index.tsv"
 	* - preemptible
-	  - Number of maximum preemptible tries allowed. This works only when *backend* is ``gcp``.
+	  - Number of maximum preemptible tries allowed. Only works for GCP
 	  - 2
 	  - 2
 	* - awsQueueArn
-	  - The AWS ARN string of the job queue to be used. This only works for ``aws`` backend.
+	  - The AWS ARN string of the job queue to be used. Only works for AWS
 	  - "arn:aws:batch:us-east-1:xxx:job-queue/priority-gwf"
 	  - ""
 
@@ -201,9 +189,9 @@ demuxEM inputs
 	  - "XIST"
 	  -
 	* - demuxEM_version
-	  - demuxEM version to use. Choose from "0.1.7", "0.1.6" and "0.1.5".
-	  - "0.1.7"
-	  - "0.1.7"
+	  - demuxEM version to use. Choose from "0.1.8", "0.1.7", "0.1.6" and "0.1.5".
+	  - "0.1.8"
+	  - "0.1.8"
 	* - demuxEM_num_cpu
 	  - demuxEM parameter. Number of CPUs to request for demuxEM per pair.
 	  - 8
@@ -274,6 +262,10 @@ souporcell inputs
 	  - souporcell parameter. Skip remap step. Only recommended in non denovo mode or common variants are provided.
 	  - true
 	  - false
+	* - souporcell_umi_tag
+	  - souporcell parameter. If the UMI tag in your data is not ``UB``, then set your UMI tag here to overwrite the default.
+	  - "UM"
+	  - "UB"
 	* - souporcell_rename_donors
 	  - souporcell parameter. A comma-separated list of donor names for matching clusters achieved by souporcell. Must be consistent with *souporcell_num_clusters* input.
 

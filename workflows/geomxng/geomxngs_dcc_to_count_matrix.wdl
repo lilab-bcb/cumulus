@@ -40,9 +40,9 @@ workflow geomxngs_dcc_to_count_matrix {
     }
 
     output {
-        String count_matrix_h5ad = geomxngs_dcc_to_count_matrix_task.count_matrix_h5ad
-        String count_matrix_text = geomxngs_dcc_to_count_matrix_task.count_matrix_text
-        String count_matrix_metadata = geomxngs_dcc_to_count_matrix_task.count_matrix_metadata
+        File count_matrix_h5ad = geomxngs_dcc_to_count_matrix_task.count_matrix_h5ad
+        File count_matrix_text = geomxngs_dcc_to_count_matrix_task.count_matrix_text
+        File count_matrix_metadata = geomxngs_dcc_to_count_matrix_task.count_matrix_metadata
     }
 
     call geomxngs_dcc_to_count_matrix_task {
@@ -105,9 +105,9 @@ task geomxngs_dcc_to_count_matrix_task {
 
     output {
         File monitoring_log = "monitoring.log"
-        String count_matrix_h5ad = output_directory_trailing_slash + "counts.h5ad"
-        String count_matrix_text = output_directory_trailing_slash + "counts.txt"
-        String count_matrix_metadata = output_directory_trailing_slash + "metadata.txt"
+        File count_matrix_h5ad = output_directory_trailing_slash + "counts.h5ad"
+        File count_matrix_text = output_directory_trailing_slash + "counts.txt"
+        File count_matrix_metadata = output_directory_trailing_slash + "metadata.txt"
     }
 
     runtime {

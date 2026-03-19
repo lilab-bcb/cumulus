@@ -10,6 +10,7 @@ RUN apt-get update && \
         build-essential \
         bzip2 \
         wget \
+        rsync \
         git \
         default-jre \
         curl \
@@ -26,7 +27,10 @@ RUN apt-get update && \
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] http://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | apt-key --keyring /usr/share/keyrings/cloud.google.gpg add - && \
-    apt-get update -y && apt-get install -y google-cloud-cli=452.0.1-0
+    apt-get update -y && apt-get install -y google-cloud-cli=483.0.0-0
+
+ENV CLOUDSDK_PYTHON=/usr/lib/google-cloud-sdk/platform/bundledpythonunix/bin/python
+ENV CLOUDSDK_GSUTIL_PYTHON=/usr/lib/google-cloud-sdk/platform/bundledpythonunix/bin/python
 
 RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.13.30.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
@@ -69,7 +73,9 @@ RUN cd /opt && \
 
 ENV PATH=/opt/souporcell:/opt/souporcell/troublet/target/release:$PATH
 
-RUN python -m pip install pysam==0.22.0 && \
+RUN python -m pip install numpy==1.26.4 && \
+    python -m pip install pandas==2.2.2 && \
+    python -m pip install pysam==0.22.0 && \
     python -m pip install git+https://github.com/stan-dev/pystan2.git@master && \
     python -m pip install pyfaidx==0.7.2.2 && \
     python -m pip install "setuptools<58" --upgrade && \
@@ -79,7 +85,7 @@ RUN python -m pip install pysam==0.22.0 && \
     python -m pip install zarr==2.16.1 && \
     python -m pip install networkx==3.2.1 && \
     python -m pip install pegasusio==0.8.1 && \
-    python -m pip install stratocumulus==0.2.1
+    python -m pip install stratocumulus==0.2.4
 
 RUN cd /opt && \
     wget -O htslib.tar.bz2 https://github.com/samtools/htslib/releases/download/1.9/htslib-1.9.tar.bz2 && \
@@ -128,9 +134,10 @@ RUN apt-get -qq -y autoremove && \
 
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/demultiplexing/souporcell/extract_barcodes_from_rna.py /opt
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/demultiplexing/souporcell/match_donors.py /opt
+RUN chmod a+rx /opt/*.py
 
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /opt
 RUN chmod a+rx /opt/monitor_script.sh
 
-ENV PATH=/opt/freebayes/build:/opt/vartrix:/opt:$PATH
+ENV PATH=/opt/freebayes/build:/opt/vartrix:/opt:/usr/local/aws-cli/v2/current/bin:$PATH
 ENV TMPDIR=/tmp

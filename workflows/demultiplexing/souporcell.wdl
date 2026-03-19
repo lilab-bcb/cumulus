@@ -22,6 +22,8 @@ workflow souporcell {
         File? common_variants
         # Skip remap step. Only recommended in non denovo mode or common variants are provided
         Boolean skip_remap
+        # Set if your umi tag is not UB
+        String umi_tag
         # A comma-separated list of donor names for renaming clusters achieved by souporcell
         String donor_rename
         # Only demultiplex cells/nuclei with at least <min_num_genes> expressed genes
@@ -60,6 +62,7 @@ workflow souporcell {
             ref_genotypes = ref_genotypes,
             common_variants = common_variants,
             skip_remap = skip_remap,
+            umi_tag = umi_tag,
             de_novo_mode = de_novo_mode,
             min_num_genes = min_num_genes,
             num_clusters = num_clusters,
@@ -111,6 +114,7 @@ task run_souporcell {
         File? ref_genotypes
         File? common_variants
         Boolean skip_remap
+        String umi_tag
         Boolean de_novo_mode
         Int min_num_genes
         Int num_clusters
@@ -171,6 +175,9 @@ task run_souporcell {
             else:
                 check_call(['samtools', 'index', '-@', '~{num_cpu}', '~{input_bam}'])
                 souporcell_call_args.extend(['--skip_remap', 'True'])
+
+        if '~{umi_tag}' not in ["UB", ""]:
+            souporcell_call_args.extend(["--umi_tag", "~{umi_tag}"])
 
         print(' '.join(souporcell_call_args))
         check_call(souporcell_call_args)
