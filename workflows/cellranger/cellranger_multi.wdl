@@ -132,13 +132,13 @@ task run_cellranger_multi {
         String backend
     }
 
-    command {
+    command <<<
         set -e
         export TMPDIR=/tmp
         export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
 
-        if [ "~{no_bam}" = "false" ] && [ "~{is_flex}" = "true" ]; then
+        if [ "$(basename "~{genome_file}")" != "null" ]; then
             mkdir -p genome_dir
             tar xf ~{genome_file} -C genome_dir --strip-components 1
         fi
@@ -218,7 +218,7 @@ task run_cellranger_multi {
             #############################
             fout.write('[gene-expression]\n')
 
-            if ('~{no_bam}' == 'false' and '~{is_flex}' == 'true') or (version.parse(cr_version) < version.parse('8.0.0')):
+            if ('~{is_flex}' == 'false') or ('~{no_bam}' == 'false' and '~{is_flex}' == 'true') or (version.parse(cr_version) < version.parse('8.0.0')):
                 fout.write('reference,' + os.path.abspath('genome_dir') + '\n')
 
             if is_null_file('~{probe_set_file}'):  # GEX case
@@ -351,7 +351,7 @@ task run_cellranger_multi {
         CODE
 
         strato sync --ionice results/outs "~{output_directory}/~{link_id}"
-    }
+    >>>
 
     output {
         String output_multi_directory = "~{output_directory}/~{link_id}"
