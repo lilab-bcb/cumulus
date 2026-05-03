@@ -74,8 +74,8 @@ workflow cellranger_workflow {
         String cumulus_feature_barcoding_version = "2.0.0"
         # 2.2.0, 2.1.0, 2.0.0
         String cellranger_atac_version = "2.2.0"
-        # 2.1.0, 2.0.2.strato, 2.0.2.custom-max-cell, 2.0.2, 2.0.1, 2.0.0
-        String cellranger_arc_version = "2.1.0"
+        # 2.2.0, 2.1.0, 2.0.2.strato, 2.0.2.custom-max-cell, 2.0.2, 2.0.1, 2.0.0
+        String cellranger_arc_version = "2.2.0"
 
         # Which docker registry to use: quay.io/cumulus (default) or cumulusprod
         String docker_registry = "quay.io/cumulus"
