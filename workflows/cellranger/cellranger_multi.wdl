@@ -143,6 +143,11 @@ task run_cellranger_multi {
             tar xf ~{genome_file} -C genome_dir --strip-components 1
         fi
 
+        if [ "$(basename "~{vdj_ref_file}")" != "null" ]; then
+            mkdir -p vdj_ref_dir
+            tar xf ~{vdj_ref_file} -C vdj_ref_dir --strip-components 1
+        fi
+
         python <<CODE
         import re
         import os
@@ -251,7 +256,7 @@ task run_cellranger_multi {
             # [vdj] section #
             #################
             if not is_null_file('~{vdj_ref_file}'):
-                fout.write('\n[vdj]\nreference,~{vdj_ref_file}\n')
+                fout.write('\n[vdj]\nreference,' + os.path.abspath('vdj_ref_dir') + '\n')
                 if not is_null_file(vdj_file):
                     fout.write('inner-enrichment-primers,' + vdj_file + '\n')
 
