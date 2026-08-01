@@ -80,7 +80,7 @@ This section covers preparing the sample sheet for Flex_ (previously named *Fixe
   Flex uses probes that target protein-coding genes in the human or mouse transcriptome. It's automatically determined by the genome reference and Flex chemistry version specified by users for the scRNA-Seq sample by following the table below:
 
     .. list-table::
-        :widths: 5 5 5 5
+        :widths: 5 5 5 5 5
         :header-rows: 1
 
         * - Genome Reference
