@@ -84,8 +84,8 @@ This section covers preparing the sample sheet for Flex_ (previously named *Fixe
         :header-rows: 1
 
         * - Genome Reference
-          - Flex chemistry version
           - Species
+          - Flex chemistry version
           - Probe Set
           - Cell Ranger version
         * - GRCh38-2024-A
