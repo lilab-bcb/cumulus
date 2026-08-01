@@ -85,32 +85,44 @@ This section covers preparing the sample sheet for Flex_ (previously named *Fixe
 
         * - Genome Reference
           - Flex chemistry version
+          - Species
           - Probe Set
           - Cell Ranger version
         * - GRCh38-2024-A
+          - Human
           - v2
           - `Flex_human_probe_v2.0`_
           - v10.0+
         * - GRCh38-2024-A
+          - Human
           - v1
           - `Flex_human_probe_v1.1`_
           - v9.0+
         * - GRCh38-2020-A
+          - Human
           - v1
           - `Flex_human_probe_v1.0.1`_
           - v7.1+
         * - GRCm39-2024-A
+          - Mouse
           - v2
           - `Flex_mouse_probe_v2.0`_
           - v10.0+
         * - GRCm39-2024-A
+          - Mouse
           - v1
           - `Flex_mouse_probe_v1.1`_
           - v9.0+
         * - mm10-2020-A
+          - Mouse
           - v1
           - `Flex_mouse_probe_v1.0.1`_
           - v7.1+
+        * - mRatBN7.2-2024-A
+          - Rat
+          - v2
+          - `Flex_rat_probe_v2.0`_
+          - v10.1+
 
   See `Flex probe sets overview`_ for details on these probe sets.
 
@@ -434,9 +446,9 @@ All the sample multiplexing assays share the same workflow input settings. ``cel
       - false
       - false
     * - cellranger_version
-      - Cell Ranger version to use. Available versions: 10.0.0, 9.0.1, 8.0.1, 7.2.0.
-      - "10.0.0"
-      - "10.0.0"
+      - Cell Ranger version to use. Available versions: 10.1.0, 10.0.0, 9.0.1, 8.0.1, 7.2.0.
+      - "10.1.0"
+      - "10.1.0"
     * - docker_registry
       - Docker registry to use for cellranger_workflow. Options:
 
@@ -516,3 +528,4 @@ All the sample multiplexing assays share the same workflow output structure. See
 .. _Flex_mouse_probe_v2.0: https://www.10xgenomics.com/support/flex-gene-expression/documentation/steps/probe-sets/chromium-frp-mouse-transcriptome-probe-set-2-0
 .. _Flex_mouse_probe_v1.1: https://www.10xgenomics.com/support/flex-gene-expression/documentation/steps/probe-sets/chromium-frp-mouse-transcriptome-probe-set-1-1
 .. _Flex_mouse_probe_v1.0.1: https://www.10xgenomics.com/support/flex-gene-expression/documentation/steps/probe-sets/chromium-frp-mouse-transcriptome-probe-set
+.. _Flex_rat_probe_v2.0: https://www.10xgenomics.com/support/flex-gene-expression/documentation/steps/probe-sets/chromium-flex-rat-transcriptome-probe-set-2-0
