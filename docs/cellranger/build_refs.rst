@@ -99,9 +99,9 @@ We provide a wrapper of ``cellranger mkref`` to build sc/snRNA-seq references. P
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be: 10.0.0, 9.0.1, 8.0.1, 7.2.0
-		  - "10.0.0"
-		  - "10.0.0"
+		  - cellranger version, could be: 10.1.0, 10.0.0, 9.0.1, 8.0.1, 7.2.0
+		  - "10.1.0"
+		  - "10.1.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
@@ -314,9 +314,9 @@ We provide a wrapper of ``cellranger mkvdjref`` to build single-cell immune prof
 		  - Ensembl v94
 		  -
 		* - cellranger_version
-		  - cellranger version, could be: 10.0.0, 9.0.1, 8.0.1, 7.2.0
-		  - "10.0.0"
-		  - "10.0.0"
+		  - cellranger version, could be: 10.1.0, 10.0.0, 9.0.1, 8.0.1, 7.2.0
+		  - "10.1.0"
+		  - "10.1.0"
 		* - docker_registry
 		  - Docker registry to use for cellranger_workflow. Options:
 
