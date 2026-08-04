@@ -1,3 +1,14 @@
+4.1.0 :small:`Aug 4, 2026`
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+* Cellranger workflow:
+    * Upgrade *cumulus_feature_barcoding* default to ``2.1.0`` to improve memory efficiency.
+    * Upgrade *cellranger_version* default to ``10.1.0``.
+    * Upgrade *cellranger_arc_version* default to ``2.2.0``.
+    * Fix a bug when processing Flex+VDJ modality. (PR `469 <https://github.com/lilab-bcb/cumulus/pull/469>`_)
+* Spaceranger workflow:
+    * Upgrade *spaceranger_version* default to ``4.1.0``, which supports Visium HD 11mm slides.
+
 4.0.4 :small:`Apr 14, 2026`
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
@@ -48,4 +59,5 @@
     * Upgrade *spaceranger_version* default to ``4.0.1``, with associated important feature changes:
 
         * Support Visium HD 3'. To enable it, in the sample sheet, leave the *ProbeSet* column blank for such samples, or skip this column if all samples are Visium HD 3'.
+        * Involve a new nucleus and cell segmentation algorithm for Visium HD data to infer cells instead of using bins. Check the corresponding section for how to enable this feature.
         * Add Visium probesets v2.1 which are bundled with 2024-A transcriptome references: ``human_probe_v2.1`` and ``mouse_probe_v2.1``.

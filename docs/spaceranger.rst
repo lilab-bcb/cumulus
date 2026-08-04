@@ -82,7 +82,8 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		  - | Probeset for FFPE samples. This can be a 10x official probeset selected from the table in this section below, or a URI to a custom probeset.
 		    | **Notice:** For non-FFPE samples, such as Visium Fresh Frozen, Visium HD 3', etc., set *ProbeSet* to ``""``.
 		* - Image
-		  - Cloud bucket url for a brightfield tissue H&E image in .jpg or .tiff format. This column is mutually exclusive with DarkImage and ColorizedImage columns.
+		  - | Cloud bucket url for a brightfield tissue H&E image in ``.jpg``, ``.tiff``, or ``.btf`` format. This column is mutually exclusive with DarkImage and ColorizedImage columns.
+		    | **Notice:** This field is *required* if you want to enable the cell segmentation feature for your Visium HD data.
 		* - DarkImage
 		  - Cloud bucket urls for Multi-channel, dark-background fluorescence image as either a single, multi-layer .tiff file, multiple .tiff or .jpg files, or a pre-combined color .tiff or .jpg file. If multiple files are provided, please separate them by ';'. This column is mutually exclusive with Image and ColorizedImage columns.
 		* - ColorizedImage
@@ -97,6 +98,11 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		  - Slide layout file indicating capture spot and fiducial spot positions. Only required if internet access is not available.
 		* - LoupeAlignment
 		  - Alignment file produced by the manual Loupe alignment step.
+
+	.. note::
+		Starting from Space Ranger v4.0, users can enable the cell segmentation feature for Visium HD data processing in addition to bins.
+
+		To do that, users need to provide a high-resolution brightfield image in **Image** column. Users can still use a CytAssist image in **CytaImage** column alongside.
 
 	Pre-built scRNA-seq references are summarized below:
 
@@ -160,6 +166,8 @@ Alternatively, users can submit jobs through command line interface (CLI) using 
 		sample_2,GRCh38-2020-A,,gs://fc-e0000000-0000-0000-0000-000000000000/VK18WBC6Z4/Fastq,gs://image/image2.tif,V19J25-123,B1
 		sample_1,GRCh38-2024-A,human_probe_v2.1,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/Fastq,gs://image/image1.tif,V19J25-123,A1
 		sample_2,GRCh38-2020-A,,gs://fc-e0000000-0000-0000-0000-000000000000/VK10WBC9Z2/Fastq,gs://image/image2.tif,V19J25-123,B1
+
+
 
 	**3.2 Upload your sample sheet to the workspace bucket:**
 

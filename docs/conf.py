@@ -26,7 +26,7 @@ author = 'Yiming Yang, Joshua Gould and Bo Li'
 # The short X.Y version
 version = '4.0'
 # The full version, including alpha/beta/rc tags
-release = '4.0.4'
+release = '4.1.0'
 
 
 # -- General configuration ---------------------------------------------------
