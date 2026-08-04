@@ -82,9 +82,9 @@ For scIR-seq data, ``cellranger_workflow`` takes sequencing reads as input (FAST
 	  - false
 	  - false
 	* - cellranger_version
-	  - cellranger version, could be: 10.0.0, 9.0.1, 8.0.1, 7.2.0
-	  - "10.0.0"
-	  - "10.0.0"
+	  - cellranger version, could be: 10.1.0, 10.0.0, 9.0.1, 8.0.1, 7.2.0
+	  - "10.1.0"
+	  - "10.1.0"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 

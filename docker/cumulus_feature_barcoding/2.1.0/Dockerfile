@@ -1,7 +1,7 @@
 FROM debian:trixie-slim
 SHELL ["/bin/bash", "-c"]
 
-ADD https://github.com/lilab-bcb/cumulus_feature_barcoding/archive/refs/tags/2.1.0rc1.tar.gz /software/
+ADD https://github.com/lilab-bcb/cumulus_feature_barcoding/archive/refs/tags/2.1.0.tar.gz /software/
 ADD https://raw.githubusercontent.com/lilab-bcb/cumulus/master/docker/monitor_script.sh /software/
 
 RUN apt-get -qq update && \
@@ -21,12 +21,12 @@ RUN apt-get -qq update && \
 
 RUN echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" | tee -a /etc/apt/sources.list.d/google-cloud-sdk.list && \
     curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | gpg --dearmor | tee /usr/share/keyrings/cloud.google.gpg > /dev/null && \
-    apt-get update -y && apt-get install -y google-cloud-cli=565.0.0-0
+    apt-get update -y && apt-get install -y google-cloud-cli=579.0.0-0
 
 ENV CLOUDSDK_PYTHON=/usr/lib/google-cloud-sdk/platform/bundledpythonunix/bin/python
 ENV CLOUDSDK_GSUTIL_PYTHON=/usr/lib/google-cloud-sdk/platform/bundledpythonunix/bin/python
 
-RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.34.31.zip" -o "awscliv2.zip" && \
+RUN curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64-2.36.16.zip" -o "awscliv2.zip" && \
     unzip awscliv2.zip && \
     ./aws/install && \
     rm awscliv2.zip
@@ -37,9 +37,9 @@ ENV PATH=/software/python/bin:$PATH
 RUN python -m pip install --upgrade pip --no-cache-dir && \
     python -m pip install stratocumulus==0.3.0 --no-cache-dir
 
-RUN tar -xzf /software/2.1.0rc1.tar.gz -C /software && \
-    cd /software/cumulus_feature_barcoding-2.1.0rc1 && make clean && make all && cd ../.. && \
-    rm -f /software/2.1.0rc1.tar.gz
+RUN tar -xzf /software/2.1.0.tar.gz -C /software && \
+    cd /software/cumulus_feature_barcoding-2.1.0 && make clean && make all && cd ../.. && \
+    rm -f /software/2.1.0.tar.gz
 
 ADD barcode_list /software/barcode_list
 
@@ -50,4 +50,4 @@ RUN apt-get -qq -y remove gnupg && \
 
 RUN chmod a+rx /software/*
 
-ENV PATH=/software:/software/cumulus_feature_barcoding-2.1.0rc1:/usr/local/aws-cli/v2/current/bin:$PATH
+ENV PATH=/software:/software/cumulus_feature_barcoding-2.1.0:/usr/local/aws-cli/v2/current/bin:$PATH
