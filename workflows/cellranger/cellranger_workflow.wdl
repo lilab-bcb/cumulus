@@ -667,7 +667,19 @@ task generate_count_config {
                             no_aux = False
                             continue
 
+                    # VDJ + GEX case — route to cellranger multi
+                    vdj_types = set(['vdj', 'vdj_t', 'vdj_b', 'vdj_t_gd'])
+                    if 'rna' in multiomics[link_id] and multiomics[link_id] & vdj_types:
+                        if not multiomics[link_id].issubset(set(['rna', 'vdj', 'vdj_t', 'vdj_b', 'vdj_t_gd', 'citeseq', 'hashing', 'adt', 'crispr'])):
+                            print("Unsupported data type combination for GEX+VDJ multi run!", file=sys.stderr)
+                            sys.exit(1)
+                        fol_multi.write(link_id + '\n')
+                        fom_s2aux.write(link_id + '\t' + ','.join(link2aux[link_id]) + '\n')
+                        no_aux = False
+                        continue
+
                     # FBC case
+                    if not multiomics[link_id].issubset(set(['rna', 'crispr', 'citeseq'])):# FBC case
                     if not multiomics[link_id].issubset(set(['rna', 'crispr', 'citeseq'])):
                         print("CellRanger count only works with RNA/CRISPR/CITESEQ data! Link '" + link_id + "' contains " + ', '.join(list(multiomics[link_id])) + '.', file = sys.stderr)
                         sys.exit(1)

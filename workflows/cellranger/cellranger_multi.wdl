@@ -175,6 +175,7 @@ task run_cellranger_multi {
         has_hto = False
         has_cmo = False
         has_flex = False
+        has_vdj = False
         for dtype, aux in zip(data_types, auxs):
             if dtype == 'rna':  # OCM, HTO, and CMO cases
                 rna_file.add(aux)
@@ -184,8 +185,9 @@ task run_cellranger_multi {
             elif dtype == 'frp':
                 flex_file.add(aux)
                 has_flex = True
-            elif dtype in ['vdj', 'vdj_t_gd']:
+            elif dtype in ['vdj', 'vdj_t', 'vdj_b', 'vdj_t_gd']:
                 vdj_file.add(aux)
+                has_vdj = True
             else:  # hashing, citeseq, adt
                 feature_file.add(aux)
                 if dtype in ['hashing', 'adt']:
@@ -346,7 +348,7 @@ task run_cellranger_multi {
                     with open(flex_file, 'r') as fin:
                         write_csv_wise(['sample_id', 'probe_barcode_ids', 'description'], fin, fout)
 
-            if (not has_ocm) and (not has_hto) and (not has_cmo) and (not has_flex):
+            if (not has_ocm) and (not has_hto) and (not has_cmo) and (not has_flex) and (not has_vdj):
                 raise Exception("Cannot locate OCM, HTO, CMO, or Flex sample file!")
 
         mem_size = re.findall(r"\d+", "~{memory}")[0]
