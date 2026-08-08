@@ -647,7 +647,7 @@ task generate_count_config {
                     if 'rna' not in multiomics[link_id]:
                         print("CellRanger multi expect RNA modality!", file = sys.stderr)
                         sys.exit(1)
-                    if not multiomics[link_id].issubset(set(['rna', 'cmo', 'crispr', 'citeseq'])):
+                    if not multiomics[link_id].issubset(set(['rna', 'cmo', 'crispr', 'citeseq', 'hashing', 'adt'])):
                         print("CellRanger multi only works with RNA/CMO/CRISPR/CITESEQ data! Link '" + link_id + "' contains " + ', '.join(list(multiomics[link_id])) + '.', file = sys.stderr)
                         sys.exit(1)
                     fol_multi.write(link_id + '\n')
@@ -668,7 +668,7 @@ task generate_count_config {
                             continue
 
                     # FBC case
-                    if not multiomics[link_id].issubset(set(['rna', 'crispr', 'citeseq'])):
+                    if not multiomics[link_id].issubset(set(['rna', 'crispr', 'citeseq', 'hashing', 'adt'])):
                         print("CellRanger count only works with RNA/CRISPR/CITESEQ data! Link '" + link_id + "' contains " + ', '.join(list(multiomics[link_id])) + '.', file = sys.stderr)
                         sys.exit(1)
                     fol_link_fbc.write(link_id + '\n')
