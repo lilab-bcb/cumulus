@@ -143,7 +143,7 @@ task run_cellranger_vdj {
         elif '~{data_type}' == 'vdj_t_gd':
             chain = 'TR'
             assert not is_null_file('~{inner_enrichment_primers}'), "Sample '~{sample_id}' of vdj_t_gd DataType doesn't have associated inner_enrichment_primers!"
-        else:
+        elif '~{data_type}' == 'vdj_b':
             chain = 'IG'
         call_args.append('--chain=' + chain)
         if '~{denovo}' != 'false':

@@ -13,6 +13,10 @@ Sample sheet
 
 		* - Keyword
 		  - Description
+		* - **GRCh38-2024-A_arc**
+		  - Human GRCh38 (GENCODE v44/Ensembl 110) for cellranger arc/atac
+		* - **GRCm39-2024-A_arc**
+		  - Mouse GRCm39 (GENCODE vM33/Ensembl 110) for cellranger arc/atac
 		* - **GRCh38-2020-A_arc_v2.0.0**
 		  - Human GRCh38, cellranger-arc/atac reference 2.0.0
 		* - **mm10-2020-A_arc_v2.0.0**
@@ -58,10 +62,16 @@ Workflow input
 	  - Output directory
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/cellranger_atac_output"
 	  -
+	* - secondary
+	  - | Perform secondary analysis of the gene-barcode matrix (dimensionality reduction, clustering and visualization).
+	  	| **Note:** This parameter works only for *cellranger_atac_version* ``2.2.0`` or later.
+	  - false
+	  - false
 	* - force_cells
-	  - Force pipeline to use this number of cells, bypassing the cell detection algorithm
+	  - | Force pipeline to use this number of cells, bypassing the cell detection algorithm
+	  	| **Note:** Users can specify any positive integer since *cellranger_atac_version* ``2.2.0``. For older versions, it has to be less than 20,000.
 	  - 6000
-	  -
+	  - Estimation from data
 	* - atac_dim_reduce
 	  - Choose the algorithm for dimensionality reduction prior to clustering and tsne: "lsa", "plsa", or "pca"
 	  - "lsa"
@@ -71,9 +81,9 @@ Workflow input
 	  - "gs://fc-e0000000-0000-0000-0000-000000000000/common_peaks.bed"
 	  -
 	* - cellranger_atac_version
-	  - cellranger-atac version. Available options: 2.1.0, 2.0.0
-	  - "2.1.0"
-	  - "2.1.0"
+	  - cellranger-atac version. Available options: 2.2.0, 2.1.0, 2.0.0
+	  - "2.2.0"
+	  - "2.2.0"
 	* - docker_registry
 	  - Docker registry to use for cellranger_workflow. Options:
 

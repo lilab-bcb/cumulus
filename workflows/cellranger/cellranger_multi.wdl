@@ -58,10 +58,12 @@ workflow cellranger_multi {
         String backend = "gcp"
     }
 
+    Boolean is_flex = sub(input_data_types, ".*frp.*", "Flex") == "Flex" || sub(input_data_types, ".*flex.*", "Flex") == "Flex"
+
     Map[String, String] acronym2uri = read_map(acronym_file)
     # If reference is a URI
     Boolean is_genome_uri = sub(genome, "^.+\\.(tgz|gz)$", "URI") == "URI"
-    File genome_file = (if is_genome_uri then genome else acronym2uri[genome])
+    File genome_file = (if no_bam && is_flex then acronym2uri["null_file"] else (if is_genome_uri then genome else acronym2uri[genome]))
 
     # If vdj reference is a URI
     Boolean is_vdj_ref_uri = sub(vdj_ref, "^.+\\.(tgz|gz)$", "URI") == "URI"
@@ -70,6 +72,7 @@ workflow cellranger_multi {
     call run_cellranger_multi {
         input:
             link_id = link_id,
+            is_flex = is_flex,
             input_samples = input_samples,
             input_fastqs_directories = input_fastqs_directories,
             input_data_types = input_data_types,
@@ -103,6 +106,7 @@ workflow cellranger_multi {
 task run_cellranger_multi {
     input {
         String link_id
+        Boolean is_flex
         String input_samples
         String input_fastqs_directories
         String input_data_types
@@ -128,20 +132,35 @@ task run_cellranger_multi {
         String backend
     }
 
-    command {
+    command <<<
         set -e
         export TMPDIR=/tmp
         export BACKEND=~{backend}
         monitor_script.sh > monitoring.log &
-        mkdir -p genome_dir
-        tar xf ~{genome_file} -C genome_dir --strip-components 1
+
+        if [ "$(basename "~{genome_file}")" != "null" ]; then
+            mkdir -p genome_dir
+            tar xf ~{genome_file} -C genome_dir --strip-components 1
+        fi
+
+        if [ "$(basename "~{vdj_ref_file}")" != "null" ]; then
+            mkdir -p vdj_ref_dir
+            tar xf ~{vdj_ref_file} -C vdj_ref_dir --strip-components 1
+        fi
 
         python <<CODE
         import re
         import os
         import sys
-        from subprocess import check_call, CalledProcessError, STDOUT, DEVNULL
+        from subprocess import check_call, check_output, CalledProcessError, STDOUT, DEVNULL
         from packaging import version
+
+        raw_version_str = check_output(['cellranger', '--version'], text=True).strip()
+        match = re.search(r"(\d+\.\d+\.\d+)", raw_version_str)
+        if match:
+            cr_version = match.group(1)
+        else:
+            raise Exception("Invalid cellranger version: " + raw_version_str)
 
         samples = '~{input_samples}'.split(',')
         data_types = '~{input_data_types}'.split(',')
@@ -203,7 +222,9 @@ task run_cellranger_multi {
             # [gene-expression] section #
             #############################
             fout.write('[gene-expression]\n')
-            fout.write('reference,' + os.path.abspath('genome_dir') + '\n')
+
+            if ('~{is_flex}' == 'false') or (('~{is_flex}' == 'true') and (('~{no_bam}' == 'false') or (version.parse(cr_version) < version.parse('8.0.0')))):
+                fout.write('reference,' + os.path.abspath('genome_dir') + '\n')
 
             if is_null_file('~{probe_set_file}'):  # GEX case
                 if '~{include_introns}' == 'false':
@@ -222,7 +243,7 @@ task run_cellranger_multi {
                 fout.write('expect-cells,~{expect_cells}\n')
             if '~{secondary}' == 'false':
                 fout.write('no-secondary,true\n')
-            if version.parse('~{cellranger_version}') >= version.parse('8.0.0'):
+            if version.parse(cr_version) >= version.parse('8.0.0'):
                 if '~{no_bam}' == 'false':
                     fout.write('create-bam,true\n')
                 else:
@@ -235,7 +256,7 @@ task run_cellranger_multi {
             # [vdj] section #
             #################
             if not is_null_file('~{vdj_ref_file}'):
-                fout.write('\n[vdj]\nreference,~{vdj_ref_file}\n')
+                fout.write('\n[vdj]\nreference,' + os.path.abspath('vdj_ref_dir') + '\n')
                 if not is_null_file(vdj_file):
                     fout.write('inner-enrichment-primers,' + vdj_file + '\n')
 
@@ -294,7 +315,7 @@ task run_cellranger_multi {
                 if not has_chemistry:
                     fout.write(samples[i] + ',' + os.path.abspath(target) + ',' +  feature_type + '\n')
                 else:
-                    fout.write(samples[i] + ',' + os.path.abspath(target) + ',' +  feature_type + chemistries[i] + '\n')
+                    fout.write(samples[i] + ',' + os.path.abspath(target) + ',' +  feature_type + ',' + chemistries[i] + '\n')
 
             #####################
             # [samples] section #
@@ -335,7 +356,7 @@ task run_cellranger_multi {
         CODE
 
         strato sync --ionice results/outs "~{output_directory}/~{link_id}"
-    }
+    >>>
 
     output {
         String output_multi_directory = "~{output_directory}/~{link_id}"

@@ -3,6 +3,11 @@ Release notes
 
 .. role:: small
 
+Version 4
+~~~~~~~~~~~~~~
+
+.. include:: release_notes/version_4.rst
+
 Version 3
 ~~~~~~~~~~~~~~
 

@@ -23,8 +23,8 @@ workflow cellranger_atac_aggr {
         # A BED file to override peak caller
         File? peaks
 
-        # 2.1.0, 2.0.0
-        String cellranger_atac_version = "2.1.0"
+        # 2.2.0, 2.1.0, 2.0.0
+        String cellranger_atac_version = "2.2.0"
         # Which docker registry to use: cumulusprod (default) or quay.io/cumulus
         String docker_registry = "quay.io/cumulus"
 

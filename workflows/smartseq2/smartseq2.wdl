@@ -45,7 +45,7 @@ workflow smartseq2 {
     Array[Array[String]] data_table = read_tsv(input_tsv_file)
 
 
-    File acronym_file = "gs://regev-lab/resources/smartseq2/index.tsv"
+    File acronym_file = "gs://cumulus-ref/resources/smartseq2/index.tsv"
     # File acronym_file = "smartseq2_index.tsv"
     Map[String, String] acronym2gsurl = read_map(acronym_file)
     # If reference is a url
